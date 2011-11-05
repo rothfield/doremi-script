@@ -1,0 +1,3 @@
+This directory contains executable scripts to be executed from the command line. They are javascript
+scripts that require node (they have  #!/usr/bin/env node as the first line)
+
