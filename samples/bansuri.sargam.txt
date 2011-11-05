@@ -1,0 +1,25 @@
+Rag:Bhairavi
+Tal:Tintal
+Title:Bansuri
+Source:AAK
+Mode: phrygian
+filename: bansuri.sargam
+time: 4/4
+key: d
+
+
+          
+                            i            IV
+         3                  +            2          .
+1)|: (Sr | n) S   (gm Pd) | P - P  P   | P - D  <(nDSn)>) |
+           .
+      ban-    su-  ri       ba- ja ra-   hi  dhu- na
+
+  0  ~                3            ~       +  .     *  *   
+| P  d   P    d    |  (Pm   PmnP) (g m) | (PdnS) -- g  S |
+  ma-dhu-ra   kan-     nai-        ya      khe-     la-ta
+
+   2               0     
+                   ~
+| (d-Pm  g) P  m | r - S :|
+   ga-      wa-ta  ho- ri

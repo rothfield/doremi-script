@@ -1,0 +1,28 @@
+<DOCTYPE html>
+
+
+
+<html lang="en" dir="ltr">
+        <head>
+</head>
+<body>
+<input type="file" id="files" name="files[]" />
+<output id="list"></output>
+<script>
+  function handleFileSelect(evt) {
+    var file = document.getElementById('files').files[0];
+    var reader=new FileReader();
+    reader.onload = loaded;
+    reader.readAsText(file, "");
+   }
+
+   function loaded(evt) {  
+             // Obtain the read file data    
+               var fileString = evt.target.result;
+               console.log("fileString is",fileString);
+       }
+   document.getElementById('files').addEventListener('change', 
+         handleFileSelect, false);
+</script>
+</body>
+</html>

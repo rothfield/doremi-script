@@ -1,0 +1,21 @@
+# run as root
+#
+# install node.js
+wget http://nodejs.org/dist/node-v0.4.11.tar.gz
+./configure --prefix=/usr/local
+make ; make install
+# install npm
+curl http://npmjs.org/install.sh | sh
+# install coffeescript
+npm install coffee
+npm install nodeunit
+# install rvm
+apt-get install build-essentials
+apt-get install gcc
+# install rvm
+bash < <(curl -sk https://rvm.beginrescueend.com/install/rvm)
+rvm default 1.9.2
+gem install sinatra
+
+
+

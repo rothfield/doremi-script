@@ -1,0 +1,11 @@
+compositions
+*.swp
+last.*
+test.ly
+test.midi
+test.png
+test.pdf
+test.ps
+test.txt
+npm-debug.log
+nohup.out

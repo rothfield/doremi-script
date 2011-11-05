@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+var path = require('path');
+var fs = require('fs');
+var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
+var x=require(lib+'/sargam/sargam_parser.js')
+console.log("x",x)
+parser=SargamParser
+x=parser.parse(fs.readFileSync('/dev/stdin').toString())
+process.stdout.write(sys.inspect(x,false,null))
