@@ -1,5 +1,3 @@
-$ = jQuery
-
 root = exports ? this
 
 $(document).ready ->
