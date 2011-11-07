@@ -141,9 +141,6 @@ Mode: phrygian
   $('#entry_area').val(str_simple)
   # window.last_val=$('#entry_area').val()
   parser=SargamParser
-  # uses coffeescripts classes
-  renderer=new SargamHtmlRenderer
-  #staff_renderer=new VexflowRenderer
   window.parse_errors=""
 
   params_for_download_lilypond =
@@ -216,31 +213,12 @@ Mode: phrygian
   $('#generate_html_page').click =>
     my_url="generate_html_page"
     composition=window.the_composition
-    rendered_composition=renderer.to_html(composition)
     full_url="http://ragapedia.com"
-    tmpl= """
-<html>
-  <head>
-    <title>#{composition.title}</title>
-    <link media="all" type="text/css" href="#{full_url}/css/application.css" rel="stylesheet">
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-  </head>
-<body>
-  <div id="rendered_sargam">
-    #{rendered_composition}
-  </div>
-    <!-- all this is needed for adjust_parens method call -->
-    <script type="text/javascript" src="#{full_url}/js/third_party/jquery.js"></script>
-    <script type="text/javascript" src="#{full_url}/js/third_party/underscore.js"></script>
-    <script type="text/javascript" src="#{full_url}/js/sargam_html_renderer.js"></script>
-    <script type="text/javascript" src="#{full_url}/js/standalone_html_page_application.js"></script>
-</body>
-</html>
-    """
+    html_str=to_html_doc(composition,full_url)
     my_data =
       timestamp: new Date().getTime()
       filename: composition.filename
-      html_to_use:tmpl
+      html_to_use:html_str
     obj=
       type:'POST'
       url:my_url
@@ -282,10 +260,10 @@ Mode: phrygian
         $('#warnings_div').html "The following warnings were reported:<br/>"+composition_data.warnings.join('<br/>')
         $('#warnings_div').show()
       $('#parse_tree').hide()
-      $('#rendered_sargam').html(renderer.to_html(composition_data))
+      $('#rendered_sargam').html(to_html(composition_data))
       $('#lilypond_source').html(composition_data.lilypond)
       # TODO: combine with the above line..
-      renderer.adjust_slurs_in_dom()
+      adjust_slurs_in_dom()
       if false
         $('span[data-begin-slur-id]').each  (index) ->
           pos2=$(this).offset()

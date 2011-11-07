@@ -11,6 +11,7 @@
   },
   "main": "lib/sargam/sargam_parser",
   "bin": {
+    "sargam2htmldoc":  "./bin/sargam2htmldoc",
     "sargam2ly":  "./bin/sargam2ly",
     "sargamparse":  "./bin/sargamparse"
   },
