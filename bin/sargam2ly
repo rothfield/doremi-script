@@ -3,8 +3,7 @@ var path = require('path');
 var fs = require('fs');
 var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 require(lib+'/sargam/sargam_parser.js')
-SargamJsonToLilypond=require(lib+'/sargam/sargam_json_to_lilypond.js').SargamJsonToLilypond
-console.log(SargamJsonToLilypond)
+var to_lilypond=require(lib+'/sargam/sargam_json_to_lilypond.js').to_lilypond
 parser=SargamParser
 var composition_data=parser.parse(fs.readFileSync('/dev/stdin').toString())
-process.stdout.write(new SargamJsonToLilypond(composition_data).to_lilypond())
+process.stdout.write(to_lilypond(composition_data))
