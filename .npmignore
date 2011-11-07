@@ -4,6 +4,7 @@ Cakefile
 build_parser.sh
 deploy_local.sh
 install_prerequisites
+temp.html
 notation_examples
 npm-debug.log
 *.md

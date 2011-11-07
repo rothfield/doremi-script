@@ -147,7 +147,12 @@ to_html_doc= (composition,full_url="http://ragapedia.com") ->
     #{rendered_composition}
   </div>
     <!-- all this is needed for adjust_parens method call -->
+    <!--
     <script type="text/javascript" src="#{full_url}/js/third_party/jquery.js"></script>
+    -->
+    <script type="text/javascript" src="#{full_url}/js/third_party/zepto.min.js"></script>
+
+
     <script type="text/javascript" src="#{full_url}/js/third_party/underscore.js"></script>
     <script type="text/javascript" src="#{full_url}/js/sargam_html_renderer.js"></script>
     <script type="text/javascript" src="#{full_url}/js/standalone_html_page_application.js"></script>
