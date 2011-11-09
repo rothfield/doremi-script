@@ -1,8 +1,10 @@
-$ = jQuery
+#  $ = jQuery
 
 root = exports ? this
 
 $(document).ready ->
+  if Zepto?
+    console.log("***Using zepto.js instead of jQuery***") if console?
   # This is for the online version
   debug=false
 
@@ -142,28 +144,29 @@ Mode: phrygian
   # window.last_val=$('#entry_area').val()
   parser=SargamParser
   window.parse_errors=""
-
-  params_for_download_lilypond =
-  	filename: () ->
-      "#{window.the_composition.filename}.ly"
-    data: () ->
-      window.the_composition.lilypond
-    swf: 'js/third_party/downloadify/media/downloadify.swf'
-    downloadImage: 'images/download.png'
-    height:21
-    width:76
-    transparent:false
-    append:false
-    onComplete: () ->
-      alert("Your file was saved")
-  params_for_download_sargam= _.clone(params_for_download_lilypond)
-  params_for_download_sargam.data = () ->
-    $('#entry_area').val()
-  params_for_download_sargam.filename = () ->
-    "#{window.the_composition.filename}_sargam.txt"
-
-  $("#download_lilypond_source").downloadify(params_for_download_lilypond)
-  $("#download_sargam_source").downloadify(params_for_download_sargam)
+  if false
+    params_for_download_lilypond =
+    	filename: () ->
+        "#{window.the_composition.filename}.ly"
+      data: () ->
+        window.the_composition.lilypond
+      swf: 'js/third_party/downloadify/media/downloadify.swf'
+      downloadImage: 'images/download.png'
+      height:21
+      width:76
+      transparent:false
+      append:false
+      onComplete: () ->
+        alert("Your file was saved")
+    params_for_download_sargam= _.clone(params_for_download_lilypond)
+    params_for_download_sargam.data = () ->
+      $('#entry_area').val()
+    params_for_download_sargam.filename = () ->
+      "#{window.the_composition.filename}_sargam.txt"
+  
+    $("#download_lilypond_source").downloadify(params_for_download_lilypond)
+    $("#download_sargam_source").downloadify(params_for_download_sargam)
+ 
   $('#load_long_composition').click ->
     $('#entry_area').val(long_composition)
   $('#load_sample_composition').click ->
@@ -197,12 +200,7 @@ Mode: phrygian
           $("#download_#{typ}").attr('onclick',snip)
 
         $('#lilypond_png').attr('src',some_data.png)
-        if true
-          fooOffset = $('#lilypond_png').offset()
-          destination = fooOffset.top
-          $(document).scrollTop(destination)
-          window.location = String(window.location).replace(/\#.*$/, "") + "#staff_notation"
-                #.effect("highlight", {}, 3000)
+        window.location = String(window.location).replace(/\#.*$/, "") + "#staff_notation"
         $('#lilypond_output').html(some_data.lilypond_output)
         if some_data.error
           $('#lilypond_output').toggle()
@@ -210,11 +208,38 @@ Mode: phrygian
       dataType: "json"
     $.ajax(obj)
 
-  $('#generate_html_page').click =>
+  get_zepto = () ->
+    params=
+      type:'GET'
+      url:'js/third_party/zepto.unminified.js'
+      dataType:'text'
+      success: (data) ->
+        $('#zepto_for_html_doc').html(data)
+        generate_html_page_aux()
+    $.ajax(params)
+ 
+  generate_html_page_aux = () ->
+    css=$('#css_for_html_doc').html()
+    js=$('#zepto_for_html_doc').html()
+
+  get_css = () ->
+    params=
+      type:'GET'
+      url:'css/application.css'
+      dataType:'text'
+      success: (data) ->
+        $('#css_for_html_doc').html(data)
+        get_zepto()
+    $.ajax(params)
+ 
+ 
+  generate_html_page_aux = () ->
+    css=$('#css_for_html_doc').html()
+    js=$('#zepto_for_html_doc').html()
     my_url="generate_html_page"
     composition=window.the_composition
     full_url="http://ragapedia.com"
-    html_str=to_html_doc(composition,full_url)
+    html_str=to_html_doc(composition,full_url,css,js)
     my_data =
       timestamp: new Date().getTime()
       filename: composition.filename
@@ -229,6 +254,13 @@ Mode: phrygian
         window.open("compositions/#{some_data}")
       dataType: "text"
     $.ajax(obj)
+
+  $('#generate_html_page').click =>
+    # load these from the server if they weren't already loaded
+    if ((css=$('#css_for_html_doc').html()).length < 100)
+      get_css()
+      return 
+    generate_html_page_aux()
 
   $('#show_lilypond_output').click ->
     $('#lilypond_output').toggle()

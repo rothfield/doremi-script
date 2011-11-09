@@ -5,7 +5,12 @@
         padding-right: 20px;
 }
 
-
+h2.step {
+  width:600px;
+  font-size: 14px;
+  background-color: lavender;
+  border: 1px solid black;
+}
 
 div#rendered_sargam {
 }

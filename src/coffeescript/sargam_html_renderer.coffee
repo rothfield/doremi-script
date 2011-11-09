@@ -132,33 +132,54 @@ draw_beat= (beat) ->
   <span #{extra} class='beat'>#{x.join('')}</span>
       """
 
-to_html_doc= (composition,full_url="http://ragapedia.com") ->
-    rendered_composition=to_html(composition)
-    full_url="http://ragapedia.com"
-    tmpl= """
-<html>
-  <head>
-    <title>#{composition.title}</title>
-    <link media="all" type="text/css" href="#{full_url}/css/application.css" rel="stylesheet">
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-  </head>
-<body>
-  <div id="rendered_sargam">
-    #{rendered_composition}
-  </div>
-    <!-- all this is needed for adjust_parens method call -->
-    <!--
-    <script type="text/javascript" src="#{full_url}/js/third_party/jquery.js"></script>
-    -->
-    <script type="text/javascript" src="#{full_url}/js/third_party/zepto.min.js"></script>
-
-
-    <script type="text/javascript" src="#{full_url}/js/third_party/underscore.js"></script>
-    <script type="text/javascript" src="#{full_url}/js/sargam_html_renderer.js"></script>
-    <script type="text/javascript" src="#{full_url}/js/standalone_html_page_application.js"></script>
-</body>
-</html>
-    """
+to_html_doc= (composition,full_url="http://ragapedia.com",css="",js="") ->
+  rendered_composition=to_html(composition)
+  #full_url="http://ragapedia.com"
+  tmpl= """
+  <html>
+    <head>
+    <style type="text/css">
+      #{css}
+    </style>
+      <title>#{composition.title}</title>
+      <!--
+      <link media="all" type="text/css" href="#{full_url}/css/application.css" rel="stylesheet">
+       -->
+      <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    </head>
+  <body>
+    <div id="rendered_sargam">
+      #{rendered_composition}
+    </div>
+  <script type="text/javascript">
+  """
+  rest= '''
+  var  adjust_slurs_in_dom = function() {
+      return $('span[data-begin-slur-id]').each(function(index) {
+        var attr, pos1, pos2, slur
+        pos2 = $(this).offset()
+        attr = $(this).attr("data-begin-slur-id")
+        slur = $("#" + attr)
+        if (slur.length === 0) {
+          return
+        }
+        pos1 = $(slur).offset()
+        return $(slur).css({
+          width: pos2.left - pos1.left + $(this).width()
+        })
+      })
+    }
+  
+  // Main
+  $(document).ready(function() {
+      return adjust_slurs_in_dom()
+  })
+  
+  </script>
+  </body>
+  </html>
+  '''
+  tmpl+"\n"+js+rest
 
 to_html= (composition_data) ->
   attrs=''
