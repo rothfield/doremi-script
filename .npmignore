@@ -2,6 +2,7 @@ compositions
 .git*
 Cakefile
 build_parser.sh
+tmp/
 deploy_local.sh
 install_prerequisites
 temp.html

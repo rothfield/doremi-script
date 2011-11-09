@@ -1,6 +1,7 @@
 compositions
 *.swp
 last.*
+tmp
 temp.html
 test.ly
 test.midi
