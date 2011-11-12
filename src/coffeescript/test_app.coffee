@@ -50,4 +50,4 @@ Mode: phrygian
       # TODO: combine with the above line..
       renderer.adjust_slurs_in_dom()
     catch err
-      console.log err
+      console.log err if console? and console.log?

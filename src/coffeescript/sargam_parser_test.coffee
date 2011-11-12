@@ -3,6 +3,7 @@ root = exports ? this
 debug=false
 
 sys = require('sys')
+utils=require './tree_iterators.js'
 log = (x) ->
   return if !console
   console.log(x) if debug
@@ -15,7 +16,7 @@ log('parser is',parser)
 aux1 = (str,result) ->
   return if !sys
   log("Result of parsing <<#{str}>> is")
-  log(sys.inspect(result,false,null))
+  log(sys.inspect(result,true,null))
   
 should_not_parse = (str,test,msg) ->
   log(str)
@@ -50,8 +51,11 @@ test_parses = (str,test,msg="") ->
 
 my_inspect = (obj,obj2="") ->
   return if ! sys
-  log(sys.inspect(obj,true,null))
-  log(sys.inspect(obj2,true,null))
+  JSON.stringify(obj)
+  JSON.stringify(obj2)
+
+  #log(sys.inspect(obj,true,null))
+  #log(sys.inspect(obj2,true,null))
   
 exports.test_bad_input = (test) ->
   str = ':'
@@ -133,8 +137,7 @@ exports.test_dashes_inside_beat = (test) ->
   second_item= measure.items[1]
   my_inspect(second_item)
   test.equal(second_item.my_type,"beat","second item of #{str} should be a beat containing S--R")
-  test.equal(second_item.items.length,4,"the beat's length should be 4")
-  third_item= line.items[2]
+  test.equal(second_item.subdivisions,x=4,"subdivisions of beat #{str} should be #{x}")
   test.done()
   
 exports.test_logical_lines = (test) ->
@@ -685,6 +688,16 @@ exports.test_abc = (test) ->
   #test.ok(x.indexOf('kommal_indicator') > -1,"#{x} -line should have kommal indicator")
   test.done()
 
+exports.test_measure_pitch_durations = (test) ->
+  str = '''
+        --S- ---- --r-
+  '''
+  composition = test_parses(str,test)
+  line=first_sargam_line(composition)
+  my_pitch=utils.tree_find(line, (item) -> item.source is "S" )
+  # TODO:
+  #test.equal(my_pitch.fraction_array.join(''), [ '2/4', '4/4', '2/4'].join('') )
+  test.done()
 
 exports.test_zzz = (test) ->
   str = '''

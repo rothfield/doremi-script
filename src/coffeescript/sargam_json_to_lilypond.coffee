@@ -137,7 +137,13 @@ normalized_pitch_to_lilypond= (pitch) ->
       ending="""
       ^"#{e.source}"
       """
-  duration=calculate_lilypond_duration pitch.numerator,pitch.denominator
+  #duration=calculate_lilypond_duration pitch.numerator,pitch.denominator
+  # TODO: clean this up!!!
+  if pitch.fraction_array?
+    first_fraction=pitch.fraction_array[0]
+  else
+    first_fraction=new Fraction(pitch.numerator,pitch.denominator)
+  duration=calculate_lilypond_duration first_fraction.numerator.toString(),first_fraction.denominator.toString()
   @log("normalized_pitch_to_lilypond, pitch is",pitch)
   if pitch.my_type is "dash"
      return "r#{duration}#{ending}"
@@ -281,6 +287,7 @@ to_lilypond= (composition_data) ->
            denominator:item.denominator
            tied:item.tied
         }
+
         @log("dash_to_tie case")
         ary.push normalized_pitch_to_lilypond(obj)
     if in_times

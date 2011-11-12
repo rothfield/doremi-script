@@ -2,13 +2,15 @@ debug=false
 
 root = exports ? this
 
+
 root.ParserHelper=
   # THESE METHODS WILL GET MIXED IN THE PEG PARSER (for now)
   # look at top of peg parser, need to manually add new methods for now
-  
+
+
   sa_helper: (source,normalized) ->
     # save a little typing
-    obj= 
+    obj=
       source:source
       normalized_pitch:normalized
     obj
@@ -41,10 +43,12 @@ root.ParserHelper=
       source: this.get_source_for_items(beat_items)
       items: beat_items
     my_beat.subdivisions=this.count_beat_subdivisions(my_beat)
+    @log("count_beat_subdivisions returned",my_beat.subdivisions,"my beat was",my_beat)
     @measure_note_durations(my_beat)
     my_beat
   
   parse_beat_undelimited: (beat_items) ->
+    beat_items=_.flatten beat_items
     my_beat =
       my_type:"beat"
       source: this.get_source_for_items(beat_items)
@@ -67,6 +71,7 @@ root.ParserHelper=
     if (this.parens_unbalanced(my_line))
       @log("unbalanced parens") 
     this.measure_dashes_at_beginning_of_beats(my_line)
+    this.measure_pitch_durations(my_line)
     my_line
 
   parse_measure: (start_obs,items,end_obs) ->
@@ -92,7 +97,7 @@ root.ParserHelper=
   extract_lyrics: () ->
     ary=[]
     for logical_line in @composition_data.logical_lines
-      for item in this.all_items_in_line(logical_line.sargam_line,[])
+      for item in this.all_items(logical_line.sargam_line,[])
         @log "extract_lyrics-item is",item
         ary.push item.syllable if item.syllable
     ary
@@ -114,22 +119,23 @@ root.ParserHelper=
           measure.is_partial=true 
 
 
-  all_items_in_line: (line_or_item,items) ->
-    # return (recursively) items in the line_or_item, delves into the hierarchy
-    # looks for an items property and if so, recurses to it.
-    # line 
-    #   measure
-    #     beat
-    #       item
-    if  (!line_or_item.items)
-       return [line_or_item]
-    for an_item in line_or_item.items
-      do (an_item) =>
-        items.push an_item #if !an_item.items?
-        items.concat this.all_items_in_line(an_item,items)
-    @log 'all_items_in_line returns', items
-    return [line_or_item].concat(items)
- 
+  measure_pitch_durations: (line) ->
+    @log("measure_pitch_durations line is",line)
+    last_pitch=null
+    _.each(all_items(line),
+           (item) =>
+             if item.my_type is "pitch"
+               item.fraction_array=[] if !item.fraction_array?
+               frac=new Fraction(item.numerator,item.denominator)
+               item.fraction_array.push(frac)
+               last_pitch=item
+               @my_inspect item
+
+             if item.my_type is "dash" and item.dash_to_tie
+               frac=new Fraction(item.numerator,item.denominator)
+               last_pitch.fraction_array.push(frac)
+          )
+
   measure_dashes_at_beginning_of_beats: (line) ->
     @log("measure_dashes line is",line)
     measures=  (item for item in line.items when item.my_type=="measure")
@@ -167,7 +173,7 @@ root.ParserHelper=
     @log "looping through items"
     last_pitch=null
     all=[]
-    for item in this.all_items_in_line(line,all)
+    for item in this.all_items(line,all)
       @log "in loop,item is", item 
       last_pitch = item if item.my_type is "pitch"
       if item.dash_to_tie and last_pitch?
@@ -181,7 +187,7 @@ root.ParserHelper=
 
     
   measure_note_durations: (beat) ->
-    @log("entering measure_note_durations for beat:"+beat.source)
+    # @log("entering measure_note_durations for beat:"+beat.source)
     denominator=beat.subdivisions
     microbeats=0
     len=beat.items.length
@@ -214,8 +220,10 @@ root.ParserHelper=
         item.denominator=denominator
 
   count_beat_subdivisions: (beat) ->
-          #beat.items.length
-    (_.select(beat.items, (item) ->
+    # use all_items to in case pitches or dashes are not at top
+    # level of tree
+    @log("all_items",all_items(beat))
+    (_.select(all_items(beat), (item) ->
       (item.my_type=="pitch" || item.my_type=="dash"))).length
 
   parens_unbalanced: (line) ->
@@ -294,7 +302,6 @@ root.ParserHelper=
 
   assign_attributes: (sargam,attribute_lines) ->
     # IN PROGRESS
-    # @debug=true
     # blindly assign attributes from the list of attribute_lines to
     # sargam.attributes_new
     @log("entering assign_attributes=sargam,attribute_lines",sargam,attribute_lines) 

@@ -58,8 +58,11 @@ draw_item= (item) ->
   my_source=item.source if !my_source?
   my_source=(Array(item.source.length+1).join "&nbsp;") if item.my_type=="whitespace"
   pitch_sign="" # flat,sharp,etc
+  title=""
   if item.my_type is 'pitch'
-    my_source=item.pitch_source 
+    # refactor to draw_pitch?
+    title="#{item.numerator}/#{item.denominator} of a beat"
+    my_source=item.pitch_source
     # TODO: make less hackish
     if (my_source[1] is "#")
       my_source=my_source[0]
@@ -117,7 +120,7 @@ draw_item= (item) ->
   # TODO: make more elegant by not including empty tags
   # hacked here
   """
-  <span class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_sym_html}#{lower_sym_html}#{syl_html}<span class="note #{item.my_type}" tabindex="0">#{my_source}</span>#{pitch_sign}</span>
+  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_sym_html}#{lower_sym_html}#{syl_html}<span class="note #{item.my_type}" tabindex="0">#{my_source}</span>#{pitch_sign}</span>
   """
 
 draw_beat= (beat) ->

@@ -296,23 +296,16 @@ Mode: phrygian
       $('#lilypond_source').html(composition_data.lilypond)
       # TODO: combine with the above line..
       adjust_slurs_in_dom()
-      if false
-        $('span[data-begin-slur-id]').each  (index) ->
-          pos2=$(this).offset()
-          attr=$(this).attr("data-begin-slur-id")
-          slur=$("##{attr}")
-          pos1=$(slur).offset()
-          $(slur).css({width: pos2.left- pos1.left + $(this).width()})
       canvas = $("#rendered_in_staff_notation")[0]
     catch err
       window.parse_errors= window.parse_errors + "\n"+ err
       $('#parse_tree').text(window.parse_errors)
       $('#parse_tree').show()
+      throw err
     finally
       window.last_val=$('#entry_area').val()
       parser.is_parsing=false
 
-  # $('#load_sample_composition').trigger('click')
   $('#run_parser').trigger('click')
   $('#parse_tree').hide()
   $('#lilypond_output').hide()
