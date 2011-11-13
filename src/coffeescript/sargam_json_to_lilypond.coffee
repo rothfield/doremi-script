@@ -67,6 +67,13 @@ fraction_to_lilypond=
    # which would be an 1/8th and a 32nd
    # To do it right should perhaps use fractional math as follows:
    # 5/8 = 1/2 + 1/8 => 1/8 + 1/32
+  "2/1":"2"
+  "3/1":"2."
+  "4/1":"1"
+  "5/1":"1.."
+  "1/1":"4"
+  "1/1":"4"
+  "1/1":"4"
   "1/1":"4"
   "1/2":"8"
   "1/3": "8"  # 1/3 1/5 1/7 all 8th notes so one beat will beam together
@@ -216,13 +223,69 @@ lilypond_pitch_map=
   "B":"b"
   "B#":"bs"
 
+
+emit_tied_array=(last_pitch,tied_array,ary) ->
+  return if !last_pitch?
+  return if tied_array.length is 0
+
+  my_funct= (memo,my_item) ->
+    frac=new Fraction(my_item.numerator,my_item.denominator)
+    if !memo?  then frac else frac.add memo
+    
+  fraction_total=_.reduce(tied_array,my_funct,null)
+  tied_array.length=0 # clear it
+  obj={}
+  for key of last_pitch
+    obj[key]=last_pitch[key]
+  obj.numerator=fraction_total.numerator
+  obj.denominator=fraction_total.denominator
+  obj.fraction_array=null
+  last=tied_array[tied_array.length-1]
+  obj.tied= last_pitch.tied
+  console.log "leaving emit_tied_array"
+  ary.push normalized_pitch_to_lilypond(obj)
+
 to_lilypond= (composition_data) ->
   # TODO: dashes at beginning of measure need to be rendered as 
   # rests in lilypond!!
   ary=[]
   in_times=false #hack
   at_beginning_of_first_measure_of_line=false
-  dash_array=[]
+  # Note that the parser produces something like this for
+  # -- --S- 
+  #
+  # composition
+  #   line
+  #     measure
+  #       beat
+  #         dash 
+  #           numerator:2
+  #           denominator:2
+  #           rest: true #### NOTICE ###
+  #           source: "-"
+  #         dash
+  #           source: "-"
+  #       whitespace
+  #       beat
+  #         dash
+  #           numerator:2
+  #           denominator:4
+  #           source: "-"
+  #         dash
+  #           source: "-"
+  #         pitch:
+  #           source: "S"
+  #           numerator:2
+  #           denominator:2
+  #         dash:
+  #           source: "-"
+  #
+  #
+  #   So that the parser has marked off 1 1/2 beats as rests
+  #   Note that Sargam only has rests at the beginning of a line by
+  #   my interpretation!!
+  dashes_at_beginning_of_line_array=[]
+  tied_array=[]
   for logical_line in composition_data.logical_lines
     at_beginning_of_first_measure_of_line=false
     in_times=false #hack
@@ -230,20 +293,26 @@ to_lilypond= (composition_data) ->
     all=[]
     x=all_items_in_line(logical_line.sargam_line,all)
     @log("in to_lilypond, all_items_in_line x=",x)
+    last_pitch=null
     for item in all
+      if item.my_type in ["pitch","barline","measure"] or item.is_barline
+        emit_tied_array(last_pitch,tied_array,ary) if tied_array.length >0 
+
       # TODO refactor
       # TODO: barlines should get attributes like endings too and talas too!
-      if in_times 
+      if in_times
         if item.my_type is "beat" or item.my_type is "barline"
-          ary.push "}" 
+          ary.push "}"
           in_times=false
       @log "processing #{item.source}, my_type is #{item.my_type}"
       if item.my_type=="pitch"
-        # TODO: process dash_array 
-        if dash_array.length > 0
-          for dash in dash_array
+        last_pitch=item  #use this to help render ties better(hopefully)
+        # process dashes_at_beginning_of_line_array
+        if dashes_at_beginning_of_line_array.length > 0
+          for dash in dashes_at_beginning_of_line_array
+            # TODO: combine 1/4 rests???
             ary.push normalized_pitch_to_lilypond(dash)
-          dash_array=[]
+          dashes_at_beginning_of_line_array=[]
         ary.push normalized_pitch_to_lilypond(item) if item.my_type=="pitch"
       bar='''
       \\bar "|" 
@@ -266,33 +335,37 @@ to_lilypond= (composition_data) ->
              in_times=true #hack
       if item.my_type is "dash"
         if !item.dash_to_tie and item.numerator? #THEN its at beginning of line!
-          dash_array.push item
+          console.log "pushing item onto dashes_at_beginning_of_line_array"
+          dashes_at_beginning_of_line_array.push item
       if item.my_type is "measure"
          measure=item
          if measure.is_partial
             ary.push "\\partial 4*#{measure.beat_count} "
       if item.dash_to_tie
-        @log "item.dash_to_tie case, item is",item
-        orig=item.pitch_to_use_for_tie
-        while orig.pitch_to_use_for_tie
-           orig=orig.pitch_to_use_for_tie
-        #orig = orig.pitch_to_use_for_tie if orig.pitch_to_use_for_tie
-        @log("dash_to_tie, orig is",orig)
-        obj={
-           source:orig.source
-           normalized_pitch:orig.normalized_pitch
-           pitch_source:orig.pitch_source
-           octave:orig.octave
-           numerator:item.numerator
-           denominator:item.denominator
-           tied:item.tied
-        }
-
-        @log("dash_to_tie case")
-        ary.push normalized_pitch_to_lilypond(obj)
+        tied_array.push item
+        if false
+          @log "item.dash_to_tie case, item is",item
+          orig=item.pitch_to_use_for_tie
+          while orig.pitch_to_use_for_tie
+             orig=orig.pitch_to_use_for_tie
+          #orig = orig.pitch_to_use_for_tie if orig.pitch_to_use_for_tie
+          @log("dash_to_tie, orig is",orig)
+          obj={
+             source:orig.source
+             normalized_pitch:orig.normalized_pitch
+             pitch_source:orig.pitch_source
+             octave:orig.octave
+             numerator:item.numerator
+             denominator:item.denominator
+             tied:item.tied
+          }
+  
+          @log("dash_to_tie case")
+          ary.push normalized_pitch_to_lilypond(obj)
     if in_times
       ary.push "}"
       in_times=false
+    emit_tied_array(last_pitch,tied_array,ary) if tied_array.length >0 
     ary.push "\\break\n"
   mode="major"
   my_mode=get_attribute(composition_data,'Mode')

@@ -124,6 +124,9 @@ root.ParserHelper=
     last_pitch=null
     _.each(all_items(line),
            (item) =>
+             console.log("***measure_pitch_durations:item.my_type is",item.my_type)
+             if item.my_type is "measure"
+               console.log("***going into measure")
              if item.my_type is "pitch"
                item.fraction_array=[] if !item.fraction_array?
                frac=new Fraction(item.numerator,item.denominator)
@@ -134,6 +137,9 @@ root.ParserHelper=
              if item.my_type is "dash" and item.dash_to_tie
                frac=new Fraction(item.numerator,item.denominator)
                last_pitch.fraction_array.push(frac)
+               my_funct= (memo,frac) ->
+                 if !memo?  then frac else frac.add memo
+               last_pitch.fraction_total=_.reduce(last_pitch.fraction_array,my_funct,null)
           )
 
   measure_dashes_at_beginning_of_beats: (line) ->
