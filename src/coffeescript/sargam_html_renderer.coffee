@@ -51,11 +51,15 @@ draw_measure= (measure) ->
   x.join ""
 
 draw_item= (item) ->
+  # TODO: review why begin_beat and end_beat need to show up in
+  # parse tree at all.
+  return "" if item.my_type is "begin_beat"
+  return "" if item.my_type is "end_beat"
   return draw_beat(item) if item.my_type=="beat"
   return draw_measure(item) if item.my_type=="measure"
-  return "" if item.my_type =="begin_slur" or item.my_type=="end_slur" or item.my_type =="begin_beat" or item.my_type=="end_beat"
-  my_source = LOOKUP[item.source]
-  my_source=item.source if !my_source?
+  # TODO: clumsy and hard to understand. source, pitch_source
+  source2 = LOOKUP[item.source]
+  my_source=if source2? then source2 else item.source
   my_source=(Array(item.source.length+1).join "&nbsp;") if item.my_type=="whitespace"
   pitch_sign="" # flat,sharp,etc
   title=""

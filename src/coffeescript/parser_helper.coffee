@@ -16,22 +16,25 @@ root.ParserHelper=
     obj
 
   parse_sargam_pitch: (slur,musical_char,end_slur) ->
-    source=musical_char.source #NEW
+    # Note that we need to track pitch_source separately from
+    # source. We need source to track columns, but pitch_source is
+    # used to render the pitch. This comes up in the case of slurs.
+    # (SR). Note that the grammar doesn't define a slurred_phrase.
+    source=''
     attributes=[]
     if (slur !='')
-      source=slur.source + source
       attributes.push(slur)
+      source=source+slur.source
+    source=source+musical_char.source
     if (end_slur !='')
-      source=source + end_slur.source
       attributes.push(end_slur)
+      source=source+end_slur.source
     {
        my_type: "pitch"
        normalized_pitch: musical_char.normalized_pitch
        attributes:attributes
-       source: source
        pitch_source:musical_char.source
-       begin_slur:  (slur !='')
-       end_slur: (end_slur !='')
+       source: source
        octave: 0
     }
 
@@ -57,7 +60,7 @@ root.ParserHelper=
     @measure_note_durations(my_beat)
     my_beat
 
-  parse_sargam_line: (line_number,items) ->
+  parse_sargam_line: (line_number,items,kind) ->
     if (line_number !='')
       items.unshift(line_number)
     source = this.get_source_for_items(items)
@@ -67,7 +70,7 @@ root.ParserHelper=
       my_type:"sargam_line"
       source: source
       items: my_items
-      kind:"latin_sargam"
+      kind:kind
     if (this.parens_unbalanced(my_line))
       @log("unbalanced parens") 
     this.measure_dashes_at_beginning_of_beats(my_line)
@@ -232,20 +235,21 @@ root.ParserHelper=
     (_.select(all_items(beat), (item) ->
       (item.my_type=="pitch" || item.my_type=="dash"))).length
 
+  item_has_attribute: (item,attr_name) ->
+      return false if  !item.attributes?
+      _.detect item.attributes,  (attr) ->
+         return false if !attr.my_type?
+         attr.my_type is "begin_slur"
+
   parens_unbalanced: (line) ->
     @log("entering parens_unbalanced")
-    #this.my_inspect(items)
-    #nodes=this.map_nodes(items,{})
-    #@log('nodes=')
-    #this.my_inspect(this.collect_nodes(items))
-    ary=[]
-    ary=this.collect_nodes(line,ary)
+    ary=this.collect_nodes(line,[])
     @log("ary is")
     this.my_inspect(ary)
-    x= _.select(ary,  (item) =>
-      item.begin_slur? && item.begin_slur is true)
-    y= _.select(ary,  (item) =>
-      item.end_slur? && item.end_slur is true)
+    x= _.select ary,  (item) ->
+      @item_has_attribute item,'begin_slur'
+    y= _.select ary,  (item) ->
+      item_has_attribute item,'end_slur'
     if x.length isnt y.length
       @warnings.push "Error on line ? unbalanced parens, line was #{line.source} Note that parens are used for slurs and should bracket pitches as so (S--- R)--- and NOT  (S--) "
       return true
@@ -280,8 +284,8 @@ root.ParserHelper=
     # TODO: should only apply to devanagri!!
     # TODO: sometimes the attribute can be attached to a sargam object
     # NOT directly below it. For example, endings
-    if (!sarg_obj)  
-      @warnings.push "Attribute #{attribute.my_type} above/below nothing, column is #{attribute.column}" 
+    if (!sarg_obj)
+      @warnings.push "Attribute #{attribute.my_type} above/below nothing, column is #{attribute.column}"
       return false
     if attribute.my_type is "kommal_indicator"
       # TODO: review
