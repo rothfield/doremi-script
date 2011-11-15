@@ -199,7 +199,7 @@ to_html= (composition_data) ->
       ) .join('\n') if composition_data.attributes?
   attrs="<div class='attribute_section'>#{attrs}</div>"
 
-  x=(for logical_line in composition_data.logical_lines
+  x=(for logical_line in composition_data.lines
     do (logical_line) =>
       draw_logical_line(logical_line)).join('\n')
   "<div class='composition_data'>#{attrs}#{x}</div>"

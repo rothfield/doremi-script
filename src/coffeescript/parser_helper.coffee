@@ -99,14 +99,14 @@ root.ParserHelper=
 
   extract_lyrics: () ->
     ary=[]
-    for sargam_line in @composition_data.logical_lines
+    for sargam_line in @composition_data.lines
       for item in this.all_items(sargam_line,[])
         @log "extract_lyrics-item is",item
         ary.push item.syllable if item.syllable
     ary
 
   mark_partial_measures: ()->
-    for sargam_line in @composition_data.logical_lines
+    for sargam_line in @composition_data.lines
       @log "processing #{sargam_line.source}"
       measures=  (item for item in sargam_line.items when item.my_type is "measure")
       @log 'mark_partial_measures: measures', measures

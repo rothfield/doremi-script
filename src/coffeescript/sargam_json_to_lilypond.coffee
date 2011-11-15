@@ -29,7 +29,7 @@ is_valid_key= (str) ->
 
 extract_lyrics= (composition_data) ->
   ary=[]
-  for sargam_line in composition_data.logical_lines
+  for sargam_line in composition_data.lines
     for item in all_items_in_line(sargam_line,[])
       @log "extract_lyrics-item is",item
       ary.push item.syllable if item.syllable
@@ -252,7 +252,7 @@ is_sargam_line= (line) ->
 
 notation_is_in_sargam= (composition_data) ->
   @log "in notation_is_in_sargam"
-  _.detect(composition_data.logical_lines, (line) -> is_sargam_line(line))
+  _.detect(composition_data.lines, (line) -> is_sargam_line(line))
 
 to_lilypond= (composition_data) ->
   # TODO: dashes at beginning of measure need to be rendered as 
@@ -296,7 +296,7 @@ to_lilypond= (composition_data) ->
   dashes_at_beginning_of_line_array=[]
   tied_array=[]
 
-  for logical_line in composition_data.logical_lines
+  for logical_line in composition_data.lines
     at_beginning_of_first_measure_of_line=false
     in_times=false #hack
     @log "processing #{logical_line.source}"
