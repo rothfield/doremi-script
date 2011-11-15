@@ -1,7 +1,7 @@
 # Uses module pattern, exports to_lilypond
 # Usage:
 # to_lilypond(composition_json_data)
-debug=false
+debug=true
 
 root = exports ? this
 
@@ -29,8 +29,8 @@ is_valid_key= (str) ->
 
 extract_lyrics= (composition_data) ->
   ary=[]
-  for logical_line in composition_data.logical_lines
-    for item in all_items_in_line(logical_line.sargam_line,[])
+  for sargam_line in composition_data.logical_lines
+    for item in all_items_in_line(sargam_line,[])
       @log "extract_lyrics-item is",item
       ary.push item.syllable if item.syllable
   ary
@@ -44,9 +44,9 @@ get_attribute= (composition_data,key) ->
   att.value
 
 log= (x) ->
-  return if ! @debug?
+  return if !@debug?
   return if !@debug
-  console.log x if console
+  console.log arguments... if console
 
 running_under_node= ->
   module? && module.exports
@@ -239,7 +239,7 @@ emit_tied_array=(last_pitch,tied_array,ary) ->
   obj.numerator=fraction_total.numerator
   obj.denominator=fraction_total.denominator
   obj.fraction_array=null
-  console.log "emit_tied_array-last is", last
+  @log "emit_tied_array-last is", last
   last=tied_array[tied_array.length-1]
   obj.tied= last.tied
   @log "leaving emit_tied_array"
@@ -251,8 +251,8 @@ is_sargam_line= (line) ->
   line.kind.indexOf('sargam') > -1
 
 notation_is_in_sargam= (composition_data) ->
-  console.log "in notation_is_in_sargam"
-  _.detect(composition_data.logical_lines, (line) -> is_sargam_line(line.sargam_line))
+  @log "in notation_is_in_sargam"
+  _.detect(composition_data.logical_lines, (line) -> is_sargam_line(line))
 
 to_lilypond= (composition_data) ->
   # TODO: dashes at beginning of measure need to be rendered as 
@@ -299,9 +299,9 @@ to_lilypond= (composition_data) ->
   for logical_line in composition_data.logical_lines
     at_beginning_of_first_measure_of_line=false
     in_times=false #hack
-    @log "processing #{logical_line.sargam_line.source}"
+    @log "processing #{logical_line.source}"
     all=[]
-    x=all_items_in_line(logical_line.sargam_line,all)
+    x=all_items_in_line(logical_line,all)
     @log("in to_lilypond, all_items_in_line x=",x)
     last_pitch=null
     for item in all
@@ -346,7 +346,7 @@ to_lilypond= (composition_data) ->
              in_times=true #hack
       if item.my_type is "dash"
         if !item.dash_to_tie and item.numerator? #THEN its at beginning of line!
-          console.log "pushing item onto dashes_at_beginning_of_line_array"
+          @log "pushing item onto dashes_at_beginning_of_line_array"
           dashes_at_beginning_of_line_array.push item
       if item.my_type is "measure"
          measure=item
@@ -393,10 +393,10 @@ to_lilypond= (composition_data) ->
   if (key_is_valid=is_valid_key(composition_data.key))
     transpose_snip="\\transpose c' #{composition_data.key}'" 
   else
-    composition_data.warnings.push "Invalid key. Valid keys are cdefgab etc. See the lilypond documentation for more"
-
-    @log("#{composition_data.key} is invalid")
     transpose_snip=""
+    if composition_data.key?
+      @log("#{composition_data.key} is invalid")
+      composition_data.warnings.push "Invalid key. Valid keys are cdefgab etc. Use a Mode: directive to set the mode(major,minor,aeolian, etc). See the lilypond documentation for more info"
   # Don't transpose non-sargam notation TODO:review
   if ! notation_is_in_sargam(composition_data)
     transpose_snip=""
@@ -404,7 +404,6 @@ to_lilypond= (composition_data) ->
   key_snippet= """
   \\key c \\#{mode}
   """
-  console.log "break here"
   if ! notation_is_in_sargam(composition_data) and key_is_valid
     key_snippet= """
     \\key #{composition_data.key} \\#{mode}

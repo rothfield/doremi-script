@@ -39,7 +39,7 @@ adjust_slurs_in_dom= () ->
 
 draw_logical_line= (logical_line) ->
   # need to use => for scoping to work
-  x=(for item in logical_line.sargam_line.items
+  x=(for item in logical_line.items
                     do (item) => draw_item(item)).join('')
   "<div class='stave sargam_line'>#{x}</div>"
 

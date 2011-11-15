@@ -99,16 +99,16 @@ root.ParserHelper=
 
   extract_lyrics: () ->
     ary=[]
-    for logical_line in @composition_data.logical_lines
-      for item in this.all_items(logical_line.sargam_line,[])
+    for sargam_line in @composition_data.logical_lines
+      for item in this.all_items(sargam_line,[])
         @log "extract_lyrics-item is",item
         ary.push item.syllable if item.syllable
     ary
 
   mark_partial_measures: ()->
-    for logical_line in @composition_data.logical_lines
-      @log "processing #{logical_line.sargam_line.source}"
-      measures=  (item for item in logical_line.sargam_line.items when item.my_type is "measure")
+    for sargam_line in @composition_data.logical_lines
+      @log "processing #{sargam_line.source}"
+      measures=  (item for item in sargam_line.items when item.my_type is "measure")
       @log 'mark_partial_measures: measures', measures
       for measure in measures
         beats=  (item for item in measure.items when item.my_type is "beat")
@@ -250,7 +250,6 @@ root.ParserHelper=
       @item_has_attribute item,'begin_slur'
     y= _.select ary,  (item) =>
       @item_has_attribute item,'end_slur'
-    console.log 'in parens_unbalanced,x,y',x,y
     if x.length isnt y.length
       @warnings.push "Error on line ? unbalanced parens, line was #{line.source} Note that parens are used for slurs and should bracket pitches as so (S--- R)--- and NOT  (S--) "
       return true
@@ -364,7 +363,6 @@ root.ParserHelper=
   log: (x) ->
     # TODO: figure out how to forward args to console.log
     # using call or apply
-    #console.log x if console
     return if !@debug?
     return if !@debug
     return if !console?

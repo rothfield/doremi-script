@@ -32,7 +32,7 @@ parse_without_reporting_error = (str) ->
     log("Didn't parse")
 
 first_sargam_line =  (composition_data) ->
-    composition_data.logical_lines[0].sargam_line
+    composition_data.logical_lines[0]
 
 first_logical_line = (composition_data) ->
     composition_data.logical_lines[0]
