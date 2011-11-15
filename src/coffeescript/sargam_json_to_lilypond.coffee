@@ -239,6 +239,10 @@ emit_tied_array=(last_pitch,tied_array,ary) ->
   obj.numerator=fraction_total.numerator
   obj.denominator=fraction_total.denominator
   obj.fraction_array=null
+  #TODO: make more general
+  my_fun = (attr) ->
+    attr.my_type is not "mordent"
+  obj.attrs2= _.select(obj.attributes, my_fun)
   @log "emit_tied_array-last is", last
   last=tied_array[tied_array.length-1]
   obj.tied= last.tied
@@ -296,12 +300,12 @@ to_lilypond= (composition_data) ->
   dashes_at_beginning_of_line_array=[]
   tied_array=[]
 
-  for logical_line in composition_data.lines
+  for line in composition_data.lines
     at_beginning_of_first_measure_of_line=false
     in_times=false #hack
-    @log "processing #{logical_line.source}"
+    @log "processing #{line.source}"
     all=[]
-    x=all_items_in_line(logical_line,all)
+    x=all_items_in_line(line,all)
     @log("in to_lilypond, all_items_in_line x=",x)
     last_pitch=null
     for item in all

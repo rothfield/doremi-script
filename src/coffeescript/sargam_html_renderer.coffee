@@ -37,9 +37,9 @@ adjust_slurs_in_dom= () ->
     pos1=$(slur).offset()
     $(slur).css {width: pos2.left- pos1.left + $(this).width()}
 
-draw_logical_line= (logical_line) ->
+draw_line= (line) ->
   # need to use => for scoping to work
-  x=(for item in logical_line.items
+  x=(for item in line.items
                     do (item) => draw_item(item)).join('')
   "<div class='stave sargam_line'>#{x}</div>"
 
@@ -199,9 +199,9 @@ to_html= (composition_data) ->
       ) .join('\n') if composition_data.attributes?
   attrs="<div class='attribute_section'>#{attrs}</div>"
 
-  x=(for logical_line in composition_data.lines
-    do (logical_line) =>
-      draw_logical_line(logical_line)).join('\n')
+  x=(for line in composition_data.lines
+    do (line) =>
+      draw_line(line)).join('\n')
   "<div class='composition_data'>#{attrs}#{x}</div>"
 
 root.to_html=to_html

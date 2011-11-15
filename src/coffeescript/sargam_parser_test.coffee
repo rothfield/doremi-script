@@ -34,7 +34,7 @@ parse_without_reporting_error = (str) ->
 first_sargam_line =  (composition_data) ->
     composition_data.lines[0]
 
-first_logical_line = (composition_data) ->
+first_line = (composition_data) ->
     composition_data.lines[0]
 
 test_parses = (str,test,msg="") ->
@@ -140,7 +140,7 @@ exports.test_dashes_inside_beat = (test) ->
   test.equal(second_item.subdivisions,x=4,"subdivisions of beat #{str} should be #{x}")
   test.done()
   
-exports.test_logical_lines = (test) ->
+exports.test_lines = (test) ->
   str = '''
   | S- |
 
@@ -244,7 +244,7 @@ exports.test_attributes = (test) ->
   test.done()
 
 
-exports.test_logical_line_can_come_right_after_header_line = (test) ->
+exports.test_line_can_come_right_after_header_line = (test) ->
   str = '''
   Rag:Kafi
   S
@@ -482,9 +482,9 @@ exports.test_parses_lyrics_line_with_leading_and_trailing_spaces = (test) ->
                { my_type: 'whitespace', source: '   ' } ] 
    ### 
   composition=test_parses(str,test)
-  test.ok(composition.lines?,"parsed composition should have a logical_lines attribute")
-  test.equal(composition.lines.length,1,"<<\n#{str}\n>> should have 1 logical lines")
-  first= first_logical_line(composition)
+  test.ok(composition.lines?,"parsed composition should have a lines attribute")
+  test.equal(composition.lines.length,1,"<<\n#{str}\n>> should have 1 line")
+  first= first_line(composition)
   # TODO:
   test.done()
 
@@ -503,8 +503,8 @@ exports.test_parses_lines = (test) ->
   '''
   composition=test_parses(str,test)
   my_inspect(composition)
-  test.ok(composition.lines?,"parsed composition should have a logical_lines attribute")
-  test.equal(composition.lines.length,2,"Should have 2 logical lines")
+  test.ok(composition.lines?,"parsed composition should have a lines attribute")
+  test.equal(composition.lines.length,2,"Should have 2 lines")
   aux1(str,composition)
   test.done()
 
