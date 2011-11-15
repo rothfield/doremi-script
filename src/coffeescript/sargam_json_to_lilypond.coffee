@@ -233,17 +233,26 @@ emit_tied_array=(last_pitch,tied_array,ary) ->
     if !memo?  then frac else frac.add memo
     
   fraction_total=_.reduce(tied_array,my_funct,null)
-  tied_array.length=0 # clear it
   obj={}
   for key of last_pitch
     obj[key]=last_pitch[key]
   obj.numerator=fraction_total.numerator
   obj.denominator=fraction_total.denominator
   obj.fraction_array=null
+  console.log "emit_tied_array-last is", last
   last=tied_array[tied_array.length-1]
-  obj.tied= last_pitch.tied
-  console.log "leaving emit_tied_array"
+  obj.tied= last.tied
+  @log "leaving emit_tied_array"
+  tied_array.length=0 # clear it
   ary.push normalized_pitch_to_lilypond(obj)
+ 
+is_sargam_line= (line) ->
+  return false if !line.kind?
+  line.kind.indexOf('sargam') > -1
+
+notation_is_in_sargam= (composition_data) ->
+  console.log "in notation_is_in_sargam"
+  _.detect(composition_data.logical_lines, (line) -> is_sargam_line(line.sargam_line))
 
 to_lilypond= (composition_data) ->
   # TODO: dashes at beginning of measure need to be rendered as 
@@ -286,6 +295,7 @@ to_lilypond= (composition_data) ->
   #   my interpretation!!
   dashes_at_beginning_of_line_array=[]
   tied_array=[]
+
   for logical_line in composition_data.logical_lines
     at_beginning_of_first_measure_of_line=false
     in_times=false #hack
@@ -307,6 +317,7 @@ to_lilypond= (composition_data) ->
       @log "processing #{item.source}, my_type is #{item.my_type}"
       if item.my_type=="pitch"
         last_pitch=item  #use this to help render ties better(hopefully)
+        # TODO: before emitting pitch, try using up tied array!!
         # process dashes_at_beginning_of_line_array
         if dashes_at_beginning_of_line_array.length > 0
           for dash in dashes_at_beginning_of_line_array
@@ -379,13 +390,25 @@ to_lilypond= (composition_data) ->
 
   title = get_attribute(composition_data,"Title")
   time = get_attribute(composition_data,"Time Signature")
-  if is_valid_key(composition_data.key)
+  if (key_is_valid=is_valid_key(composition_data.key))
     transpose_snip="\\transpose c' #{composition_data.key}'" 
   else
     @log("#{composition_data.key} is invalid")
     transpose_snip=""
-  time="4/4" if !time 
-  title_snippet="" 
+  # Don't transpose non-sargam notation TODO:review
+  if ! notation_is_in_sargam(composition_data)
+    transpose_snip=""
+  time="4/4" if !time
+  key_snippet= """
+  \\key c \\#{mode}
+  """
+  console.log "break here"
+  if ! notation_is_in_sargam(composition_data) and key_is_valid
+    key_snippet= """
+    \\key #{composition_data.key} \\#{mode}
+    """
+  
+  title_snippet=""
   if title
     title_snippet= """
       title = "#{title}"
@@ -405,7 +428,7 @@ to_lilypond= (composition_data) ->
 %}
 melody = {
 \\clef treble
-\\key c \\#{mode}
+#{key_snippet}
 \\time #{time}
 \\autoBeamOn  
 #{notes}

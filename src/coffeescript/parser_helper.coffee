@@ -127,9 +127,9 @@ root.ParserHelper=
     last_pitch=null
     _.each(all_items(line),
            (item) =>
-             console.log("***measure_pitch_durations:item.my_type is",item.my_type)
+             @log("***measure_pitch_durations:item.my_type is",item.my_type)
              if item.my_type is "measure"
-               console.log("***going into measure")
+               @log("***going into measure")
              if item.my_type is "pitch"
                item.fraction_array=[] if !item.fraction_array?
                frac=new Fraction(item.numerator,item.denominator)
@@ -239,17 +239,18 @@ root.ParserHelper=
       return false if  !item.attributes?
       _.detect item.attributes,  (attr) ->
          return false if !attr.my_type?
-         attr.my_type is "begin_slur"
+         attr.my_type is attr_name
 
   parens_unbalanced: (line) ->
     @log("entering parens_unbalanced")
     ary=this.collect_nodes(line,[])
     @log("ary is")
     this.my_inspect(ary)
-    x= _.select ary,  (item) ->
+    x= _.select ary,  (item) =>
       @item_has_attribute item,'begin_slur'
-    y= _.select ary,  (item) ->
-      item_has_attribute item,'end_slur'
+    y= _.select ary,  (item) =>
+      @item_has_attribute item,'end_slur'
+    console.log 'in parens_unbalanced,x,y',x,y
     if x.length isnt y.length
       @warnings.push "Error on line ? unbalanced parens, line was #{line.source} Note that parens are used for slurs and should bracket pitches as so (S--- R)--- and NOT  (S--) "
       return true
