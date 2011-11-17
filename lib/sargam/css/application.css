@@ -1,0 +1,320 @@
+#controls li
+{
+        display: inline;
+        list-style-type: none;
+        padding-right: 20px;
+}
+
+h2.step {
+  width:600px;
+  font-size: 14px;
+  background-color: lavender;
+  border: 1px solid black;
+}
+
+div#rendered_sargam {
+}
+
+span.note_wrapper {
+    position: relative;
+}
+
+.show_sargam_source {
+    border: 1px solid black;
+    font-family: monospace; 
+    font-size: 18px;
+    padding-left: 10px;
+}
+textarea#entry_area, textarea.entry_area {
+    font-family: monospace; 
+    font-size: 18px;
+    padding-left: 10px;
+
+}
+#parse_tree,#warnings_div {
+    border: 1px solid black;
+    width: 70%;
+    height:550px;
+    overflow:scroll;
+    margin-left: 20px;
+    padding:4px;
+    display:none;
+}
+#warnings_div {
+  height:auto;
+}
+div.line {
+    position: relative;
+    font-family: sans-serif;
+}
+span.beatSAVE {
+    border-top: 0px;
+    border-bottom: .1em solid;
+    padding-bottom: .75em;
+    -moz-border-radius: 6em;
+    -webkit-border-radius: 6em;
+    border: 1px solid rgb(0, 0, 0);
+    border-left-width: 0px;
+    border-right-width: 0px;
+    border-top-width: 0px;
+}
+
+span.beat[data-subdivisions] {
+    border-top: 0px;
+    border-bottom: .1em solid;
+    padding-bottom: .75em;
+    border-radius: 6em;
+    border-style: solid
+    border-color:black;
+    border-left-width: 0px;
+    border-top-width: 0px;
+    border-bottom-width:1px;
+    border-right-width: 0px;
+}
+
+span.beat {
+}
+
+span.zzzbeat {
+    border-top: 0px;
+    border-bottom: .1em solid;
+    padding-bottom: .75em;
+    -moz-border-radius: 6em;
+    -webkit-border-radius: 6em;
+    border: 1px solid rgb(0, 0, 0);
+    border-left-width: 0px;
+    border-right-width: 0px;
+    border-top-width: 0px;
+}
+
+span.beat {
+    margin-right: 1em;
+    margin-left: .3em;
+}
+
+span.slur {
+    position:absolute;
+    margin-top: 1.5em;
+    border-top: .1em solid;
+    padding-top: 3.2em;
+    -moz-border-radius: .5em;
+    -webkit-border-radius: .5em;
+    border-style: solid;
+    border-color: black;
+    border-top-width: 2px;
+    border-bottom-width: 0em;
+    border-bottom:none;
+    border-left-width: 0em;;
+    border-right-width: 0em;
+}
+
+span.ornament {
+    position: absolute;
+    bottom: 0.75em;
+    margin-left: -.1em;
+}
+
+span.ornament span.note {
+    padding-right: .2em;
+}
+
+div.sargam_line {
+    /* font-size: 1em; */
+   /*  font-family: sans-serif; */
+    /* border: 1px black dotted; */
+    border: none;
+    height: 11.5em;
+    padding-top: 0em;
+    padding-left:1em;
+    line-height: 10em; /* don't change this */
+    margin-bottom:0.4em;
+    padding-top:0em;
+}
+
+span.note.dash {
+  margin-left: 0.09em;
+  margin-right: 0.09em;
+}
+
+span.note.barline {
+    letter-spacing: -0.2em;
+    margin-right: .2em;
+    margin-left: .2em;
+    padding:.2em;
+}
+
+span.note.double_barline {
+    font-weight:bold;
+}
+
+div.composition {
+    border: 1px black;
+    border-style: solid;
+    font-size: 0.7em;
+    font-family: sans-serif;
+
+}
+
+div.display1 {
+
+}
+
+div:focus {
+     outline: none;
+   // border-style: solid;
+}
+
+span:focus {
+    outline: none;
+}
+
+.focused {
+    -moz-outline-style: none;
+    border: none;
+    border-right: 2px solid;
+    border-right-color: black;
+
+}
+
+div.composition.entered {
+    cursor: text;
+}
+
+span.ornament {
+    font-size: 1em;
+}
+span.mordent {
+    font-size: 1em;
+    left:0.13em;
+}
+
+span.ornament span.note_wrapper span.note {
+    font-size: .5em;
+}
+
+span.ornament span.upper_octave1, span.mordent {
+    font-size: 1.75em;
+}
+
+span.ornament span.upper_octave1 {
+    position: absolute;
+    top: 1.2em;
+    left: .45em;
+}
+
+span.lower_octave1 {
+    left: 0.2em;
+    bottom: -.6em;
+}
+
+span.upper_octave1, span.mordent{
+    top: -1.3em;
+}
+span.upper_octave1{
+    left: 0.2em;
+}
+span.note.whitespace {
+}
+span.upper_octave_indicator {
+    top: -1em;
+}
+span.tala {
+  top: -2.2em;
+}
+span.chord_symbol, span.ending {
+  font-family:"Times New Roman",Georgia,Serif;
+  font-size: 1em;
+  top: -2em;
+  left:.2em;
+}
+span.ending {
+  font-family:"Times New Roman",Georgia,Serif;
+  font-size: .8em;
+  top: -2.75em;
+  left:.2em;
+}
+
+
+div.composition_data {
+  border: 1px solid black;
+  padding-left: 10px;
+  padding-top:4px;
+}
+
+/* applies to chord_symbol when chord symbol has a tala sibling
+ *
+ * Doesn't seem to work
+ *
+ *
+ 
+span.tala ~ span.chord_symbol  {
+  top: -1em;
+}
+
+ * */
+
+span.lower_octave1, span.upper_octave1,span.mordent, span.upper_attribute {
+    z-index: 2;
+    position: absolute;
+
+}
+
+span.kommal_indicator {
+ left: 0.2em;
+ bottom: 0.05em;
+}
+    
+span.upper_attribute + span.upper_attribute {
+  margin-top: -.7em;
+}
+span.attribute_key,span.attribute_value {
+    font-family: sans-serif;
+    font-size: 1.6em; 
+}
+span.attribute_key {
+    font-weight: bold;
+}
+
+span.note, span.note_wrapper {
+    font-family: sans-serif;
+    font-size: 1.6em; 
+    position: relative;
+    margin-right: -.75px;
+    margin-left: -.75px;
+    display: inline-block;
+}
+span.flat, span.sharp {
+  position: relative;
+  bottom: 0.7em;
+}
+span.breath_mark {
+    /*bottom: .75em;*/
+}
+
+
+span.whitespace {
+    margin-right: 0em;
+    margin-left: 0em;
+}
+
+/* unicode chars need this */
+span.note.left_repeat, 
+span.note.right_repeat,
+span.note.repeat_symbol,
+span.note.barline,
+span.note.final_barline,
+span.note.reverse_final_barline,
+span.note.double_barline
+{
+    margin-right: 0.4em;
+    margin-left: 0.4em;
+}
+
+span.syllable1 {
+    position: absolute;
+    bottom: -2.1em;
+    margin-left: 0.03em;
+    font-size: 1.2em;
+    font-family: serif;
+}
+

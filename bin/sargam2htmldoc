@@ -3,8 +3,11 @@ var path = require('path');
 var fs = require('fs');
 var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 require(lib+'/sargam/sargam_parser.js')
+css=fs.readFileSync(lib+'/sargam/css/application.css','utf8').toString()
+// js/third_party/zepto.unminified.js'
+js=fs.readFileSync(lib+'/sargam/third_party/zepto.unminified.js','utf8').toString()
 var to_html_doc=require(lib+'/sargam/sargam_html_renderer.js').to_html_doc
 parser=SargamParser
 var composition_data=parser.parse(fs.readFileSync('/dev/stdin').toString())
-process.stdout.write(to_html_doc(composition_data))
+process.stdout.write(to_html_doc(composition_data,null,css,js))
 
