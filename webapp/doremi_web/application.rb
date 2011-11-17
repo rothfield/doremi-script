@@ -42,10 +42,8 @@ post '/generate_html_page' do
 end
 
 post '/lilypond.txt' do
-  puts "in post"
   comp=settings.comp
   dir=File.join('public','compositions')
-  #`cd public/compositions`
   puts params.inspect      
   return "no data param" if !params["data"]
   data=params["data"]
@@ -80,16 +78,12 @@ post '/lilypond.txt' do
   end
   puts "result of running lilypond is <<#{result}>>"
   `cp #{fp}.ly #{comp}/last.ly`
-  #return result
-  result2=`openssl enc -base64 -in #{fp}.png`
-  puts "result2.length is #{result2[0..20]}..."
-  midi=`openssl enc -base64 -in #{fp}.midi`
-  puts "midi is #{midi[0..20]}..."
+  # puts "result2.length is #{result2[0..20]}..."
+  #midi=`openssl enc -base64 -in #{fp}.midi`
+  #puts "midi is #{midi[0..20]}..."
   content_type :json
   {:error => false, 
    :fname => fname,
    :lilypond_output => result,
-   :png => "data:image/png;base64,#{result2}",
-   :midi => midi #"data:audio/x-midi;base64,#{midi}"
   }.to_json
 end

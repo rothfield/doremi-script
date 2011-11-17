@@ -166,8 +166,8 @@ normalized_pitch_to_lilypond= (pitch) ->
     if _.detect(pitch.attributes, (x) -> x.my_type is "mordent")
       mordent="\\mordent"
   end_slur=""
-  begin_slur="(" if pitch.begin_slur
-  end_slur=")" if pitch.end_slur
+  begin_slur="(" if item_has_attribute(pitch,"begin_slur")
+  end_slur=")" if item_has_attribute(pitch,"end_slur")
   t=""
   t='~' if pitch.tied?
   "#{p}#{o}#{duration}#{t}#{mordent}#{begin_slur}#{end_slur}#{ending}"
@@ -225,6 +225,7 @@ lilypond_pitch_map=
 
 
 emit_tied_array=(last_pitch,tied_array,ary) ->
+
   return if !last_pitch?
   return if tied_array.length is 0
 
@@ -233,9 +234,15 @@ emit_tied_array=(last_pitch,tied_array,ary) ->
     if !memo?  then frac else frac.add memo
     
   fraction_total=_.reduce(tied_array,my_funct,null)
+  
   obj={}
   for key of last_pitch
     obj[key]=last_pitch[key]
+  # hack the obj attributes to remove mordents
+ 
+  filter = (attr) ->
+    attr.my_type? and attr.my_type is not "mordent"
+  obj.attributes= _.select(last_pitch.attributes,filter)
   obj.numerator=fraction_total.numerator
   obj.denominator=fraction_total.denominator
   obj.fraction_array=null
@@ -424,6 +431,7 @@ to_lilypond= (composition_data) ->
   src1= composition_data.source.replace /%\{/gi, "% {"
   src= src1.replace /\{%/gi, "% }"
   lilypond_template= """
+  #(ly:set-option 'midi-extension "mid")
   \\version "2.12.3"
   \\include "english.ly"
   \\header{ #{title_snippet} #{composer_snippet} }

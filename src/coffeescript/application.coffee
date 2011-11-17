@@ -3,8 +3,13 @@
 root = exports ? this
 
 $(document).ready ->
+  $('.generated_by_lilypond').hide()
+  Logger=_console.constructor
+  # _console.level  = Logger.DEBUG
+  _console.level  = Logger.WARN
+  _.mixin(_console.toObject())
   if Zepto?
-    console.log("***Using zepto.js instead of jQuery***") if console?
+    _.debug("***Using zepto.js instead of jQuery***")
   # This is for the online version
   debug=false
 
@@ -52,7 +57,7 @@ Key: d
           
                             i            IV
          3                  +            2          .
-1)|: (Sr | n) S   (gm Pd) | P - P  P   | P - D  <(nDSn)>) |
+1)|: (Sr | n) S   (gm Pd) | P - P  P   | P - D  <(nDSn)> |
            .
       ban-    su-  ri       ba- ja ra-   hi  dhu- na
 
@@ -116,15 +121,15 @@ Mode: phrygian
   Source:AAK
 
             3             ~    +            2         .
-  1) |: (Sr | n) S   (gm Pd)|| P - P  P   | P - D  (<nDSn>) |
+  1) |: (Sr | n) S   (gm Pd)|| P - P  P   | P - D  <(nDSn)> |
               .
          ban-    su-  ri       ba- ja ra-   hi  dhu- na
 
-  0                 3                    +     .    *  .
+  0                 3                       +  .    *  .
   | P  d   P   d    | <(Pm>   PmnP) (g m)|| PdnS -- g  S |
     ma-dhu-ra  kan-     nai-         ya     khe-    la-ta
 
-  2              0     ~
+  2              0 ~
   |  d-Pm g P  m | r - S :|
      ga-    wa-ta  ho- ri
 
@@ -178,6 +183,7 @@ Mode: phrygian
 
   $('#generate_staff_notation').click =>
     $('#lilypond_png').attr('src',"")
+    $('.generated_by_lilypond').hide()
     my_data =
       fname:window.the_composition.filename
       data: window.the_composition.lilypond
@@ -190,17 +196,18 @@ Mode: phrygian
         alert "Generating staff notation failed"
         $('#lilypond_png').attr('src','none.jpg')
       success: (some_data,text_status) ->
-        $('#play_midi').attr('src',some_data.midi)
-        window.the_composition.midi=some_data.midi
-        for typ in ["png","pdf","midi","ly","txt"]
+        for typ in ["png","pdf","mid","ly","txt"]
           snip = """
           window.open('compositions/#{some_data.fname}.#{typ}'); return false; 
           """
-          $("#download_#{typ}").attr('href',"compositions/#{some_data.fname}.#{typ}")
+          $("#download_#{typ}").attr('href',x="compositions/#{some_data.fname}.#{typ}")
+          if typ is 'png'
+            console.log "typ is png"
+            $('#lilypond_png').attr('src',x)
           $("#download_#{typ}").attr('onclick',snip)
 
-        $('#lilypond_png').attr('src',some_data.png)
         window.location = String(window.location).replace(/\#.*$/, "") + "#staff_notation"
+        $('.generated_by_lilypond').show()
         $('#lilypond_output').html(some_data.lilypond_output)
         if some_data.error
           $('#lilypond_output').toggle()

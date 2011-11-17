@@ -1,35 +1,51 @@
 root = exports ? this
 
-debug=false
-
+debug=true
+global._console ||= require('./underscore.logger.js') if global?
+Logger=global._console.constructor
+_console.level  = Logger.DEBUG
+_console.level  = Logger.WARN
+_ = require("underscore")._ if require?
+require './sargam_parser.js'
 sys = require('sys')
 utils=require './tree_iterators.js'
-log = (x) ->
-  return if !console
-  console.log(x) if debug
- 
-require './sargam_parser.js'
-log('SargamParser is',SargamParser) 
+_.mixin(_console.toObject())
+
+
+
+my_inspect = (x) ->
+  return if !debug?
+  console.log "debug is #{debug}"
+  return if !debug
+  return if !JSON?
+  console.log(JSON.stringify(arg,null," ")) for arg in arguments
+  #  if arg?
+  #    JSON.stringify arg,null," "
+
+_.mixin(my_inspect: my_inspect)
+_.my_inspect(1:2)
+
+_.debug('SargamParser is',SargamParser) 
 parser=SargamParser
-log('parser is',parser)
+_.debug('parser is',parser)
 
 aux1 = (str,result) ->
   return if !sys
-  log("Result of parsing <<#{str}>> is")
-  log(sys.inspect(result,true,null))
+  _.debug("Result of parsing <<#{str}>> is")
+  _.debug(sys.inspect(result,true,null))
   
 should_not_parse = (str,test,msg) ->
-  log(str)
-  log("Testing that <<#{str}>> does NOT parse")
+  _.debug(str)
+  _.debug("Testing that <<#{str}>> does NOT parse")
   test.throws (-> parser.parse(str)),"<<\n#{str}\n>> should not parse!. #{msg}"
 
 parse_without_reporting_error = (str) ->
-  log("Entering parse_without_reporting_error")
+  _.debug("Entering parse_without_reporting_error")
   log "Parsing <<\n#{str}>>"
   try
     parser.parse(str)
   catch error
-    log("Didn't parse")
+    _.debug("Didn't parse")
 
 first_sargam_line =  (composition_data) ->
     composition_data.lines[0]
@@ -39,24 +55,15 @@ first_line = (composition_data) ->
 
 test_parses = (str,test,msg="") ->
   composition=parser.parse(str)
-  my_inspect(composition) if composition?
-
+  _.debug("test_parses",composition)
   test.ok(composition?,"#{str} didn't parse!!. #{msg}")
   return composition
   ###
   test.doesNotThrow(-> result=parser.parse(str))
   test.ok(result?,"didn't parse")
-  log(sys.inspect(result,false,null))
+  _.debug(sys.inspect(result,false,null))
   ###
 
-my_inspect = (obj,obj2="") ->
-  return if ! sys
-  JSON.stringify(obj)
-  JSON.stringify(obj2)
-
-  #log(sys.inspect(obj,true,null))
-  #log(sys.inspect(obj2,true,null))
-  
 exports.test_bad_input = (test) ->
   str = ':'
   should_not_parse(str,test)
@@ -105,11 +112,11 @@ exports.test_eof_ends_beat = (test) ->
   |SR
   '''
   composition=test_parses(str,test)
-  my_inspect(composition)
+  log composition
   line=first_sargam_line(composition)
   measure=line.items[0]
   second_item= measure.items[1]
-  my_inspect(second_item)
+  _.debug(second_item)
   test.equal(second_item.my_type,"beat","second item of #{str} should be a beat containing SR")
   test.equal(second_item.subdivisions,2)
   test.done()
@@ -122,7 +129,7 @@ exports.test_barline_ends_beat = (test) ->
   line=first_sargam_line(composition)
   measure=line.items[0]
   second_item= measure.items[1]
-  my_inspect(second_item)
+  _.debug(second_item)
   test.equal(second_item.my_type,"beat","second item of #{str} should be a beat containing SR")
   test.equal(second_item.subdivisions,2)
   test.done()
@@ -135,7 +142,7 @@ exports.test_dashes_inside_beat = (test) ->
   line=first_sargam_line(composition)
   measure=line.items[0]
   second_item= measure.items[1]
-  my_inspect(second_item)
+  _.debug(second_item)
   test.equal(second_item.my_type,"beat","second item of #{str} should be a beat containing S--R")
   test.equal(second_item.subdivisions,x=4,"subdivisions of beat #{str} should be #{x}")
   test.done()
@@ -147,16 +154,16 @@ exports.test_lines = (test) ->
 
   '''
   composition=test_parses(str,test)
-  my_inspect(composition)
+  _.debug(composition)
   test.done()
   return
   second_item= composition.lines[0].items[1]
-  my_inspect(second_item)
+  _.debug(second_item)
   test.equal(second_item.my_type,"beat","second item of #{str} should be a beat")
   test.equal(second_item.items.length,2,"the beat's length should be 2")
   test.equal(second_item.items[0].my_type,"dash","dash should be first item")
   third_item= composition.lines[0].items[2]
-  my_inspect(third_item)
+  _.debug(third_item)
   test.equal(third_item.my_type,"barline","third item of #{str} should be a barline")
   test.done()
 
@@ -168,7 +175,7 @@ exports.test_dash_starts_beat = (test) ->
   line=first_sargam_line(composition)
   measure=line.items[0]
   second_item=measure.items[1]
-  my_inspect(second_item)
+  _.debug(second_item)
   test.equal(second_item.my_type,"beat","second item of #{str} should be a beat")
   test.equal(second_item.items.length,2,"the beat's length should be 2")
   test.equal(second_item.items[0].my_type,"dash","dash should be first item")
@@ -205,7 +212,7 @@ exports.test_accepts_delimited_beat = (test) ->
 
   '''
   composition=test_parses(str,test)
-  my_inspect(composition)
+  _.debug(composition)
   test.done()
 
 exports.test_accepts_spaces_in_delimited_beat = (test) ->
@@ -214,7 +221,7 @@ exports.test_accepts_spaces_in_delimited_beat = (test) ->
 
   '''
   composition=test_parses(str,test)
-  my_inspect(composition)
+  _.debug(composition)
   test.done()
 
 exports.test_accepts_delimited_beat = (test) ->
@@ -223,7 +230,7 @@ exports.test_accepts_delimited_beat = (test) ->
 
   '''
   composition=test_parses(str,test)
-  my_inspect(composition)
+  _.debug(composition)
   test.done()
 
 exports.test_recognizes_ornament_symbol = (test) ->
@@ -344,14 +351,14 @@ exports.test_upper_octave_assigned_to_note_below_it = (test) ->
   '''
   composition=test_parses(str,test)
   line=first_sargam_line(composition)
-  my_inspect line
+  log line
   measure=line.items[0]
-  my_inspect "measure is",measure
+  log "measure is",measure
   beat=measure.items[0]
-  my_inspect "beat is",beat
+  log "beat is",beat
   test.equal("beat",beat.my_type)
   pitch=beat.items[0]
-  my_inspect "pitch is",pitch
+  log "pitch is",pitch
   test.equal("pitch",pitch.my_type)
   test.equal(beat.items[0].octave,1,"#{str} should have octave 1 for S")
   test.equal(beat.items[1].octave,1,"#{str} should have octave 1 for r")
@@ -373,7 +380,7 @@ exports.test_lower_octave_assigned_to_note_above_it = (test) ->
   test.equal("beat",beat.my_type)
   pitch=beat.items[0]
   test.equal("pitch",pitch.my_type)
-  my_inspect line
+  log line
   test.equal(beat.items[0].octave,-1,"#{str} should have octave -1 for S")
   test.equal(beat.items[1].octave,-1,"#{str} should have octave -1 for r")
   test.equal(beat.items[2].octave,-2,"#{str} should have octave -2 for g")
@@ -392,7 +399,7 @@ Title:Bansuri
 Source:AAK
 
           3                   +            2         .
-1) |: (Sr | n) S   (gm Pd) || P - P  P   | P - D  (<nDSn>) |
+1) |: (Sr | n) S   (gm Pd) || P - P  P   | P - D  <(nDSn)> |
             .
        ban-    su-  ri        ba- ja ra-   hi  dhu- na
 
@@ -404,7 +411,7 @@ Source:AAK
 |  d-Pm g P  m | r - S :| %
    ga-    wa-ta  ho- ri
 
-     +                     2    0     3     
+     +                     2    0     3
 2)  [| Srgm PdnS SndP mgrS | %    | %   | S--S --S- ---- R-G-     |]
 
 '''
@@ -502,7 +509,9 @@ exports.test_parses_lines = (test) ->
   R
   '''
   composition=test_parses(str,test)
-  my_inspect(composition)
+  _.log("test_parses_lines, after test_parses")
+  _.debug(composition.toString())
+  _.log "z"
   test.ok(composition.lines?,"parsed composition should have a lines attribute")
   test.equal(composition.lines.length,2,"Should have 2 lines")
   aux1(str,composition)
@@ -561,7 +570,6 @@ exports.test_sargam_characters_only_should_parse_as_sargam_line = (test) ->
  
 
 exports.test_parses_one_as_tala = (test) ->
-  debug=true
   str = '''
         1 
         S
@@ -573,7 +581,6 @@ exports.test_parses_one_as_tala = (test) ->
   test.done()
 
 exports.test_ending_one_dot = (test) ->
-  debug=true
   str = '''
         1.
         S
@@ -585,7 +592,6 @@ exports.test_ending_one_dot = (test) ->
   test.done()
 
 exports.test_chord_iv = (test) ->
-  debug=true
   str = '''
         iv
         S
@@ -619,7 +625,6 @@ exports.test_ending_two_underscores = (test) ->
   test.done()
 
 exports.test_tivra_ma_devanagri = (test) ->
-  debug=true
   str = '''
     म'
     tivrama
@@ -632,7 +637,6 @@ exports.test_tivra_ma_devanagri = (test) ->
 
 exports.test_devanagri_and_latin_sargam_together_should_fail = (test) ->
   #  \u0938\u0930\u095A\u092E\u092a\u0927\u0929\u0938
-  debug=true
   str = '''
            .
     सरग़मपधऩस SrRgGmMPdDnN
@@ -642,7 +646,6 @@ exports.test_devanagri_and_latin_sargam_together_should_fail = (test) ->
   test.done()
 exports.test_devanagri = (test) ->
   #  \u0938\u0930\u095A\u092E\u092a\u0927\u0929\u0938
-  debug=true
   str = '''
            .
     सरग़मपधऩस
