@@ -265,6 +265,13 @@ notation_is_in_sargam= (composition_data) ->
   @log "in notation_is_in_sargam"
   _.detect(composition_data.lines, (line) -> is_sargam_line(line))
 
+beat_is_all_dashes= (beat) ->
+  x=all_items_in_line(beat)
+  fun = (item) ->
+    return true if !item.my_type?
+    return false if item.my_type is "pitch"
+  _.all(beat,fun)
+  
 to_lilypond= (composition_data) ->
   # TODO: dashes at beginning of measure need to be rendered as 
   # rests in lilypond!!
@@ -346,7 +353,7 @@ to_lilypond= (composition_data) ->
         x= ary.push  x
       if item.my_type is "beat"
          beat=item
-         if beat.subdivisions not in [0,1,2,4,8,16,32,64,128] 
+         if beat.subdivisions not in [0,1,2,4,8,16,32,64,128] and !beat_is_all_dashes(beat) 
              @log "odd beat.subdivisions=",beat.subdivisions
              x=2
              if beat.subdivisions is 6
@@ -465,7 +472,7 @@ text = \\lyricmode {
   """
   lilypond_template
 
-all_items_in_line= (line_or_item,items) ->
+all_items_in_line= (line_or_item,items=[]) ->
   # TODO: dry this up
   # return (recursively) items in the line_or_item, delves into the hierarchy
   # looks for an items property and if so, recurses to it.

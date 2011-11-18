@@ -3,8 +3,8 @@ root = exports ? this
 debug=true
 global._console ||= require('./underscore.logger.js') if global?
 Logger=global._console.constructor
+#_console.level  = Logger.WARN
 _console.level  = Logger.DEBUG
-_console.level  = Logger.WARN
 _ = require("underscore")._ if require?
 require './sargam_parser.js'
 sys = require('sys')
@@ -23,11 +23,7 @@ my_inspect = (x) ->
   #    JSON.stringify arg,null," "
 
 _.mixin(my_inspect: my_inspect)
-_.my_inspect(1:2)
-
-_.debug('SargamParser is',SargamParser) 
 parser=SargamParser
-_.debug('parser is',parser)
 
 aux1 = (str,result) ->
   return if !sys
@@ -54,10 +50,10 @@ first_line = (composition_data) ->
     composition_data.lines[0]
 
 test_parses = (str,test,msg="") ->
+  _.debug("Entering test_parses, str is #{str}")
   composition=parser.parse(str)
-  _.debug("test_parses",composition)
-  test.ok(composition?,"#{str} didn't parse!!. #{msg}")
-  return composition
+  _.debug("in test_parses,composition is #{composition}")
+  composition
   ###
   test.doesNotThrow(-> result=parser.parse(str))
   test.ok(result?,"didn't parse")
@@ -74,7 +70,11 @@ exports.test_does_not_accept_single_barline = (test) ->
   should_not_parse(str,test)
   test.done()
 
+exports.test_accepts_various_eols = (test) ->
 
+  for str in ["SS\nRR","SS\rSS","SS\r\nRR","SS\n\rSS"]
+    test_parses(str,test)
+  test.done()
 
 exports.test_does_not_accepts_single_left_repeat = (test) ->
   str = '|:'

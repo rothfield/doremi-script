@@ -35,6 +35,10 @@ adjust_slurs_in_dom= () ->
     slur=$("##{attr}")
     return if slur.length==0
     pos1=$(slur).offset()
+    val=pos2.left-pos1.left
+    if val <0
+      _.error "adjust_slurs_in_dom, negative width"
+      return
     $(slur).css {width: pos2.left- pos1.left + $(this).width()}
 
 draw_line= (line) ->
@@ -135,6 +139,8 @@ draw_beat= (beat) ->
       val= draw_item(item))
       extra=""
       extra= "data-subdivisions=#{beat.subdivisions}" if beat.subdivisions > 1
+      #if beat.subdivisions >4
+      #   extra = extra + " title="'#{beat.subdivisions} subdivisions' "
       """
   <span #{extra} class='beat'>#{x.join('')}</span>
       """

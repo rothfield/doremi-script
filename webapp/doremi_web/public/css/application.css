@@ -64,7 +64,7 @@ span.beat[data-subdivisions] {
     border-bottom: .1em solid;
     padding-bottom: .75em;
     border-radius: 6em;
-    border-style: solid
+    border-style: solid;
     border-color:black;
     border-left-width: 0px;
     border-top-width: 0px;
@@ -160,8 +160,7 @@ div.display1 {
 }
 
 div:focus {
-     outline: none;
-   // border-style: solid;
+  outline: none;
 }
 
 span:focus {

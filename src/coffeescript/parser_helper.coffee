@@ -15,6 +15,35 @@ root.ParserHelper=
       normalized_pitch:normalized
     obj
 
+  parse_composition: (attributes,lines) ->
+    attributes=null if (attributes=="") 
+    title="Untitled"
+    @log("in composition, attributes is")
+    @my_inspect(attributes)
+    to_string= () ->
+      zz=this.to_string
+      delete this.to_string
+      str= JSON.stringify(this,null," ")
+      this.to_string=zz
+      "\n#{str}"
+    @composition_data =
+      my_type:"composition"
+      title:title
+      filename: "untitled"
+      attributes: attributes
+      lines: _.flatten(lines)
+      warnings:@warnings
+      source:"" # can't get input source here, put it in later
+      toString:to_string
+              
+    # Certain attributes get set on the data object
+    # TODO: dry
+    if get_attribute("Key") then this.composition_data.key =x
+    if get_attribute("Filename") then this.composition_data.filename =x
+    if get_attribute("Title") then this.composition_data.title=x
+    @mark_partial_measures()
+    @composition_data
+  
   parse_sargam_pitch: (slur,musical_char,end_slur) ->
     # Note that we need to track pitch_source separately from
     # source. We need source to track columns, but pitch_source is
