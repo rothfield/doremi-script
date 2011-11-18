@@ -407,7 +407,7 @@ to_lilypond= (composition_data) ->
      """
 
   title = get_attribute(composition_data,"Title")
-  time = get_attribute(composition_data,"Time Signature")
+  time = get_attribute(composition_data,"TimeSignature")
   if (key_is_valid=is_valid_key(composition_data.key))
     transpose_snip="\\transpose c' #{composition_data.key}'" 
   else

@@ -7,6 +7,8 @@ root.ParserHelper=
   # THESE METHODS WILL GET MIXED IN THE PEG PARSER (for now)
   # look at top of peg parser, need to manually add new methods for now
 
+  trim: (val) ->
+     if String::trim? then val.trim() else val.replace /^\s+|\s+$/g, ""
 
   sa_helper: (source,normalized) ->
     # save a little typing
@@ -38,9 +40,9 @@ root.ParserHelper=
               
     # Certain attributes get set on the data object
     # TODO: dry
-    if get_attribute("Key") then this.composition_data.key =x
-    if get_attribute("Filename") then this.composition_data.filename =x
-    if get_attribute("Title") then this.composition_data.title=x
+    if x=get_attribute("Key") then this.composition_data.key =x
+    if x=get_attribute("Filename") then this.composition_data.filename =x
+    if x=get_attribute("Title") then this.composition_data.title=x
     @mark_partial_measures()
     @composition_data
   

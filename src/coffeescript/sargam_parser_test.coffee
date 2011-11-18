@@ -680,6 +680,37 @@ exports.test_abc = (test) ->
   #test.ok(x.indexOf('kommal_indicator') > -1,"#{x} -line should have kommal indicator")
   test.done()
 
+exports.test_title = (test) ->
+  str = '''
+  Title: The entertainer 
+
+  S
+  '''
+  composition = test_parses(str,test)
+  test.equal(composition.title, "The entertainer" )
+  test.done()
+
+exports.test_filename = (test) ->
+  str = '''
+  Filename: the_entertainer 
+
+  S
+  '''
+  composition = test_parses(str,test)
+  test.equal(composition.filename, "the_entertainer" )
+  test.done()
+
+exports.test_empty_lines_with_blanks = (test) ->
+  str = '''
+        --S- ---- --r-
+     
+    
+                S
+  '''
+  composition = test_parses(str,test)
+  test.done()
+
+
 exports.test_measure_pitch_durations = (test) ->
   str = '''
         --S- ---- --r-
