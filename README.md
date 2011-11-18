@@ -92,10 +92,13 @@ should be used to indicate the melismas
         - cat composition.txt | sargam | lilypond -o composition -
   - This project borrows ideas from [ABC musical notation](http://en.wikipedia.org/wiki/ABC_notation), [lilypond](http://lilypond.org), and [markdown](http://en.wikipedia.org/wiki/Markdown).
   - Special thanks to George Ruckert, Ali Akbar Khan and the authors of peg.js, lilypond, and coffeescript.
-
+```ruby
+x='''
 Ornament example:
-```Title: test
-
    NRSNS
-| S```
+| S
+'''
+```
+
+
  
