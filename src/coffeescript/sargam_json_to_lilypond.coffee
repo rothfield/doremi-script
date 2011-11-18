@@ -212,6 +212,7 @@ lilypond_pitch_map=
   "E":"e"
   "E#":"es"
   "F":"f"
+  "Fb":"ff"
   "F#":"fs"
   "Gb":"gf"
   "G":"g"

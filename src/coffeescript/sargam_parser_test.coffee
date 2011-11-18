@@ -710,6 +710,14 @@ exports.test_empty_lines_with_blanks = (test) ->
   composition = test_parses(str,test)
   test.done()
 
+exports.test_recognizes_number_notation= (test) ->
+  str = '''
+   | 1234567 1#2#3#4#5#6#7#-   1b2b3b4b5b6b7b- 
+     hello
+  '''
+  composition = test_parses(str,test)
+  test.equal(composition.lines[0].kind,"number","should set composition kind to number")
+  test.done()
 
 exports.test_measure_pitch_durations = (test) ->
   str = '''
