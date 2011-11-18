@@ -77,8 +77,15 @@ should be used to indicate the melismas
   - DoremiScript grammar is [here](https://github.com/rothfield/doremi/raw/src/grammars/sargam.peg.js)
   - Endings are entered as follows: 1.________ or 2._____ Current lilypond support for endings is poor.
   - It is possible to mix ABC, Devanagri, and AACM notations in the same composition, but each line of notation must be in only one style.
+  - Supports ornaments (Sargam only for now). Octaves for ornaments are not supported and the ornament is placed in the column to the RIGHT of the pitch:
+  ```
+      Title: test
+
+       NRSNS
+      S
+  ```
   - Code base is written in coffeescript
-  - Command line tools are available via npm:
+  - (Programmes only:)Command line tools are available via npm:
     - First install [npm](http://npmjs.org)
     - Then install the **sargam** package:
     - npm install sargam
