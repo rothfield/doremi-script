@@ -291,7 +291,7 @@ Mode: phrygian
       parser.is_parsing=true
       composition_data= parser.parse (src=$('#entry_area').val())
       composition_data.source=src
-      #composition_data.lilypond=to_lilypond(composition_data)
+      composition_data.lilypond=to_lilypond(composition_data)
       window.the_composition=composition_data
       $('#parse_tree').text("Parsing completed with no errors \n"+JSON.stringify(composition_data,null,"  "))
       if composition_data.warnings.length > 0
