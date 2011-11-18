@@ -18,7 +18,7 @@ root.ParserHelper=
     obj
 
   parse_composition: (attributes,lines) ->
-    attributes=null if (attributes=="") 
+    attributes=null if (attributes=="")
     title="Untitled"
     @log("in composition, attributes is")
     @my_inspect(attributes)
@@ -90,6 +90,15 @@ root.ParserHelper=
     my_beat.subdivisions=this.count_beat_subdivisions(my_beat)
     @measure_note_durations(my_beat)
     my_beat
+
+  parse_ornament: (items) ->
+    beat_items=_.flatten items
+    ornament =
+      my_type:"ornament"
+      source: this.get_source_for_items(items)
+      ornament_items: items
+    ornament
+
 
   parse_sargam_line: (line_number,items,kind) ->
     if (line_number !='')
@@ -305,8 +314,17 @@ root.ParserHelper=
         this.measure_columns(item.items,pos)
       pos=pos + item.source.length
 
+  handle_ornament: (sargam,sarg_obj,ornament,sargam_nodes) ->
+    s=sargam_nodes[ornament.column-1]
+    if s? and (s.my_type is "pitch")
+      ornament.placement="after"
+      s.attributes = [] if !s.attributes?
+      s.attributes.push(ornament)
+      return
+    @warnings.push "ornament #{ornament.my_type} (#{ornament.source}) not to right of pitch , column is #{ornament.column}"
 
-  check_semantics: (sargam,sarg_obj,attribute) ->
+
+  check_semantics: (sargam,sarg_obj,attribute,sargam_nodes) ->
     # return false if the attribute is not to be added to sarg_obj
     # TODO: take more object oriented approach
     # eventually move this to a separate function
@@ -315,8 +333,11 @@ root.ParserHelper=
     # TODO: should only apply to devanagri!!
     # TODO: sometimes the attribute can be attached to a sargam object
     # NOT directly below it. For example, endings
+    if (attribute.my_type is"ornament")
+      handle_ornament(sargam,sarg_obj,attribute,sargam_nodes)
+      return false
     if (!sarg_obj)
-      @warnings.push "Attribute #{attribute.my_type} above/below nothing, column is #{attribute.column}"
+      @warnings.push "Attribute #{attribute.my_type} (#{attribute.source}) above/below nothing, column is #{attribute.column}"
       return false
     if attribute.my_type is "kommal_indicator"
       # TODO: review
@@ -325,7 +346,7 @@ root.ParserHelper=
         sarg_obj.normalized_pitch=sarg_obj.normalized_pitch+"b"
         return true
       @warnings.push "Error on line ?, column "+sarg_obj.column + "kommal indicator below non-devanagri pitch. Type of obj was #{sarg_obj.my_type}. sargam line was:"+sargam.source
-      return false 
+      return false
       #if sarg_obj.source 
     if attribute.octave?
       if (sarg_obj.my_type isnt 'pitch')
@@ -341,7 +362,10 @@ root.ParserHelper=
       return false # as we consumed the attribute
     true
 
+  assign_ornaments: (attribute_line,sargam,sargam_nodes) ->
+
   assign_attributes: (sargam,attribute_lines) ->
+    console.log "assign_attributes"
     # IN PROGRESS
     # blindly assign attributes from the list of attribute_lines to
     # sargam.attributes_new
@@ -352,11 +376,11 @@ root.ParserHelper=
       @log "processing",attribute_line
       attribute_map={}
       attribute_nodes=this.map_nodes(attribute_line)
-      for column, attribute of attribute_nodes 
+      for column, attribute of attribute_nodes
         @log "processing column,attribute",column,attribute
         sarg_obj=sargam_nodes[column]
         # TODO: eventually move this to an semantic analyzer phase
-        if this.check_semantics(sargam,sarg_obj,attribute) is not false
+        if this.check_semantics(sargam,sarg_obj,attribute,sargam_nodes) is not false
           sarg_obj.attributes=[] if !sarg_obj.attributes?
           sarg_obj.attributes.push attribute
 

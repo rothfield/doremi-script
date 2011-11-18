@@ -108,10 +108,11 @@ span.slur {
     border-right-width: 0em;
 }
 
-span.ornament {
+span.upper_attribute.ornament {
     position: absolute;
-    bottom: 0.75em;
-    margin-left: -.1em;
+    bottom: 2.4em;
+    font-size: .5em;
+    margin-left: 1.8em;
 }
 
 span.ornament span.note {
@@ -187,6 +188,10 @@ span.mordent {
     left:0.13em;
 }
 
+span.upper_attribute span.ornament {
+  font-size: .5em;
+
+}
 span.ornament span.note_wrapper span.note {
     font-size: .5em;
 }

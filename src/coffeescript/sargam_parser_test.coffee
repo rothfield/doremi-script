@@ -72,7 +72,7 @@ exports.test_does_not_accept_single_barline = (test) ->
 
 exports.test_accepts_various_eols = (test) ->
 
-  for str in ["SS\nRR","SS\rSS","SS\r\nRR","SS\n\rSS"]
+  for str in ["| SS\n\n| RR","| SS\r\r | SS","| SS\r\n\n| RR","| SS\n\r| SS"]
     test_parses(str,test)
   test.done()
 
@@ -184,22 +184,22 @@ exports.test_dash_starts_beat = (test) ->
   
 exports.test_recognizes_upper_octave_line = (test) ->
   str = '''
-  .:~*
-  SRGR
+   .:~*
+  |SRGR
   '''
   composition=test_parses(str,test)
   test.done()
 exports.test_recognizes_lower_octave_line = (test) ->
   str = '''
-  SRG  R
-  .:   *
+  |SRG  R
+   .:   *
   '''
   composition=test_parses(str,test)
   test.done()
 
 exports.test_recognizes_slurs = (test) ->
   str = '''
-  (S  R)
+  | (S  R)
    .
 
   '''
@@ -235,8 +235,8 @@ exports.test_accepts_delimited_beat = (test) ->
 
 exports.test_recognizes_ornament_symbol = (test) ->
   str = '''
-  ~
-  S  R
+    ~
+  | S  R
   '''
   composition=test_parses(str,test)
   test.done()
@@ -245,16 +245,16 @@ exports.test_attributes = (test) ->
   str = '''
   Rag:Bhairavi
 
-  SRG
-  '''
+  | SRG
+    '''
   composition=test_parses(str,test)
   test.done()
 
 
 exports.test_line_can_come_right_after_header_line = (test) ->
   str = '''
-  Rag:Kafi
-  S
+Rag:Kafi
+  | S
   '''
   composition=test_parses(str,test)
   test.done()
@@ -264,7 +264,7 @@ exports.test_leading_spaces_in_upper_octave_line = (test) ->
   Rag:Kafi
 
             .
-     SRGmPDNS
+  |   SRGmPDNS
   '''
   composition=test_parses(str,test)
   test.done()
@@ -273,7 +273,7 @@ exports.test_leading_spaces_in_sargam_line = (test) ->
   str = '''
   Rag:Kafi
 
-     Sr
+  |   Sr
   '''
   composition=test_parses(str,test)
   test.done()
@@ -282,7 +282,7 @@ exports.test_gives_warning_if_misplaced_upper_octave_indicator= (test) ->
   str = '''
   Rag:Kafi
     .
-     r
+  |   r
   '''
   composition=test_parses(str,test)
   test.ok(composition.warnings.length > 0,"expected warnings")
@@ -291,7 +291,7 @@ exports.test_gives_warning_if_misplaced_upper_octave_indicator= (test) ->
 
 exports.test_gives_warning_if_unmatched_parens_for_slurs = (test) ->
   str = '''
-  (Pm
+  | (Pm
   '''
   composition=test_parses(str,test)
   test.ok(composition.warnings.length > 0,"expected warnings")
@@ -330,61 +330,61 @@ exports.test_gives_warning_if_syllable_not_under_note = (test) ->
 
 exports.test_syllable_assigned_to_note_above_it = (test) ->
   str = '''
-  S
-  hi 
+  | S
+    hi 
 
   '''
   composition=test_parses(str,test)
   line=first_sargam_line(composition)
-  measure=line.items[0]
-  beat=measure.items[0]
-  test.equal("beat",beat.my_type)
-  pitch=beat.items[0]
-  test.equal("pitch",pitch.my_type)
-  test.equal("hi",pitch.syllable)
+  _.log composition
+  my_pitch=utils.tree_find(line, (item) -> item.my_type is "pitch" )
+  test.equal("hi",my_pitch.syllable)
   test.done()
 
 exports.test_upper_octave_assigned_to_note_below_it = (test) ->
   str = '''
-  .*::
-  Srgm
+    .*::
+  | Srgm
   '''
   composition=test_parses(str,test)
-  line=first_sargam_line(composition)
-  log line
-  measure=line.items[0]
-  log "measure is",measure
-  beat=measure.items[0]
-  log "beat is",beat
-  test.equal("beat",beat.my_type)
-  pitch=beat.items[0]
-  log "pitch is",pitch
-  test.equal("pitch",pitch.my_type)
-  test.equal(beat.items[0].octave,1,"#{str} should have octave 1 for S")
-  test.equal(beat.items[1].octave,1,"#{str} should have octave 1 for r")
-  test.equal(beat.items[2].octave,2,"#{str} should have octave 2 for g")
-  test.equal(beat.items[3].octave,2,"#{str} should have octave 2 for m")
+  sa=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "S")
+  re=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "r")
+  ga=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "g")
+  ma=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "m")
+  test.equal(sa.octave,1,"#{str} should have octave 1 for S")
+  test.equal(re.octave,1,"#{str} should have octave 1 for r")
+  test.equal(ga.octave,2,"#{str} should have octave 1 for g")
+  test.equal(ma.octave,2,"#{str} should have octave 1 for m")
+  test.done()
+
+
+exports.test_recognizes_ornament_to_right_of_pitch= (test) ->
+  str = '''
+     NRSNS  
+  | S
+  '''
+  composition = test_parses(str,test)
+  item=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source="S" )
+  orn=_.detect(item.attributes, (attr) -> attr.my_type is "ornament")
+  console.log("orn",orn)
+  test.ok(orn)
+  test.ok(orn.source is "NRSNS")
   test.done()
 
 exports.test_lower_octave_assigned_to_note_above_it = (test) ->
   str = '''
-  Srgm
-  .*::
+  |Srgm
+   .*::
   '''
   composition=test_parses(str,test)
-  line=first_sargam_line(composition)
-  log "line is #{line}"
-  measure=line.items[0]
-  test.equal("measure",measure.my_type)
-  beat=measure.items[0]
-  test.equal("beat",beat.my_type)
-  pitch=beat.items[0]
-  test.equal("pitch",pitch.my_type)
-  log line
-  test.equal(beat.items[0].octave,-1,"#{str} should have octave -1 for S")
-  test.equal(beat.items[1].octave,-1,"#{str} should have octave -1 for r")
-  test.equal(beat.items[2].octave,-2,"#{str} should have octave -2 for g")
-  test.equal(beat.items[3].octave,-2,"#{str} should have octave -2 for m")
+  sa=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "S")
+  re=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "r")
+  ga=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "g")
+  ma=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "m")
+  test.equal(sa.octave,-1,"#{str} should have octave -1 for S")
+  test.equal(re.octave,-1,"#{str} should have octave -1 for r")
+  test.equal(ga.octave,-2,"#{str} should have octave -2 for g")
+  test.equal(ma.octave,-2,"#{str} should have octave -2 for m")
   test.done()
 
 exports.test_all = (test) ->
@@ -426,15 +426,18 @@ Source:AAK
 
 
 exports.test_parses_measure_at_beginning_of_line = (test) ->
+  # TODO
   str = '''
   Sr
   ban-
   '''
+  str = '''
+  |Sr
+   ban-
+  '''
   composition=test_parses(str,test)
-  line=first_sargam_line(composition)
-  measure=line.items[0]
-  test.equal(measure.my_type,"measure","<<#{str}>> should be parsed as a measure with beat #{str}")
-  test.equal(measure.items[0].my_type,"beat","<<#{str}>> should be parsed as a measure with beat #{str}")
+  measure=utils.tree_find(composition.lines[0], (item) -> item.my_type is "measure" )
+  test.equal(measure.items[1].my_type,"beat","<<#{str}>> should be parsed as a measure with beat #{str}")
   test.done()
 
 
@@ -442,8 +445,8 @@ exports.test_parses_measure_at_beginning_of_line = (test) ->
 exports.test_parses_lyrics_line_without_leading_and_trailing_spaces = (test) ->
   # TODO-rewrite
   str = '''
-  Srgm|  S
-  he-llo john
+  |Srgm|  S
+   he-llo john
   '''
   composition=test_parses(str,test)
   test.done()
@@ -495,18 +498,19 @@ exports.test_parses_lyrics_line_with_leading_and_trailing_spaces = (test) ->
   # TODO:
   test.done()
 
-exports.test_position_counting = (test) ->
-  str = 'Sr'
+exports.test_column_assignment = (test) ->
+  str = '|Sr'
   composition=test_parses(str,test)
-  aux1(str,composition)
+  my_pitch=utils.tree_find(composition.lines[0], (item) -> item.source is "S" )
+  test.equal(1,my_pitch.column)
   test.done()
 
 
 exports.test_parses_lines = (test) ->
   str = '''
-  S
+  |S
 
-  R
+  |R
   '''
   composition=test_parses(str,test)
   _.log("test_parses_lines, after test_parses")
@@ -518,7 +522,7 @@ exports.test_parses_lines = (test) ->
   test.done()
 
 exports.test_position_counting = (test) ->
-  str = 'Sr'
+  str = '|Sr'
   composition=test_parses(str,test)
   aux1(str,composition)
   test.done()
@@ -553,26 +557,28 @@ exports.test_accepts_double_barline = (test) ->
 
 exports.test_accepts_mordent = (test) ->
   str = '''
-        ~
-        S
+          ~
+        | S
   '''
   test_parses(str,test)
   test.done()
 
-exports.test_sargam_characters_only_should_parse_as_sargam_line = (test) -> 
-  str = '''
-        SrRgGmMPdDnN
-        '''
-  composition = test_parses(str,test)
-  line=first_sargam_line(composition)
-  test.equal(line.my_type,"sargam_line","#{str} only should parse as a  sargam_line and NOT a lyrics_line")
-  test.done()
+
+
+#  exports.test_sargam_characters_only_parse_as_sargam_line = (test) -> 
+#    str = '''
+#          SrRgGmMPdDnN
+#          '''
+#    composition = test_parses(str,test)
+#    line=first_sargam_line(composition)
+#    test.equal(line.my_type,"sargam_line","#{str} only should parse as a  sargam_line and NOT a lyrics_line")
+#    test.done()
  
 
 exports.test_parses_one_as_tala = (test) ->
-  str = '''
-        1 
-        S
+  str =   '''
+           1
+        |  S
         '''
   composition = test_parses(str,test)
   line=first_sargam_line(composition)
@@ -582,8 +588,8 @@ exports.test_parses_one_as_tala = (test) ->
 
 exports.test_ending_one_dot = (test) ->
   str = '''
-        1.
-        S
+          1.
+        | S
         '''
   composition = test_parses(str,test)
   line=first_sargam_line(composition)
@@ -593,8 +599,8 @@ exports.test_ending_one_dot = (test) ->
 
 exports.test_chord_iv = (test) ->
   str = '''
-        iv
-        S
+          iv
+        | S
         '''
   composition = test_parses(str,test)
   line=first_sargam_line(composition)
@@ -604,8 +610,8 @@ exports.test_chord_iv = (test) ->
 
 exports.test_ending_one_dot_underscores = (test) ->
   str = '''
-        1.__
-        S
+          1.__
+        | S
         '''
   composition = test_parses(str,test)
   line=first_sargam_line(composition)
@@ -615,9 +621,9 @@ exports.test_ending_one_dot_underscores = (test) ->
 
 exports.test_ending_two_underscores = (test) ->
   str = '''
-        2______
-        S
-        '''
+          2______
+        | S
+       '''
   composition = test_parses(str,test)
   line=first_sargam_line(composition)
   x=sys.inspect(line,true,null)
@@ -626,8 +632,8 @@ exports.test_ending_two_underscores = (test) ->
 
 exports.test_tivra_ma_devanagri = (test) ->
   str = '''
-    म'
-    tivrama
+    |म'
+     tivrama
   '''
   composition = test_parses(str,test)
   line=first_sargam_line(composition)
@@ -639,8 +645,8 @@ exports.test_devanagri_and_latin_sargam_together_should_fail = (test) ->
   #  \u0938\u0930\u095A\u092E\u092a\u0927\u0929\u0938
   str = '''
            .
-    सरग़मपधऩस SrRgGmMPdDnN
-    SRGmPDNS
+    | सरग़मपधऩस SrRgGmMPdDnN
+      SRGmPDNS
   '''
   composition = should_not_parse(str,test)
   test.done()
@@ -682,10 +688,10 @@ exports.test_abc = (test) ->
 
 exports.test_title = (test) ->
   str = '''
-  Title: The entertainer 
-
-  S
-  '''
+Title: The entertainer 
+  
+| S
+'''
   composition = test_parses(str,test)
   test.equal(composition.title, "The entertainer" )
   test.done()
@@ -694,7 +700,7 @@ exports.test_filename = (test) ->
   str = '''
   Filename: the_entertainer 
 
-  S
+|  S
   '''
   composition = test_parses(str,test)
   test.equal(composition.filename, "the_entertainer" )
@@ -705,8 +711,13 @@ exports.test_empty_lines_with_blanks = (test) ->
         --S- ---- --r-
      
     
-                S
+       |         S
   '''
+  composition = test_parses(str,test)
+  test.done()
+
+exports.test_simple_line=(test) ->
+  str="| S\n\n|R\n\n|G\n\n|m"
   composition = test_parses(str,test)
   test.done()
 
@@ -718,6 +729,7 @@ exports.test_recognizes_number_notation= (test) ->
   composition = test_parses(str,test)
   test.equal(composition.lines[0].kind,"number","should set composition kind to number")
   test.done()
+
 
 exports.test_measure_pitch_durations = (test) ->
   str = '''

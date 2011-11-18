@@ -172,26 +172,28 @@ normalized_pitch_to_lilypond= (pitch) ->
   t='~' if pitch.tied?
   "#{p}#{o}#{duration}#{t}#{mordent}#{begin_slur}#{end_slur}#{ending}"
 
-lilypond_barline_map=
+lookup_lilypond_barline= (barline_type) ->
   # maps my_type field for barlines
-  "reverse_final_barline":'''
-    \\bar "|."
-  '''
-  "final_barline":'''
-    \\bar "||"
-  '''
-  "double_barline":'''
-    \\bar "||" 
-  '''
-  "single_barline":'''
-    \\bar "|" 
-  '''
-  "left_repeat":'''
-    \\bar "|:" 
-  '''
-  "right_repeat":'''
-    \\bar ":|" 
-  '''
+  map=
+    "reverse_final_barline":'''
+      \\bar "|."
+    '''
+    "final_barline":'''
+      \\bar "||"
+    '''
+    "double_barline":'''
+      \\bar "||" 
+    '''
+    "single_barline":'''
+      \\bar "|" 
+    '''
+    "left_repeat":'''
+      \\bar "|:" 
+    '''
+    "right_repeat":'''
+      \\bar ":|" 
+    '''
+  map[barline_type] or map["single_barline"]
 
 lilypond_octave_map=
   "-2":","
@@ -336,22 +338,13 @@ to_lilypond= (composition_data) ->
       @log "processing #{item.source}, my_type is #{item.my_type}"
       if item.my_type=="pitch"
         last_pitch=item  #use this to help render ties better(hopefully)
-        # TODO: before emitting pitch, try using up tied array!!
-        # process dashes_at_beginning_of_line_array
         if dashes_at_beginning_of_line_array.length > 0
           for dash in dashes_at_beginning_of_line_array
-            # TODO: combine 1/4 rests???
             ary.push normalized_pitch_to_lilypond(dash)
           dashes_at_beginning_of_line_array=[]
-        ary.push normalized_pitch_to_lilypond(item) if item.my_type=="pitch"
-      bar='''
-      \\bar "|" 
-      '''
+        ary.push normalized_pitch_to_lilypond(item) 
       if item.is_barline
-        # TODO:extract method
-        x= lilypond_barline_map[item.my_type] 
-        x=bar if !x?
-        x= ary.push  x
+        ary.push(lookup_lilypond_barline(item.my_type))
       if item.my_type is "beat"
          beat=item
          if beat.subdivisions not in [0,1,2,4,8,16,32,64,128] and !beat_is_all_dashes(beat) 
@@ -373,33 +366,13 @@ to_lilypond= (composition_data) ->
             ary.push "\\partial 4*#{measure.beat_count} "
       if item.dash_to_tie
         tied_array.push item
-        if false
-          @log "item.dash_to_tie case, item is",item
-          orig=item.pitch_to_use_for_tie
-          while orig.pitch_to_use_for_tie
-             orig=orig.pitch_to_use_for_tie
-          #orig = orig.pitch_to_use_for_tie if orig.pitch_to_use_for_tie
-          @log("dash_to_tie, orig is",orig)
-          obj={
-             source:orig.source
-             normalized_pitch:orig.normalized_pitch
-             octave:orig.octave
-             numerator:item.numerator
-             denominator:item.denominator
-             tied:item.tied
-          }
-  
-          @log("dash_to_tie case")
-          ary.push normalized_pitch_to_lilypond(obj)
     if in_times
       ary.push "}"
       in_times=false
     emit_tied_array(last_pitch,tied_array,ary) if tied_array.length >0 
     ary.push "\\break\n"
-  mode="major"
-  my_mode=get_attribute(composition_data,'Mode')
-  mode = my_mode if my_mode
-  # TODO: dry
+  mode = get_attribute(composition_data,'Mode')
+  mode or= "major"
   composer = get_attribute(composition_data,"Author")
   composer_snippet=""
   if composer
