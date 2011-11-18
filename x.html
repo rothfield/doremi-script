@@ -74,13 +74,7 @@ should be used to indicate the melismas</li>
 <li>DoremiScript grammar is <a href="https://github.com/rothfield/doremi/raw/src/grammars/sargam.peg.js">here</a></li>
 <li>Endings are entered as follows: 1.<strong><em>_</em><em></strong> or 2.<strong></em></strong> Current lilypond support for endings is poor.</li>
 <li>It is possible to mix ABC, Devanagri, and AACM notations in the same composition, but each line of notation must be in only one style.</li>
-<li><p>Supports ornaments (Sargam only for now). Octaves for ornaments are not supported and the ornament is placed in the column to the RIGHT of the pitch:
-```
-  Title: test</p>
-
-<p>NRSNS
-  S
-```</p></li>
+<li>Supports ornaments (Sargam only for now). Octaves for ornaments are not supported and the ornament is placed in the column to the RIGHT of the pitch:</li>
 <li>Code base is written in coffeescript</li>
 <li>(Programmes only:)Command line tools are available via npm:
 <ul>
@@ -100,3 +94,9 @@ should be used to indicate the melismas</li>
 <li>This project borrows ideas from <a href="http://en.wikipedia.org/wiki/ABC_notation">ABC musical notation</a>, <a href="http://lilypond.org">lilypond</a>, and <a href="http://en.wikipedia.org/wiki/Markdown">markdown</a>.</li>
 <li>Special thanks to George Ruckert, Ali Akbar Khan and the authors of peg.js, lilypond, and coffeescript.</li>
 </ul>
+
+<p>Ornament example:
+```Title: test</p>
+
+<p>NRSNS
+| S```</p>

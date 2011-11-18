@@ -78,12 +78,6 @@ should be used to indicate the melismas
   - Endings are entered as follows: 1.________ or 2._____ Current lilypond support for endings is poor.
   - It is possible to mix ABC, Devanagri, and AACM notations in the same composition, but each line of notation must be in only one style.
   - Supports ornaments (Sargam only for now). Octaves for ornaments are not supported and the ornament is placed in the column to the RIGHT of the pitch:
-  ```
-      Title: test
-
-       NRSNS
-      S
-  ```
   - Code base is written in coffeescript
   - (Programmes only:)Command line tools are available via npm:
     - First install [npm](http://npmjs.org)
@@ -98,4 +92,10 @@ should be used to indicate the melismas
         - cat composition.txt | sargam | lilypond -o composition -
   - This project borrows ideas from [ABC musical notation](http://en.wikipedia.org/wiki/ABC_notation), [lilypond](http://lilypond.org), and [markdown](http://en.wikipedia.org/wiki/Markdown).
   - Special thanks to George Ruckert, Ali Akbar Khan and the authors of peg.js, lilypond, and coffeescript.
+
+Ornament example:
+```Title: test
+
+   NRSNS
+| S```
  
