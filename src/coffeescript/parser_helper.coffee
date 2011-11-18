@@ -365,7 +365,6 @@ root.ParserHelper=
   assign_ornaments: (attribute_line,sargam,sargam_nodes) ->
 
   assign_attributes: (sargam,attribute_lines) ->
-    console.log "assign_attributes"
     # IN PROGRESS
     # blindly assign attributes from the list of attribute_lines to
     # sargam.attributes_new

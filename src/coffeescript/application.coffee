@@ -202,7 +202,6 @@ Mode: phrygian
           """
           $("#download_#{typ}").attr('href',x="compositions/#{some_data.fname}.#{typ}")
           if typ is 'png'
-            console.log "typ is png"
             $('#lilypond_png').attr('src',x)
           $("#download_#{typ}").attr('onclick',snip)
 
