@@ -1,7 +1,6 @@
 # Uses module pattern, exports to_html 
 # Usage:
-# to_html(composition)
-
+# to_html(composition_json_data)
 root = exports ? this
 
 #"Global" to this module
@@ -36,35 +35,6 @@ draw_line= (line) ->
 draw_measure= (measure) ->
   (draw_item(item) for item in measure.items).join('')
 
-draw_upper_sym = (item) ->
-  return "" if !item.octave?
-  bull=lookup_html_entity(".")
-  return "" if  item.octave < 1
-  return "" if  item.octave > 2
-  upper_sym=bull if  item.octave == 1
-  upper_sym=":" if  item.octave == 2
-  """
-     <span class="upper_octave1 upper_octave_indicator">#{upper_sym}</span>
-  """
-
-draw_syllable = (item) ->
-  return '' if !item.syllable?
-  return '' if item.syllable is ''
-  """
-     <span class="syllable1">#{item.syllable}</span>
-  """
-
-draw_lower_sym = (item) ->
-  return "" if !item.octave?
-  return "" if  item.octave > -1
-  return "" if  item.octave < -2
-  bull=lookup_html_entity(".")
-  lower_sym=bull if  item.octave == -1
-  lower_sym=":" if  item.octave == -2
-  """
-  <span class="lower_octave1">#{lower_sym}</span>
-  """
-
 draw_item= (item) ->
   return "" if item.my_type is "begin_beat"
   return "" if item.my_type is "end_beat"
@@ -87,12 +57,34 @@ draw_item= (item) ->
     if (my_source[1] is "b")
       my_source=my_source[0]
       pitch_sign="<span class='pitch_sign flat'>#{lookup_html_entity('b')}</span>"
-  upper_sym_html= draw_upper_sym(item)
-  lower_sym_html=draw_lower_sym(item)
-  syl_html=draw_syllable(item)
+  bull=lookup_html_entity(".")
+  upper_sym=""
+  lower_sym=""
+  lower_sym=bull if  item.octave == -1
+  lower_sym=":" if  item.octave == -2
+  upper_sym=":" if  item.octave == 2
+  upper_sym=bull if  item.octave == 1
+  lower_sym_html=""
+  if lower_sym isnt ""
+     lower_sym_html="""
+  <span class="lower_octave1">#{lower_sym}</span>
+     """
+
+
+  upper_sym_html=""
+  if upper_sym isnt ""
+     upper_sym_html="""
+     <span class="upper_octave1 upper_octave_indicator">#{upper_sym}</span>
+     """
+  syl= ""
   upper_attributes_html=""
+  syl= item.syllable if item.syllable?
+  syl_html=""
+  if syl isnt ""
+     syl_html="""
+     <span class="syllable1">#{syl}</span>
+     """
   data1=""
-  # TODO: refactor
   if item.attributes
     upper_attributes_html=(for attribute in item.attributes
       do (attribute) =>

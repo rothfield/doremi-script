@@ -149,11 +149,15 @@ span.note.double_barline {
 }
 
 div.composition {
-    border: 1px black;
-    border-style: solid;
-    font-size: 0.7em;
-    font-family: sans-serif;
+  border: 1px solid black;
+  padding-left: 10px;
+  padding-top:4px;
+}
 
+@media print {
+    div.composition {
+      border:none;
+  }
 }
 
 div.display1 {
@@ -238,12 +242,6 @@ span.ending {
   left:.2em;
 }
 
-
-div.composition_data {
-  border: 1px solid black;
-  padding-left: 10px;
-  padding-top:4px;
-}
 
 /* applies to chord_symbol when chord symbol has a tala sibling
  *

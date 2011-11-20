@@ -214,6 +214,16 @@ Mode: phrygian
       dataType: "json"
     $.ajax(obj)
 
+  get_dom_fixer = () ->
+    params=
+      type:'GET'
+      url:'js/dom_fixer.js'
+      dataType:'text'
+      success: (data) ->
+        $('#dom_fixer_for_html_doc').html(data)
+        generate_html_page_aux()
+    $.ajax(params)
+  
   get_zepto = () ->
     params=
       type:'GET'
@@ -221,13 +231,9 @@ Mode: phrygian
       dataType:'text'
       success: (data) ->
         $('#zepto_for_html_doc').html(data)
-        generate_html_page_aux()
+        get_dom_fixer()
     $.ajax(params)
  
-  generate_html_page_aux = () ->
-    css=$('#css_for_html_doc').html()
-    js=$('#zepto_for_html_doc').html()
-
   get_css = () ->
     params=
       type:'GET'
@@ -242,10 +248,11 @@ Mode: phrygian
   generate_html_page_aux = () ->
     css=$('#css_for_html_doc').html()
     js=$('#zepto_for_html_doc').html()
+    js2=$('#dom_fixer_for_html_doc').html()
     my_url="generate_html_page"
     composition=window.the_composition
     full_url="http://ragapedia.com"
-    html_str=to_html_doc(composition,full_url,css,js)
+    html_str=to_html_doc(composition,full_url,css,js+js2)
     my_data =
       timestamp: new Date().getTime()
       filename: composition.filename

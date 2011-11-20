@@ -3,7 +3,6 @@
 <head>
 <script type="text/javascript">
     if (!window.console) {
-    alert("no window.console");
       window.console = {
                    log: function() {}
                  };
@@ -102,9 +101,12 @@
     <script type="text/javascript" src="js/parser_helper.js"></script>
     <script type="text/javascript" src="js/sargam_json_to_lilypond.js"></script>
     <script type="text/javascript" src="js/sargam_parser.js"></script>
+    <script type="text/javascript" src="js/dom_fixer.js"></script>
     <script type="text/javascript" src="js/sargam_html_renderer.js"></script>
     <script type="text/javascript" src="js/application.js"></script>
+<!-- stash css and javascript here when necessary to generate a standalone page.  -->
 <script id="css_for_html_doc" type="text/html"></script>
 <script id="zepto_for_html_doc" type="text/html"></script>
+<script id="dom_fixer_for_html_doc" type="text/html"></script>
 </body>
 </html>
