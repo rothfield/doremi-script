@@ -7,8 +7,9 @@ css=fs.readFileSync(lib+'/sargam/css/application.css','utf8').toString()
 // js/third_party/zepto.unminified.js'
 var js=fs.readFileSync(lib+'/sargam/third_party/zepto.unminified.js','utf8').toString()
 var more_js=fs.readFileSync(lib+'/sargam/dom_fixer.js','utf8').toString()
-var to_html_doc=require(lib+'/sargam/sargam_html_renderer.js').to_html_doc
 var parser=SargamParser
-var composition_data=parser.parse(fs.readFileSync('/dev/stdin').toString())
-process.stdout.write(to_html_doc(composition_data,null,css,js+"\n"+more_js))
+var to_html_doc=require(lib+'/sargam/sargam_html_renderer.js').to_html_doc
+var source= fs.readFileSync('/dev/stdin').toString()
+var composition=parser.parse(source)
+process.stdout.write(to_html_doc(composition,null,css,js+"\n"+more_js))
 

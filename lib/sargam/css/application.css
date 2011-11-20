@@ -64,7 +64,7 @@ span.beat[data-subdivisions] {
     border-bottom: .1em solid;
     padding-bottom: .75em;
     border-radius: 6em;
-    border-style: solid
+    border-style: solid;
     border-color:black;
     border-left-width: 0px;
     border-top-width: 0px;
@@ -108,10 +108,11 @@ span.slur {
     border-right-width: 0em;
 }
 
-span.ornament {
+span.upper_attribute.ornament {
     position: absolute;
-    bottom: 0.75em;
-    margin-left: -.1em;
+    bottom: 1.6em;
+    font-size: .5em;
+    margin-left: 1.8em;
 }
 
 span.ornament span.note {
@@ -148,11 +149,15 @@ span.note.double_barline {
 }
 
 div.composition {
-    border: 1px black;
-    border-style: solid;
-    font-size: 0.7em;
-    font-family: sans-serif;
+  border: 1px solid black;
+  padding-left: 10px;
+  padding-top:4px;
+}
 
+@media print {
+    div.composition {
+      border:none;
+  }
 }
 
 div.display1 {
@@ -160,8 +165,7 @@ div.display1 {
 }
 
 div:focus {
-     outline: none;
-   // border-style: solid;
+  outline: none;
 }
 
 span:focus {
@@ -188,6 +192,10 @@ span.mordent {
     left:0.13em;
 }
 
+span.upper_attribute span.ornament {
+  font-size: .5em;
+
+}
 span.ornament span.note_wrapper span.note {
     font-size: .5em;
 }
@@ -234,12 +242,6 @@ span.ending {
   left:.2em;
 }
 
-
-div.composition_data {
-  border: 1px solid black;
-  padding-left: 10px;
-  padding-top:4px;
-}
 
 /* applies to chord_symbol when chord symbol has a tala sibling
  *
