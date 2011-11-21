@@ -143,9 +143,15 @@ Mode: phrygian
   |<(S--  r)>  (r---  g-m) | (Sn-d    Pmg rS) - - |
      test-ing   looped-       melisma-
   '''
-  str=str1
+  str3='''
+   . .
+    NRG
+    .
+ | S
+
+  '''
   str="S--R --G- | -m-- P"
-  $('#entry_area').val(str_simple)
+  $('#entry_area').val(str3)
   # window.last_val=$('#entry_area').val()
   parser=SargamParser
   window.parse_errors=""

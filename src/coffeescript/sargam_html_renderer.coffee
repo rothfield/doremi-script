@@ -65,6 +65,9 @@ draw_lower_sym = (item) ->
   <span class="lower_octave1">#{lower_sym}</span>
   """
 
+
+draw_ornament= (item) ->
+
 draw_item= (item) ->
   return "" if item.my_type is "begin_beat"
   return "" if item.my_type is "end_beat"
@@ -103,9 +106,13 @@ draw_item= (item) ->
           return """
           <span id="#{id_ctr}" class="slur">&nbsp;&nbsp;</span>
           """
-        if (attribute.my_type=="end_slur")
+        if (attribute.my_type is "end_slur")
           data1="data-begin-slur-id='#{last_slur_id}'"
           return ""
+        if (attribute.my_type is "zzornament")
+          """ 
+          <span class="upper_attribute ornament">#{orn_html}</span>
+          """
         my_item=attribute
         my_source2 = lookup_html_entity(my_item.source) # TODO:
         my_source2=my_item.source if !my_source2

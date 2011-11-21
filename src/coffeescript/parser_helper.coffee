@@ -17,6 +17,29 @@ root.ParserHelper=
       normalized_pitch:normalized
     obj
 
+  parse_line: (uppers,sargam,lowers,lyrics) ->
+    lyrics = '' if lyrics.length is 0
+    lowers= '' if  lowers.length is 0
+    uppers= '' if  uppers.length is 0
+    my_items = _.flatten(_.compact([uppers,sargam,lowers,lyrics]))
+    #add a group_line_no to each source line
+    ctr=0
+    for upper in uppers
+      upper.group_line_no=ctr
+      ctr= ctr + 1
+      sargam.group_line_no=ctr
+      ctr = ctr + 1
+    for lower in lowers
+      lower.group_line_no=ctr
+      ctr= ctr + 1
+    lyrics.group_line_no=ctr if lyrics?
+    _.each(my_items, (my_line)-> this.measure_columns(my_line.items,0))
+    my_uppers=_.flatten(_.compact([uppers]))
+    my_lowers=_.flatten(_.compact([lowers]))
+    attribute_lines=_.flatten(_.compact([uppers,lowers,lyrics]))
+    this.assign_attributes(sargam,attribute_lines)
+    sargam
+
   parse_composition: (attributes,lines) ->
     attributes=null if (attributes=="")
     title="Untitled"
@@ -350,7 +373,7 @@ root.ParserHelper=
       #if sarg_obj.source 
     if attribute.octave?
       if (sarg_obj.my_type isnt 'pitch')
-        @warnings.push "Error on line ?, column "+sarg_obj.column + "lower octave indicator below non-pitch. Type of obj was #{sarg_obj.my_type}. sargam line was:"+sargam.source
+        @warnings.push "Error on line ?, column "+sarg_obj.column + "#{attribute.my_type} below non-pitch. Type of obj was #{sarg_obj.my_type}. sargam line was:"+sargam.source
         return false
       sarg_obj.octave=attribute.octave
       return false # as we consumed the attribute
@@ -362,26 +385,61 @@ root.ParserHelper=
       return false # as we consumed the attribute
     true
 
-  assign_ornaments: (attribute_line,sargam,sargam_nodes) ->
+  find_ornaments: (attribute_lines) ->
+    orns=[]
+    for line in attribute_lines
+      for item in line.items
+        if item.my_type is "ornament"
+          item.group_line_no=line.group_line_no
+          for orn_item in item.ornament_items
+            orn_item.group_line_no=line.group_line_no
+          orns.push item
+    orns
 
+  map_ornaments: (ornaments) ->
+    # returns a map, column_number --> ornament_item
+    map={}
+    ##map[orn.column]= orn for orn in ornaments
+    for  orn in ornaments
+      console.log orn
+      column=orn.column
+      for ornament_item in orn.ornament_items
+        map[column]=ornament_item
+        column= column + 1
+    map
+   
   assign_attributes: (sargam,attribute_lines) ->
-    # IN PROGRESS
     # blindly assign attributes from the list of attribute_lines to
-    # sargam.attributes_new
-    @log("entering assign_attributes=sargam,attribute_lines",sargam,attribute_lines) 
+    @log("entering assign_attributes=sargam,attribute_lines",sargam,attribute_lines)
     # gets leaf nodes-
     sargam_nodes= this.map_nodes(sargam)
+    ornaments=this.find_ornaments(attribute_lines)
+    console.log ornaments
+    ornament_nodes=this.map_ornaments(ornaments)
+    console.log ornament_nodes
     for attribute_line in attribute_lines
       @log "processing",attribute_line
       attribute_map={}
       attribute_nodes=this.map_nodes(attribute_line)
       for column, attribute of attribute_nodes
-        @log "processing column,attribute",column,attribute
-        sarg_obj=sargam_nodes[column]
-        # TODO: eventually move this to an semantic analyzer phase
-        if this.check_semantics(sargam,sarg_obj,attribute,sargam_nodes) is not false
-          sarg_obj.attributes=[] if !sarg_obj.attributes?
-          sarg_obj.attributes.push attribute
+        do (column,attribute) =>
+          @log "processing column,attribute",column,attribute
+          sarg_obj=sargam_nodes[column]
+          orn_obj=ornament_nodes[column]
+          # TODO: eventually move this to an semantic analyzer phase
+          # handle case of an octave indicator for an ornament
+          if orn_obj?
+            if attribute.my_type is "upper_octave_indicator"
+              console.log "upper_octave_indicator case",attribute
+              if orn_obj.group_line_no < attribute_line.group_line_no
+                attribute.my_type = "lower_octave_indicator" # YES, change it
+                attribute.octave= (attribute.octave * -1)
+              orn_obj.attributes=[] if !orn_obj.attributes?
+              orn_obj.attributes.push attribute
+              return  
+          if this.check_semantics(sargam,sarg_obj,attribute,sargam_nodes) is not false
+            sarg_obj.attributes=[] if !sarg_obj.attributes?
+            sarg_obj.attributes.push attribute
 
   collect_nodes: (obj,ary) ->
     ary.push obj if  obj.my_type? and  !obj.items?
