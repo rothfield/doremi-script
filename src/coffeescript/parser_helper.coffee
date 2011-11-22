@@ -430,10 +430,15 @@ root.ParserHelper=
           # handle case of an octave indicator for an ornament
           if orn_obj?
             if attribute.my_type is "upper_octave_indicator"
+              orn_obj.octave=1
               _.debug "assign_attributes:upper_octave_indicator case",attribute
               if orn_obj.group_line_no < attribute_line.group_line_no
-                attribute.my_type = "lower_octave_indicator" # YES, change it
-                attribute.octave= (attribute.octave * -1)
+                # note that for ornaments, the dots will 
+                # always be upper_octave_indicator
+                # since ornaments are above the main line
+                # That is why multiply octave by -1
+                attribute.my_type = "lower_octave_indicator" 
+                orn_obj.octave= (orn_obj.octave * -1)
               orn_obj.attributes=[] if !orn_obj.attributes?
               orn_obj.attributes.push attribute
               return  

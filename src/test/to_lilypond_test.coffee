@@ -8,7 +8,7 @@ _ = require("underscore")._ if require?
 require './sargam_parser.js'
 sys = require('sys')
 utils=require './tree_iterators.js'
-_console.level  = Logger.DEBUG
+_console.level  = Logger.ERROR
 _.mixin(_console.toObject())
 
 `_.mixin({
@@ -30,9 +30,8 @@ parser=SargamParser
 
 test_to_lilypond = (str,test,msg="") ->
   composition=parser.parse(str)
-  _.error "composition is #{composition}"
+  _.debug "test_to_lilypond:composition is #{composition}"
   composition.source=str
-  #_.debug("test_parses:composition is #{composition}")
   _.debug("test_to_lilypond, str is \n#{str}\n")
   lily=to_lilypond(composition)
   composition.lilypond=lily

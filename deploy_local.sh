@@ -22,6 +22,7 @@ sudo killall -9 ruby
 if [ "$(hostname)" == 'ragapedia' ]; then
         echo "running sudo nohup since on server"
         nohup ruby application.rb &
-else ruby application.rb 
+else ruby application.rb &
 fi
+firefox http://localhost:4567 &
 

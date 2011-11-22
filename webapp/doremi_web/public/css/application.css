@@ -108,6 +108,18 @@ span.slur {
     border-right-width: 0em;
 }
 
+
+span.ornament_item.octave0 {
+}
+span.ornament_item.octave-1 {
+  text-decoration: underline;
+}
+span.ornament_item.octave1 {
+  text-decoration: overline;
+}
+span.ornament_item.octave2, span.ornament_item.octave2 {
+  /* octave of -2 or 2 */
+}
 span.upper_attribute.ornament {
     position: absolute;
     bottom: 1.6em;

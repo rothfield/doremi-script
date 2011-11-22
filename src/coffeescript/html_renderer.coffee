@@ -66,14 +66,17 @@ draw_lower_sym = (item) ->
   """
 
 
-draw_ornament_item= (ornament_item) ->
-  draw_pitch(ornament_item)
+draw_ornament_item= (item) ->
+  """
+  <span class="ornament_item octave#{item.octave}">#{item.source}</span>
+  """
+
 
 draw_ornament= (ornament) ->
   #console.log "draw_ornament"
-  #x=(draw_ornament_item(orn_item) for orn_item in ornament.ornament_items).join('')
+  x=(draw_ornament_item(orn_item) for orn_item in ornament.ornament_items).join('')
   """
-  <span class="upper_attribute ornament">#{ornament.source}</span>
+  <span class="upper_attribute ornament">#{x}</span>
   """
 
 draw_pitch= (pitch) ->
