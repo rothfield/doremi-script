@@ -3,13 +3,12 @@ root = exports ? this
 debug=false
 global._console ||= require('./underscore.logger.js') if global?
 Logger=global._console.constructor
-#_console.level  = Logger.DEBUG
 
 _ = require("underscore")._ if require?
 require './sargam_parser.js'
 sys = require('sys')
 utils=require './tree_iterators.js'
-_console.level  = Logger.WARN
+_console.level  = Logger.DEBUG
 _.mixin(_console.toObject())
 
 `_.mixin({
@@ -25,12 +24,13 @@ _.mixin(_console.toObject())
   }
 });`
 
-to_lilypond=require('./sargam_json_to_lilypond.js').to_lilypond
+to_lilypond=require('./to_lilypond.js').to_lilypond
 
 parser=SargamParser
 
 test_to_lilypond = (str,test,msg="") ->
   composition=parser.parse(str)
+  _.error "composition is #{composition}"
   composition.source=str
   #_.debug("test_parses:composition is #{composition}")
   _.debug("test_to_lilypond, str is \n#{str}\n")
@@ -56,7 +56,7 @@ exports.test_all = (test) ->
   fun = (args) ->
     [str,expected,msg]= args
     lily=test_to_lilypond(str,test)
-    console.log ("Testing #{str} -> #{expected}")
+    _.debug("Testing #{str} -> #{expected}")
     test.ok(lily.indexOf(expected) > -1,"FAILED*** #{msg}. Expected output of #{str} to include #{expected}. Lilypond output was #{lily}" )
   _.each_slice(test_data,3,fun)
   test.done()

@@ -2,6 +2,12 @@
 var path = require('path');
 var fs = require('fs');
 var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
+
+_console = require(lib+'/sargam/underscore.logger.js') 
+_console.level  = _console.constructor.WARN
+_ = require("underscore")._ 
+_.mixin(_console.toObject())
+
 require(lib+'/sargam/sargam_parser.js')
 var parser=SargamParser
 var source= fs.readFileSync('/dev/stdin').toString()

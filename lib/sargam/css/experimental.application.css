@@ -12,6 +12,35 @@ h2.step {
   border: 1px solid black;
 }
 
+span.ornament {
+  position:relative
+}
+span.ornament > span.pitch {
+  font-size: 1.6em;
+}
+
+span.ornament > span.note_wrapper { 
+  font-size: 1.5em;
+  position: absolute;
+}
+span.upper_attribute.ornament {
+    position: absolute;
+    bottom: 1.6em;
+    font-size: .5em;
+    margin-left: 1.8em;
+}
+
+span.ornament span.note {
+    padding-right: .2em;
+}
+
+span.ornament {
+    font-size: 1em;
+}
+span.ornament span.note_wrapper span.note {
+    font-size: 1em;
+}
+
 div#rendered_sargam {
 }
 
@@ -108,17 +137,6 @@ span.slur {
     border-right-width: 0em;
 }
 
-span.upper_attribute.ornament {
-    position: absolute;
-    bottom: 1.6em;
-    font-size: .5em;
-    margin-left: 1.8em;
-}
-
-span.ornament span.note {
-    padding-right: .2em;
-}
-
 div.sargam_line {
     /* font-size: 1em; */
    /*  font-family: sans-serif; */
@@ -184,9 +202,6 @@ div.composition.entered {
     cursor: text;
 }
 
-span.ornament {
-    font-size: 1em;
-}
 span.mordent {
     font-size: 1em;
     left:0.13em;
@@ -195,9 +210,6 @@ span.mordent {
 span.upper_attribute span.ornament {
   font-size: .5em;
 
-}
-span.ornament span.note_wrapper span.note {
-    font-size: .5em;
 }
 
 span.ornament span.upper_octave1, span.mordent {
@@ -319,5 +331,4 @@ span.syllable1 {
     font-size: 1.2em;
     font-family: serif;
 }
-
 
