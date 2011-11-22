@@ -401,7 +401,7 @@ root.ParserHelper=
     map={}
     ##map[orn.column]= orn for orn in ornaments
     for  orn in ornaments
-      console.log orn
+      _.debug orn
       column=orn.column
       for ornament_item in orn.ornament_items
         map[column]=ornament_item
@@ -414,9 +414,9 @@ root.ParserHelper=
     # gets leaf nodes-
     sargam_nodes= this.map_nodes(sargam)
     ornaments=this.find_ornaments(attribute_lines)
-    console.log ornaments
+    _.debug  "assign_attributes:ornaments are: #{ornaments}"
     ornament_nodes=this.map_ornaments(ornaments)
-    console.log ornament_nodes
+    _.debug "in assign_attributes ornament nodes: #{ornament_nodes}"
     for attribute_line in attribute_lines
       @log "processing",attribute_line
       attribute_map={}
@@ -430,7 +430,7 @@ root.ParserHelper=
           # handle case of an octave indicator for an ornament
           if orn_obj?
             if attribute.my_type is "upper_octave_indicator"
-              console.log "upper_octave_indicator case",attribute
+              _.debug "assign_attributes:upper_octave_indicator case",attribute
               if orn_obj.group_line_no < attribute_line.group_line_no
                 attribute.my_type = "lower_octave_indicator" # YES, change it
                 attribute.octave= (attribute.octave * -1)

@@ -1,6 +1,6 @@
 root = exports ? this
 
-debug=true
+debug=false
 global._console ||= require('./underscore.logger.js') if global?
 Logger=global._console.constructor
 #_console.level  = Logger.DEBUG

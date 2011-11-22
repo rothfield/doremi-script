@@ -66,9 +66,66 @@ draw_lower_sym = (item) ->
   """
 
 
-draw_ornament= (item) ->
+draw_ornament_item= (ornament_item) ->
+  draw_pitch(ornament_item)
+
+draw_ornament= (ornament) ->
+  #console.log "draw_ornament"
+  #x=(draw_ornament_item(orn_item) for orn_item in ornament.ornament_items).join('')
+  """
+  <span class="upper_attribute ornament">#{ornament.source}</span>
+  """
+
+draw_pitch= (pitch) ->
+  #console.log "entering draw_pitch"
+  source2 = lookup_html_entity(pitch.source)
+  my_source=if source2? then source2 else pitch.source
+  my_source=(Array(pitch.source.length+1).join "&nbsp;") if pitch.my_type=="whitespace"
+  pitch_sign="" # flat,sharp,etc
+  title=""
+  # refactor to draw_pitch?
+  title="#{pitch.numerator}/#{pitch.denominator} of a beat"
+  my_source=pitch.pitch_source
+  # TODO: make less hackish
+  if (my_source[1] is "#")
+    my_source=my_source[0]
+    pitch_sign="<span class='pitch_sign sharp'>#{lookup_html_entity('#')}</span>"
+  if (my_source[1] is "b")
+    my_source=my_source[0]
+    pitch_sign="<span class='pitch_sign flat'>#{lookup_html_entity('b')}</span>"
+  upper_sym_html= draw_upper_sym(pitch)
+  lower_sym_html=draw_lower_sym(pitch)
+  syl_html=draw_syllable(pitch)
+  upper_attributes_html=""
+  data1=""
+  # TODO: refactor
+  if pitch.attributes
+    upper_attributes_html=(for attribute in pitch.attributes
+      do (attribute) =>
+        return "" if attribute.my_type=="upper_octave_indicator"
+        if (attribute.my_type=="begin_slur")
+          id_ctr++
+          last_slur_id=id_ctr
+          return """
+          <span id="#{id_ctr}" class="slur">&nbsp;&nbsp;</span>
+          """
+        if (attribute.my_type is "end_slur")
+          data1="data-begin-slur-id='#{last_slur_id}'"
+          return ""
+        if (attribute.my_type is "ornament")
+          return draw_ornament(attribute)
+        my_item=attribute
+        my_source2 = lookup_html_entity(my_item.source) # TODO:
+        my_source2=my_item.source if !my_source2
+        """
+        <span class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
+        """).join('')
+  """
+  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_sym_html}#{lower_sym_html}#{syl_html}<span class="note #{pitch.my_type}" tabindex="0">#{my_source}</span>#{pitch_sign}</span>
+  """
 
 draw_item= (item) ->
+  return draw_pitch(item) if item.my_type is "pitch"
   return "" if item.my_type is "begin_beat"
   return "" if item.my_type is "end_beat"
   return draw_beat(item) if item.my_type=="beat"
@@ -79,17 +136,6 @@ draw_item= (item) ->
   my_source=(Array(item.source.length+1).join "&nbsp;") if item.my_type=="whitespace"
   pitch_sign="" # flat,sharp,etc
   title=""
-  if item.my_type is 'pitch'
-    # refactor to draw_pitch?
-    title="#{item.numerator}/#{item.denominator} of a beat"
-    my_source=item.pitch_source
-    # TODO: make less hackish
-    if (my_source[1] is "#")
-      my_source=my_source[0]
-      pitch_sign="<span class='pitch_sign sharp'>#{lookup_html_entity('#')}</span>"
-    if (my_source[1] is "b")
-      my_source=my_source[0]
-      pitch_sign="<span class='pitch_sign flat'>#{lookup_html_entity('b')}</span>"
   upper_sym_html= draw_upper_sym(item)
   lower_sym_html=draw_lower_sym(item)
   syl_html=draw_syllable(item)
@@ -109,10 +155,8 @@ draw_item= (item) ->
         if (attribute.my_type is "end_slur")
           data1="data-begin-slur-id='#{last_slur_id}'"
           return ""
-        if (attribute.my_type is "zzornament")
-          """ 
-          <span class="upper_attribute ornament">#{orn_html}</span>
-          """
+        if (attribute.my_type is "ornament")
+          return draw_ornament(attribute)
         my_item=attribute
         my_source2 = lookup_html_entity(my_item.source) # TODO:
         my_source2=my_item.source if !my_source2

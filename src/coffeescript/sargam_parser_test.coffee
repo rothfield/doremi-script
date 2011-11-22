@@ -1,10 +1,10 @@
 root = exports ? this
 
-debug=true
+debug=false
 global._console ||= require('./underscore.logger.js') if global?
 Logger=global._console.constructor
-#_console.level  = Logger.WARN
-_console.level  = Logger.DEBUG
+_console.level  = Logger.WARN
+#_console.level  = Logger.DEBUG
 _ = require("underscore")._ if require?
 require './sargam_parser.js'
 sys = require('sys')
@@ -37,7 +37,7 @@ should_not_parse = (str,test,msg) ->
 
 parse_without_reporting_error = (str) ->
   _.debug("Entering parse_without_reporting_error")
-  log "Parsing <<\n#{str}>>"
+  _.debug "Parsing <<\n#{str}>>"
   try
     parser.parse(str)
   catch error
@@ -112,7 +112,7 @@ exports.test_eof_ends_beat = (test) ->
   |SR
   '''
   composition=test_parses(str,test)
-  log composition
+  _.debug composition
   line=first_sargam_line(composition)
   measure=line.items[0]
   second_item= measure.items[1]
@@ -336,7 +336,7 @@ exports.test_syllable_assigned_to_note_above_it = (test) ->
   '''
   composition=test_parses(str,test)
   line=first_sargam_line(composition)
-  _.log composition
+  _.debug composition
   my_pitch=utils.tree_find(line, (item) -> item.my_type is "pitch" )
   test.equal("hi",my_pitch.syllable)
   test.done()
@@ -366,7 +366,7 @@ exports.test_recognizes_ornament_to_right_of_pitch= (test) ->
   composition = test_parses(str,test)
   item=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source="S" )
   orn=_.detect(item.attributes, (attr) -> attr.my_type is "ornament")
-  console.log("orn",orn)
+  _.debug("orn #{orn.my_inspect}")
   test.ok(orn)
   test.ok(orn.source is "NRSNS")
   test.done()
@@ -391,7 +391,7 @@ exports.test_all = (test) ->
   x=  '''
 dog
 '''
-  log  "x=#{x}" 
+  _.debug "x=#{x}" 
   str = '''
 Rag:Bhairavi
 Tal:Tintal
@@ -513,9 +513,9 @@ exports.test_parses_lines = (test) ->
   |R
   '''
   composition=test_parses(str,test)
-  _.log("test_parses_lines, after test_parses")
+  _.debug("test_parses_lines, after test_parses")
   _.debug(composition.toString())
-  _.log "z"
+  _.debug "z"
   test.ok(composition.lines?,"parsed composition should have a lines attribute")
   test.equal(composition.lines.length,2,"Should have 2 lines")
   aux1(str,composition)
