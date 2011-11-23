@@ -66,9 +66,17 @@ draw_lower_sym = (item) ->
   """
 
 
+class_for_octave = (octave_num) ->
+  return "octave0" if !octave_num?
+  if octave_num < 0
+     return "lower_octave_#{octave_num*-1}"
+  if octave_num > 0
+     return "upper_octave_#{octave_num}"
+  "octave0"
+
 draw_ornament_item= (item) ->
   """
-  <span class="ornament_item octave#{item.octave}">#{item.source}</span>
+  <span class="ornament_item #{class_for_octave(item.octave)}">#{item.source}</span>
   """
 
 

@@ -157,7 +157,7 @@ Mode: phrygian
   window.parse_errors=""
   if false
     params_for_download_lilypond =
-    	filename: () ->
+      filename: () ->
         "#{window.the_composition.filename}.ly"
       data: () ->
         window.the_composition.lilypond
@@ -334,5 +334,6 @@ Mode: phrygian
 
 
   window.do_timer()
+
 
 

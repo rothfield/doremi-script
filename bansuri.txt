@@ -1,24 +1,27 @@
+
 Rag:Bhairavi
 Tal:Tintal
 Title:Bansuri
+Author:Traditional
 Source:AAK
 Mode: phrygian
-filename: bansuri
+Filename: bansuri.sargam
+Time: 4/4
+Key: d
 
-           . .
-[| Srgm PdnS SndP mgrS |]
 
-           I  IV            V   V7 ii    iii7 
-               3                  +            2          .
-1)|: S S S (Sr | n) S   (gm Pd) | P - P  P   | P - D  <(nDSn)>) |
-                 .
-            ban-    su-  ri       ba- ja ra-   hi  dhu- na
+          
+                              i            IV          . 
+         3                    +             2        DSnDn
+1)|: (Sr | n) S   (gm <Pd)> | P - P  P   | P - D    n     |
+           .
+      ban-    su-  ri         ba- ja ra-   hi  dhu- na
 
-  0  ~                3               ~       +  .     *  *   
-| P  d   P       d    |  (Pm   PmnP) (g m) | (PdnS) -- g  S |
-     ma- dhu-ra  kan-     nai-        ya      khe-     la-ta
+  0  ~                3            ~       +  .     *  *   
+| P  d   P    d    |  (Pm   PmnP) (g m) | (PdnS) -- g  S |
+  ma-dhu-ra   kan-     nai-        ya      khe-     la-ta
 
-    2              0     
+   2               0     
                    ~
 | (d-Pm  g) P  m | r - S :|
    ga-      wa-ta  ho- ri

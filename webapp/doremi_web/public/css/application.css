@@ -114,8 +114,10 @@ span.ornament_item.octave0 {
 span.ornament_item.octave-1 {
   text-decoration: underline;
 }
-span.ornament_item.octave1 {
-  text-decoration: overline;
+
+span.ornament_item {
+  position: static;
+  display:inline;
 }
 span.ornament_item.octave2, span.ornament_item.octave2 {
   /* octave of -2 or 2 */
@@ -200,22 +202,37 @@ span.ornament {
     font-size: 1em;
 }
 span.mordent {
-    font-size: 1em;
+/* TODO: use background image like ornaments bullet */
+    font-size: 1.5em;
     left:0.13em;
 }
-
+span.upper_attribute + span.upper_attribute {
+            margin-top: -0.7em;
+}
 span.upper_attribute span.ornament {
   font-size: .5em;
-
 }
+
 span.ornament span.note_wrapper span.note {
     font-size: .5em;
 }
 
-span.ornament span.upper_octave1, span.mordent {
-    font-size: 1.75em;
+
+span.ornament_item.upper_octave_1, span.ornament_item.lower_octave_1 {
+  padding-top: .5em;
+  padding-bottom: .5em;
+  /* Embed the bullet in the css file, that will make it easier to create standalone html pages that don't need image files travelling along with them */
+  background: url(data:image/gif;base64,R0lGODlhCQAHAID/AAAAAMDAwCH5BAEAAAEALAAAAAAJAAcAQAINjI8Bu8idomHpgQpDAQA7);
+  background-repeat: no-repeat;
 }
 
+span.ornament_item.upper_octave_1 {
+  background-position:top;
+}
+
+span.ornament_item.lower_octave_1 {
+  background-position:bottom;
+}
 span.ornament span.upper_octave1 {
     position: absolute;
     top: 1.2em;
@@ -277,10 +294,7 @@ span.kommal_indicator {
  left: 0.2em;
  bottom: 0.05em;
 }
-    
-span.upper_attribute + span.upper_attribute {
-  margin-top: -.7em;
-}
+
 span.attribute_key,span.attribute_value {
     font-family: sans-serif;
     font-size: 1.6em; 
