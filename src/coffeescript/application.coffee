@@ -144,10 +144,10 @@ Mode: phrygian
      test-ing   looped-       melisma-
   '''
   str3='''
-   . .
-    NRG
-    .
- | S
+   . .. .
+    NRSNS      NRSNS
+               .  .    
+ | S          S
 
   '''
   str="S--R --G- | -m-- P"

@@ -135,6 +135,35 @@ calculate_lilypond_duration= (numerator,denominator) ->
     return alternate # return something
   looked_up_duration
 
+get_ornament = (pitch) ->
+  return false if !pitch.attributes?
+  _.detect(pitch.attributes, (attribute) -> attribute.my_type is "ornament")
+  
+has_mordent = (pitch) ->
+  return false if !pitch.attributes?
+  _.detect(pitch.attributes, (attribute) -> attribute.my_type is "mordent")
+
+lookup_lilypond_pitch= (pitch) ->
+  lilypond_pitch_map[pitch.normalized_pitch]
+
+lilypond_grace_note_pitch = (pitch) ->
+  # generate a single pitch for use as a grace note
+  duration="16"
+  lilypond_pitch=lookup_lilypond_pitch(pitch)
+  lilypond_octave=lilypond_octave_map["#{pitch.octave}"]
+  return "???#{pitch.octave}" if !lilypond_octave?
+  "#{lilypond_pitch}#{lilypond_octave}#{duration}"
+
+lilypond_grace_notes = (ornament) ->
+  # generate a series of grace notes for an ornament
+  #  c1 \afterGrace d1( { c16[ d]) } c1
+  #  In the above line, generate what is between {}
+  ary=(lilypond_grace_note_pitch(pitch) for pitch in ornament.ornament_items)
+  ary[0]= "#{ary[0]}["
+  length=ary.length
+  ary[length-1]="#{ary[length-1]}])"
+  ary.join ' '
+
 normalized_pitch_to_lilypond= (pitch) ->
   # Render a pitch/dash as lilypond
   # needs work
@@ -154,23 +183,30 @@ normalized_pitch_to_lilypond= (pitch) ->
   @log("normalized_pitch_to_lilypond, pitch is",pitch)
   if pitch.my_type is "dash"
      return "r#{duration}#{ending}"
-  p=lilypond_pitch_map[pitch.normalized_pitch]
-  return "???#{pitch.source}" if  !p?
-  o=lilypond_octave_map["#{pitch.octave}"]
-  return "???#{pitch.octave}" if !o?
-  begin_slur=""
+  lilypond_pitch=lilypond_pitch_map[pitch.normalized_pitch]
+  return "???#{pitch.source}" if  !lilypond_pitch?
+  lilypond_octave=lilypond_octave_map["#{pitch.octave}"]
+  return "???#{pitch.octave}" if !lilypond_octave?
   # Lower markings would be added as follows:
   # "-\"#{pp}\""
-  mordent=""
-  if pitch.attributes
-    if _.detect(pitch.attributes, (x) -> x.my_type is "mordent")
-      mordent="\\mordent"
-  end_slur=""
-  begin_slur="(" if item_has_attribute(pitch,"begin_slur")
-  end_slur=")" if item_has_attribute(pitch,"end_slur")
-  t=""
-  t='~' if pitch.tied?
-  "#{p}#{o}#{duration}#{t}#{mordent}#{begin_slur}#{end_slur}#{ending}"
+  mordent = if has_mordent(pitch) then "\\mordent" else ""
+  begin_slur = if item_has_attribute(pitch,"begin_slur") then "("  else ""
+  end_slur  =  if item_has_attribute(pitch,"end_slur") then ")" else ""
+  lilypond_symbol_for_tie=  if pitch.tied? then '~' else ''
+  #If you want to end a note with a grace, 
+  # use the \afterGrace command. It takes two 
+  # arguments: the main note, and the 
+  # grace notes following the main note.
+  #
+  #  c1 \afterGrace d1( { c16[ d]) } c1
+
+  ornament=get_ornament(pitch)
+  grace1=grace2=grace_notes=""
+  if ornament?
+    grace1 = "\\afterGrace "
+    grace2="( { #{lilypond_grace_notes(ornament)}) }"
+  "#{grace1}#{lilypond_pitch}#{lilypond_octave}#{duration}#{lilypond_symbol_for_tie}#{mordent}#{begin_slur}#{end_slur}#{ending}#{grace2}"
+
 
 lookup_lilypond_barline= (barline_type) ->
   # maps my_type field for barlines
