@@ -118,9 +118,9 @@ root.ParserHelper=
     beat_items=_.flatten items
     ornament =
       my_type:"ornament"
+      id: ++@id_ctr
       source: this.get_source_for_items(items)
       ornament_items: items
-      id: @id_ctr++
     ornament
 
 
@@ -132,6 +132,7 @@ root.ParserHelper=
     my_line =
       line_number:line_number
       my_type:"sargam_line"
+      id: ++@id_ctr
       source: source
       items: my_items
       kind:kind
@@ -150,6 +151,7 @@ root.ParserHelper=
     source = this.get_source_for_items(items)
     obj=
       my_type: "measure"
+      id: ++@id_ctr
       source:source
       items:items
 
