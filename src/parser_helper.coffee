@@ -120,6 +120,7 @@ root.ParserHelper=
       my_type:"ornament"
       source: this.get_source_for_items(items)
       ornament_items: items
+      id: @id_ctr++
     ornament
 
 
@@ -338,6 +339,20 @@ root.ParserHelper=
       pos=pos + item.source.length
 
   handle_ornament: (sargam,sarg_obj,ornament,sargam_nodes) ->
+    # Assign the ornament to a pitch if possible
+    # 2 kinds so far:
+    #  mDP        mD
+    # P      and    P
+    # if ornament is BEFORE sargam..
+    console.log "handle_ornament"
+    s=sargam_nodes[ornament.column+ornament.source.length]
+    if s? and (s.my_type is "pitch")
+      console.log "handle_ornament, before case, s is #{s}"
+      ornament.placement="before"
+      s.attributes = [] if !s.attributes?
+      s.attributes.push(ornament)
+      console.log "handle_ornament"
+      return
     s=sargam_nodes[ornament.column-1]
     if s? and (s.my_type is "pitch")
       ornament.placement="after"

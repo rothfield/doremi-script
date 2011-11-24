@@ -5,7 +5,7 @@
 root = exports ? this
 
 #"Global" to this module
-id_ctr=new Date().getTime()
+@id_ctr=new Date().getTime()
 
 last_slur_id=-1
 
@@ -81,10 +81,11 @@ draw_ornament_item= (item) ->
 
 
 draw_ornament= (ornament) ->
-  #console.log "draw_ornament"
+  console.log "draw_ornament, @id_ctr is #{@id_ctr}" 
   x=(draw_ornament_item(orn_item) for orn_item in ornament.ornament_items).join('')
+  @id_ctr++
   """
-  <span class="upper_attribute ornament">#{x}</span>
+  <span id="#{@id_ctr}" class="upper_attribute ornament placement_#{ornament.placement}">#{x}</span>
   """
 
 draw_pitch= (pitch) ->

@@ -42,7 +42,31 @@ $(document).ready ->
       window.timer_is_on=1
       window.timed_count()
   str="| S--R --G- | -m-- P"
-  $('#entry_area').val(str)
+  str3='''
+       . .. .
+        NRSNS      NRSNS
+               .  .    
+ |     S          S
+
+  m
+ | g
+
+
+  '''
+  str3='''
+   . .. .
+    NRSNS      NRSNS
+               .  .    
+ | S          S
+
+    m
+|    g
+  '''
+  str3='''
+  PmPm             .  .    
+ |    P   
+  '''
+  $('#entry_area').val(str3)
   parser=SargamParser
   window.parse_errors=""
   $('#load_long_composition').click ->

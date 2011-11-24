@@ -199,12 +199,19 @@ normalized_pitch_to_lilypond= (pitch) ->
   # grace notes following the main note.
   #
   #  c1 \afterGrace d1( { c16[ d]) } c1
+  #
+  #  Use
+  #  \acciaccatura { e16 d16 } c4
+  #  for ornaments with ornament.placement is "before"
 
   ornament=get_ornament(pitch)
   grace1=grace2=grace_notes=""
-  if ornament?
+  if ornament?.placement is "after"
     grace1 = "\\afterGrace "
     grace2="( { #{lilypond_grace_notes(ornament)}) }"
+  if ornament?.placement is "before"
+  #  \acciaccatura { e16 d16 } c4
+    grace1= "\\acciaccatura {#{lilypond_grace_notes(ornament)}}"
   "#{grace1}#{lilypond_pitch}#{lilypond_octave}#{duration}#{lilypond_symbol_for_tie}#{mordent}#{begin_slur}#{end_slur}#{ending}#{grace2}"
 
 
