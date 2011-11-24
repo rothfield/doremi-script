@@ -5,8 +5,6 @@ root = exports ? this
 
 
 adjust_slurs_in_dom= () ->
-  console.log("entering adjust_slurs_in_dom")
-  # TODO: extract into own file?
   $('span[data-begin-slur-id]').each  (index) ->
     pos2=$(this).offset()
     attr=$(this).attr("data-begin-slur-id")
@@ -26,7 +24,6 @@ adjust_slurs_in_dom= () ->
     #
     # Pmg
     #    R
-    _.debug("fixing ornaments.processing #{this}")
     el=$(this)
     el.css('margin-left',"-#{el.offset().width}px")
 root.adjust_slurs_in_dom=adjust_slurs_in_dom
