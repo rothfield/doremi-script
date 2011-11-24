@@ -148,7 +148,7 @@ lookup_lilypond_pitch= (pitch) ->
 
 lilypond_grace_note_pitch = (pitch) ->
   # generate a single pitch for use as a grace note
-  duration="16"
+  duration="32"
   lilypond_pitch=lookup_lilypond_pitch(pitch)
   lilypond_octave=lilypond_octave_map["#{pitch.octave}"]
   return "???#{pitch.octave}" if !lilypond_octave?
@@ -198,7 +198,7 @@ normalized_pitch_to_lilypond= (pitch) ->
   # arguments: the main note, and the 
   # grace notes following the main note.
   #
-  #  c1 \afterGrace d1( { c16[ d]) } c1
+  #  c1 \afterGrace d1( { c32[ d]) } c1
   #
   #  Use
   #  \acciaccatura { e16 d16 } c4
