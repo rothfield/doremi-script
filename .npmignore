@@ -2,6 +2,7 @@ compositions
 .git*
 Cakefile
 build_parser.sh
+src/
 tmp/
 deploy_local.sh
 install_prerequisites
@@ -12,6 +13,7 @@ npm-debug.log
 runtests.sh
 samples/
 vendor/
+webapp
 webapp/
 watch.sh
 

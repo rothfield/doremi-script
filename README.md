@@ -48,6 +48,7 @@ Generated Western Staff Notation
 
 
   - Use a blank line to separate lines of music.
+  - Start lines of music with a barline "|", for example,  | C D E F 
   - ABC style notation is written as follows C C# Db etc
   - Numbered notation is written as follows 1234567 corresponding to the diatonic notes of the C scale, with sharps and flats notated as 2b(Db) and 2#(D#), for example.
   - AACM sargam notation is written as follows SrRgGmMPdDnN for the 12 notes. Sharp and flat notes are also supported as follows: S# R# etc and Pb. This allows proper notation using Sargam of Jazz/Pop/Classical music that uses these notes. For example, in notating the Beatles tune "Yesterday", use P# to indicate the sharpened fifth degree. P# corresponds to G# in the key of C.
@@ -81,15 +82,17 @@ should be used to indicate the melismas
   - Code base is written in coffeescript
   - (Programmes only:)Command line tools are available via npm:
     - First install [npm](http://npmjs.org)
-    - Then install the **sargam** package:
-    - npm install sargam
+    - Then install the **doremiscript** package:
+    - npm install doremi
     - Command line usage: 
       - To generate lilypond:
-        - cat composition.txt | sargam 
+        - cat composition.txt | doremi2ly
       - To parse the composition, returning the parsed json:
-        - cat composition.txt | sargamparse
+        - cat composition.txt | doremiparse
       - Run lilypond on composition.txt
-        - cat composition.txt | sargam | lilypond -o composition -
+        - cat composition.txt | doremi2ly | lilypond -o composition -
+      - Create a standalone html page composition.html from composition.txt:
+        - cat composition.txt | doremi2htmldoc > composition.html
   - This project borrows ideas from [ABC musical notation](http://en.wikipedia.org/wiki/ABC_notation), [lilypond](http://lilypond.org), and [markdown](http://en.wikipedia.org/wiki/Markdown).
   - Special thanks to George Ruckert, Ali Akbar Khan and the authors of peg.js, lilypond, and coffeescript.
 

@@ -1,5 +1,5 @@
-{ "name": "sargam",
-  "description": "Sargam processor",
+{ "name": "doremiscript",
+  "description": "Letter music notation processor",
   "keywords":["sargam","solfege","letter music notation","doremi","lilypond","raga","Indian Music"],
   "author": "John Rothfield",
   "version": "0.0.3-pre",
@@ -11,9 +11,9 @@
   },
   "main": "lib/sargam/sargam_parser",
   "bin": {
-    "sargam2htmldoc":  "./bin/sargam2htmldoc",
-    "sargam2ly":  "./bin/sargam2ly",
-    "sargamparse":  "./bin/sargamparse"
+    "doremi2htmldoc":  "./bin/doremi2htmldoc",
+    "doremi2ly":  "./bin/doremi2ly",
+    "doremiparse":  "./bin/doremiparse"
   },
   "homepage": "http://ragapedia.com",
   "repository": {

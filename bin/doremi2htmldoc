@@ -18,5 +18,5 @@ var parser=SargamParser
 var to_html_doc=require(lib+'/sargam/html_renderer.js').to_html_doc
 var source= fs.readFileSync('/dev/stdin').toString()
 var composition=parser.parse(source)
-process.stdout.write(to_html_doc(composition,null,css,js+"\n"+more_js))
+process.stdout.write(to_html_doc(composition,null,css,js+"\n"+more_js)+ "\n")
 
