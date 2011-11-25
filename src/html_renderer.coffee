@@ -81,7 +81,6 @@ draw_ornament_item= (item) ->
 
 
 draw_ornament= (ornament) ->
-  console.log "draw_ornament, @id_ctr is #{@id_ctr}" 
   x=(draw_ornament_item(orn_item) for orn_item in ornament.ornament_items).join('')
   @id_ctr++
   """
@@ -89,7 +88,6 @@ draw_ornament= (ornament) ->
   """
 
 draw_pitch= (pitch) ->
-  #console.log "entering draw_pitch"
   source2 = lookup_html_entity(pitch.source)
   my_source=if source2? then source2 else pitch.source
   my_source=(Array(pitch.source.length+1).join "&nbsp;") if pitch.my_type=="whitespace"

@@ -173,8 +173,6 @@ normalized_pitch_to_lilypond= (pitch) ->
       ending="""
       ^"#{e.source}"
       """
-  #duration=calculate_lilypond_duration pitch.numerator,pitch.denominator
-  # TODO: clean this up!!!
   if pitch.fraction_array?
     first_fraction=pitch.fraction_array[0]
   else
@@ -182,7 +180,14 @@ normalized_pitch_to_lilypond= (pitch) ->
   duration=calculate_lilypond_duration first_fraction.numerator.toString(),first_fraction.denominator.toString()
   @log("normalized_pitch_to_lilypond, pitch is",pitch)
   if pitch.my_type is "dash"
-     return "r#{duration}#{ending}"
+    # unfortunately this is resulting in tied 1/4s.
+    if pitch.dash_to_tie is true
+      pitch.normalized_pitch=pitch.pitch_to_use_for_tie.normalized_pitch
+      pitch.octave=pitch.pitch_to_use_for_tie.octave
+      pitch.attributes=[]
+    # if pitch is a dash and not tied then output a rest
+    else
+      return "r#{duration}#{ending}"
   lilypond_pitch=lilypond_pitch_map[pitch.normalized_pitch]
   return "???#{pitch.source}" if  !lilypond_pitch?
   lilypond_octave=lilypond_octave_map["#{pitch.octave}"]
@@ -403,12 +408,17 @@ to_lilypond= (composition_data) ->
         if !item.dash_to_tie and item.numerator? #THEN its at beginning of line!
           @log "pushing item onto dashes_at_beginning_of_line_array"
           dashes_at_beginning_of_line_array.push item
-      if item.my_type is "measure"
+        if item.dash_to_tie
+          #TODO:review
+
+          ary.push normalized_pitch_to_lilypond(item)
+          item=null
+      if item? and item.my_type is "measure"
          measure=item
          if measure.is_partial
             ary.push "\\partial 4*#{measure.beat_count} "
-      if item.dash_to_tie
-        tied_array.push item
+      if item? and item.dash_to_tie
+        tied_array.push item if item?
     if in_times
       ary.push "}"
       in_times=false

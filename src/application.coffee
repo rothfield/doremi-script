@@ -63,9 +63,9 @@ $(document).ready ->
 |    g
   '''
   str3='''
-  PmPm             .  .    
+  PmPm       
  |    P   
-  '''
+ '''
   $('#entry_area').val(str3)
   parser=SargamParser
   window.parse_errors=""

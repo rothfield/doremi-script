@@ -41,22 +41,26 @@ test_to_lilypond = (str,test,msg="") ->
 
 test_data = [
   "S - -" ,
-  "c'4~ c'2",
-  "should combine whole empty beat within a measure"
+  #"c'4~ c'2",
+  "c'4~ c'4~ c'4",
+  "DOESNT combine whole empty beat within a measure"
   "S -- ---------" ,
-  "c'4~ c'2",
-  "should combine whole empty beat within a measure"
+  "c'4~ c'4~ c'4",
+  "DOESNT should combine whole empty beat within a measure"
   "1#2#3#4#5#6#7#-   1b2b3b4b5b6b7b- 1234567-"
   "cs'32 ds'32 es'32 fs'32 gs'32 as'32 bs'16 cf'32 df'32 ef'32 ff'32 gf'32 af'32 bf'16 c'32 d'32 e'32 f'32 g'32 a'32 b'16"
   "should work with number notation"
-
+  "| S-RG | ---- -SRS",
+  "e'4",
+  "2nd measure should have tied e4"
   ]
 exports.test_all = (test) ->
   fun = (args) ->
     [str,expected,msg]= args
     lily=test_to_lilypond(str,test)
     _.debug("Testing #{str} -> #{expected}")
-    test.ok(lily.indexOf(expected) > -1,"FAILED*** #{msg}. Expected output of #{str} to include #{expected}. Lilypond output was #{lily}" )
+    test.ok(lily.indexOf(expected) > -1,"FAILED*** #{msg}. Expected output of #{str} to include #{expected}.")
+    #Lilypond output was #{lily}" )
   _.each_slice(test_data,3,fun)
   test.done()
 
