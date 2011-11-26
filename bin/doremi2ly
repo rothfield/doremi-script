@@ -8,7 +8,7 @@ _console.level  = _console.constructor.WARN
 _ = require("underscore")._ 
 _.mixin(_console.toObject())
 
-require(lib+'/doremi-script/sargam_parser.js')
+require(lib+'/doremi-script/doremi_script_parser.js')
 var to_lilypond=require(lib+'/doremi-script/to_lilypond.js').to_lilypond
 var parser=SargamParser
 var source= fs.readFileSync('/dev/stdin').toString()
