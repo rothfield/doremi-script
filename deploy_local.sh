@@ -18,11 +18,9 @@ echo "copying $SRC_WEBAPP_DIR/* to $WEBAPP_DIR/public"
 
 cp -r $SRC_WEBAPP_DIR/* $WEBAPP_DIR/public
 cd $WEBAPP_DIR
-sudo killall -9 ruby
 if [ "$(hostname)" == 'ragapedia' ]; then
         echo "running sudo nohup since on server"
         nohup ruby application.rb &
-else ruby application.rb &
+else ruby application.rb 
 fi
-firefox http://localhost:4567 &
 

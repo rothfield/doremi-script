@@ -1,4 +1,5 @@
 # Run tests using nodeunit
+mkdir -p tmp
 nodeunit webapp/doremi_web/public/js/parser_test.js
 nodeunit webapp/doremi_web/public/js/fractions_test.js
 nodeunit webapp/doremi_web/public/js/to_lilypond_test.js
