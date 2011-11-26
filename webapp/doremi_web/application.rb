@@ -30,6 +30,15 @@ get '/' do
   File.read(File.join('public', 'index.html'))
 end
 
+get '/list_samples' do
+  ary=[]
+  Dir.chdir("samples") do
+    ary=Dir.glob("*.{txt,sargam}") 
+  end
+  content_type :json
+  ary.to_json
+end
+
 post '/generate_html_page' do
   # params are html_to_use and filename
   filename=params["filename"] || ""

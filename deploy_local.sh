@@ -9,7 +9,9 @@ THIRD_PARTY_DIR=$WEBAPP_DIR/public/js/third_party
 echo "WEBAPP_DIR is" $WEBAPP_DIR
 echo "copying application.rb  to $WEBAPP_DIR"
 mkdir -p $WEBAPP_DIR/public/compositions
-
+mkdir -p $WEBAPP_DIR/public/samples
+echo "copying sample/* to  $WEBAPP_DIR"
+cp -r ./samples $WEBAPP_DIR/public
 mkdir -p $WEBAPP_DIR/public/js/third_party
 echo "copying $THIRD_PARTY_DIR files to $WEBAPP_DIR "
 echo "copying third party to ..."

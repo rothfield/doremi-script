@@ -12,33 +12,7 @@ $(document).ready ->
     _.debug("***Using zepto.js instead of jQuery***")
   # This is for the online version
   debug=false
- 
 
-  # Setup samples dropdown
-  params=
-    type:'GET'
-    url:'list_samples'
-    dataType:'json'
-    success: (data) ->
-      str= ("<option>#{item}</option>" for item in data).join('')
-      $('#sample_compositions').append(str)
-  $.ajax(params)
-
-  # Handler for samples dropdown
-  sample_compositions_click = ->
-    console.log "sample_compositions_click"
-    return if this.selectedIndex is 0
-    val=this.value
-    params=
-      type:'GET'
-      url:"/samples/#{val}"
-      dataType:'text'
-      success: (data) ->
-        $('#sample_compositions').val("Load sample compositions")
-        $('#entry_area').val(data)
-    $.ajax(params)
-
-  $('#sample_compositions').change(sample_compositions_click)
   handleFileSelect = (evt) =>
     file = document.getElementById('file').files[0]
     reader=new FileReader()
@@ -251,5 +225,6 @@ $(document).ready ->
 
 
   window.do_timer()
+
 
 
