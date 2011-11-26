@@ -1,4 +1,4 @@
-{ "name": "doremiscript",
+{ "name": "doremi-script",
   "description": "Letter music notation processor",
   "keywords":["sargam","solfege","letter music notation","doremi","lilypond","raga","Indian Music"],
   "author": "John Rothfield",
