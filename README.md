@@ -1,7 +1,7 @@
 DoremiScript
 ============
 
-**DoremiScript** is a small language for creating [letter based musical notation](http://en.wikipedia.org/wiki/Letter_notation). It currently supports western ABC style notation, [Numbered notation](http://http://en.wikipedia.org/wiki/Numbered_musical_notation) using 1234567, [Sargam](http://en.wikipedia.org/wiki/Swara) notation using english letters SrRgGmMPdnN as used at the AACM for notating Ragas, and [Devanagri notation in Bhatkande style](http://en.wikipedia.org/wiki/Musical_notation#India) using Devanagri letters for the sargam letters. **DoremiScript** lets you write letter music notation using an easy-to-read, easy-to-write plain text format, then nicely formats it using css and html. DoRemiScript can also generate standard western notation via a [Lilypond](http://lilypond.org) converter. 
+**DoremiScript** is a small language for creating [letter based musical notation](http://en.wikipedia.org/wiki/Letter_notation). It currently supports western ABC style notation, [Numbered notation](http://http://en.wikipedia.org/wiki/Numbered_musical_notation) using 1234567, [Sargam](http://en.wikipedia.org/wiki/Swara) notation using english letters SrRgGmMPdnN as used at the AACM for notating Ragas, and [Devanagri notation in Bhatkande style](http://en.wikipedia.org/wiki/Musical_notation#India) using Devanagri letters for the sargam letters. **DoremiScript** lets you write letter music notation using an easy-to-read, easy-to-write plain text format, then nicely formats it using css and html. DoremiScript can also generate standard western notation via a [Lilypond](http://lilypond.org) converter. 
 
 Try the [online version](http://ragapedia.com)
 
@@ -34,7 +34,7 @@ Sample Input in AACM Sargam Style
     | (d-Pm  g) P  m | r - S :|
        ga-      wa-ta  ho- ri
     
-DoremiScript HTML Output
+DoremiScript HTML Output(screen snapshot)
 ------------------
 ![Screenshot of DoremiScript rendered in html](https://github.com/rothfield/doremi/raw/master/docs/bansuri_in_html_screenshot.png "Sargam Screenshot")
 
@@ -45,7 +45,7 @@ Generated Western Staff Notation
 
 
   - Use a blank line to separate lines of music.
-  - Start lines of music with a barline "|", for example,  | C D E F 
+  - Start lines of music with a barline "|", for example,  | C D E F | . Otherwise be sure to include a barline or dash in the main line of music.
   - ABC style notation is written as follows C C# Db etc
   - Numbered notation is written as follows 1234567 corresponding to the diatonic notes of the C scale, with sharps and flats notated as 2b(Db) and 2#(D#), for example.
   - AACM sargam notation is written as follows SrRgGmMPdDnN for the 12 notes. Sharp and flat notes are also supported as follows: S# R# etc and Pb. This allows proper notation using Sargam of Jazz/Pop/Classical music that uses these notes. For example, in notating the Beatles tune "Yesterday", use P# to indicate the sharpened fifth degree. P# corresponds to G# in the key of C.
@@ -79,8 +79,8 @@ should be used to indicate the melismas
   - Code base is written in coffeescript
   - (Programmes only:)Command line tools are available via npm:
     - First install [npm](http://npmjs.org)
-    - Then install the **doremiscript** package:
-    - npm install doremi
+    - Then install the **doremi-script** package:
+    - npm install doremi-script
     - Command line usage: 
       - To generate lilypond:
         - cat composition.txt | doremi2ly
@@ -92,6 +92,7 @@ should be used to indicate the melismas
         - cat composition.txt | doremi2htmldoc > composition.html
   - This project borrows ideas from [ABC musical notation](http://en.wikipedia.org/wiki/ABC_notation), [lilypond](http://lilypond.org), and [markdown](http://en.wikipedia.org/wiki/Markdown).
   - Special thanks to George Ruckert, Ali Akbar Khan and the authors of peg.js, lilypond, and coffeescript.
+  - The online version is best used with Firefox.
 
 
  
