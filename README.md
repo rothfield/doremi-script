@@ -7,7 +7,6 @@ Try the [online version](http://ragapedia.com)
 
 Sample Input in AACM Sargam Style
 ---------------------------------
-
     Rag:Bhairavi
     Tal:Tintal
     Title:Bansuri
@@ -15,35 +14,33 @@ Sample Input in AACM Sargam Style
     Source:AAK
     Mode: phrygian
     Filename: bansuri.sargam
-    Time: 4/4 
+    Time: 4/4
     Key: d
     
     
+              
+                                   i            IV         . 
+             3S             n      +            2         DSnDn
+    1)|: (Sr | n) S   (gm <P d)> | P - P  P   | P - D    n     |
+               .
+          ban-    su-  ri          ba- ja ra-   hi  dhu- na
     
-                                i            IV  
-             3                  +            2          .   
-    1)|: (Sr | n) S   (gm Pd) | P - P  P   | P - D  <(nDSn)>) |
-               .   
-          ban-    su-  ri       ba- ja ra-   hi  dhu- na
+      0  ~                 3           mgm        +  .     *  *   
+    | P  d   P    d    |  (Pm   PmnP)    (g m) | (PdnS) -- g  S |
+      ma-dhu-ra   kan-     nai-           ya      khe-     la-ta
     
-      0  ~                3            ~       +  .     *  *   
-    | P  d   P    d    |  (Pm   PmnP) (g m) | (PdnS) -- g  S | 
-      ma-dhu-ra   kan-     nai-        ya      khe-     la-ta
-    
-       2               0    
-                       ~   
+       2               0     
+                    Pm ~
     | (d-Pm  g) P  m | r - S :|
        ga-      wa-ta  ho- ri
-
-
-
-Sargam HTML Output
+    
+DoremiScript HTML Output
 ------------------
-![Screenshot of Sargam rendered in html](https://github.com/rothfield/doremi/raw/master/docs/sargam_screenshot.png "Sargam Screenshot")
+![Screenshot of DoremiScript rendered in html](https://github.com/rothfield/doremi/raw/master/docs/bansuri_in_html_screenshot.png "Sargam Screenshot")
 
 Generated Western Staff Notation
 --------------------------------
-![Converted to western notation](https://github.com/rothfield/doremi/raw/master/docs/western_notation_example.png "")
+![Converted to western notation](https://github.com/rothfield/doremi/raw/master/docs/bansuri_in_western_notation.png "")
 
 
 
