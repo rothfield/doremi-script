@@ -9,7 +9,7 @@ _ = require("underscore")._
 _.mixin(_console.toObject())
 
 require(lib+'/doremi-script/doremi_script_parser.js')
-var parser=SargamParser
+var parser=DoremiScriptParser
 var source= fs.readFileSync('/dev/stdin').toString()
 var composition=parser.parse(source)
 composition.source=source

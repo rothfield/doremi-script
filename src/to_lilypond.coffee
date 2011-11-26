@@ -159,9 +159,19 @@ lilypond_grace_notes = (ornament) ->
   #  c1 \afterGrace d1( { c16[ d]) } c1
   #  In the above line, generate what is between {}
   ary=(lilypond_grace_note_pitch(pitch) for pitch in ornament.ornament_items)
-  ary[0]= "#{ary[0]}["
+  
+  needs_beam = (ary.length > 1)
+  begin_beam=end_beam=""
+  begin_slur="("
+  begin_slur=""
+  end_slur=")"
+  if needs_beam
+    begin_beam="["
+    end_beam="]"
+  ary[0]= "#{ary[0]}#{begin_slur}#{begin_beam}" 
   length=ary.length
-  ary[length-1]="#{ary[length-1]}])"
+  ary[length-1]="#{ary[length-1]}#{end_beam}" 
+  # TODO: end slur??????????
   ary.join ' '
 
 normalized_pitch_to_lilypond= (pitch) ->
@@ -209,6 +219,11 @@ normalized_pitch_to_lilypond= (pitch) ->
   #  \acciaccatura { e16 d16 } c4
   #  for ornaments with ornament.placement is "before"
 
+
+  # The afterGrace in lilypond require parens to get lilypond
+  # to render a slur.
+  # The acciatura in lilypond don't require parens to get lilypond
+  # to render a slur.
   ornament=get_ornament(pitch)
   grace1=grace2=grace_notes=""
   if ornament?.placement is "after"

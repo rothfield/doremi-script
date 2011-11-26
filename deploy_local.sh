@@ -1,5 +1,7 @@
 #!/bin/bash
 # deploy the sinatra web app
+sudo killall -9 ruby
+
 WEBAPP_DIR=./webapp/doremi_web
 SRC_WEBAPP_DIR=./src/web_app/
 THIRD_PARTY_DIR=$WEBAPP_DIR/public/js/third_party

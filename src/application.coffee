@@ -67,7 +67,7 @@ $(document).ready ->
  |    P   
  '''
   $('#entry_area').val(str3)
-  parser=SargamParser
+  parser=DoremiScriptParser
   window.parse_errors=""
   $('#load_long_composition').click ->
     $('#entry_area').val($('#long_sample').html())
@@ -83,7 +83,7 @@ $(document).ready ->
     my_data =
       fname:window.the_composition.filename
       data: window.the_composition.lilypond
-      sargam_source: $('#entry_area').val()
+      doremi_script_source: $('#entry_area').val()
     obj=
       type:'POST'
       url:my_url
@@ -165,6 +165,7 @@ $(document).ready ->
     $.ajax(obj)
 
   $('#generate_html_page').click =>
+    # Generate standalone html page
     # load these from the server if they weren't already loaded
     if ((css=$('#css_for_html_doc').html()).length < 100)
       get_css()
@@ -201,7 +202,7 @@ $(document).ready ->
         $('#warnings_div').html "The following warnings were reported:<br/>"+composition_data.warnings.join('<br/>')
         $('#warnings_div').show()
       $('#parse_tree').hide()
-      $('#rendered_sargam').html(to_html(composition_data))
+      $('#rendered_doremi_script').html(to_html(composition_data))
       $('#lilypond_source').html(composition_data.lilypond)
       # TODO: combine with the above line..
       adjust_slurs_in_dom()

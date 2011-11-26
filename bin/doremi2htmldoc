@@ -14,7 +14,7 @@ css=fs.readFileSync(lib+'/doremi-script/css/application.css','utf8').toString()
 // js/third_party/zepto.unminified.js'
 var js=fs.readFileSync(lib+'/doremi-script/third_party/zepto.unminified.js','utf8').toString()
 var more_js=fs.readFileSync(lib+'/doremi-script/dom_fixer.js','utf8').toString()
-var parser=SargamParser
+var parser=DoremiScriptParser
 var to_html_doc=require(lib+'/doremi-script/html_renderer.js').to_html_doc
 var source= fs.readFileSync('/dev/stdin').toString()
 var composition=parser.parse(source)

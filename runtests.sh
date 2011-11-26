@@ -1,8 +1,9 @@
 # Run tests using nodeunit
 mkdir -p tmp
-nodeunit webapp/doremi_web/public/js/parser_test.js
-nodeunit webapp/doremi_web/public/js/fractions_test.js
-nodeunit webapp/doremi_web/public/js/to_lilypond_test.js
+nodeunit lib/doremi-script/parser_test.js
+nodeunit lib/doremi-script/fractions_test.js
+nodeunit lib/doremi-script/to_lilypond_test.js
+nodeunit lib/doremi-script/to_html_test.js
 echo "testing command line utility doremi2htmldoc with input | SRG"
 echo "| SRG" | doremi2htmldoc > tmp/test2htmldoc.html ;  
 echo "`wc -l tmp/test2htmldoc.html`"

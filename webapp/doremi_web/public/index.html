@@ -8,7 +8,7 @@
                  };
     }
 </script>
-    <title>Sargam Online Parser/Formatter</title>
+    <title>DoremiScript Letter Music Notation</title>
     <link rel="stylesheet" href="css/application.css" type="text/css" media="all">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 </head>
@@ -31,7 +31,7 @@
 <a id="load_long_composition" >Load Long sample</a> 
 </li>
 <li>
-<a href="#rendered_sargam">Jump to Rendered Sargam</a> 
+<a href="#rendered_doremi_script">Jump to Rendered DoremiScript</a> 
 </li>
 <li>
 </li>
@@ -42,7 +42,7 @@
 </li>
 </ul>
 </div>
-<h2 class="step">Step 1: Enter music notation as letters. You can use ABC(C C# D Eb), Sargam (SrRgGmPdDnN), or Devanagri Sargam(<span class="display_devanagri">सरग़मपधऩस</span>). Place dots above/below notes to indicate octaves. Use (CDEF) to indicate a slur between C and F. Put a blank line between each line of notation. Use dashes as rhythmic placeholders (for example, try C--D--E)</h2>
+<h2 class="step">Step 1: Enter music notation as letters. You can use ABC(C C# D Eb), Sargam (SrRgGmPdDnN), Number notation(1234567), or Devanagri Sargam(<span class="display_devanagri">सरग़मपधऩस</span>). Place dots above/below notes to indicate octaves. Use (CDEF) to indicate a slur between C and F. Put a blank line between each line of notation. Use dashes as rhythmic placeholders (for example, try C--D--E)</h2>
 <textarea id="entry_area" rows="5" cols="90"></textarea>
 <div id="parse_tree_div">
                 <pre id="parse_tree">
@@ -51,12 +51,12 @@
                         </div>
 <div id="warnings_div">
 </div>
-<a name="rendered_sargam"></a> 
+<a name="rendered_doremi_script"></a> 
 <h2 class="step">Step 2: The music notation is rendered using standard html/css. Note the lower loops are automatically drawn to delimit beats and that upper loops are drawn for slurs. 
 </h2>
 <h4>Click <button id="run_parser">here</button> to run the parser manually</h4>
-<div><label>Rendered Sargam:</label> </div>
-<div id="rendered_sargam">
+<div><label>Rendered DoremiScript:</label> </div>
+<div id="rendered_doremi_script">
 </div>
 <br/>
 <br/>
@@ -68,8 +68,8 @@
 <button id="show_lilypond_source">Lilypond source</button>
 <button id="show_lilypond_output">Lilypond output</button>
 <button id="generate_html_page">Display html in own window</button>
-<h2 class="step">Step 4: Save your composition to your computer as a text file by clicking here: 
-<a id="download_txt" href="" target="_blank">sargam(right click and do save/as)</a>
+<h2 class="step">Step 4: Save your composition to your computer as a text file by clicking 
+<a id="download_txt" href="" target="_blank">here</a>(right click and do save/as)(Must click the Generate staff notation... button first)
 </h2>
 <pre id='lilypond_source'>
 </pre>
@@ -108,6 +108,7 @@
 <script id="css_for_html_doc" type="text/html"></script>
 <script id="zepto_for_html_doc" type="text/html"></script>
 <script id="dom_fixer_for_html_doc" type="text/html"></script>
+<!-- TODO: load from a common location -->
 <script id="long_sample" type="text/html">
 Rag:Bhairavi
 Tal:Tintal
@@ -121,18 +122,18 @@ Key: d
 
 
           
-                              i            IV         . 
-         3                    +             2        DSnDn
-1)|: (Sr | n) S   (gm <Pd)> | P - P  P   | P - D    n     |
+                               i            IV         . 
+         3S             n      +            2         DSnDn
+1)|: (Sr | n) S   (gm <P d)> | P - P  P   | P - D    n     |
            .
-      ban-    su-  ri         ba- ja ra-   hi  dhu- na
+      ban-    su-  ri          ba- ja ra-   hi  dhu- na
 
   0  ~                 3           mgm        +  .     *  *   
 | P  d   P    d    |  (Pm   PmnP)    (g m) | (PdnS) -- g  S |
   ma-dhu-ra   kan-     nai-           ya      khe-     la-ta
 
    2               0     
-                   ~
+                Pm ~
 | (d-Pm  g) P  m | r - S :|
    ga-      wa-ta  ho- ri
 </script>

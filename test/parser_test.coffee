@@ -6,7 +6,7 @@ Logger=global._console.constructor
 _console.level  = Logger.WARN
 #_console.level  = Logger.DEBUG
 _ = require("underscore")._ if require?
-require './sargam_parser.js'
+require './doremi_script_parser.js'
 sys = require('sys')
 utils=require './tree_iterators.js'
 _.mixin(_console.toObject())
@@ -23,7 +23,7 @@ my_inspect = (x) ->
   #    JSON.stringify arg,null," "
 
 _.mixin(my_inspect: my_inspect)
-parser=SargamParser
+parser=DoremiScriptParser
 
 aux1 = (str,result) ->
   return if !sys

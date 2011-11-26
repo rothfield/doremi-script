@@ -5,10 +5,10 @@ global._console ||= require('./underscore.logger.js') if global?
 Logger=global._console.constructor
 
 _ = require("underscore")._ if require?
-require './sargam_parser.js'
+require './doremi_script_parser.js'
 sys = require('sys')
 utils=require './tree_iterators.js'
-_console.level  = Logger.ERROR
+_console.level  = Logger.WARN
 _.mixin(_console.toObject())
 
 `_.mixin({
@@ -26,7 +26,7 @@ _.mixin(_console.toObject())
 
 to_lilypond=require('./to_lilypond.js').to_lilypond
 
-parser=SargamParser
+parser=DoremiScriptParser
 
 test_to_lilypond = (str,test,msg="") ->
   composition=parser.parse(str)
@@ -53,13 +53,17 @@ test_data = [
   "| S-RG | ---- -SRS",
   "e'4",
   "2nd measure should have tied e4"
+  " PmPm\n|    P",
+  "\\acciaccatura {g'32[ f'32 g'32 f'32]}g'4"
+  "ornaments"
   ]
 exports.test_all = (test) ->
+  console.log "test_all"
   fun = (args) ->
     [str,expected,msg]= args
     lily=test_to_lilypond(str,test)
-    _.debug("Testing #{str} -> #{expected}")
-    test.ok(lily.indexOf(expected) > -1,"FAILED*** #{msg}. Expected output of #{str} to include #{expected}.")
+    _.warn("Testing #{str} -> #{expected}")
+    test.ok(lily.indexOf(expected) > -1,"FAILED*** #{msg}. Expected output of #{str} to include #{expected}. Output was \n\n#{lily}\n\n")
     #Lilypond output was #{lily}" )
   _.each_slice(test_data,3,fun)
   test.done()

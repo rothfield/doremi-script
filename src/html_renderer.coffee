@@ -37,6 +37,7 @@ draw_measure= (measure) ->
   (draw_item(item) for item in measure.items).join('')
 
 draw_upper_sym = (item) ->
+  return "" if item.my_type is "dash"
   return "" if !item.octave?
   bull=lookup_html_entity(".")
   return "" if  item.octave < 1
@@ -89,13 +90,14 @@ draw_ornament= (ornament) ->
 
 draw_pitch= (pitch) ->
   source2 = lookup_html_entity(pitch.source)
+  my_source=""
   my_source=if source2? then source2 else pitch.source
-  my_source=(Array(pitch.source.length+1).join "&nbsp;") if pitch.my_type=="whitespace"
+  my_source=pitch.pitch_source if pitch.pitch_source?
+ 
   pitch_sign="" # flat,sharp,etc
   title=""
   # refactor to draw_pitch?
-  title="#{pitch.numerator}/#{pitch.denominator} of a beat"
-  my_source=pitch.pitch_source
+  title="#{pitch.numerator}/#{pitch.denominator} of a beat" if pitch.numerator?
   # TODO: make less hackish
   if (my_source[1] is "#")
     my_source=my_source[0]
@@ -103,12 +105,11 @@ draw_pitch= (pitch) ->
   if (my_source[1] is "b")
     my_source=my_source[0]
     pitch_sign="<span class='pitch_sign flat'>#{lookup_html_entity('b')}</span>"
-  upper_sym_html= draw_upper_sym(pitch)
-  lower_sym_html=draw_lower_sym(pitch)
+  upper_octave_symbol_html= draw_upper_sym(pitch)
+  lower_octave_symbol_html=draw_lower_sym(pitch)
   syl_html=draw_syllable(pitch)
   upper_attributes_html=""
   data1=""
-  # TODO: refactor
   if pitch.attributes
     upper_attributes_html=(for attribute in pitch.attributes
       do (attribute) =>
@@ -131,24 +132,23 @@ draw_pitch= (pitch) ->
         <span class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
         """).join('')
   """
-  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_sym_html}#{lower_sym_html}#{syl_html}<span class="note #{pitch.my_type}" tabindex="0">#{my_source}</span>#{pitch_sign}</span>
+  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_octave_symbol_html}#{lower_octave_symbol_html}#{syl_html}<span class="note #{pitch.my_type}" tabindex="0">#{my_source}</span>#{pitch_sign}</span>
   """
+
 
 draw_item= (item) ->
   return draw_pitch(item) if item.my_type is "pitch"
+  return draw_pitch(item) if item.my_type is "dash"
   return "" if item.my_type is "begin_beat"
   return "" if item.my_type is "end_beat"
-  return draw_beat(item) if item.my_type=="beat"
-  return draw_measure(item) if item.my_type=="measure"
-  # TODO: clumsy and hard to understand. source, pitch_source
+  return draw_beat(item) if item.my_type is "beat"
+  return draw_measure(item) if item.my_type is "measure"
+  my_source=""
   source2 = lookup_html_entity(item.source)
   my_source=if source2? then source2 else item.source
   my_source=(Array(item.source.length+1).join "&nbsp;") if item.my_type=="whitespace"
-  pitch_sign="" # flat,sharp,etc
+  my_source="" if !my_source?
   title=""
-  upper_sym_html= draw_upper_sym(item)
-  lower_sym_html=draw_lower_sym(item)
-  syl_html=draw_syllable(item)
   upper_attributes_html=""
   data1=""
   # TODO: refactor
@@ -173,10 +173,8 @@ draw_item= (item) ->
         """
         <span class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
         """).join('')
-  # TODO: make more elegant by not including empty tags
-  # hacked here
   """
-  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_sym_html}#{lower_sym_html}#{syl_html}<span class="note #{item.my_type}" tabindex="0">#{my_source}</span>#{pitch_sign}</span>
+  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}<span class="note #{item.my_type}" tabindex="0">#{my_source}</span></span>
   """
 
 draw_beat= (beat) ->

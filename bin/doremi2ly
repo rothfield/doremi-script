@@ -10,7 +10,7 @@ _.mixin(_console.toObject())
 
 require(lib+'/doremi-script/doremi_script_parser.js')
 var to_lilypond=require(lib+'/doremi-script/to_lilypond.js').to_lilypond
-var parser=SargamParser
+var parser=DoremiScriptParser
 var source= fs.readFileSync('/dev/stdin').toString()
 var composition=parser.parse(source)
 composition.source=source
