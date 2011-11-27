@@ -40,7 +40,7 @@ DoremiScript HTML Output(screen snapshot)
 
 Generated Western Staff Notation
 --------------------------------
-![Converted to western notation](https://github.com/rothfield/doremi-scriptraw/master/docs/bansuri_in_western_notation.png "")
+![Converted to western notation](https://github.com/rothfield/doremi-script/raw/master/docs/bansuri_in_western_notation.png "")
 
 
 
@@ -72,7 +72,7 @@ should be used to indicate the melismas
   - Supports tala markings +023456 for notating classical North Indian rhythmical cycles such as teental. The **+** indicates (usually) the first beat of the rhythmical cycle. The tala markings indicate the claps(taali) and non-claps(kaali) that delimit the rhythmic cycle.  
   - Generates [lilypond](http://lilypond.org) as an interchange format, which can be used to generate western staff notation and midi
   - Parser is easy to modify and is generated from a PEG grammar using a parsing expression grammar [peg.js])https://github.com/dmajda/pegjs)
-  - DoremiScript grammar is [here](https://github.com/rothfield/doremi-scriptraw/src/grammars/sargam.peg.js)
+  - DoremiScript grammar is [here](https://github.com/rothfield/doremi-script/raw/src/grammars/sargam.peg.js)
   - Endings are entered as follows: 1.________ or 2._____ Current lilypond support for endings is poor.
   - It is possible to mix ABC, Devanagri, and AACM notations in the same composition, but each line of notation must be in only one style.
   - Supports ornaments (Sargam only for now). Ornaments can be entered either to RIGHT or LEFT of the note to be ornamented(on one of the lines above the note). You can put dots above/below the ornament pitch to indicate the octave. Lilypond renderer displays the (right hand) ornaments as looped 32th grace notes.
