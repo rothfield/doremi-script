@@ -62,7 +62,7 @@ exports.test_all = (test) ->
   fun = (args) ->
     [str,expected,msg]= args
     lily=test_to_lilypond(str,test)
-    _.warn("Testing #{str} -> #{expected}")
+    _.warn("✔ Testing #{str} -> #{expected}")
     test.ok(lily.indexOf(expected) > -1,"FAILED*** #{msg}. Expected output of #{str} to include #{expected}. Output was \n\n#{lily}\n\n")
     #Lilypond output was #{lily}" )
   _.each_slice(test_data,3,fun)

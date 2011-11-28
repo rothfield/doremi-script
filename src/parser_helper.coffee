@@ -346,14 +346,13 @@ root.ParserHelper=
     #  mDP        mD
     # P      and    P
     # if ornament is BEFORE sargam..
-    console.log "handle_ornament"
+    _.debug "handle_ornament"
     s=sargam_nodes[ornament.column+ornament.source.length]
     if s? and (s.my_type is "pitch")
-      console.log "handle_ornament, before case, s is #{s}"
+      _.debug "handle_ornament, before case, s is #{s}"
       ornament.placement="before"
       s.attributes = [] if !s.attributes?
       s.attributes.push(ornament)
-      console.log "handle_ornament"
       return
     s=sargam_nodes[ornament.column-1]
     if s? and (s.my_type is "pitch")

@@ -730,6 +730,14 @@ exports.test_recognizes_number_notation= (test) ->
   test.equal(composition.lines[0].kind,"number","should set composition kind to number")
   test.done()
 
+exports.test_recognizes_sa= (test) ->
+  str = '''
+  S
+  '''
+  composition = test_parses(str,test)
+  test.equal(composition.lines[0].kind,z="latin_sargam","should set composition kind to #{z}")
+  test.done()
+
 
 exports.test_measure_pitch_durations = (test) ->
   str = '''

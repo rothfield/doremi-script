@@ -2,6 +2,7 @@ compositions
 *.swp
 last.*
 tmp
+snip
 temp.html
 test.ly
 test.midi
