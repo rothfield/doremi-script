@@ -739,6 +739,11 @@ exports.test_recognizes_sa= (test) ->
   test.done()
 
 
+exports.test_two_blank_lines_case = (test) ->
+  str ="S\n\n\nR"
+  composition = test_parses(str,test)
+  test.done()
+
 exports.test_measure_pitch_durations = (test) ->
   str = '''
         --S- ---- --r-

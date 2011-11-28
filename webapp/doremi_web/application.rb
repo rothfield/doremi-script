@@ -32,7 +32,7 @@ end
 
 get '/list_samples' do
   ary=[]
-  Dir.chdir("samples") do
+  Dir.chdir("public/samples") do
     ary=Dir.glob("*.{txt,sargam}") 
   end
   content_type :json
@@ -56,14 +56,14 @@ post '/lilypond.txt' do
   puts params.inspect      
   return "no data param" if !params["data"]
   data=params["data"]
-  sargam_source=params["sargam_source"]
+  doremi_script_source=params["doremi_script_source"]
   puts "params.data is #{params['data']}" 
   filename=params["fname"] || ""
   fname="#{sanitize_filename(filename)}_#{Time.new.to_i}"
   fp= "#{comp}/#{fname}"
   `rm #{fp}-page*png`
   File.open("#{fp}.ly", 'w') {|f| f.write(data) }
-  File.open("#{fp}.txt", 'w') {|f| f.write(sargam_source) }
+  File.open("#{fp}.txt", 'w') {|f| f.write(doremi_script_source) }
   result=`lilypond --png  -o #{fp} #{fp}.ly  2>&1`
   # lilypond will create files like untitled_1319780034-page1.png
   # ... page2.png etc  if pdf is multi page

@@ -26,16 +26,26 @@ $(document).ready ->
 
   # Handler for samples dropdown
   sample_compositions_click = ->
-    console.log "sample_compositions_click"
     return if this.selectedIndex is 0
-    val=this.value
+    filename=this.value
     params=
       type:'GET'
-      url:"/samples/#{val}"
+      url:"/samples/#{filename}"
       dataType:'text'
-      success: (data) ->
-        $('#sample_compositions').val("Load sample compositions")
+      success: (data) =>
+        without_suffix=filename.substr(0, filename.lastIndexOf('.')) || filename
         $('#entry_area').val(data)
+        $('#sample_compositions').val("Load sample compositions")
+          # TODO:dry
+        for typ in ["png","pdf","mid","ly","txt"]
+          snip = """
+          window.open('compositions/#{without_suffix}.#{typ}'); return false; 
+          """
+          $("#download_#{typ}").attr('href',x="samples/#{without_suffix}.#{typ}")
+          if typ is 'png'
+            $('#lilypond_png').attr('src',x)
+          $("#download_#{typ}").attr('onclick',snip)
+        $('.generated_by_lilypond').show()
     $.ajax(params)
 
   $('#sample_compositions').change(sample_compositions_click)
