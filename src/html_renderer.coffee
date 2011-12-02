@@ -215,6 +215,9 @@ to_html_doc= (composition,full_url="http://ragapedia.com",css="",js="") ->
       return adjust_slurs_in_dom()
   })
   </script>
+<script id="source" type="text/html">
+#{composition.source}
+</script>
   </body>
   </html>
   """

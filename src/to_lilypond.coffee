@@ -56,7 +56,7 @@ my_inspect= (obj) ->
   return if !debug
   return if !console?
   if running_under_node()
-    console.log(sys.inspect(obj,false,null)) 
+    console.log(util.inspect(obj,false,null)) 
     return
   console.log obj
 

@@ -2,7 +2,7 @@ root = exports ? this
 
 debug=false
 
-sys = require('sys')
+util = require('util')
 log = (x) ->
   return if !console
   console.log(x) if debug
@@ -13,7 +13,7 @@ tree_select=x.tree_select
 
 
 my_log = (obj) ->
-  sys.inspect(obj,true,null)
+  util.inspect(obj,true,null)
 
 exports.test_tree_select = (test) ->
   tree =

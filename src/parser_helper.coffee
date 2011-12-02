@@ -511,8 +511,8 @@ root.ParserHelper=
     return if !debug
     return if !console?
     return if !console.log?
-    if sys?
-      console.log(sys.inspect(obj,false,null)) 
+    if util?
+      console.log(util.inspect(obj,false,null)) 
       return
     console.log obj
 

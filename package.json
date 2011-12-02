@@ -4,7 +4,7 @@
   "author": "John Rothfield",
   "version": "0.0.3-pre",
   "engines": {
-    "node": ">=0.4.0"
+    "node": ">=0.4.11"
   },
   "directories" : {
     "lib" : "./lib/sargam"
@@ -21,6 +21,9 @@
     "url": "git://github.com/rothfield/doremi.git"
   },
   "dependencies": {
-    "underscore":""
+    "underscore":"",
+    "pegjs":"",
+    "nodeunit":"",
+    "coffee-script":"1.1.2"
   }
 }

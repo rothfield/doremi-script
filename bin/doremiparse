@@ -13,4 +13,4 @@ var parser=DoremiScriptParser
 var source= fs.readFileSync('/dev/stdin').toString()
 var composition=parser.parse(source)
 composition.source=source
-process.stdout.write(sys.inspect(composition,false,null)+"\n")
+process.stdout.write(util.inspect(composition,false,null)+"\n")

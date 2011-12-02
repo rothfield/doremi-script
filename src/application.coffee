@@ -28,6 +28,7 @@ $(document).ready ->
   sample_compositions_click = ->
     return if this.selectedIndex is 0
     filename=this.value
+    
     params=
       type:'GET'
       url:"/samples/#{filename}"
