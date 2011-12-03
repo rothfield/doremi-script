@@ -415,7 +415,7 @@ Source:AAK
 2)  [| Srgm PdnS SndP mgrS | %    | %   | S--S --S- ---- R-G-     |]
 
 '''
-  str = '''
+  strzz = '''
 Rag:Bhairavi
 Tal:Tintal
 Title:Bansuri
@@ -425,8 +425,6 @@ Source:AAK
 1) |: (Sr | n) S   (gm Pd) || P - P  P   | P - D  <(nDSn)> |
             .
        ban-    su-  ri        ba- ja ra-   hi  dhu- na
-'''
-str3='''
 0                 3                     +     .    *  .
 | P  d   P   d    | <(Pm>   PmnP) (g m) || PdnS -- g  S |
   ma-dhu-ra  kan-     nai-         ya      khe-    la-ta
@@ -437,10 +435,9 @@ str3='''
 
      +                     2    0     3
 2)  [| Srgm PdnS SndP mgrS | %    | %   | S--S --S- ---- R-G-     |]
+  '''
 
-'''
 
-  # 2)  | Srgm PdnS SndP mgrS |     |    |     |
   composition=test_parses(str,test)
   console.log composition
   first_sargam_source=str.split('\n')[6]
