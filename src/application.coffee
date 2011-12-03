@@ -14,10 +14,7 @@ $(document).ready ->
   debug=false
  
 
-  $('body').append($('#testing_utf_support').html())
-  x=$('span.note.left_repeat')[0]
-  window.left_repeat_width=$(x).width()
-  $('#width_test').hide()
+
   $('body').append("left_repeat_width is #{window.left_repeat_width}")
 
 

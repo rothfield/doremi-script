@@ -9,6 +9,26 @@ root = exports ? this
 
 last_slur_id=-1
 
+lookup_simple = (str) ->
+  # for displaying characters where there is not font support 
+  # in the browser
+  # The user enters the source using ascii characters. Map
+  # these to html entities
+  LOOKUP=
+    "b"    : "b" # flat  sign
+    "#"    : "#" # sharp sign
+    "."    : "&bull;"
+    "*"    : "&bull;"
+    "|:"  : "|:"
+    "~"   : "~" #mordent
+    ":|"  : ":|"
+    "|"  : "|"
+    "||"  : "|" #double barline
+    "%"  : "%"
+    "|]"  : "|" # final barline
+    "[|"  : "|" # reverse final barline
+  LOOKUP[str]
+
 
 lookup_html_entity = (str) ->
   # The user enters the source using ascii characters. Map
@@ -92,19 +112,25 @@ draw_pitch= (pitch) ->
   source2 = lookup_html_entity(pitch.source)
   my_source=""
   my_source=if source2? then source2 else pitch.source
+  fallback=""
+  if source2?
+    simple=lookup_simple(source2)
+    fallback="data-fallback-if-no-utf8-chars='#{simple}'"
   my_source=pitch.pitch_source if pitch.pitch_source?
- 
+   
   pitch_sign="" # flat,sharp,etc
   title=""
   # refactor to draw_pitch?
   title="#{pitch.numerator}/#{pitch.denominator} of a beat" if pitch.numerator?
   # TODO: make less hackish
   if (my_source[1] is "#")
+    simple=lookup_simple("#")
     my_source=my_source[0]
-    pitch_sign="<span class='pitch_sign sharp'>#{lookup_html_entity('#')}</span>"
+    pitch_sign="<span data-fallback-if-no-utf8-chars='#{simple}' class='pitch_sign sharp'>#{lookup_html_entity('#')}</span>"
   if (my_source[1] is "b")
     my_source=my_source[0]
-    pitch_sign="<span class='pitch_sign flat'>#{lookup_html_entity('b')}</span>"
+    simple=lookup_simple("b")
+    pitch_sign="<span data-fallback-if-no-utf8-chars='#{simple}' class='pitch_sign flat'>#{lookup_html_entity('b')}</span>"
   upper_octave_symbol_html= draw_upper_sym(pitch)
   lower_octave_symbol_html=draw_lower_sym(pitch)
   syl_html=draw_syllable(pitch)
@@ -127,12 +153,16 @@ draw_pitch= (pitch) ->
           return draw_ornament(attribute)
         my_item=attribute
         my_source2 = lookup_html_entity(my_item.source) # TODO:
+        data=""
+        simple=lookup_simple(my_item.source)
+        if my_source2?
+          data="data-fallback-if-no-utf8-chars='#{simple}'"
         my_source2=my_item.source if !my_source2
         """
-        <span class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
+        <span #{data} class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
         """).join('')
   """
-  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_octave_symbol_html}#{lower_octave_symbol_html}#{syl_html}<span class="note #{pitch.my_type}" tabindex="0">#{my_source}</span>#{pitch_sign}</span>
+  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_octave_symbol_html}#{lower_octave_symbol_html}#{syl_html}<span #{fallback} class="note #{pitch.my_type}" tabindex="0">#{my_source}</span>#{pitch_sign}</span>
   """
 
 
@@ -145,6 +175,10 @@ draw_item= (item) ->
   return draw_measure(item) if item.my_type is "measure"
   my_source=""
   source2 = lookup_html_entity(item.source)
+  fallback=""
+  if source2?
+    simple=lookup_simple(item.source)
+    fallback="data-fallback-if-no-utf8-chars='#{simple}'"
   my_source=if source2? then source2 else item.source
   my_source=(Array(item.source.length+1).join "&nbsp;") if item.my_type=="whitespace"
   my_source="" if !my_source?
@@ -168,13 +202,17 @@ draw_item= (item) ->
         if (attribute.my_type is "ornament")
           return draw_ornament(attribute)
         my_item=attribute
+        data=""
+        simple=lookup_simple(my_item.source)
         my_source2 = lookup_html_entity(my_item.source) # TODO:
+        if simple?
+          data="data-fallback-if-no-utf8-chars='#{simple}'"
         my_source2=my_item.source if !my_source2
         """
-        <span class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
+        <span #{data} class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
         """).join('')
   """
-  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}<span class="note #{item.my_type}" tabindex="0">#{my_source}</span></span>
+  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}<span #{fallback} class="note #{item.my_type}" tabindex="0">#{my_source}</span></span>
   """
 
 draw_beat= (beat) ->
