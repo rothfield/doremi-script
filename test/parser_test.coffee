@@ -415,9 +415,34 @@ Source:AAK
 2)  [| Srgm PdnS SndP mgrS | %    | %   | S--S --S- ---- R-G-     |]
 
 '''
+  str = '''
+Rag:Bhairavi
+Tal:Tintal
+Title:Bansuri
+Source:AAK
+
+          3                   +            2         .
+1) |: (Sr | n) S   (gm Pd) || P - P  P   | P - D  <(nDSn)> |
+            .
+       ban-    su-  ri        ba- ja ra-   hi  dhu- na
+'''
+str3='''
+0                 3                     +     .    *  .
+| P  d   P   d    | <(Pm>   PmnP) (g m) || PdnS -- g  S |
+  ma-dhu-ra  kan-     nai-         ya      khe-    la-ta
+
+2              0     ~
+|  d-Pm g P  m | r - S :| %
+   ga-    wa-ta  ho- ri
+
+     +                     2    0     3
+2)  [| Srgm PdnS SndP mgrS | %    | %   | S--S --S- ---- R-G-     |]
+
+'''
 
   # 2)  | Srgm PdnS SndP mgrS |     |    |     |
   composition=test_parses(str,test)
+  console.log composition
   first_sargam_source=str.split('\n')[6]
   line=first_sargam_line(composition)
   test.equal(line.source,first_sargam_source,"sanity check, expected first line's source to be #{first_sargam_source}")

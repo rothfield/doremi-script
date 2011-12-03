@@ -33,7 +33,9 @@ root.ParserHelper=
       lower.group_line_no=ctr
       ctr= ctr + 1
     lyrics.group_line_no=ctr if lyrics?
-    _.each(my_items, (my_line)-> this.measure_columns(my_line.items,0))
+    _.each(my_items, (my_line)-> 
+      _.debug(my_line.my_type)
+      this.measure_columns(my_line.items,0))
     my_uppers=_.flatten(_.compact([uppers]))
     my_lowers=_.flatten(_.compact([lowers]))
     attribute_lines=_.flatten(_.compact([uppers,lowers,lyrics]))
