@@ -15,7 +15,6 @@ $(document).ready ->
  
 
 
-  $('body').append("left_repeat_width is #{window.left_repeat_width}")
 
 
   # Setup samples dropdown

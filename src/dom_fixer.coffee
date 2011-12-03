@@ -11,8 +11,9 @@ adjust_slurs_in_dom= () ->
     x.show()
     window.left_repeat_width=$(x).width()
     x.hide()
+    $('body').append("left_repeat_width is #{window.left_repeat_width}")
   console.log "checking left_repeat_width"
-  if window.left_repeat_width is 0 or window.left_repeat_width > 8 
+  if (window.left_repeat_width is 0) or (window.left_repeat_width > 8) or true
     tag="data-fallback-if-no-utf8-chars"
     $("span[#{tag}]").each  (index) ->
       console.log("utf8 fix loop, this is", this)
