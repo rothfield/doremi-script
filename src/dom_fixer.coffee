@@ -10,15 +10,14 @@ adjust_slurs_in_dom= () ->
     x=$('#testing_utf_support')
     x.show()
     window.left_repeat_width=$(x).width()
+    if !window.left_repeat_width?
+      window.left_repeat_width=0
     x.hide()
     $('body').append("left_repeat_width is #{window.left_repeat_width}")
-  console.log "checking left_repeat_width"
-  if (window.left_repeat_width is 0) or (window.left_repeat_width > 8) or true
+  if (window.left_repeat_width is 0) or (window.left_repeat_width > 10) 
     tag="data-fallback-if-no-utf8-chars"
     $("span[#{tag}]").each  (index) ->
-      console.log("utf8 fix loop, this is", this)
       obj=$(this)
-      console.log('dom-fixer',this)
       attr=obj.attr(tag)
       obj.html(attr)
 
