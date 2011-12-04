@@ -108,29 +108,28 @@ draw_ornament= (ornament) ->
   <span id="#{@id_ctr}" class="upper_attribute ornament placement_#{ornament.placement}">#{x}</span>
   """
 
-draw_pitch= (pitch) ->
-  source2 = lookup_html_entity(pitch.source)
-  my_source=""
-  my_source=if source2? then source2 else pitch.source
-  fallback=""
-  if source2?
-    simple=lookup_simple(source2)
-    fallback="data-fallback-if-no-utf8-chars='#{simple}'"
-  my_source=pitch.pitch_source if pitch.pitch_source?
-   
-  pitch_sign="" # flat,sharp,etc
-  title=""
-  # refactor to draw_pitch?
-  title="#{pitch.numerator}/#{pitch.denominator} of a beat" if pitch.numerator?
-  # TODO: make less hackish
+draw_pitch_sign = (my_source) ->
+  return "" if my_source.length is 1
   if (my_source[1] is "#")
     simple=lookup_simple("#")
     my_source=my_source[0]
-    pitch_sign="<span data-fallback-if-no-utf8-chars='#{simple}' class='pitch_sign sharp'>#{lookup_html_entity('#')}</span>"
+    return "<span data-fallback-if-no-utf8-chars='#{simple}' class='pitch_sign sharp'>#{lookup_html_entity('#')}</span>"
   if (my_source[1] is "b")
     my_source=my_source[0]
     simple=lookup_simple("b")
-    pitch_sign="<span data-fallback-if-no-utf8-chars='#{simple}' class='pitch_sign flat'>#{lookup_html_entity('b')}</span>"
+    return "<span data-fallback-if-no-utf8-chars='#{simple}' class='pitch_sign flat'>#{lookup_html_entity('b')}</span>"
+  ""
+
+draw_pitch= (pitch) ->
+  my_source=pitch.source
+  my_source=pitch.pitch_source if pitch.pitch_source?
+  title=""
+  title="#{pitch.numerator}/#{pitch.denominator} of a beat" if pitch.numerator?
+  pitch_sign=draw_pitch_sign(my_source)
+  if (my_source[1] is "#")
+    my_source=my_source[0]
+  if (my_source[1] is "b")
+    my_source=my_source[0]
   upper_octave_symbol_html= draw_upper_sym(pitch)
   lower_octave_symbol_html=draw_lower_sym(pitch)
   syl_html=draw_syllable(pitch)
@@ -162,7 +161,7 @@ draw_pitch= (pitch) ->
         <span #{data} class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
         """).join('')
   """
-  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_octave_symbol_html}#{lower_octave_symbol_html}#{syl_html}<span #{fallback} class="note #{pitch.my_type}" tabindex="0">#{my_source}</span>#{pitch_sign}</span>
+  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_octave_symbol_html}#{lower_octave_symbol_html}#{syl_html}<span class="note #{pitch.my_type}" tabindex="0">#{my_source}</span>#{pitch_sign}</span>
   """
 
 
