@@ -233,7 +233,12 @@ $(document).ready ->
       $('#warnings_div').hide()
       $('#warnings_div').html("")
       parser.is_parsing=true
-      composition_data= parser.parse (src=$('#entry_area').val())
+      src= $('#entry_area').val()
+      src2=src.replace(/\n[\t ]+\n/g, "\n\n")
+      src2=src2.replace(/\n[\t ]+$/g, "\n")
+      console.log(src2)
+      #composition_data= parser.parse (src=$('#entry_area').val())
+      composition_data= parser.parse(src2)
       composition_data.source=src
       composition_data.lilypond=to_lilypond(composition_data)
       window.the_composition=composition_data
