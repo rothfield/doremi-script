@@ -109,27 +109,24 @@ draw_ornament= (ornament) ->
   """
 
 draw_pitch_sign = (my_source) ->
-  return "" if my_source.length is 1
+
+  snip= "" if my_source.length is 1
   if (my_source[1] is "#")
     simple=lookup_simple("#")
     my_source=my_source[0]
-    return "<span data-fallback-if-no-utf8-chars='#{simple}' class='pitch_sign sharp'>#{lookup_html_entity('#')}</span>"
+    snip="<span data-fallback-if-no-utf8-chars='#{simple}' class='pitch_sign sharp'>#{lookup_html_entity('#')}</span>"
   if (my_source[1] is "b")
     my_source=my_source[0]
     simple=lookup_simple("b")
-    return "<span data-fallback-if-no-utf8-chars='#{simple}' class='pitch_sign flat'>#{lookup_html_entity('b')}</span>"
-  ""
+    snip= "<span data-fallback-if-no-utf8-chars='#{simple}' class='pitch_sign flat'>#{lookup_html_entity('b')}</span>"
+  [snip,my_source]
 
 draw_pitch= (pitch) ->
   my_source=pitch.source
   my_source=pitch.pitch_source if pitch.pitch_source?
   title=""
   title="#{pitch.numerator}/#{pitch.denominator} of a beat" if pitch.numerator?
-  pitch_sign=draw_pitch_sign(my_source)
-  if (my_source[1] is "#")
-    my_source=my_source[0]
-  if (my_source[1] is "b")
-    my_source=my_source[0]
+  [pitch_sign, my_source] =draw_pitch_sign(my_source)
   upper_octave_symbol_html= draw_upper_sym(pitch)
   lower_octave_symbol_html=draw_lower_sym(pitch)
   syl_html=draw_syllable(pitch)
@@ -161,7 +158,7 @@ draw_pitch= (pitch) ->
         <span #{data} class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
         """).join('')
   """
-  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_octave_symbol_html}#{lower_octave_symbol_html}#{syl_html}<span class="note #{pitch.my_type}" tabindex="0">#{my_source}</span>#{pitch_sign}</span>
+  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_octave_symbol_html}#{lower_octave_symbol_html}#{syl_html}<span class="note #{pitch.my_type}" >#{my_source}</span>#{pitch_sign}</span>
   """
 
 
@@ -211,7 +208,7 @@ draw_item= (item) ->
         <span #{data} class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
         """).join('')
   """
-  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}<span #{fallback} class="note #{item.my_type}" tabindex="0">#{my_source}</span></span>
+  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}<span #{fallback} class="note #{item.my_type}" >#{my_source}</span></span>
   """
 
 draw_beat= (beat) ->
@@ -246,6 +243,7 @@ to_html_doc= (composition,full_url="http://ragapedia.com",css="",js="") ->
     <div id="rendered_sargam">
       #{rendered_composition}
     </div>
+  <span id="testing_utf_support" style="display:none" class="note left_repeat">&#x1d106;</span>
   <script type="text/javascript">
   #{js}
   $(document).ready(function() {

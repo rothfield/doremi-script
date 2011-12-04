@@ -242,7 +242,7 @@ span.ornament span.upper_octave1 {
 
 span.lower_octave1 {
     left: 0.2em;
-    bottom: -.6em;
+    bottom: -.79em;
 }
 
 span.upper_octave1, span.mordent{
@@ -312,8 +312,10 @@ span.note, span.note_wrapper {
     margin-left: -.75px;
     display: inline-block;
 }
+
 span.flat, span.sharp {
-  position: relative;
+  /* TODO: review */
+  position: absolute;
   bottom: 0.7em;
 }
 span.breath_mark {
@@ -343,7 +345,7 @@ span.syllable1 {
     position: absolute;
     bottom: -2.1em;
     margin-left: 0.03em;
-    font-size: 1.2em;
+    font-size: 1.01em;
     font-family: serif;
 }
 

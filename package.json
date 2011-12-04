@@ -12,6 +12,7 @@
   "main": "lib/sargam/sargam_parser",
   "bin": {
     "doremi2htmldoc":  "./bin/doremi2htmldoc",
+    "doremi2html":  "./bin/doremi2html",
     "doremi2ly":  "./bin/doremi2ly",
     "doremiparse":  "./bin/doremiparse"
   },
