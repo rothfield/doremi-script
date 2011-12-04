@@ -86,6 +86,7 @@ post '/lilypond.txt' do
     return {:error => true,:midi => "",:lilypond_output => result, :png => ""}.to_json
   end
   puts "result of running lilypond is <<#{result}>>"
+  `rm #{fp}.ps`
   `cp #{fp}.ly #{comp}/last.ly`
   # puts "result2.length is #{result2[0..20]}..."
   #midi=`openssl enc -base64 -in #{fp}.midi`
