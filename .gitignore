@@ -1,6 +1,7 @@
 compositions
 *.swp
 last.*
+webapp/doremi_web/public/samples
 tmp
 snip
 temp.html
