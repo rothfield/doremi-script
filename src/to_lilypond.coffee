@@ -372,8 +372,10 @@ beat_is_all_dashes= (beat) ->
   x=all_items_in_line(beat)
   fun = (item) ->
     return true if !item.my_type?
+    return true if item.my_type is "dash"
     return false if item.my_type is "pitch"
-  _.all(beat,fun)
+    return true
+  _.all(x,fun)
   
 to_lilypond= (composition_data) ->
   ary=[]
@@ -412,7 +414,7 @@ to_lilypond= (composition_data) ->
         ary.push(lookup_lilypond_barline(item.my_type))
       if item.my_type is "beat"
          beat=item
-         if beat.subdivisions not in [0,1,2,4,8,16,32,64,128] and !beat_is_all_dashes(beat) 
+         if beat.subdivisions not in [0,1,2,4,8,16,32,64,128] and !beat_is_all_dashes(beat)
              @log "odd beat.subdivisions=",beat.subdivisions
              x=2
              if beat.subdivisions is 6

@@ -51,11 +51,14 @@ test_data = [
   "cs'32 ds'32 es'32 fs'32 gs'32 as'32 bs'16 cf'32 df'32 ef'32 ff'32 gf'32 af'32 bf'16 c'32 d'32 e'32 f'32 g'32 a'32 b'16"
   "should work with number notation"
   "| S-RG | ---- -SRS",
-  "e'4",
-  "2nd measure should have tied e4"
+  "e'4~ e'16"
+  "2nd measure should have tied e4 tied to e16"
   " PmPm\n|    P",
   "\\acciaccatura {g'32[ f'32 g'32 f'32]}g'4"
   "ornaments"
+  "Srg m m m"
+  "\\times 2/3 {  c'8 df'8 ef'8 } f'4 f'4 f'4"
+  "triplet test.lilypond output should start with times 2/3"
   ]
 exports.test_all = (test) ->
   console.log "test_all"

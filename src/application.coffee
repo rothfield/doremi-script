@@ -64,7 +64,7 @@ $(document).ready ->
 
   document.getElementById('file').addEventListener('change', handleFileSelect, false)
 
-  str=""
+  str="S -- ---------"
   root.debug=true
   window.timer_is_on=0
   window.last_val=str
