@@ -10,22 +10,30 @@ $(document).ready ->
   _.mixin(_console.toObject())
   if Zepto?
     _.debug("***Using zepto.js instead of jQuery***")
-  # This is for the online version
   debug=false
- 
+  setup_samples_dropdown= () ->
+    params=
+      type:'GET'
+      url:'list_samples'
+      dataType:'json'
+      success: (data) ->
+        str= ("<option>#{item}</option>" for item in data).join('')
+        $('#sample_compositions').append(str)
+    $.ajax(params)
 
+  setup_samples_dropdown()
 
+  setup_links= (filename,dir="compositions") ->
+    without_suffix=filename.substr(0, filename.lastIndexOf('.txt')) || filename
+    for typ in ["png","pdf","mid","ly","txt"]
+      snip = """
+      window.open('compositions/#{without_suffix}.#{typ}'); return false; 
+      """
+      $("#download_#{typ}").attr('href',x="#{dir}/#{without_suffix}.#{typ}")
+      if typ is 'png'
+        $('#lilypond_png').attr('src',x)
+      $("#download_#{typ}").attr('onclick',snip)
 
-
-  # Setup samples dropdown
-  params=
-    type:'GET'
-    url:'list_samples'
-    dataType:'json'
-    success: (data) ->
-      str= ("<option>#{item}</option>" for item in data).join('')
-      $('#sample_compositions').append(str)
-  $.ajax(params)
 
   # Handler for samples dropdown
   sample_compositions_click = ->
@@ -37,18 +45,9 @@ $(document).ready ->
       url:"/samples/#{filename}"
       dataType:'text'
       success: (data) =>
-        without_suffix=filename.substr(0, filename.lastIndexOf('.')) || filename
         $('#entry_area').val(data)
         $('#sample_compositions').val("Load sample compositions")
-          # TODO:dry
-        for typ in ["png","pdf","mid","ly","txt"]
-          snip = """
-          window.open('compositions/#{without_suffix}.#{typ}'); return false; 
-          """
-          $("#download_#{typ}").attr('href',x="samples/#{without_suffix}.#{typ}")
-          if typ is 'png'
-            $('#lilypond_png').attr('src',x)
-          $("#download_#{typ}").attr('onclick',snip)
+        setup_links(filename,'samples')
         $('.generated_by_lilypond').show()
     $.ajax(params)
 
@@ -132,21 +131,12 @@ $(document).ready ->
         alert "Generating staff notation failed"
         $('#lilypond_png').attr('src','none.jpg')
       success: (some_data,text_status) ->
-        for typ in ["png","pdf","mid","ly","txt"]
-          snip = """
-          window.open('compositions/#{some_data.fname}.#{typ}'); return false; 
-          """
-          $("#download_#{typ}").attr('href',x="compositions/#{some_data.fname}.#{typ}")
-          if typ is 'png'
-            $('#lilypond_png').attr('src',x)
-          $("#download_#{typ}").attr('onclick',snip)
-
+        setup_links(some_data.fname)
         window.location = String(window.location).replace(/\#.*$/, "") + "#staff_notation"
         $('.generated_by_lilypond').show()
         $('#lilypond_output').html(some_data.lilypond_output)
         if some_data.error
           $('#lilypond_output').toggle()
-
       dataType: "json"
     $.ajax(obj)
 

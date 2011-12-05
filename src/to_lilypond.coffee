@@ -1,6 +1,43 @@
 # Uses module pattern, exports to_lilypond
 # Usage:
 # to_lilypond(composition_json_data)
+
+
+  # TODO: dashes at beginning of measure need to be rendered as 
+  # rests in lilypond!!
+  # Note that the parser produces something like this for
+  # -- --S- 
+  #
+  # composition
+  #   line
+  #     measure
+  #       beat
+  #         dash 
+  #           numerator:2
+  #           denominator:2
+  #           rest: true #### NOTICE ###
+  #           source: "-"
+  #         dash
+  #           source: "-"
+  #       whitespace
+  #       beat
+  #         dash
+  #           numerator:2
+  #           denominator:4
+  #           source: "-"
+  #         dash
+  #           source: "-"
+  #         pitch:
+  #           source: "S"
+  #           numerator:2
+  #           denominator:2
+  #         dash:
+  #           source: "-"
+  #
+  #
+  #   So that the parser has marked off 1 1/2 beats as rests
+  #   Note that Sargam only has rests at the beginning of a line by
+  #   my interpretation!!
 debug=true
 
 root = exports ? this
@@ -339,44 +376,9 @@ beat_is_all_dashes= (beat) ->
   _.all(beat,fun)
   
 to_lilypond= (composition_data) ->
-  # TODO: dashes at beginning of measure need to be rendered as 
-  # rests in lilypond!!
   ary=[]
   in_times=false #hack
   at_beginning_of_first_measure_of_line=false
-  # Note that the parser produces something like this for
-  # -- --S- 
-  #
-  # composition
-  #   line
-  #     measure
-  #       beat
-  #         dash 
-  #           numerator:2
-  #           denominator:2
-  #           rest: true #### NOTICE ###
-  #           source: "-"
-  #         dash
-  #           source: "-"
-  #       whitespace
-  #       beat
-  #         dash
-  #           numerator:2
-  #           denominator:4
-  #           source: "-"
-  #         dash
-  #           source: "-"
-  #         pitch:
-  #           source: "S"
-  #           numerator:2
-  #           denominator:2
-  #         dash:
-  #           source: "-"
-  #
-  #
-  #   So that the parser has marked off 1 1/2 beats as rests
-  #   Note that Sargam only has rests at the beginning of a line by
-  #   my interpretation!!
   dashes_at_beginning_of_line_array=[]
   tied_array=[]
 

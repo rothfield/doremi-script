@@ -74,11 +74,16 @@ exports.test_long_sample = (test) ->
   test.done()
 
 test_data = [
-  "P#" ,
+  "P#"
   '''
 <div class='composition'><div class='stave sargam_line'><span class='beat'><span title="1/1 of a beat" class="note_wrapper" ><span data-fallback-if-no-utf8-chars='#' class='pitch_sign sharp'>&#9839;</span><span class="note pitch">P</span></span></span></div></div>
   '''
   "not expected"
+  "S\n."
+  '''
+<span class="lower_octave_1">&bull;</span>
+  '''
+  "Testing html for lower octave span"
   ]
 
 exports.test_all = (test) ->

@@ -108,18 +108,11 @@ span.slur {
     border-right-width: 0em;
 }
 
-
-span.ornament_item.octave0 {
-}
-span.ornament_item.octave-1 {
-  text-decoration: underline;
-}
-
 span.ornament_item {
   position: static;
   display:inline;
 }
-span.ornament_item.octave2, span.ornament_item.octave2 {
+span.ornament_item.octave_2, span.ornament_item.octave_2 {
   /* octave of -2 or 2 */
 }
 span.upper_attribute.ornament {
@@ -234,21 +227,25 @@ span.ornament_item.upper_octave_1 {
 span.ornament_item.lower_octave_1 {
   background-position:bottom;
 }
-span.ornament span.upper_octave1 {
+span.ornament span.upper_octave_1 {
     position: absolute;
     top: 1.2em;
     left: .45em;
 }
 
-span.lower_octave1 {
+span.lower_octave_2 {
+    bottom: -.79em;
+}
+
+span.lower_octave_1 {
     left: 0.2em;
     bottom: -.79em;
 }
 
-span.upper_octave1, span.mordent{
+span.upper_octave_1, span.upper_octave_2, span.mordent{
     top: -1.3em;
 }
-span.upper_octave1{
+span.upper_octave_1{
     left: 0.2em;
 }
 span.note.whitespace {
@@ -265,6 +262,7 @@ span.chord_symbol, span.ending {
   top: -2em;
   left:.2em;
 }
+
 span.ending {
   font-family:"Times New Roman",Georgia,Serif;
   font-size: .8em;
@@ -273,19 +271,10 @@ span.ending {
 }
 
 
-/* applies to chord_symbol when chord symbol has a tala sibling
- *
- * Doesn't seem to work
- *
- *
- 
-span.tala ~ span.chord_symbol  {
-  top: -1em;
+span.lower_octave_2,span.upper_octave_2 {
+  left:.3em;
 }
-
- * */
-
-span.lower_octave1, span.upper_octave1,span.mordent, span.upper_attribute {
+span.lower_octave_1, span.upper_octave_2, span.lower_octave_2,span.upper_octave_1,span.mordent, span.upper_attribute {
     z-index: 2;
     position: absolute;
 

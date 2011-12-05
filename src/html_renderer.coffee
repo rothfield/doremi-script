@@ -56,16 +56,16 @@ draw_line= (line) ->
 draw_measure= (measure) ->
   (draw_item(item) for item in measure.items).join('')
 
-draw_upper_sym = (item) ->
-  return "" if item.my_type is "dash"
+draw_upper_octave_symbol = (item) ->
   return "" if !item.octave?
+  return "" if item.octave is 0
   bull=lookup_html_entity(".")
   return "" if  item.octave < 1
   return "" if  item.octave > 2
   upper_sym=bull if  item.octave == 1
   upper_sym=":" if  item.octave == 2
   """
-     <span class="upper_octave1 upper_octave_indicator">#{upper_sym}</span>
+     <span class="#{class_for_octave(item.octave)} upper_octave_indicator">#{upper_sym}</span>
   """
 
 draw_syllable = (item) ->
@@ -75,15 +75,16 @@ draw_syllable = (item) ->
      <span class="syllable">#{item.syllable}</span>
   """
 
-draw_lower_sym = (item) ->
+draw_lower_octave_symbol = (item) ->
   return "" if !item.octave?
+  return "" if item.octave is 0
   return "" if  item.octave > -1
   return "" if  item.octave < -2
   bull=lookup_html_entity(".")
   lower_sym=bull if  item.octave == -1
   lower_sym=":" if  item.octave == -2
   """
-  <span class="lower_octave1">#{lower_sym}</span>
+  <span class="#{class_for_octave(item.octave)}">#{lower_sym}</span>
   """
 
 
@@ -127,11 +128,12 @@ draw_pitch= (pitch) ->
   title=""
   title="#{pitch.numerator}/#{pitch.denominator} of a beat" if pitch.numerator?
   [pitch_sign, my_source] =draw_pitch_sign(my_source)
-  upper_octave_symbol_html= draw_upper_sym(pitch)
-  lower_octave_symbol_html=draw_lower_sym(pitch)
+  upper_octave_symbol_html= draw_upper_octave_symbol(pitch)
+  lower_octave_symbol_html=draw_lower_octave_symbol(pitch)
   syl_html=draw_syllable(pitch)
   upper_attributes_html=""
   data1=""
+  # TODO: refactor
   if pitch.attributes
     upper_attributes_html=(for attribute in pitch.attributes
       do (attribute) =>

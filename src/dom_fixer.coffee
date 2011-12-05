@@ -19,15 +19,12 @@ adjust_slurs_in_dom= () ->
     next_left=$next.offset().left
     syl_right=$syllable.offset().left + width
     if syl_right > next_left 
-      console.log "correcting syllable #{$syllable.html()}"
-      #  $syllable.css('background-color','red')
       $par=$syllable.parent()
       $note=$('span.note',$par)
       margin_right=$note.css("margin-right")
       existing_margin_right=0
       extra=5
       $note.css("margin-right","#{ existing_margin_right + (syl_right - next_left)+ extra}px")
-  console.log "adjust_slurs_in_dom"
 
   if !window.left_repeat_width?
     x=$('#testing_utf_support')
@@ -36,7 +33,7 @@ adjust_slurs_in_dom= () ->
     if !window.left_repeat_width?
       window.left_repeat_width=0
     x.hide()
-    $('body').append("left_repeat_width is #{window.left_repeat_width}")
+  #  $('body').append("left_repeat_width is #{window.left_repeat_width}")
   if (window.left_repeat_width is 0) or (window.left_repeat_width > 10) 
     tag="data-fallback-if-no-utf8-chars"
     $("span[#{tag}]").each  (index) ->
