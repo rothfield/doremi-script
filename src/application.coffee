@@ -52,24 +52,22 @@ $(document).ready ->
     $.ajax(params)
 
   $('#sample_compositions').change(sample_compositions_click)
+
   handleFileSelect = (evt) =>
+    # Handler for file upload button(HTML5)
     file = document.getElementById('file').files[0]
     reader=new FileReader()
     reader.onload =  (evt) ->
       $('#entry_area').val evt.target.result
       $('#lilypond_png').attr('src',"")
-
     reader.readAsText(file, "")
-
 
   document.getElementById('file').addEventListener('change', handleFileSelect, false)
 
-
+  str=""
   root.debug=true
-  # TODO: don't use window. Use an application object
   window.timer_is_on=0
   window.last_val=str
-  
   window.timed_count = () =>
     cur_val= $('#entry_area').val()
     if window.last_val != cur_val
@@ -80,38 +78,9 @@ $(document).ready ->
     if !window.timer_is_on
       window.timer_is_on=1
       window.timed_count()
-  str="| S--R --G- | -m-- P"
-  str3='''
-       . .. .
-        NRSNS      NRSNS
-               .  .    
- |     S          S
-
-  m
- | g
-
-
-  '''
-  str3='''
-   . .. .
-    NRSNS      NRSNS
-               .  .    
- | S          S
-
-    m
-|    g
-  '''
-  str3='''
- | P(P  D)  n  
-   he-llo there
- '''
-  $('#entry_area').val(str3)
+  $('#entry_area').val(str)
   parser=DoremiScriptParser
   window.parse_errors=""
-  $('#load_long_composition').click ->
-    $('#entry_area').val($('#long_sample').html())
-  $('#load_sample_composition').click ->
-    $('#entry_area').val(str)
   $('#show_parse_tree').click ->
       $('#parse_tree').toggle()
   my_url="lilypond.txt"
