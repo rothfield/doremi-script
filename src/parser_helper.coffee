@@ -17,11 +17,27 @@ root.ParserHelper=
       normalized_pitch:normalized
     obj
 
+  assign_lyrics: (sargam,lyrics) ->
+    return if !lyrics?
+    return if lyrics is ""
+    slurring_state=false
+    syls=  (item.syllable for item in lyrics.items when item.my_type is "syllable")
+
+    for item in this.all_items(sargam)
+      do (item) =>
+        return if item.my_type != "pitch"
+        return if syls.length is 0
+        if !slurring_state 
+          item.syllable = syls.shift()
+        slurring_state=true if item_has_attribute item,'begin_slur'
+        slurring_state=false if item_has_attribute item,'end_slur'
+      
   parse_line: (uppers,sargam,lowers,lyrics) ->
     lyrics = '' if lyrics.length is 0
     lowers= '' if  lowers.length is 0
     uppers= '' if  uppers.length is 0
-    my_items = _.flatten(_.compact([uppers,sargam,lowers,lyrics]))
+    # doesn't include lyrics
+    my_items = _.flatten(_.compact([uppers,sargam,lowers]))
     #add a group_line_no to each source line
     ctr=0
     for upper in uppers
@@ -41,6 +57,7 @@ root.ParserHelper=
     my_lowers=_.flatten(_.compact([lowers]))
     attribute_lines=_.flatten(_.compact([uppers,lowers,lyrics]))
     this.assign_attributes(sargam,attribute_lines)
+    this.assign_lyrics(sargam,lyrics)
     sargam
 
   parse_composition: (attributes,lines) ->

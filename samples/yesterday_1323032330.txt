@@ -4,28 +4,28 @@ Title: Yesterday
 Author: McCartney
 Time: 4/4
 
-                                                            *
-1) |: <R--  S>   S -- --  | -- <G   M> <P#    D>  <N        S> | <N   D> D -- -- |
-       yes- ter  day            all my  trou- bles seemed   so    far a- way
+                               *
+1) |: RS S -- --  | -- GM P#D NS | N DD -- -- |
+      yes-ter day      all my trou-bles seemed so far a- way
 
-| -- <D    D> <P     m> <G       R> |    m   <G  G>  -- R- | S G   R     D | S   <G    G> - - :|
-                                                                         * 
+| -- DD Pm GR | m GG -- R- | S G R D | S GG - - :|
+                                   * 
       now  it  looks as  though  they're here to stay   oh   I be- lieve in  Yes- ter- day
 
-                                                        *
-2) |: <R--   S>   S -- --  | -- <G    M> <P#   D>  <N   S> | <N     D> D -- -- |
-       sudd- en-  ly             I'm  not half the  man I     used  to be
+                                   *
+2) |: R--S S- -- --  | -- GM P#D  NS | N DD -- -- |
+       sudd- en- ly   I'm  not half the  man I  used  to be
 
-   | -- <D      D> <P     m> <G     R> |   m   <G    G>  -- R- | S G   R     D | S  <G   G> - - :|
+   | -- D      D P     m G     R |   m   G    G  -- R- | S G   R     D | S  G   G - - :|
                                                                              *
          theres a   sha-  dow hang- ing    o-   ver  me     Oh   I be- lieve in  Yes-ter-day
 
                         .       
-3) || G   G   <D    N> <S-  N  D> |   <N---  D> <P      D>    G- -- |
+3) || G   G   D    N S-  N  D |   N---  D P      D    G- -- |
       why she  had  to  go  I  don't   know  she would- n't   say
 
                           .                                       . 
-   | G   G   <D     N>   <S-    N   D> |   <N--  D>  <P     N>   (SP mG)  ||
+   | G   G   D     N   S-    N   D |   N--  D  P     N   (SP mG)  ||
      I   said some- thing wrong now I       long for  yes-  ter-  day  
 
  

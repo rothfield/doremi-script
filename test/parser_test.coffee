@@ -298,47 +298,19 @@ exports.test_gives_warning_if_unmatched_parens_for_slurs = (test) ->
   test.ok(composition.warnings[0].indexOf(z="unbalanced parens")> -1,"Expected warning to include #{z}. Warning was #{composition.warnings[0]}")
   test.done()
 
-exports.test_gives_warning_if_syllable_under_right_paren = (test) ->
-  str = '''
-  | <(Pm)>
-        nai- 
-  '''
-  composition=test_parses(str,test)
-  test.ok(composition.warnings.length > 0,"expected warnings")
-  test.ok(composition.warnings[0].indexOf(z="Attribute syllable above/below nothing" > -1),"Expected warning to include #{z}, warning was #{warnings[0]}")
-  test.done()
 
-exports.test_gives_warning_if_syllable_under_left_paren = (test) ->
+exports.test_syllable_assigned_using_melismas = (test) ->
   str = '''
-  | <(Pm)>
-     nai- 
-  '''
-  composition=test_parses(str,test)
-  test.ok(composition.warnings.length > 0,"expected warnings")
-  test.ok(composition.warnings[0].indexOf(z="Attribute syllable above/below nothing" > -1),"Expected warning to include #{z}, warning was #{warnings[0]}")
-  test.done()
-exports.test_gives_warning_if_syllable_not_under_note = (test) ->
-  str = '''
-  |S
-    hi 
-
-  '''
-  composition=test_parses(str,test)
-  test.ok(composition.warnings.length > 0,"No warnings")
-  test.ok(composition.warnings[0].indexOf(z="Attribute syllable above/below nothing" > -1),"Expected warning to include #{z}, warning was #{warnings[0]}")
-  test.done()
-
-exports.test_syllable_assigned_to_note_above_it = (test) ->
-  str = '''
-  | S
-    hi 
+  | (SR G)m P
+  he-llo     john 
 
   '''
   composition=test_parses(str,test)
   line=first_sargam_line(composition)
-  _.debug composition
-  my_pitch=utils.tree_find(line, (item) -> item.my_type is "pitch" )
-  test.equal("hi",my_pitch.syllable)
+  my_pitch=utils.tree_find(line, (item) -> item.syllable is "llo" )
+  test.equal("m",my_pitch.source)
+  my_pitch=utils.tree_find(line, (item) -> item.source is "R" )
+  test.ok(!my_pitch.syllable?,"R is part of a slur SRG an should not be assigned a syllable")
   test.done()
 
 exports.test_upper_octave_assigned_to_note_below_it = (test) ->
@@ -439,7 +411,6 @@ Source:AAK
 
 
   composition=test_parses(str,test)
-  console.log composition
   first_sargam_source=str.split('\n')[6]
   line=first_sargam_line(composition)
   test.equal(line.source,first_sargam_source,"sanity check, expected first line's source to be #{first_sargam_source}")

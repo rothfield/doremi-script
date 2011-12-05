@@ -103,8 +103,8 @@ $(document).ready ->
 |    g
   '''
   str3='''
-  PmPm       
- |    P   
+ | P(P  D)  n  
+   he-llo there
  '''
   $('#entry_area').val(str3)
   parser=DoremiScriptParser

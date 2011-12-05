@@ -158,7 +158,7 @@ draw_pitch= (pitch) ->
         <span #{data} class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
         """).join('')
   """
-  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_octave_symbol_html}#{lower_octave_symbol_html}#{syl_html}<span class="note #{pitch.my_type}" >#{my_source}</span>#{pitch_sign}</span>
+  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_octave_symbol_html}#{lower_octave_symbol_html}#{syl_html}#{pitch_sign}<span class="note #{pitch.my_type}">#{my_source}</span></span>
   """
 
 
@@ -214,9 +214,9 @@ draw_item= (item) ->
 draw_beat= (beat) ->
   x=(draw_item(item) for item in beat.items).join('')
   extra=""
-  extra= "data-subdivisions=#{beat.subdivisions}" if beat.subdivisions > 1
+  extra= "data-subdivisions=#{beat.subdivisions} " if beat.subdivisions > 1
   """
-  <span #{extra} class='beat'>#{x}</span>
+  <span #{extra}class='beat'>#{x}</span>
   """
 
 

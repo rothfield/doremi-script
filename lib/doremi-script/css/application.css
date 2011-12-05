@@ -314,9 +314,9 @@ span.note, span.note_wrapper {
 }
 
 span.flat, span.sharp {
-  /* TODO: review */
   position: absolute;
   bottom: 0.7em;
+  left: 1em;
 }
 span.breath_mark {
     /*bottom: .75em;*/
