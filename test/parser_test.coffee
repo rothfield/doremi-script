@@ -776,6 +776,17 @@ exports.test_measure_pitch_durations = (test) ->
   # TODO:
   #test.equal(my_pitch.fraction_array.join(''), [ '2/4', '4/4', '2/4'].join('') )
   test.done()
+exports.test_multiple_lyric_lines = (test) ->
+  str = '''
+  P  P      
+  hi
+     john
+  '''
+  composition = test_parses(str,test)
+  line=first_sargam_line(composition)
+  my_pitch=utils.tree_find(line, (item) -> item.source is "john" )
+  test.done()
+
 
 exports.test_zzz = (test) ->
   str = '''

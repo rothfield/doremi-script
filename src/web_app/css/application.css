@@ -341,11 +341,11 @@ span.note.double_barline
     margin-left: 0.4em;
 }
 
-span.syllable1 {
+span.syllable {
     position: absolute;
     bottom: -2.1em;
     margin-left: 0.03em;
-    font-size: 1.01em;
+    font-size: 1.01em; 
     font-family: serif;
 }
 

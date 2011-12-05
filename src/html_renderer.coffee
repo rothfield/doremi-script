@@ -72,7 +72,7 @@ draw_syllable = (item) ->
   return '' if !item.syllable?
   return '' if item.syllable is ''
   """
-     <span class="syllable1">#{item.syllable}</span>
+     <span class="syllable">#{item.syllable}</span>
   """
 
 draw_lower_sym = (item) ->

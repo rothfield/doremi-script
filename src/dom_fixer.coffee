@@ -5,7 +5,30 @@ root = exports ? this
 
 
 adjust_slurs_in_dom= () ->
+
+  syllables=$('span.syllable').get()
+  len=syllables.length
+  for syllable,index in syllables
+    continue if index is (len-1) 
+    $syllable=$(syllable)
+    $next=$(syllables[index+1])
+    width=$syllable.offset().width
+    left=$next.offset().left
+    # on different line case
+    continue if $next.offset().top  !=  $syllable.offset().top
+    next_left=$next.offset().left
+    syl_right=$syllable.offset().left + width
+    if syl_right > next_left 
+      console.log "correcting syllable #{$syllable.html()}"
+      #  $syllable.css('background-color','red')
+      $par=$syllable.parent()
+      $note=$('span.note',$par)
+      margin_right=$note.css("margin-right")
+      existing_margin_right=0
+      extra=5
+      $note.css("margin-right","#{ existing_margin_right + (syl_right - next_left)+ extra}px")
   console.log "adjust_slurs_in_dom"
+
   if !window.left_repeat_width?
     x=$('#testing_utf_support')
     x.show()
@@ -20,6 +43,8 @@ adjust_slurs_in_dom= () ->
       obj=$(this)
       attr=obj.attr(tag)
       obj.html(attr)
+
+    
 
   $('span[data-begin-slur-id]').each  (index) ->
     pos2=$(this).offset()

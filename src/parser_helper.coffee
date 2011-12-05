@@ -32,7 +32,8 @@ root.ParserHelper=
     for lower in lowers
       lower.group_line_no=ctr
       ctr= ctr + 1
-    lyrics.group_line_no=ctr if lyrics?
+    for lyric in lyrics
+      lyric.group_line_no=ctr
     _.each(my_items, (my_line)-> 
       _.debug(my_line.my_type)
       this.measure_columns(my_line.items,0))
