@@ -64,7 +64,7 @@ $(document).ready ->
 
   document.getElementById('file').addEventListener('change', handleFileSelect, false)
 
-  str="S -- ---------"
+  str=".\nS --"
   root.debug=true
   window.timer_is_on=0
   window.last_val=str
