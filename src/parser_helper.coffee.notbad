@@ -265,8 +265,7 @@ root.ParserHelper=
       done=false
       ctr=0
       first_dash=null
-      # KEEP _.each for NOW
-      _.each my_beat.items,  (item) => 
+      for item in my_beat.items
         return if done
         done=item.my_type=="pitch"
         if item.my_type=="dash"
@@ -356,8 +355,10 @@ root.ParserHelper=
 
   get_source_for_items: (items) ->
     str=''
-    for item in items
-      str = str + item.source if item.source?
+    _.each items, (item) =>
+      if !item.source?
+        return
+      str = str + item.source
     return str
 
   measure_columns: (items,pos) ->
