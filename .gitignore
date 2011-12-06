@@ -1,5 +1,5 @@
 compositions
-*.swp
+*.coffee.swp
 last.*
 webapp/doremi_web/public/samples
 tmp
