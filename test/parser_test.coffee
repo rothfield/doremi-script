@@ -3,7 +3,7 @@ root = exports ? this
 debug=false
 global._console ||= require('./underscore.logger.js') if global?
 Logger=global._console.constructor
-_console.level  = Logger.WARN
+_console.level  = Logger.INFO
 #_console.level  = Logger.DEBUG
 _ = require("underscore")._ if require?
 require './doremi_script_parser.js'
@@ -11,6 +11,18 @@ sys = require('sys')
 utils=require './tree_iterators.js'
 _.mixin(_console.toObject())
 
+`_.mixin({
+  each_slice: function(obj, slice_size, iterator, context) {
+    var collection = obj.map(function(item) { return item; });
+    
+    if (typeof collection.slice !== 'undefined') {
+      for (var i = 0, s = Math.ceil(collection.length/slice_size); i < s; i++) {
+        iterator.call(context, _(collection).slice(i*slice_size, (i*slice_size)+slice_size), obj);
+      }
+    }
+    return; 
+  }
+});`
 
 
 my_inspect = (x) ->
@@ -762,3 +774,24 @@ exports.test_zzz = (test) ->
 
         '''
   test.done()
+
+
+test_data = [
+  '''  
+  C/E
+  S-
+  '''
+  ''
+  "Test accepts C/E chord"
+  ]
+
+exports.test_all2 = (test) ->
+  fun = (args) ->
+    [str,expected,msg]= args
+    _.info("✔ Testing #{str} -> #{expected}")
+    val=test_parses(str,test,msg)
+
+  _.each_slice(test_data,3,fun)
+  test.done()
+
+

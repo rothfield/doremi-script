@@ -8,7 +8,7 @@ _ = require("underscore")._ if require?
 require './doremi_script_parser.js'
 sys = require('sys')
 utils=require './tree_iterators.js'
-_console.level  = Logger.ERROR
+_console.level  = Logger.INFO
 _.mixin(_console.toObject())
 
 `_.mixin({
@@ -97,7 +97,7 @@ exports.test_all = (test) ->
   fun = (args) ->
     [str,expected,msg]= args
     val=test_to_html(str,test)
-    _.error("✔ Testing #{str} -> #{expected}")
+    _.info("✔ Testing #{str} -> #{expected}")
     test.ok(val.indexOf(expected) > -1,"FAILED*** #{msg}. Expected output of #{str} to include #{expected}. Output was \n\n#{val}\n\n")
   _.each_slice(test_data,3,fun)
   test.done()
