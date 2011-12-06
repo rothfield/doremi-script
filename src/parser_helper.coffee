@@ -345,16 +345,15 @@ root.ParserHelper=
     str=''
     _.each items, (item) =>
       if !item.source?
-        return 
-      str = str + item.source 
+        return
+      str = str + item.source
     return str
 
   measure_columns: (items,pos) ->
     _.each items, (item) =>
       item.column=pos
-      # HACK
-      item.column=item.column + 1 if (item.my_type=="pitch") and (item.source[0]=="(")
-      item.column=item.column - 1 if (item.my_type=="pitch") and (item.source[item.source.length]==")")
+      item.column=item.column + 1 if (item.my_type is "pitch") and (item.source[0]=="(")
+      item.column=item.column - 1 if (item.my_type is "pitch") and (item.source[item.source.length]==")")
 
       if item.items?
         this.measure_columns(item.items,pos)
@@ -380,7 +379,7 @@ root.ParserHelper=
       s.attributes = [] if !s.attributes?
       s.attributes.push(ornament)
       return
-    @warnings.push "ornament #{ornament.my_type} (#{ornament.source}) not to right of pitch , column is #{ornament.column}"
+    #@warnings.push "ornament #{ornament.my_type} (#{ornament.source}) not to right of pitch , column is #{ornament.column}"
 
 
   check_semantics: (sargam,sarg_obj,attribute,sargam_nodes) ->
