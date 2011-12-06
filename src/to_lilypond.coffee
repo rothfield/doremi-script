@@ -211,15 +211,25 @@ lilypond_grace_notes = (ornament) ->
   # TODO: end slur??????????
   ary.join ' '
 
+get_chord= (item) ->
+  if e =_.detect(item.attributes, (x) -> x.my_type is "chord_symbol")
+    return """
+    ^"#{e.source}"
+    """
+  ""
+
+get_ending= (item) ->
+  if e =_.detect(item.attributes, (x) -> x.my_type is "ending")
+    return """
+    ^"#{e.source}"
+    """
+  ""
+
 normalized_pitch_to_lilypond= (pitch) ->
   # Render a pitch/dash as lilypond
   # needs work
-  ending=""
-  if pitch.attributes
-    if e =_.detect(pitch.attributes, (x) -> x.my_type is "ending")
-      ending="""
-      ^"#{e.source}"
-      """
+  chord=get_chord(pitch)
+  ending=get_ending(pitch)
   if pitch.fraction_array?
     first_fraction=pitch.fraction_array[0]
   else
@@ -232,7 +242,7 @@ normalized_pitch_to_lilypond= (pitch) ->
       pitch.normalized_pitch=pitch.pitch_to_use_for_tie.normalized_pitch
       pitch.octave=pitch.pitch_to_use_for_tie.octave
     else
-      return "r#{duration}#{ending}"
+      return "r#{duration}#{chord}#{ending}"
   lilypond_pitch=lilypond_pitch_map[pitch.normalized_pitch]
   return "???#{pitch.source}" if  !lilypond_pitch?
   lilypond_octave=lilypond_octave_map["#{pitch.octave}"]
@@ -267,7 +277,7 @@ normalized_pitch_to_lilypond= (pitch) ->
   if ornament?.placement is "before"
   #  \acciaccatura { e16 d16 } c4
     grace1= "\\acciaccatura {#{lilypond_grace_notes(ornament)}}"
-  "#{grace1}#{lilypond_pitch}#{lilypond_octave}#{duration}#{lilypond_symbol_for_tie}#{mordent}#{begin_slur}#{end_slur}#{ending}#{grace2}"
+  "#{grace1}#{lilypond_pitch}#{lilypond_octave}#{duration}#{lilypond_symbol_for_tie}#{mordent}#{begin_slur}#{end_slur}#{ending}#{chord}#{grace2}"
 
 
 lookup_lilypond_barline= (barline_type) ->

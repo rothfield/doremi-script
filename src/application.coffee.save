@@ -100,7 +100,7 @@ $(document).ready ->
         $('#lilypond_png').attr('src','none.jpg')
       success: (some_data,text_status) ->
         setup_links(some_data.fname)
-        #window.location = String(window.location).replace(/\#.*$/, "") + "#staff_notation"
+        window.location = String(window.location).replace(/\#.*$/, "") + "#staff_notation"
         $('.generated_by_lilypond').show()
         $('#lilypond_output').html(some_data.lilypond_output)
         if some_data.error
@@ -171,10 +171,6 @@ $(document).ready ->
     # load these from the server if they weren't already loaded
     if ((css=$('#css_for_html_doc').html()).length < 100)
       return if window.generate_html_doc_ctr? and  (window.generate_html_doc_ctr > 0)
-      # Load the things we need from the server asynchronously
-      # from the server. Use a simple counter mechanism to synchronize 
-      # things. I'm using a very lightweight library (zepto) that doesn't
-      # support 'promises'
       window.generate_html_doc_ctr=3
       get_css()
       get_zepto()
@@ -187,9 +183,16 @@ $(document).ready ->
 
   $('#show_lilypond_source').click ->
     $('#lilypond_source').toggle()
+  $('#lilypond_output').click ->
+          # $('#lilypond_output').hide()
 
+  $('#lilypond_source').click ->
+          # $('#lilypond_source').hide()
+
+    return if parser.is_parsing
   $('#run_parser').click ->
     return if parser.is_parsing
+
     window.parse_errors=""
     $('#parse_tree').text('parsing...')
     try
@@ -228,6 +231,10 @@ $(document).ready ->
   $('#parse_tree').hide()
   $('#lilypond_output').hide()
   $('#lilypond_source').hide()
+
+
+
+
   window.do_timer()
 
 

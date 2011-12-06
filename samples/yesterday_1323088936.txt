@@ -1,5 +1,6 @@
 Filename: yesterday
 Key: f
+Mode: major
 Title: Yesterday
 Author: McCartney
 Time: 4/4
@@ -22,12 +23,17 @@ now it looks as though they're here to stay oh I be-lieve in  Yes-ter-day
                                       *
         theres a sha-  dow hang-ing o-ver  me Oh I be-lieve in  Yes-ter-day
 
+
+      A11  A7     Dm
+                    C Bb  Dm/A Gm    C        F
                       *       
 3) || G -  G - |  D N S-  ND | N- -D P   DG | - - - - |
       why she     had  to  go  I  don't   know  she would- n't   say
 
-                    *                    *                      
-   | G - G - |  D N S- ND | N- -D P N | (S P m G)  ||
-     I said some-thing wrong now I long for  yes-ter-day  
+     A11 A7    Dm  Bb Dm/A       C      F           F
+                 C         Gm           1_____      2______
+                   *                    *           *           
+   | G - G - | D N S- ND | N- -D P N | (S P m G) :| S - - -     ||
+     I said some-thing wrong now I long for  yes-ter-day day 
 
  
