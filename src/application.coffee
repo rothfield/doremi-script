@@ -68,6 +68,17 @@ $(document).ready ->
   mg
    (m--D) |
   '''
+  str='''
+     A11 A7    Dm  Bb Dm/A       C      F           F
+                 C         Gm           1_____      2______
+                   *                    *           *           
+   | G - G - | D N S- ND | N- -D P N | (S P m G) :| S - - -     ||
+     I said some-thing wrong now I long for  yes-ter-day day 
+  '''
+  str='''
+    Am/D
+  | S- - - -   
+  '''
   root.debug=true
   window.timer_is_on=0
   window.last_val=str

@@ -8,13 +8,13 @@ Filename: bansuri.sargam
 Time: 4/4
 Key: d
 
-          S                    i            IV         * 
+          S      <m>            i            IV         * 
            3            n      +            2         DSnDn
 1)|: (Sr | n) S   (gm <P d)> | P - P  P   | P - D    n     |
            *
       ban-    su-  ri          ba- ja ra-   hi  dhu- na
 
-  0  ~                3           mgm        +  *     *  *   
+  0 n~                3           mgm        +  *     *  *   
 | P  d   P    d    | (Pm   PmnP)    (g m) | (PdnS) -- g  S |
   ma-dhu-ra   kan-    nai-           ya      khe-     la-ta
 

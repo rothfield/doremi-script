@@ -110,7 +110,7 @@ draw_ornament= (ornament) ->
   """
 
 draw_pitch_sign = (my_source) ->
-
+  snip=""
   snip= "" if my_source.length is 1
   if (my_source[1] is "#")
     simple=lookup_simple("#")
@@ -128,6 +128,7 @@ draw_pitch= (pitch) ->
   title=""
   title="#{pitch.numerator}/#{pitch.denominator} of a beat" if pitch.numerator?
   [pitch_sign, my_source] =draw_pitch_sign(my_source)
+  has_pitch_sign = (if pitch_sign isnt '' then  "has_pitch_sign" else "")
   upper_octave_symbol_html= draw_upper_octave_symbol(pitch)
   lower_octave_symbol_html=draw_lower_octave_symbol(pitch)
   syl_html=draw_syllable(pitch)
@@ -160,7 +161,7 @@ draw_pitch= (pitch) ->
         <span #{data} class="upper_attribute #{my_item.my_type}">#{my_source2}</span>
         """).join('')
   """
-  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_octave_symbol_html}#{lower_octave_symbol_html}#{syl_html}#{pitch_sign}<span class="note #{pitch.my_type}">#{my_source}</span></span>
+  <span title="#{title}" class="note_wrapper" #{data1}>#{upper_attributes_html}#{upper_octave_symbol_html}#{lower_octave_symbol_html}#{syl_html}#{pitch_sign}<span class="note #{has_pitch_sign} #{pitch.my_type}">#{my_source}</span></span>
   """
 
 
