@@ -84,6 +84,12 @@ test_data = [
 <span class="lower_octave_1">&bull;</span>
   '''
   "Testing html for lower octave span"
+  'C   C7\nS  -'
+  ''
+  'Should display chord over dash'
+  "C    C7\nS R- --"
+  "C7"
+  "had bug"
   ]
 
 exports.test_all = (test) ->
@@ -91,7 +97,7 @@ exports.test_all = (test) ->
   fun = (args) ->
     [str,expected,msg]= args
     val=test_to_html(str,test)
-    _.warn("✔ Testing #{str} -> #{expected}")
+    _.error("✔ Testing #{str} -> #{expected}")
     test.ok(val.indexOf(expected) > -1,"FAILED*** #{msg}. Expected output of #{str} to include #{expected}. Output was \n\n#{val}\n\n")
   _.each_slice(test_data,3,fun)
   test.done()

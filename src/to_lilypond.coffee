@@ -231,8 +231,6 @@ normalized_pitch_to_lilypond= (pitch) ->
     if pitch.dash_to_tie is true
       pitch.normalized_pitch=pitch.pitch_to_use_for_tie.normalized_pitch
       pitch.octave=pitch.pitch_to_use_for_tie.octave
-      pitch.attributes=[]
-    # if pitch is a dash and not tied then output a rest
     else
       return "r#{duration}#{ending}"
   lilypond_pitch=lilypond_pitch_map[pitch.normalized_pitch]
