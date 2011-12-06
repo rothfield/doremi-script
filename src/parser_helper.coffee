@@ -50,9 +50,8 @@ root.ParserHelper=
       ctr= ctr + 1
     for lyric in lyrics
       lyric.group_line_no=ctr
-    _.each(my_items, (my_line)-> 
-      _.debug(my_line.my_type)
-      this.measure_columns(my_line.items,0))
+    for my_line in my_items
+      this.measure_columns(my_line.items,0)
     my_uppers=_.flatten(_.compact([uppers]))
     my_lowers=_.flatten(_.compact([lowers]))
     attribute_lines=_.flatten(_.compact([uppers,lowers,lyrics]))
@@ -225,25 +224,25 @@ root.ParserHelper=
   measure_pitch_durations: (line) ->
     @log("measure_pitch_durations line is",line)
     last_pitch=null
-    _.each(all_items(line),
-           (item) =>
-             @log("***measure_pitch_durations:item.my_type is",item.my_type)
-             if item.my_type is "measure"
-               @log("***going into measure")
-             if item.my_type is "pitch"
-               item.fraction_array=[] if !item.fraction_array?
-               frac=new Fraction(item.numerator,item.denominator)
-               item.fraction_array.push(frac)
-               last_pitch=item
-               @my_inspect item
+    for item in all_items(line)
+      @log("***measure_pitch_durations:item.my_type is",item.my_type)
+      if item.my_type is "measure"
+        @log("***going into measure")
+      if item.my_type is "pitch"
+        item.fraction_array=[] if !item.fraction_array?
+        frac=new Fraction(item.numerator,item.denominator)
+        item.fraction_array.push(frac)
+        last_pitch=item
+        @my_inspect item
 
-             if item.my_type is "dash" and item.dash_to_tie
-               frac=new Fraction(item.numerator,item.denominator)
-               last_pitch.fraction_array.push(frac)
-               my_funct= (memo,frac) ->
-                 if !memo?  then frac else frac.add memo
-               last_pitch.fraction_total=_.reduce(last_pitch.fraction_array,my_funct,null)
-          )
+      if item.my_type is "dash" and item.dash_to_tie
+        frac=new Fraction(item.numerator,item.denominator)
+        last_pitch.fraction_array.push(frac)
+        my_funct= (memo,frac) ->
+          if !memo?  then frac else frac.add memo
+        last_pitch.fraction_total=_.reduce(last_pitch.fraction_array,
+                                              my_funct,null)
+          
 
   measure_dashes_at_beginning_of_beats: (line) ->
     @log("measure_dashes line is",line)
@@ -364,14 +363,15 @@ root.ParserHelper=
     return str
 
   measure_columns: (items,pos) ->
-    _.each items, (item) =>
+    for item in items
       item.column=pos
       item.column=item.column + 1 if (item.my_type is "pitch") and (item.source[0]=="(")
       if item.items?
         pos=this.measure_columns(item.items,pos)
       if !item.items?
         pos=pos + item.source.length
-    pos 
+    pos
+
   handle_ornament: (sargam,sarg_obj,ornament,sargam_nodes) ->
     #console.log("handle_ornament, ornament is", ornament)
     # Assign the ornament to a pitch if possible
@@ -506,7 +506,7 @@ root.ParserHelper=
   collect_nodes: (obj,ary) ->
     ary.push obj if  obj.my_type? and  !obj.items?
     if obj.items?
-       _.each obj.items, (my_obj) =>
+       for my_obj in obj.items
          ary.push my_obj if my_obj.my_type?
          if my_obj.items?
            this.collect_nodes(my_obj,ary)
@@ -526,7 +526,7 @@ root.ParserHelper=
     if obj.column?
       map[obj.column]=obj
     if obj.items?
-       _.each obj.items, (my_obj) =>
+       for my_obj in obj.items
          @log("my_obj.column is ")
          if my_obj.column?
            map[my_obj.column]=my_obj
