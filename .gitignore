@@ -6,11 +6,7 @@ webapp/doremi_web/public/samples
 tmp
 snip
 temp.html
-test.ly
-test.midi
-test.png
-test.pdf
-test.ps
-test.txt
+tmp.*
+test.*
 npm-debug.log
 nohup.out

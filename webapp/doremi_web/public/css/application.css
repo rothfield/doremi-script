@@ -212,7 +212,7 @@ span.ornament span.note_wrapper span.note {
 }
 
 
-span.ornament_item.upper_octave_1, span.ornament_item.lower_octave_1 {
+span.ornament_item.upper_octave_1 {
   padding-top: .5em;
   padding-bottom: .5em;
   /* Embed the bullet in the css file, that will make it easier to create standalone html pages that don't need image files travelling along with them */
@@ -220,6 +220,13 @@ span.ornament_item.upper_octave_1, span.ornament_item.lower_octave_1 {
   background-repeat: no-repeat;
 }
 
+span.ornament_item.lower_octave_1 {
+  padding-top: .5em;
+  padding-bottom: .5em;
+  /* Embed the bullet in the css file, that will make it easier to create standalone html pages that don't need image files travelling along with them */
+  background: url(data:image/gif;base64,R0lGODlhCQAHAID/AAAAAMDAwCH5BAEAAAEALAAAAAAJAAcAQAINjI8Bu8idomHpgQpDAQA7);
+  background-repeat: no-repeat;
+}
 
 span.ornament_item.lower_octave_1 {
   background-position:bottom;
@@ -229,14 +236,22 @@ span.ornament_item.lower_octave_1 {
  *
  *  Note that ornament dots are implemented differently than regular notes
  */
-span.ornament span.upper_octave_1 {
+span.ornament span.upper_octave_1, 
+span.ornament span.lower_octave_1 {
     position: static;
     display:inline;
+}
+span.ornament span.upper_octave_1  {
     top: 1.2em;
     left: .45em;
 }
+span.ornament span.lower_octave_1  {
+    top: -1.2em;
+    left: .45em;
+}
 
-span.ornament span.ornament_item.upper_octave_1 {
+span.ornament span.ornament_item.upper_octave_1
+{
   background-position:top;
 }
 

@@ -89,23 +89,16 @@ root.ParserHelper=
     @mark_partial_measures()
     @composition_data
   
-  parse_sargam_pitch: (begin_slur,musical_char,end_slur) ->
-    # AKA parse_note, parse_pitch
-    #
+  parse_sargam_pitch: (slur,musical_char,end_slur) ->
     # Note that we need to track pitch_source separately from
     # source. We need source to track columns, but pitch_source is
     # used to render the pitch. This comes up in the case of slurs.
     # (SR). Note that the grammar doesn't define a slurred_phrase.
     source=''
     attributes=[]
-    column_offset=0
-    if (begin_slur !='')
-      column_offset=1
-      attributes.push(begin_slur)
-      # if the source looks like (S - we want the column 
-      # to be set 1 greater so that attributes will get assigned
-      # properly
-      source=source+begin_slur.source
+    if (slur !='')
+      attributes.push(slur)
+      source=source+slur.source
     source=source+musical_char.source
     if (end_slur !='')
       attributes.push(end_slur)
@@ -116,7 +109,6 @@ root.ParserHelper=
        attributes:attributes
        pitch_source:musical_char.source
        source: source
-       column_offset:column_offset
        octave: 0
     }
 
@@ -141,20 +133,14 @@ root.ParserHelper=
     my_beat.subdivisions=this.count_beat_subdivisions(my_beat)
     @measure_note_durations(my_beat)
     my_beat
-  
-  parse_ornament: (left_delim="",items,right_delim="") ->
-    if left_delim.length >0
-      column_offset=1
-    source="#{left_delim}#{z=get_source_for_items(items)}#{right_delim}"
-    usable_source= z
+
+  parse_ornament: (items) ->
+    beat_items=_.flatten items
     ornament =
       my_type:"ornament"
       id: ++@id_ctr
-      column_offset:column_offset
-      source: source
-      usable_source: usable_source
+      source: this.get_source_for_items(items)
       ornament_items: items
-    #console.log "ORNAMENT:",ornament
     ornament
 
 
@@ -367,27 +353,21 @@ root.ParserHelper=
     _.each items, (item) =>
       item.column=pos
       item.column=item.column + 1 if (item.my_type is "pitch") and (item.source[0]=="(")
+      item.column=item.column - 1 if (item.my_type is "pitch") and (item.source[item.source.length]==")")
+
       if item.items?
-        pos=this.measure_columns(item.items,pos)
-      if !item.items?
+        this.measure_columns(item.items,pos)
+      else
         pos=pos + item.source.length
-    pos 
+
   handle_ornament: (sargam,sarg_obj,ornament,sargam_nodes) ->
-    #console.log("handle_ornament, ornament is", ornament)
     # Assign the ornament to a pitch if possible
     # 2 kinds so far:
     #  mDP        mD
     # P      and    P
-    #
-    # also
-    # <mD>
-    #    P
     # if ornament is BEFORE sargam..
     _.debug "handle_ornament"
-    target_column=ornament.column+ornament.ornament_items.length
-    #console.log "target_column",target_column
-    #console.log "handle_ornament, sargam_nodes",sargam_nodes
-    s=sargam_nodes[target_column]
+    s=sargam_nodes[ornament.column+ornament.source.length]
     if s? and (s.my_type is "pitch")
       _.debug "handle_ornament, before case, s is #{s}"
       ornament.placement="before"
@@ -400,8 +380,7 @@ root.ParserHelper=
       s.attributes = [] if !s.attributes?
       s.attributes.push(ornament)
       return
-    @warnings.push "#{ornament.my_type} (#{ornament.source}) not to right "+
-            "or left of pitch , column is #{ornament.column}"
+    #@warnings.push "ornament #{ornament.my_type} (#{ornament.source}) not to right of pitch , column is #{ornament.column}"
 
 
   check_semantics: (sargam,sarg_obj,attribute,sargam_nodes) ->

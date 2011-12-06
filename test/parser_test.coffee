@@ -348,7 +348,7 @@ exports.test_recognizes_ornament_to_right_of_pitch= (test) ->
   | S
   '''
   composition = test_parses(str,test)
-  item=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source="S" )
+  item=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "S" )
   orn=_.detect(item.attributes, (attr) -> attr.my_type is "ornament")
   _.debug("orn #{orn.my_inspect}")
   test.ok(orn)
@@ -744,6 +744,16 @@ exports.test_recognizes_sa= (test) ->
   test.done()
 
 
+exports.test_slurred = (test) ->
+  str ="(SR)"
+  str =" SR"
+  composition = test_parses(str,test)
+  item=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "S" )
+  test.equal(1,item.column)
+  item=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "R" )
+  test.equal(2,item.column)
+  test.done()
+
 exports.test_two_blank_lines_case = (test) ->
   str ="S\n\n\nR"
   composition = test_parses(str,test)
@@ -775,23 +785,13 @@ exports.test_zzz = (test) ->
         '''
   test.done()
 
-
-test_data = [
-  '''  
-  C/E
-  S-
-  '''
-  ''
-  "Test accepts C/E chord"
-  ]
-
-exports.test_all2 = (test) ->
-  fun = (args) ->
-    [str,expected,msg]= args
-    _.info("✔ Testing #{str} -> #{expected}")
-    val=test_parses(str,test,msg)
-
-  _.each_slice(test_data,3,fun)
+exports.test_ornament_item = (test) ->
+  str="""
+       S
+  |(Sr  n)
+  """
+  composition=test_parses(str,test,"")
+  test.ok((composition.toString()).indexOf("ornament_item")> -1)
   test.done()
 
 

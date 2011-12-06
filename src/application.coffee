@@ -79,6 +79,11 @@ $(document).ready ->
     Am/D
   | S- - - -   
   '''
+  str='<SR>\n|  m'
+  str='''
+       S
+  |(Sr  n)
+  '''
   root.debug=true
   window.timer_is_on=0
   window.last_val=str
