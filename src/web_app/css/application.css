@@ -220,17 +220,24 @@ span.ornament_item.upper_octave_1, span.ornament_item.lower_octave_1 {
   background-repeat: no-repeat;
 }
 
-span.ornament_item.upper_octave_1 {
-  background-position:top;
-}
 
 span.ornament_item.lower_octave_1 {
   background-position:bottom;
 }
+
+/******
+ *
+ *  Note that ornament dots are implemented differently than regular notes
+ */
 span.ornament span.upper_octave_1 {
-    position: absolute;
+    position: static;
+    display:inline;
     top: 1.2em;
     left: .45em;
+}
+
+span.ornament span.ornament_item.upper_octave_1 {
+  background-position:top;
 }
 
 span.lower_octave_2 {
