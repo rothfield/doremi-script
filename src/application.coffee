@@ -34,7 +34,6 @@ $(document).ready ->
         $('#lilypond_png').attr('src',x)
       $("#download_#{typ}").attr('onclick',snip)
 
-
   # Handler for samples dropdown
   sample_compositions_click = ->
     return if this.selectedIndex is 0
@@ -116,6 +115,7 @@ $(document).ready ->
       dataType:'text'
       success: (data) ->
         $('#dom_fixer_for_html_doc').html(data)
+        window.generate_html_doc_ctr--
         generate_html_page_aux()
     $.ajax(params)
   
@@ -126,7 +126,8 @@ $(document).ready ->
       dataType:'text'
       success: (data) ->
         $('#zepto_for_html_doc').html(data)
-        get_dom_fixer()
+        window.generate_html_doc_ctr--
+        generate_html_page_aux()
     $.ajax(params)
  
   get_css = () ->
@@ -136,11 +137,13 @@ $(document).ready ->
       dataType:'text'
       success: (data) ->
         $('#css_for_html_doc').html(data)
-        get_zepto()
+        window.generate_html_doc_ctr--
+        generate_html_page_aux()
     $.ajax(params)
  
  
   generate_html_page_aux = () ->
+    return if window.generate_html_doc_ctr > 0
     css=$('#css_for_html_doc').html()
     js=$('#zepto_for_html_doc').html()
     js2=$('#dom_fixer_for_html_doc').html()
@@ -167,8 +170,12 @@ $(document).ready ->
     # Generate standalone html page
     # load these from the server if they weren't already loaded
     if ((css=$('#css_for_html_doc').html()).length < 100)
+      return if window.generate_html_doc_ctr? and  (window.generate_html_doc_ctr > 0)
+      window.generate_html_doc_ctr=3
       get_css()
-      return 
+      get_zepto()
+      get_dom_fixer()
+      return
     generate_html_page_aux()
 
   $('#show_lilypond_output').click ->
