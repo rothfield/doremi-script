@@ -3,12 +3,12 @@ root = exports ? this
 debug=false
 
 util = require('util')
+all_items= require('./all_items.js').all_items
 log = (x) ->
   return if !console
   console.log(x) if debug
  
 x=require './tree_iterators.js'
-all_items=x.all_items
 tree_select=x.tree_select
 
 

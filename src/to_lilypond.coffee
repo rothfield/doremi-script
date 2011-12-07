@@ -377,13 +377,12 @@ notation_is_in_sargam= (composition_data) ->
   _.detect(composition_data.lines, (line) -> is_sargam_line(line))
 
 beat_is_all_dashes= (beat) ->
-  x=all_items_in_line(beat)
   fun = (item) ->
     return true if !item.my_type?
     return true if item.my_type is "dash"
     return false if item.my_type is "pitch"
     return true
-  _.all(x,fun)
+  all_items_in_line(beat).every(fun)
   
 to_lilypond= (composition_data) ->
   ary=[]
