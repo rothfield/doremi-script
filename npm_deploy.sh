@@ -1,9 +1,7 @@
 #!/bin/bash
-# move files as necessary for npm
+# copy files as necessary for npm package
 CSS_DIR=./lib/doremi-script/css
-JS_DIR=./lib/doremi-script
 SRC_WEBAPP_DIR=./src/web_app/
-THIRD_PARTY_DIR=$WEBAPP_DIR/public/js/third_party
 
 rm -rf $CSS_DIR
 echo "move css  to $CSS_DIR"

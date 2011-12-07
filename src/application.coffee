@@ -14,7 +14,7 @@ $(document).ready ->
   setup_samples_dropdown= () ->
     params=
       type:'GET'
-      url:'list_samples'
+      url:'/list_samples'
       dataType:'json'
       success: (data) ->
         str= ("<option>#{item}</option>" for item in data).join('')
@@ -27,7 +27,7 @@ $(document).ready ->
     without_suffix=filename.substr(0, filename.lastIndexOf('.txt')) || filename
     for typ in ["png","pdf","mid","ly","txt"]
       snip = """
-      window.open('compositions/#{without_suffix}.#{typ}'); return false; 
+      window.open('/compositions/#{without_suffix}.#{typ}'); return false; 
       """
       $("#download_#{typ}").attr('href',x="#{dir}/#{without_suffix}.#{typ}")
       if typ is 'png'
@@ -103,7 +103,6 @@ $(document).ready ->
   window.parse_errors=""
   $('#show_parse_tree').click ->
       $('#parse_tree').toggle()
-  my_url="lilypond.txt"
 
   $('#generate_staff_notation').click =>
     $('#lilypond_png').attr('src',"")
@@ -112,9 +111,10 @@ $(document).ready ->
       fname:window.the_composition.filename
       data: window.the_composition.lilypond
       doremi_script_source: $('#entry_area').val()
+      save_to_samples: $('#save_to_samples').val() is "on"
     obj=
       type:'POST'
-      url:my_url
+      url:'/lilypond.txt'
       data: my_data
       error: (some_data) ->
         alert "Generating staff notation failed"
@@ -132,7 +132,7 @@ $(document).ready ->
   get_dom_fixer = () ->
     params=
       type:'GET'
-      url:'js/dom_fixer.js'
+      url:'/js/dom_fixer.js'
       dataType:'text'
       success: (data) ->
         $('#dom_fixer_for_html_doc').html(data)
@@ -143,7 +143,7 @@ $(document).ready ->
   get_zepto = () ->
     params=
       type:'GET'
-      url:'js/third_party/zepto.unminified.js'
+      url:'/js/third_party/zepto.unminified.js'
       dataType:'text'
       success: (data) ->
         $('#zepto_for_html_doc').html(data)
@@ -154,7 +154,7 @@ $(document).ready ->
   get_css = () ->
     params=
       type:'GET'
-      url:'css/application.css'
+      url:'/css/application.css'
       dataType:'text'
       success: (data) ->
         $('#css_for_html_doc').html(data)
@@ -168,7 +168,6 @@ $(document).ready ->
     css=$('#css_for_html_doc').html()
     js=$('#zepto_for_html_doc').html()
     js2=$('#dom_fixer_for_html_doc').html()
-    my_url="generate_html_page"
     composition=window.the_composition
     full_url="http://ragapedia.com"
     html_str=to_html_doc(composition,full_url,css,js+js2)
@@ -178,7 +177,7 @@ $(document).ready ->
       html_to_use:html_str
     obj=
       type:'POST'
-      url:my_url
+      url:"/generate_html_page"
       data: my_data
       error: (some_data) ->
         alert "Create html page failed, some_data is #{some_data}"

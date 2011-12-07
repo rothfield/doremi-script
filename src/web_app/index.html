@@ -9,11 +9,11 @@
     }
 </script>
     <title>DoremiScript Letter Music Notation</title>
-    <link rel="stylesheet" href="css/application.css" type="text/css" media="all">
+    <link rel="stylesheet" href="/css/application.css" type="text/css" media="all">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 </head>
 <body>
-<a href="https://github.com/rothfield/doremi-script">doremi Project home page on github</a>
+<a href="/https://github.com/rothfield/doremi-script">doremi Project home page on github</a>
 <h1>Letter Music Notation Editor</h1>
 <h2>Enter music notation as text/letters, render it beautifully in html/css, and generate western staff notation/midi</h2>
 <div>
@@ -26,7 +26,7 @@
 </li>
 <!--
 <li>
-<a id="staff_notation_link" href="#staff_notation">Jump to Staff Notation</a> 
+<a id="staff_notation_link" href="/#staff_notation">Jump to Staff Notation</a> 
 </li>
 -->
 <li>
@@ -34,7 +34,7 @@
 </li>
 <!--
 <li>
-<a href="#rendered_doremi_script">Jump to Rendered DoremiScript</a> 
+<a href="/#rendered_doremi_script">Jump to Rendered DoremiScript</a> 
 </li>
 -->
 <li>
@@ -63,7 +63,8 @@
 <br/>
 <br/>
 <a name="staff_notation"></a> 
-<h2 class="step">Step 3: Click <button id="generate_staff_notation">Generate staff notation and midi file...</button> to render the notation in staff notation using lilypond. This also generates midi, png, and pdf files on the server.
+<h2 class="step">Step 3: Click <button id="generate_staff_notation">Generate staff notation...</button> to render the notation in staff notation using lilypond. This also generates midi, png, and pdf files on the server.
+<input id="save_to_samples" name="save_to_samples" type="checkbox">Save to Samples(Admin Only)</input>
 </h2>
 <button id="show_lilypond_source">Lilypond source</button>
 <button id="show_lilypond_output">Lilypond output</button>
@@ -84,7 +85,7 @@
 <a class="generated_by_lilypond" id="download_ly" href="" target="_blank">Lilypond</a>
 </div>
 <div>
-<img class="generated_by_lilypond" id="lilypond_png" src="images/none.png"/>
+<img class="generated_by_lilypond" id="lilypond_png" src="/images/none.png"/>
 </div>
 <br/>
 <br/>
@@ -93,22 +94,22 @@
 <span id="testing_utf_support" style="display:none" class="note left_repeat">&#x1d106;</span>
 
 <!-- Try using zepto instead of jquery! -->
-    <script type="text/javascript" src="js/third_party/zepto.min.js"></script>
+    <script type="text/javascript" src="/js/third_party/zepto.min.js"></script>
     <!--
-    <script type="text/javascript" src="js/third_party/jquery.js"></script>
+    <script type="text/javascript" src="/js/third_party/jquery.js"></script>
     -->
-    <script type="text/javascript" src="js/underscore.logger.js"></script>
-    <script type="text/javascript" src="js/shims.js"></script>
-    <script type="text/javascript" src="js/all_items.js"></script>
-    <script type="text/javascript" src="js/third_party/underscore.js"></script>
-    <script type="text/javascript" src="js/third_party/fraction.js"></script>
-    <script type="text/javascript" src="js/tree_iterators.js"></script>
-    <script type="text/javascript" src="js/parser_helper.js"></script>
-    <script type="text/javascript" src="js/to_lilypond.js"></script>
-    <script type="text/javascript" src="js/doremi_script_parser.js"></script>
-    <script type="text/javascript" src="js/dom_fixer.js"></script>
-    <script type="text/javascript" src="js/html_renderer.js"></script>
-    <script type="text/javascript" src="js/application.js"></script>
+    <script type="text/javascript" src="/js/underscore.logger.js"></script>
+    <script type="text/javascript" src="/js/shims.js"></script>
+    <script type="text/javascript" src="/js/all_items.js"></script>
+    <script type="text/javascript" src="/js/third_party/underscore.js"></script>
+    <script type="text/javascript" src="/js/third_party/fraction.js"></script>
+    <script type="text/javascript" src="/js/tree_iterators.js"></script>
+    <script type="text/javascript" src="/js/parser_helper.js"></script>
+    <script type="text/javascript" src="/js/to_lilypond.js"></script>
+    <script type="text/javascript" src="/js/doremi_script_parser.js"></script>
+    <script type="text/javascript" src="/js/dom_fixer.js"></script>
+    <script type="text/javascript" src="/js/html_renderer.js"></script>
+    <script type="text/javascript" src="/js/application.js"></script>
 <!-- stash css and javascript here when necessary to generate a standalone page.  -->
 <script id="css_for_html_doc" type="text/html"></script>
 <script id="zepto_for_html_doc" type="text/html"></script>

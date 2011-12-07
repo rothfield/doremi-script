@@ -50,16 +50,23 @@ post '/generate_html_page' do
   fname
 end
 
+get %r{/samples/([a-zA-Z0-9]+)$} do
+  File.read(File.join('public', 'index.html'))
+end
+
 post '/lilypond.txt' do
   comp=settings.comp
   dir=File.join('public','compositions')
   puts params.inspect      
   return "no data param" if !params["data"]
   data=params["data"]
+  save_to_samples=params['save_to_samples']
   doremi_script_source=params["doremi_script_source"]
   puts "params.data is #{params['data']}" 
   filename=params["fname"] || ""
-  fname="#{sanitize_filename(filename)}_#{Time.new.to_i}"
+  simple_file_name=sanitize_filename(filename)
+  fname="#{simple_file_name}_#{Time.new.to_i}"
+  
   fp= "#{comp}/#{fname}"
   `rm #{fp}-page*png`
   File.open("#{fp}.ly", 'w') {|f| f.write(data) }
@@ -88,6 +95,22 @@ post '/lilypond.txt' do
   puts "result of running lilypond is <<#{result}>>"
   `rm #{fp}.ps`
   `cp #{fp}.ly #{comp}/last.ly`
+  ary=[]
+
+  if save_to_samples 
+    Dir.chdir("public/compositions") do
+      ary=Dir.glob("#{fname}*") 
+    end
+    puts "ary is #{ary.inspect}"
+    ary.each do |x| 
+     puts "x is #{x}"
+     x =~ /^.*\.(.*)$/
+     suffix=$1
+     fp= "#{comp}/#{x}"
+    `cp #{fp} ../../samples/#{simple_file_name}.#{suffix}`
+    `cp #{fp} ./samples/#{simple_file_name}.#{suffix}`
+    end
+  end
   # puts "result2.length is #{result2[0..20]}..."
   #midi=`openssl enc -base64 -in #{fp}.midi`
   #puts "midi is #{midi[0..20]}..."
