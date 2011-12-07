@@ -265,13 +265,13 @@ root.ParserHelper=
       done=false
       ctr=0
       first_dash=null
-      # KEEP _.each for NOW
-      _.each my_beat.items,  (item) => 
-        return if done
-        done=item.my_type=="pitch"
-        if item.my_type=="dash"
-          ctr++
-          first_dash=item if ctr is 1
+      for item in my_beat.items
+        do (item) =>
+          return if done
+          done=item.my_type=="pitch"
+          if item.my_type=="dash"
+            ctr++
+            first_dash=item if ctr is 1
       first_dash.numerator=ctr
       first_dash.denominator=denominator
       first_dash.dash_to_tie=true
