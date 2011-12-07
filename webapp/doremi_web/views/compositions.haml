@@ -1,0 +1,7 @@
+- @compositions.each do |file|
+  - @short=file.slice(0,file.length-4)
+  %a(href="/compositions/#{@short}")
+    = @short
+  %br
+
+

@@ -3,7 +3,7 @@ require 'json'
 
 set :comp, "#{Dir.pwd}/public/compositions"
 set :port,80  if `hostname`.chomp == 'ragapedia'
-
+set :haml, :format => :html5
 def sanitize_filename(filename)
   name=filename.strip
    # NOTE: File.basename doesn't work right with Windows paths on Unix
@@ -50,8 +50,21 @@ post '/generate_html_page' do
   fname
 end
 
-get %r{/samples/([a-zA-Z0-9]+)$} do
+get %r{/samples/([a-z_A-Z0-9]+)$} do
   File.read(File.join('public', 'index.html'))
+end
+
+get %r{/compositions/([a-z_A-Z0-9]+)$} do
+  File.read(File.join('public', 'index.html'))
+end
+
+get '/compositions' do
+  ary=[]
+  @compositions=Dir.chdir("public/compositions") do
+    ary=Dir.entries('.').sort {|b,a| File.stat(a).mtime <=> File.stat(b).mtime}
+  end
+  @compositions= @compositions.find_all {|i|  i =~ /\.txt$/ }
+  haml :compositions
 end
 
 post '/lilypond.txt' do

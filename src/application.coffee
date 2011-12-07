@@ -34,14 +34,11 @@ $(document).ready ->
         $('#lilypond_png').attr('src',x)
       $("#download_#{typ}").attr('onclick',snip)
 
-  # Handler for samples dropdown
-  sample_compositions_click = ->
-    return if this.selectedIndex is 0
-    filename=this.value
-    
+
+  load_filepath= (filepath) ->
     params=
       type:'GET'
-      url:"/samples/#{filename}"
+      url:filepath
       dataType:'text'
       success: (data) =>
         $('#entry_area').val(data)
@@ -49,6 +46,11 @@ $(document).ready ->
         setup_links(filename,'samples')
         $('.generated_by_lilypond').show()
     $.ajax(params)
+
+  # Handler for samples dropdown
+  sample_compositions_click = ->
+    return if this.selectedIndex is 0
+    load_filepath("/samples/#{this.value}")
 
   $('#sample_compositions').change(sample_compositions_click)
 
@@ -86,6 +88,13 @@ $(document).ready ->
   '''
   root.debug=true
   window.timer_is_on=0
+  # "/samples/happy_birthday" in URL
+  if window.location.pathname.indexOf("/samples/") > -1
+    load_filepath("#{window.location.pathname}.txt")
+  if window.location.pathname.indexOf("/compositions/") > -1
+    load_filepath("#{window.location.pathname}.txt")
+
+  $('#entry_area').val(str)
   window.last_val=str
   window.timed_count = () =>
     cur_val= $('#entry_area').val()
@@ -98,7 +107,6 @@ $(document).ready ->
     if !window.timer_is_on
       window.timer_is_on=1
       window.timed_count()
-  $('#entry_area').val(str)
   parser=DoremiScriptParser
   window.parse_errors=""
   $('#show_parse_tree').click ->
