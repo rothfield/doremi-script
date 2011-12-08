@@ -129,7 +129,7 @@ post '/lilypond.txt' do
   #puts "midi is #{midi[0..20]}..."
   content_type :json
   {:error => false, 
-   :fname => fname,
+   :fname => "/compositions/#{fname}",
    :lilypond_output => result,
   }.to_json
 end
