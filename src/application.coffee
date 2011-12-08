@@ -17,21 +17,21 @@ $(document).ready ->
       url:'/list_samples'
       dataType:'json'
       success: (data) ->
-        str= ("<option>#{item}</option>" for item in data).join('')
+        str= ("<option value='/samples/#{item}'>#{item}</option>" for item in data).join('')
         $('#sample_compositions').append(str)
     $.ajax(params)
 
   setup_samples_dropdown()
 
-  setup_links= (filename,dir="compositions") ->
+  setup_links= (filename) ->
     without_suffix=filename.substr(0, filename.lastIndexOf('.txt')) || filename
     for typ in ["png","pdf","mid","ly","txt"]
       snip = """
-      window.open('/compositions/#{without_suffix}.#{typ}'); return false; 
+      window.open('#{without_suffix}.#{typ}'); return false; 
       """
-      $("#download_#{typ}").attr('href',x="#{dir}/#{without_suffix}.#{typ}")
+      $("#download_#{typ}").attr('href',full_path="#{without_suffix}.#{typ}")
       if typ is 'png'
-        $('#lilypond_png').attr('src',x)
+        $('#lilypond_png').attr('src',full_path)
       $("#download_#{typ}").attr('onclick',snip)
 
 
@@ -43,14 +43,14 @@ $(document).ready ->
       success: (data) =>
         $('#entry_area').val(data)
         $('#sample_compositions').val("Load sample compositions")
-        setup_links(filename,'samples')
+        setup_links(filepath)
         $('.generated_by_lilypond').show()
     $.ajax(params)
 
   # Handler for samples dropdown
   sample_compositions_click = ->
     return if this.selectedIndex is 0
-    load_filepath("/samples/#{this.value}")
+    load_filepath(this.value)
 
   $('#sample_compositions').change(sample_compositions_click)
 
@@ -116,6 +116,7 @@ $(document).ready ->
     $('#lilypond_png').attr('src',"")
     $('.generated_by_lilypond').hide()
     my_data =
+      as_html:true
       fname:window.the_composition.filename
       data: window.the_composition.lilypond
       doremi_script_source: $('#entry_area').val()
@@ -128,6 +129,7 @@ $(document).ready ->
         alert "Generating staff notation failed"
         $('#lilypond_png').attr('src','none.jpg')
       success: (some_data,text_status) ->
+        console.log "success,fname is",some_data.fname
         setup_links(some_data.fname)
         #window.location = String(window.location).replace(/\#.*$/, "") + "#staff_notation"
         $('.generated_by_lilypond').show()

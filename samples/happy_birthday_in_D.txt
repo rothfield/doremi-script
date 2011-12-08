@@ -1,5 +1,5 @@
 Title: Happy Birthday
-Filename: happy_birthday
+Filename: happy_birthday_in_D
 Key: c
 Author: Traditional
 TimeSignature: 3/4
@@ -9,7 +9,7 @@ TimeSignature: 3/4
 ha-ppy birth-day to you ha-ppy birth-day to you ha-ppy
 
                                      1.____   2.______
-| P G S | (N - - | D) - mm | G S R | S -   :| S -P DP | n - -
-           .       .                             . ..   .
+| P G S | (N - - | D) - mm | G S R | S -   :| S -P DP | n
+                                                 . ..   .
   birth-day dear Jim ha-ppy birth-day to you  you and ma-ny more
 

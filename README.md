@@ -53,11 +53,12 @@ Generated Western Staff Notation
   - Devanagri style sargam is written using the devanagri letters सरग़मपधऩस
   for the seven notes SRGmPDN. Use an underline underneath the letter to indicate a kommal note (flat). For sharp Ma, write as म' (note the tick symbol) 
   - left and right parens are used to indicate slurs. Slurs can only be made between pitches. For example, use (SRg)- rather than  (Srg-)
-  - Beats are delimited by spaces. If you need more space within the beat(for example, to make room for lyrics), then use angle brackets <> to delimit the beat
+  - Beats are delimited by spaces. You can also use angle brackets <> to delimit the beat
   - Dot (.) and asterisk can be used interchangeably to 
 indicate octaves. Place dots underneath for lower octave and above for
 upper octaves. Use a colon **:** to indicate upper-upper octave or lower-lower octave
-  - Rhythm: In this style of notation, derived from the AACM style, the dash (**-**) is used as a rhythmic placeholder. For example, this measure `| C--Eb--G-   A   A   A |` is interpreted as a measure consisting of four beats. The first beat is divided into 8 parts, where the C gets 3/8ths of the beat, Eb gets 3/8ths of a beat and G gets 2/8ths. (Note that 3/8ths of a beat in western 4/4 notation is considered 3/32nds and is written as a dotted 16th. Confused?) The 3 A's are each a single beat. The lilypond generator attempts to support this, but still needs a bit of work.
+  - Lyrics: Enter lyrics for each line underneath the notes. Syllable DO NOT need to be directly under their corresponding note, as the parser can figure out which syllables go with which notes by counting pitches and slurred phrases. 
+  - Rhythm: In this style of notation, derived from the AACM style, the dash (**-**) is used as a rhythmic placeholder. For example, this measure `| C--Eb--G-   A   A   A |` is interpreted as a measure consisting of four beats. The first beat is divided into 8 parts, where the C gets 3/8ths of the beat, Eb gets 3/8ths of a beat and G gets 2/8ths. (Note that 3/8ths of a beat in western 4/4 notation is considered 3/32nds and is written as a dotted 16th. The 3 A's are each a single beat. The lilypond generator attempts to support this, but still needs a bit of work.
   - Underlines are supported for Devanagri to indicate flat notes
   - Mode,Time, and Key in header are used in generating western notation
   - Chord symbols are supported

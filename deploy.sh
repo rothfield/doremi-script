@@ -24,7 +24,7 @@ echo "copying $THIRD_PARTY_DIR files to $WEBAPP_DIR "
 echo "copying third party to ..."
 cp -r ./vendor/third_party/* $THIRD_PARTY_DIR/
 
-cp ./src/sinatra_webapp/application.rb $WEBAPP_DIR/
+cp ./src/webapp/application.rb $WEBAPP_DIR/
 echo "copying $SRC_WEBAPP_DIR/* to $WEBAPP_DIR/public"
 
 cp -r $SRC_WEBAPP_DIR/* $WEBAPP_DIR/public
