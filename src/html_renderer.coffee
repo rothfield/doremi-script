@@ -214,11 +214,12 @@ draw_item= (item) ->
   """
 
 draw_beat= (beat) ->
+  looped_class= if beat.subdivisions > 1 then "looped" else ""
   x=(draw_item(item) for item in beat.items).join('')
   extra=""
   extra= "data-subdivisions=#{beat.subdivisions} " if beat.subdivisions > 1
   """
-  <span #{extra}class='beat'>#{x}</span>
+  <span #{extra}class='beat #{looped_class}'>#{x}</span>
   """
 
 
