@@ -14,6 +14,7 @@
     "doremi2htmldoc":  "./bin/doremi2htmldoc",
     "doremi2html":  "./bin/doremi2html",
     "doremi2ly":  "./bin/doremi2ly",
+    "doremi2musicxml":  "./bin/doremi2musicxml",
     "doremiparse":  "./bin/doremiparse"
   },
   "homepage": "http://ragapedia.com",

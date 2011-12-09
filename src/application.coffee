@@ -22,7 +22,8 @@ $(document).ready ->
     $.ajax(params)
 
   setup_samples_dropdown()
-
+  if window.location.host.indexOf('localhost') is -1
+    $("#add_to_samples").hide()
   setup_links= (filename) ->
     without_suffix=filename.substr(0, filename.lastIndexOf('.txt')) || filename
     for typ in ["png","pdf","mid","ly","txt"]
@@ -234,6 +235,7 @@ $(document).ready ->
       composition_data= parser.parse(src)
       composition_data.source=src
       composition_data.lilypond=to_lilypond(composition_data)
+      composition_data.musicxml=to_musicxml(composition_data)
       window.the_composition=composition_data
       $('#parse_tree').text("Parsing completed with no errors \n"+JSON.stringify(composition_data,null,"  "))
       if composition_data.warnings.length > 0

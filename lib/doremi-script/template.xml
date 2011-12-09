@@ -6,10 +6,10 @@
         <work-title></work-title>
     </work>
     <movement-number></movement-number>
-    <movement-title>#{movement_title}</movement-title>
+    <movement-title>{{movement_title}}</movement-title>
     <identification>
-            <creator type="composer">#{composer}</creator>
-            <creator type="poet">#{poet}</creator>
+            <creator type="composer">{{composer}}</creator>
+            <creator type="poet">{{poet}}</creator>
         <rights></rights>
         <encoding>
             <software>DoremiScript</software>
@@ -283,5 +283,7 @@
                 </lyric>
             </note>
         </measure>
+          {{body}}
+
     </part>
 </score-partwise>

@@ -3,6 +3,7 @@ mkdir -p tmp
 nodeunit lib/doremi-script/parser_test.js
 nodeunit lib/doremi-script/fractions_test.js
 nodeunit lib/doremi-script/to_lilypond_test.js
+#nodeunit lib/doremi-script/to_musicxml_test.js
 nodeunit lib/doremi-script/to_html_test.js
 nodeunit lib/doremi-script/tree_iterators_test.js
 echo "testing command line utility doremi2htmldoc with input | SRG"

@@ -48,15 +48,14 @@ div.line {
     font-family: sans-serif;
 }
 
-/* looped beat TODO: add looped class to beats that need them! */
-span.beat[data-subdivisions] {
+span.beat.looped {
     border-top: 0px;
     border-bottom: .1em solid;
     padding-bottom: .75em;
-    border-bottom-left-radius: .5em;
-    border-bottom-right-radius: .5em;
     border-top-left-radius: 0em;
     border-top-right-radius: 0em;
+    border-bottom-left-radius: .5em;
+    border-bottom-right-radius: .5em;
     border-style: solid;
     border-color:black;
     border-left-width: 0px;
