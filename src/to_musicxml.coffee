@@ -244,8 +244,8 @@ note_template_str='''
               <voice>1</voice>
               {{type_and_dots}}
               {{lyric}}
-              <notations>{{tied}}{{ornament_before_slur_end}}
-              {{begin_slur}}{{end_slur}}{{ornament_after_slur_begin}}</notations>
+              <notations>{{tied}}
+              {{end_slur}}{{begin_slur}}</notations>
              </note>
              {{after_ornaments}}
 '''
@@ -257,16 +257,6 @@ draw_note = (pitch,context) ->
   if pitch.my_type is "dash"
     return "" if !pitch.pitch_to_use_for_tie?
   [before_ornaments,after_ornaments]=draw_ornaments(pitch,context)
-  ornament_before_slur_end=""
-  if (orn = get_ornament(pitch)) and orn.placement is "before" and !context.dont_slur_ornament
-    ornament_before_slur_end="""
-          <slur number="#{context.slur_number}" type="stop"/>
-    """
-  ornament_after_slur_begin=""
-  if (orn = get_ornament(pitch)) and orn.placement is "after" and !context.dont_slur_ornament
-    ornament_after_slur_begin="""
-          <slur number="#{context.slur_number}" type="start"/>
-    """
   if pitch.dash_to_tie? and pitch.dash_to_tie is true
     pitch.normalized_pitch=pitch.pitch_to_use_for_tie.normalized_pitch
     pitch.octave=pitch.pitch_to_use_for_tie.octave
@@ -322,7 +312,7 @@ draw_note = (pitch,context) ->
   begin_slur = end_slur =""
   if item_has_attribute(pitch,"end_slur")
     end_slur="""
-<slur number="#{context.slur_number-1}" type="stop"/>
+<slur number="#{context.slur_number}" type="stop"/>
     """
     context.in_slur=false
 
@@ -344,8 +334,6 @@ draw_note = (pitch,context) ->
     end_slur:end_slur
     before_ornaments:before_ornaments
     after_ornaments:after_ornaments
-    ornament_before_slur_end: ornament_before_slur_end
-    ornament_after_slur_begin:ornament_after_slur_begin
   templates.note(params)
 
 musicxml_type_and_dots= (numerator,denominator) ->
@@ -369,7 +357,6 @@ grace_note_template_str =  """
         </pitch>
         <voice>1</voice>
         <type>{{type}}</type>
-        <notations>{{slur_start}}{{slur_end}}</notations>
       </note>
   """
 
@@ -390,21 +377,11 @@ grace_note_after_template_str =  """
 templates.grace_note_after = _.template(grace_note_after_template_str)
 
 draw_grace_note = (ornament_item,which,len,steal_time="",placement,context) ->
-  if which is 0 and placement is "before" and context.dont_slur_ornament is false
-    slur_start="""
-    <slur number="#{++context.slur_number}" type="start"/>
-    """
-  if which is (len-1) and placement is "after" and context.dont_slur_ornament is false
-    slur_end="""
-    <slur number="#{context.slur_number}" type="stop"/>
-    """
   params=
     step:musicxml_step(ornament_item)
     alter:musicxml_alter(ornament_item)
     octave:musicxml_octave(ornament_item)
     type:"<span>32nd</span>"
-    slur_start:slur_start
-    slur_end:slur_end
     steal_time:steal_time
   templates.grace_note(params)
 
