@@ -11,6 +11,16 @@ $(document).ready ->
   if Zepto?
     _.debug("***Using zepto.js instead of jQuery***")
   debug=false
+  setup_to_musicxml= () ->
+    params=
+      type:'GET'
+      url:'/js/composition.mustache'
+      dataType:'txt'
+      success: (data) ->
+        to_musicxml.templates.composition=_.template(data)
+    $.ajax(params)
+
+  setup_to_musicxml()
   setup_samples_dropdown= () ->
     params=
       type:'GET'
@@ -87,6 +97,7 @@ $(document).ready ->
        S
   |(Sr  n)
   '''
+  str='SRG'
   root.debug=true
   window.timer_is_on=0
   # "/samples/happy_birthday" in URL
@@ -235,7 +246,7 @@ $(document).ready ->
       composition_data= parser.parse(src)
       composition_data.source=src
       composition_data.lilypond=to_lilypond(composition_data)
-      composition_data.musicxml=to_musicxml(composition_data)
+      #composition_data.musicxml=to_musicxml(composition_data)
       window.the_composition=composition_data
       $('#parse_tree').text("Parsing completed with no errors \n"+JSON.stringify(composition_data,null,"  "))
       if composition_data.warnings.length > 0

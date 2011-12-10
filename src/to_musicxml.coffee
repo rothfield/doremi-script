@@ -1,6 +1,6 @@
 # Uses module pattern, exports to_lilypond
 # Usage:
-# to_lilypond(composition_json_data)
+# to_musicxml(composition_json_data)
 
 fs= require 'fs' if require?
 templates={}
@@ -105,79 +105,61 @@ my_inspect= (obj) ->
   console.log obj
 
 
-fraction_to_lilypond=
-   # Todo: use fractions.js
-   # TODO: have to tie notes for things like 5/8
-   # which would be an 1/8th and a 32nd
-   # To do it right should perhaps use fractional math as follows:
-   # 5/8 = 1/2 + 1/8 => 1/8 + 1/32
-  "2/1":"2"
-  "3/1":"2."
-  "4/1":"1"
-  "5/1":"1.."
-  "1/1":"4"
-  "1/1":"4"
-  "1/1":"4"
-  "1/1":"4"
-  "1/2":"8"
-  "1/3": "8"  # 1/3 1/5 1/7 all 8th notes so one beat will beam together
-  "1/9":"8"
-  "1/11":"8"
-  "1/13":"8"
-  "1/5":"16"
-  "2/5":"8"
-  "3/5":"8." #TODO should be tied
-  "4/5":"4" #TODO should be tied
-  "5/5":4
-  "6/6":4
-  "7/7":4
-  "8/8":4
-  "9/9":4
-  "10/10":4
-  "11/11":4
-  "12/12":4
-  "13/13":4
-  "1/7": "32" # ??? correct???hhhhhhhhhh
-  "2/7": "16" # ??? correct???hhhhhhhhhh
-  "3/7": "16." # ??? correct???hhhhhhhhhh
-  "4/7": "8" # ??? correct???hhhhhhhhhh
-  "5/7": "8.." # ??? correct???hhhhhhhhhh
-  "6/7": "8.." # ??? correct???hhhhhhhhhh
-  "6/8": "8." 
-  "2/3": "4"
-  "2/8": "16"
-  "3/8": "16."  # 1/4 + 1/8
-  "5/8": "8"   # TODO: WRONG
-  "4/8": "8"
-  "7/8": "8.." # 1/2 + 1/4 + 1/8
-  "1/6": "16"
-  "2/6": "8"
-  "3/6": "4"
-  "4/6":"4" # NOT SURE ????
-  "5/6":"8.." #  WRONGnot sure TODO??
-  "2/2":"4"
-  "3/3":"4"
-  "4/4":"4"
-  "8/8":"4"
-  "1/4":"16"
-  "2/4":"8"
-  "3/4":"8."
-  "3/8":"16."
-  "4/16":"16"
-  "3/16":""
-  "1/8":"32"
-  "3/8":"16."
-  "6/16":"16"
 
-calculate_lilypond_duration= (numerator,denominator) ->
-  if numerator is denominator
-    return "4"
-  frac="#{numerator}/#{denominator}"
-  looked_up_duration=fraction_to_lilypond[frac]
-  if !looked_up_duration?
-    alternate="16"
-    return alternate # return something
-  looked_up_duration
+fraction_to_musicxml_step_and_dots = (frac) ->
+  "2/1":"<type>half</type>"
+  "3/1":"<type>half</type><dot/>"
+  "4/1":"<type>whole</type>"
+  "5/1":"<type>whole</type><dot/><dot/>"
+  "1/1":"<type>quarter</type>"
+  "1/1":"<type>quarter</type>"
+  "1/1":"<type>quarter</type>"
+  "1/1":"<type>quarter</type>"
+  "1/2":"<type>eighth</type>"
+  "1/3": "<type>eighth</type>"  # 1/3 1/5 1/7 all 8th notes so one beat will beam together
+  "1/9":"<type>eighth</type>"
+  "1/11":"<type>eighth</type>"
+  "1/13":"<type>eighth</type>"
+  "1/5":"sixteenth"
+  "2/5":"<type>eighth</type>"
+  "3/5":"<type>eighth</type><dot/>" #TODO should be tied
+  "4/5":"<type>quarter</type>" #TODO should be tied
+  "5/5":"<type>quarter</type>"
+  "6/6":"<type>quarter</type>"
+  "7/7":"<type>quarter</type>"
+  "8/8":"<type>quarter</type>"
+  "9/9":"<type>quarter</type>"
+  "10/10":"<type>quarter</type>"
+  "11/11":"<type>quarter</type>"
+  "12/12":"<type>quarter</type>"
+  "13/13":"<type>quarter</type>"
+  "1/7": "<type>thirtysecond</type>" # ??? correct???hhhhhhhhhh
+  "2/7": "<type>sixteenth</type>" # ??? correct???hhhhhhhhhh
+  "3/7": "<type>sixteenth</type><dot/>" # ??? correct???hhhhhhhhhh
+  "4/7": "<type>eighth</type>" # ??? correct???hhhhhhhhhh
+  "5/7": "<type>eighth</type><dot/><dot/>" # ??? correct???hhhhhhhhhh
+  "6/7": "<type>eighth</type><dot/><dot/>" # ??? correct???hhhhhhhhhh
+  "6/8": "<type>eighth</type><dot/>"
+  "2/3": "<type>quarter</type>"
+  "2/8": "<type>sixteenth</type>"
+  "3/8": "<type>sixteenth</type><dot/>"  # 1/4 + 1/8
+  "5/8": "<type>eighth</type>"   # TODO: WRONG
+  "4/8": "<type>eighth</type>"
+  "7/8": "<type>eighth</type><dot/><dot/>" # 1/2 + 1/4 + 1/8
+  "1/6": "<type>sixteenth</type>"
+  "2/6": "<type>eighth</type>"
+  "3/6": "<type>quarter</type>" # not sure??
+  "4/6":"<type>quarter</type>" # NOT SURE ????
+  "5/6":"<type>eighth</type><dot/><dot/>" #  WRONGnot sure TODO??
+  "2/2":"<type>quarter</type>"
+  "3/3":"<type>quarter</type>"
+  "4/4":"<type>quarter</type>"
+  "8/8":"<type>quarter</type>"
+  "1/4":"<type>sixteenth</type>"
+  "2/4":"<type>eighth</type>"
+  "3/4":"<type>eighth</type><dot/>"
+  "3/8":"<type>sixteenth</type><dot/>"
+
 
 get_ornament = (pitch) ->
   return false if !pitch.attributes?
@@ -289,18 +271,6 @@ normalized_pitch_to_lilypond= (pitch) ->
     grace1= "\\acciaccatura {#{lilypond_grace_notes(ornament)}}"
   "#{grace1}#{lilypond_pitch}#{lilypond_octave}#{duration}#{lilypond_symbol_for_tie}#{mordent}#{begin_slur}#{end_slur}#{ending}#{chord}#{grace2}"
   """
-  <note>
-    <attributes>
-    <divisions>#{pitch.denominator}</divisions>
-    </attributes>
-    <pitch>
-      <step>#{musicxml_step(pitch)}->
-      </step>
-      <octave>#{musicxml_octave(pitch)}</octave>
-    </pitch>
-    <duration>#{pitch.numerator}</duration>
-    <type>whole</type>
-  </note>
   """
 
 
@@ -478,13 +448,17 @@ to_musicxml= (composition_data) ->
   templates.composition(params)
   return templates.composition(params)
 
+
+#
 note_template_str='''
             <note>
                 <pitch>
                     <step>{{step}}</step>
+                    {{alter}}
                     <octave>{{octave}}</octave>
+                    {{type_and_dots}}
+                    <duration>{{duration}}</duration>
                 </pitch>
-                <duration>{{duration}}</duration>
                 <voice>1</voice>
             </note>
   '''
@@ -516,19 +490,55 @@ example- 2/4
 
 """
 draw_note = (pitch) ->
+  if pitch.fraction_total?
+    fraction=new Fraction(pitch.fraction_total.numerator,pitch.fraction_total.denominator)
+  else
+    fraction=new Fraction(pitch.numerator,pitch.denominator)
+
   divisions_per_quarter=24
-  fraction=new Fraction(pitch.numerator,pitch.denominator)
-  #frac=fraction.divide(4)
   frac2=fraction.multiply(divisions_per_quarter)
-  
+  duration=frac2.numerator
+  if pitch.denominator not in [0,1,2,4,8,16,32,64,128] 
+     x=2
+     if pitch.denominator is 6
+       x=4
+     if  pitch.denominator is 5
+       x=4
+       #ary.push "\\times #{x}/#{beat.subdivisions} { "
+       #in_times=true #hack
+     duration=divisions_per_quarter/2
   params=
     step: musicxml_step(pitch)
     octave:musicxml_octave(pitch)
     duration:frac2.numerator
+    alter:musicxml_alter(pitch)
+    type_and_dots:musicxml_type_and_dots(pitch.numerator,pitch.denominator)
   templates.note(params)
 
+musicxml_type_and_dots= (numerator,denominator) ->
+  if numerator is denominator
+    return "<type>eighth</type>"
+  frac="#{numerator}/#{denominator}"
+  looked_up_duration=fraction_to_musicxml_step_and_dots[frac]
+  if !looked_up_duration?
+    alternate= "<type>sixteenth</type>"
+    return alternate # return something
+  looked_up_duration
+    
 musicxml_step = (pitch) ->
   pitch.normalized_pitch[0]
+
+musicxml_alter = (pitch) ->
+  alt="" 
+  if pitch.normalized_pitch.indexOf('#') > -1
+    alt="1"
+  else if pitch.normalized_pitch.indexOf('b') > -1
+    alt="-1"
+  else
+    return ""
+  "<alter>#{alt}</alter>"
+
+    
 
 musicxml_octave = (pitch) ->
   pitch.octave + 4
