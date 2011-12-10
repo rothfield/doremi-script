@@ -333,10 +333,8 @@ beat_is_all_dashes= (beat) ->
   all_items_in_line(beat).every(fun)
   
 to_musicxml= (composition_data) ->
-  context=
-    slur_number:0
-    measure_number:2
   ary=[]
+  measure_ctr=2
   in_times=false #hack
   at_beginning_of_first_measure_of_line=false
   dashes_at_beginning_of_line_array=[]
@@ -351,8 +349,9 @@ to_musicxml= (composition_data) ->
     last_pitch=null
     for item in all
       if item.my_type is "measure"
-        ary.push draw_measure(item,context)
-        context.measure_number++
+        [str,slur_ctr]=draw_measure(item,measure_ctr,slur_ctr)
+        ary.push str
+        measure_ctr=measure_ctr+1
   mode = get_attribute(composition_data,'Mode')
   mode or= "major"
   composer = get_attribute(composition_data,"Author")
@@ -470,7 +469,8 @@ example- 2/4
                 </lyric>
 
 """
-draw_note = (pitch,context) ->
+draw_note = (pitch,slur_ctr) ->
+  slur_ctr=1
   console.log "Entering draw_note, pitch is #{pitch}" if !running_under_node()
   if pitch.my_type is "dash"
     return "" if !pitch.pitch_to_use_for_tie?
@@ -527,15 +527,12 @@ draw_note = (pitch,context) ->
      </lyric>
     """
   begin_slur = end_slur =""
-  if item_has_attribute(pitch,"end_slur")
-    end_slur="""
-<slur number="#{context.slur_number}" type="stop"/>
-    """
-
   if item_has_attribute(pitch,"begin_slur")
+    slur_ctr++
     begin_slur="""
-<slur number="#{context.slur_number++}" type="start"/>
+<slur number="#{slur_ctr}" type="start"/>
     """
+  end_slur  =  if item_has_attribute(pitch,"end_slur") then ")" else ""
   params=
     step: musicxml_step(pitch)
     octave:musicxml_octave(pitch)
@@ -547,8 +544,7 @@ draw_note = (pitch,context) ->
     lyric:lyric
     begin_slur:begin_slur
     end_slur:end_slur
-
-  templates.note(params)
+  [templates.note(params),slur_ctr]
 
 musicxml_type_and_dots= (numerator,denominator) ->
   console.log "musicxml_type_and_dots(#{numerator},#{denominator}" if !running_under_node()
@@ -581,23 +577,24 @@ musicxml_octave = (pitch) ->
 musicxml_duration = (pitch) ->
   1 # TODO  
 
-draw_measure= (measure,context) ->
+draw_measure= (measure,ctr,slur_ctr) ->
   ary=[]
   for item in all_items(measure)
-    #console.log "item"
-    ary.push(draw_note(item,context)) if item.my_type is "pitch"
-    ary.push(draw_note(item,context)) if item.my_type is "dash"
+    [str,slur_ctr]=draw_note(item,slur_ctr) if (item.my_type is "pitch" or item.my_type is "dash")
+    ary.push str
   #console.log "ary is",ary
   # 1st measure gets combined with clef
   measure="""
-  <measure number="#{context.measure_number}">
+  <measure number="#{ctr}">
   """
-  measure="" if context.measure_number is 2
-  """
+  measure="" if ctr is 2
+
+  return_val ="""
     #{measure}
     #{ary.join(' ')}
 </measure>
   """
+  [return_val,slur_ctr]
 
 all_items_in_line= (line_or_item,items=[]) ->
   # TODO: dry this up
