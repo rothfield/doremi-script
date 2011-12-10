@@ -1,7 +1,6 @@
-# Uses module pattern, exports to_musicxml
+# Uses module pattern, exports to_lilypond
 # Usage:
 # to_musicxml(composition_json_data)
-# IMPORTANT: need to set templates.composition externally
 
 fs= require 'fs' if require?
 templates={}
@@ -10,9 +9,7 @@ _.templateSettings = {
 }
 if require?
   templates.composition = _.template(fs.readFileSync(__dirname + '/composition.mustache', 'UTF-8'))
-# otherwise, let the browser app install it-see application.js. 
-# TODO: find different mechanism to do this
-#
+
 debug=true
 
 root = exports ? this
@@ -95,12 +92,44 @@ fraction_to_musicxml_type_and_dots =
   "3/8":"<type>16th</type><dot/>"
 
 get_ornament = (pitch) ->
-  return null if !pitch.attributes?
+  return false if !pitch.attributes?
   _.detect(pitch.attributes, (attribute) -> attribute.my_type is "ornament")
   
 has_mordent = (pitch) ->
   return false if !pitch.attributes?
   _.detect(pitch.attributes, (attribute) -> attribute.my_type is "mordent")
+
+lookup_lilypond_pitch= (pitch) ->
+  lilypond_pitch_map[pitch.normalized_pitch]
+
+
+lilypond_grace_note_pitch = (pitch) ->
+  # generate a single pitch for use as a grace note
+  duration="32"
+  lilypond_pitch=lookup_lilypond_pitch(pitch)
+  lilypond_octave=lilypond_octave_map["#{pitch.octave}"]
+  return "???#{pitch.octave}" if !lilypond_octave?
+  "#{lilypond_pitch}#{lilypond_octave}#{duration}"
+
+lilypond_grace_notes = (ornament) ->
+  # generate a series of grace notes for an ornament
+  #  c1 \afterGrace d1( { c16[ d]) } c1
+  #  In the above line, generate what is between {}
+  ary=(lilypond_grace_note_pitch(pitch) for pitch in ornament.ornament_items)
+  
+  needs_beam = (ary.length > 1)
+  begin_beam=end_beam=""
+  begin_slur="("
+  begin_slur=""
+  end_slur=")"
+  if needs_beam
+    begin_beam="["
+    end_beam="]"
+  ary[0]= "#{ary[0]}#{begin_slur}#{begin_beam}" 
+  length=ary.length
+  ary[length-1]="#{ary[length-1]}#{end_beam}" 
+  # TODO: end slur??????????
+  ary.join ' '
 
 get_chord= (item) ->
   if e =_.detect(item.attributes, (x) -> x.my_type is "chord_symbol")
@@ -115,6 +144,121 @@ get_ending= (item) ->
     ^"#{e.source}"
     """
   ""
+
+normalized_pitch_to_musicxml_step = (normalized_pitch) ->
+
+normalized_pitch_to_lilypond= (pitch) ->
+  # Render a pitch/dash as lilypond
+  # needs work
+  chord=get_chord(pitch)
+  ending=get_ending(pitch)
+  if pitch.fraction_array?
+    first_fraction=pitch.fraction_array[0]
+  else
+    first_fraction=new Fraction(pitch.numerator,pitch.denominator)
+  duration=calculate_lilypond_duration first_fraction.numerator.toString(),first_fraction.denominator.toString()
+  @log("normalized_pitch_to_lilypond, pitch is",pitch)
+  if pitch.my_type is "dash"
+    # unfortunately this is resulting in tied 1/4s.
+    if pitch.dash_to_tie is true
+      pitch.normalized_pitch=pitch.pitch_to_use_for_tie.normalized_pitch
+      pitch.octave=pitch.pitch_to_use_for_tie.octave
+    else
+      return "r#{duration}#{chord}#{ending}"
+  lilypond_pitch=lilypond_pitch_map[pitch.normalized_pitch]
+  return "???#{pitch.source}" if  !lilypond_pitch?
+  lilypond_octave=lilypond_octave_map["#{pitch.octave}"]
+  return "???#{pitch.octave}" if !lilypond_octave?
+  # Lower markings would be added as follows:
+  # "-\"#{pp}\""
+  mordent = if has_mordent(pitch) then "\\mordent" else ""
+  begin_slur = if item_has_attribute(pitch,"begin_slur") then "("  else ""
+  end_slur  =  if item_has_attribute(pitch,"end_slur") then ")" else ""
+  lilypond_symbol_for_tie=  if pitch.tied? then '~' else ''
+  #If you want to end a note with a grace, 
+  # use the \afterGrace command. It takes two 
+  # arguments: the main note, and the 
+  # grace notes following the main note.
+  #
+  #  c1 \afterGrace d1( { c32[ d]) } c1
+  #
+  #  Use
+  #  \acciaccatura { e16 d16 } c4
+  #  for ornaments with ornament.placement is "before"
+
+
+  # The afterGrace in lilypond require parens to get lilypond
+  # to render a slur.
+  # The acciatura in lilypond don't require parens to get lilypond
+  # to render a slur.
+  ornament=get_ornament(pitch)
+  grace1=grace2=grace_notes=""
+  if ornament?.placement is "after"
+    grace1 = "\\afterGrace "
+    grace2="( { #{lilypond_grace_notes(ornament)}) }"
+  if ornament?.placement is "before"
+  #  \acciaccatura { e16 d16 } c4
+    grace1= "\\acciaccatura {#{lilypond_grace_notes(ornament)}}"
+  "#{grace1}#{lilypond_pitch}#{lilypond_octave}#{duration}#{lilypond_symbol_for_tie}#{mordent}#{begin_slur}#{end_slur}#{ending}#{chord}#{grace2}"
+  """
+  """
+
+
+
+lookup_lilypond_barline= (barline_type) ->
+  # maps my_type field for barlines
+  map=
+    "reverse_final_barline":'''
+      \\bar "|."
+    '''
+    "final_barline":'''
+      \\bar "||"
+    '''
+    "double_barline":'''
+      \\bar "||" 
+    '''
+    "single_barline":'''
+      \\bar "|" 
+    '''
+    "left_repeat":'''
+      \\bar "|:" 
+    '''
+    "right_repeat":'''
+      \\bar ":|" 
+    '''
+  map[barline_type] or map["single_barline"]
+
+lilypond_octave_map=
+  "-2":","
+  "-1":""
+  "0":"'"
+  "1":"'"+"'"
+  "2":"'"+"'"+"'"
+
+lilypond_pitch_map=
+  "-":"r"
+  "C":"c"
+  "C#":"cs"
+  "Cb":"cf"
+  "Db":"df"
+  "D":"d"
+  "D#":"ds"
+  "Eb":"ef"
+  "E":"e"
+  "E#":"es"
+  "F":"f"
+  "Fb":"ff"
+  "F#":"fs"
+  "Gb":"gf"
+  "G":"g"
+  "G#":"gs"
+  "Ab":"af"
+  "A":"a"
+  "A#":"as"
+  "Bb":"bf"
+  "B":"b"
+  "B#":"bs"
+
 
 emit_tied_array=(last_pitch,tied_array,ary) ->
 
@@ -192,7 +336,7 @@ to_musicxml= (composition_data) ->
   context=
     in_slur:false
     slur_number:0
-    measure_number:1
+    measure_number:2
   ary=[]
   in_times=false #hack
   at_beginning_of_first_measure_of_line=false
@@ -218,9 +362,38 @@ to_musicxml= (composition_data) ->
     composer_snippet= """
       composer = "#{composer}"
      """
+
   title = get_attribute(composition_data,"Title")
   time = get_attribute(composition_data,"TimeSignature")
+  if (key_is_valid=is_valid_key(composition_data.key))
+    transpose_snip="\\transpose c' #{composition_data.key}'" 
+  else
+    transpose_snip=""
+    if composition_data.key?
+      @log("#{composition_data.key} is invalid")
+      composition_data.warnings.push "Invalid key. Valid keys are cdefgab etc. Use a Mode: directive to set the mode(major,minor,aeolian, etc). See the lilypond documentation for more info"
+  # Don't transpose non-sargam notation TODO:review
+  if ! notation_is_in_sargam(composition_data)
+    transpose_snip=""
+  time="4/4" if !time
+  key_snippet= """
+  \\key c \\#{mode}
+  """
+  if ! notation_is_in_sargam(composition_data) and key_is_valid
+    key_snippet= """
+    \\key #{composition_data.key} \\#{mode}
+    """
+  
+  title_snippet=""
+  if title
+    title_snippet= """
+      title = "#{title}"
+     """
   notes = ary.join " "
+  # Anything that is enclosed in %{ and %} is ignored  by lilypond
+  composition_data.source="" if !composition_data.source?
+  src1= composition_data.source.replace /%\{/gi, "% {"
+  src= src1.replace /\{%/gi, "% }"
   params=
     body:ary.join(" ")
     movement_title:title
@@ -230,7 +403,29 @@ to_musicxml= (composition_data) ->
     encoding_date:""
     mode:mode
   templates.composition(params)
+  return templates.composition(params)
 
+"""
+            <note default-y="-30.00" default-x="108.08">
+                <pitch>
+                    <step>G</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>2</duration>
+                <voice>1</voice>
+                <type>eighth</type>
+                <stem>up</stem>
+                <beam number="1">begin</beam>
+                <lyric number="1">
+                    <syllabic>begin</syllabic>
+                    <text>Yes</text>
+                </lyric>
+                <lyric number="2">
+                    <syllabic>begin</syllabic>
+                    <text>Sud</text>
+                </lyric>
+            </note>
+"""
 note_template_str='''
             {{before_ornaments}}
             <note>
@@ -251,19 +446,47 @@ note_template_str='''
 '''
 templates.note = _.template(note_template_str)
 
+
+x="""
+
+divisions set to 96 per note
+
+if our note is S-R-
+
+then sa has fraction 2/4
+
+2/4 * 1/4 = 2/16th, an eighth note
+
+but divisions is 96 so multiply by
+
+2/16 = x/96
+
+x= 2/16 *96
+
+
+1/2 of a  1/4 is 1/8   1/8=x/24 =3
+
+example- 2/4
+
+2/4 * 1/4 *24 = 2/4 * 6 = 3
+                <lyric number="1">
+                    <syllabic>begin</syllabic>
+                    <text>Yes</text>
+                </lyric>
+
+"""
+
 draw_note = (pitch,context) ->
-  context.dont_slur_ornament=  item_has_attribute(pitch,"begin_slur") or context.in_slur
   console.log "Entering draw_note, pitch is #{pitch}" if !running_under_node()
   if pitch.my_type is "dash"
     return "" if !pitch.pitch_to_use_for_tie?
   [before_ornaments,after_ornaments]=draw_ornaments(pitch,context)
   ornament_before_slur_end=""
-  if (orn = get_ornament(pitch)) and orn.placement is "before" and !context.dont_slur_ornament
+  if (orn = get_ornament(pitch)) and orn.placement is "before"
     ornament_before_slur_end="""
           <slur number="#{context.slur_number}" type="stop"/>
     """
-  ornament_after_slur_begin=""
-  if (orn = get_ornament(pitch)) and orn.placement is "after" and !context.dont_slur_ornament
+  if (orn = get_ornament(pitch)) and orn.placement is "after"
     ornament_after_slur_begin="""
           <slur number="#{context.slur_number}" type="start"/>
     """
@@ -359,16 +582,18 @@ musicxml_type_and_dots= (numerator,denominator) ->
     return alternate # return something
   looked_up_duration
    
+# for grace notes before the main note
 grace_note_template_str =  """
       <note>
         <grace {{steal_time}} />
         <pitch>
           <step>{{step}}</step>
-                {{alter}}
           <octave>{{octave}}</octave>
         </pitch>
         <voice>1</voice>
         <type>{{type}}</type>
+        {{beaming_begin}}
+        {{beaming_end}}
         <notations>{{slur_start}}{{slur_end}}</notations>
       </note>
   """
@@ -379,7 +604,6 @@ grace_note_after_template_str =  """
         <grace steal-time-previous="{{steal_time_percentage}}"/>
         <pitch>
           <step>{{step}}</step>
-                {{alter}}
           <octave>{{octave}}</octave>
         </pitch>
         <voice>1</voice>
@@ -390,19 +614,31 @@ grace_note_after_template_str =  """
 templates.grace_note_after = _.template(grace_note_after_template_str)
 
 draw_grace_note = (ornament_item,which,len,steal_time="",placement,context) ->
-  if which is 0 and placement is "before" and context.dont_slur_ornament is false
+  beaming_begin=beaming_end=""
+  if which is 0
+    beaming_begin="""
+        <beam number="1">begin</beam>
+        <beam number="2">begin</beam>
+    """
+  if which is 0 and placement is "before" and context.in_slur is false
     slur_start="""
     <slur number="#{++context.slur_number}" type="start"/>
     """
-  if which is (len-1) and placement is "after" and context.dont_slur_ornament is false
+  if which is (len-1) and placement is "after" and context.in_slur is false
     slur_end="""
     <slur number="#{context.slur_number}" type="stop"/>
     """
+  if which is (len-1) 
+    beaming_end="""
+        <beam number="1">end</beam>
+        <beam number="2">end</beam>
+    """
   params=
     step:musicxml_step(ornament_item)
-    alter:musicxml_alter(ornament_item)
     octave:musicxml_octave(ornament_item)
     type:"<span>32nd</span>"
+    beaming_begin:beaming_begin
+    beaming_end:beaming_end
     slur_start:slur_start
     slur_end:slur_end
     steal_time:steal_time
@@ -460,7 +696,7 @@ draw_measure= (measure,context) ->
   measure="""
   <measure number="#{context.measure_number}">
   """
-  measure="" if context.measure_number is 1 
+  measure="" if context.measure_number is 2
   """
     #{measure}
     #{ary.join(' ')}
@@ -468,7 +704,13 @@ draw_measure= (measure,context) ->
   """
 
 all_items_in_line= (line_or_item,items=[]) ->
-  # TODO: dry
+  # TODO: dry this up
+  # return (recursively) items in the line_or_item, delves into the hierarchy
+  # looks for an items property and if so, recurses to it.
+  # line 
+  #   measure
+  #     beat
+  #       item
   if  (!line_or_item.items)
      return [line_or_item]
   for an_item in line_or_item.items
