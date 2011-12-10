@@ -99,7 +99,7 @@ $(document).ready ->
        S
   |(Sr  n)
   '''
-  str='SRG-'
+  str='mP\n  D-'
   root.debug=true
   window.timer_is_on=0
   # "/samples/happy_birthday" in URL

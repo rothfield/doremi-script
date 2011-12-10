@@ -425,6 +425,7 @@ to_musicxml= (composition_data) ->
             </note>
 """
 note_template_str='''
+            {{before_ornaments}}
             <note>
               <pitch>
                 <step>{{step}}</step>
@@ -470,10 +471,12 @@ example- 2/4
                 </lyric>
 
 """
+
 draw_note = (pitch,context) ->
   console.log "Entering draw_note, pitch is #{pitch}" if !running_under_node()
   if pitch.my_type is "dash"
     return "" if !pitch.pitch_to_use_for_tie?
+  [before_ornaments,after_ornaments]=draw_ornaments(pitch)
   if pitch.dash_to_tie? and pitch.dash_to_tie is true
     pitch.normalized_pitch=pitch.pitch_to_use_for_tie.normalized_pitch
     pitch.octave=pitch.pitch_to_use_for_tie.octave
@@ -547,6 +550,8 @@ draw_note = (pitch,context) ->
     lyric:lyric
     begin_slur:begin_slur
     end_slur:end_slur
+    before_ornaments:before_ornaments
+    after_ornaments:after_ornaments
 
   templates.note(params)
 
@@ -560,7 +565,38 @@ musicxml_type_and_dots= (numerator,denominator) ->
     alternate= "<type>16th</type>"
     return alternate # return something
   looked_up_duration
-    
+   
+
+grace_note_template_str =  """
+      <note>
+        <grace/>
+        <pitch>
+          <step>{{step}}</step>
+          <octave>{{octave}}</octave>
+        </pitch>
+        <voice>1</voice>
+        <type>{{type}}</type>
+      </note>
+  """
+
+templates.grace_note = _.template(grace_note_template_str)
+
+draw_grace_note = (ornament_item) ->
+  params=
+    step:"G"
+    octave:"4"
+    type:"16th"
+  templates.grace_note(params)
+
+draw_ornaments = (pitch) ->
+  console.log "Entering draw_ornaments",pitch if !running_under_node()
+  before_ary=[]
+  ornament=get_ornament(pitch)
+  return ['',''] if !ornament
+  if ornament.placement is "before"
+    before_ary=(draw_grace_note(x) for x in ornament.ornament_items)
+  [before_ary.join("/n"),""]
+
 musicxml_step = (pitch) ->
   pitch.normalized_pitch[0]
 
@@ -580,6 +616,7 @@ musicxml_octave = (pitch) ->
   pitch.octave + 4
 musicxml_duration = (pitch) ->
   1 # TODO  
+
 
 draw_measure= (measure,context) ->
   ary=[]
