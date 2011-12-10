@@ -396,6 +396,7 @@ to_musicxml= (composition_data) ->
   params=
     body:ary.join(" ")
     movement_title:title
+    title:title
     composer:""
     poet:""
     encoding_date:""
