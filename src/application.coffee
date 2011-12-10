@@ -38,7 +38,7 @@ $(document).ready ->
     $("#add_to_samples").hide()
   setup_links= (filename) ->
     without_suffix=filename.substr(0, filename.lastIndexOf('.txt')) || filename
-    for typ in ["png","pdf","mid","ly","txt"]
+    for typ in ["png","pdf","mid","ly","txt","xml"]
       snip = """
       window.open('#{without_suffix}.#{typ}'); return false; 
       """
@@ -138,6 +138,7 @@ $(document).ready ->
       fname:window.the_composition.filename
       data: window.the_composition.lilypond
       doremi_script_source: $('#entry_area').val()
+      musicxml:window.the_composition.musicxml
       save_to_samples: $('#save_to_samples').val() is "on"
     obj=
       type:'POST'

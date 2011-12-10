@@ -4,16 +4,15 @@
 \header{   }
 \include "english.ly"
 %{
-  I    IV   III  V7
-| SGRG RmGm GPmP RmGm |
-  
+     GR 
+| (GR S)-  
 %}
 melody = {
 \clef treble
 \key c \major
 \time 4/4
 \autoBeamOn  
-\bar "|"  c'16^"I" e'16 d'16 e'16 d'16^"IV" f'16 e'16 f'16 e'16^"III" g'16 f'16 g'16 d'16^"V7" f'16 e'16 f'16 \bar "|"  \break
+\partial 4*2  \bar "|"  e'8( d'8 c'4) \break
 
 }
 

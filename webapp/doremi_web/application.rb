@@ -1,6 +1,8 @@
 require 'sinatra'
 require 'json'
-
+configure do
+  mime_type :xml, 'text'
+end
 set :comp, "#{Dir.pwd}/public/compositions"
 set :port,80  if `hostname`.chomp == 'ragapedia'
 set :haml, :format => :html5
@@ -75,6 +77,7 @@ post '/lilypond.txt' do
   data=params["data"]
   save_to_samples=params['save_to_samples']
   doremi_script_source=params["doremi_script_source"]
+  musicxml=params["musicxml"]
   puts "params.data is #{params['data']}" 
   filename=params["fname"] || ""
   simple_file_name=sanitize_filename(filename)
@@ -84,6 +87,7 @@ post '/lilypond.txt' do
   `rm #{fp}-page*png`
   File.open("#{fp}.ly", 'w') {|f| f.write(data) }
   File.open("#{fp}.txt", 'w') {|f| f.write(doremi_script_source) }
+  File.open("#{fp}.xml", 'w') {|f| f.write(musicxml) }
   result=`lilypond --png  -o #{fp} #{fp}.ly  2>&1`
   # lilypond will create files like untitled_1319780034-page1.png
   # ... page2.png etc  if pdf is multi page

@@ -6,14 +6,14 @@
         <work-title></work-title>
     </work>
     <movement-number></movement-number>
-    <movement-title>{{movement_title}}</movement-title>
+    <movement-title></movement-title>
     <identification>
-            <creator type="composer">{{composer}}</creator>
-            <creator type="poet">{{poet}}</creator>
+            <creator type="composer"></creator>
+            <creator type="poet"></creator>
         <rights></rights>
         <encoding>
             <software>DoremiScript</software>
-            <encoding-date>{{encoding_date}}</encoding-date>
+            <encoding-date></encoding-date>
             <software>DoremiScript</software>
         </encoding>
         <source></source>
@@ -35,7 +35,7 @@
         </page-layout>
     </defaults>
     <credit page="1">
-            <credit-words font-size="24" default-y="1626.98" default-x="595.238" justify="center" valign="top">{{title}}</credit-words>
+            <credit-words font-size="24" default-y="1626.98" default-x="595.238" justify="center" valign="top"></credit-words>
     </credit>
     <part-list>
         <score-part id="P1">
@@ -64,7 +64,7 @@
                 <divisions>24</divisions>
                 <key>
                     <fifths>0</fifths>
-                    <mode>{{mode}}</mode>
+                    <mode>major</mode>
                 </key>
                 <time symbol="common">
                     <beats>4</beats>
@@ -75,6 +75,53 @@
                     <line>2</line>
                 </clef>
             </attributes>
-            {{body}}
+            
+
+<note>
+  <pitch>
+    <step>E</step>
+    
+    <octave>4</octave>
+  </pitch>
+  <duration>12</duration>
+  
+  <voice>1</voice>
+  <type>eighth</type>
+  
+  <notations>
+  <slur number="1" type="start"/></notations>
+ </note>
+  
+<note>
+  <pitch>
+    <step>D</step>
+    
+    <octave>4</octave>
+  </pitch>
+  <duration>12</duration>
+  
+  <voice>1</voice>
+  <type>eighth</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>4</octave>
+  </pitch>
+  <duration>24</duration>
+  
+  <voice>1</voice>
+  <type>quarter</type>
+  
+  <notations>
+  <slur number="1" type="stop"/></notations>
+ </note>
+  
+</measure>
     </part>
 </score-partwise>
