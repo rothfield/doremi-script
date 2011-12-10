@@ -363,7 +363,12 @@ root.ParserHelper=
   measure_columns: (items,pos) ->
     for item in items
       item.column=pos
-      item.column=item.column + 1 if (item.my_type is "pitch") and (item.source[0]=="(")
+      if (item.my_type is "ornament") and (item.source[0] is "<")
+        console.log("measure_columns,buggy case",item) if !running_under_node()
+        item.column=item.column + 1
+      if (item.my_type is "pitch") and (item.source[0] is "(")
+        console.log("measure_columns,buggy case",item) if !running_under_node()
+        item.column=item.column + 1
       if item.items?
         pos=this.measure_columns(item.items,pos)
       if !item.items?
@@ -543,7 +548,7 @@ root.ParserHelper=
       console.log arg if console
 
   running_under_node: ()->
-    false #todo
+    module? && module.exports
 
   my_inspect: (obj) ->
     return if !debug?
@@ -551,7 +556,7 @@ root.ParserHelper=
     return if !console?
     return if !console.log?
     if util?
-      console.log(util.inspect(obj,false,null)) 
+      console.log(util.inspect(obj,false,null))
       return
     console.log obj
 

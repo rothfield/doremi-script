@@ -341,6 +341,15 @@ exports.test_upper_octave_assigned_to_note_below_it = (test) ->
   test.equal(ma.octave,2,"#{str} should have octave 1 for m")
   test.done()
 
+exports.test_recognizes_ornament_to_right_of_pitch2= (test) ->
+  str=' DSnDn\nn---'
+  composition = test_parses(str,test)
+  item=utils.tree_find(composition.lines[0], (item) -> item.my_type is "pitch" and item.source is "n" )
+  orn=_.detect(item.attributes, (attr) -> attr.my_type is "ornament")
+  _.debug("orn #{orn.my_inspect}")
+  test.ok(orn)
+  test.ok(orn.source is "DSnDn")
+  test.done()
 
 exports.test_recognizes_ornament_to_right_of_pitch= (test) ->
   str = '''

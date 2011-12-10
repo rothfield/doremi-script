@@ -100,7 +100,11 @@ $(document).ready ->
   |(Sr  n)
   '''
   str='mP\n  D-'
-  root.debug=true
+  str=' DSnDn\nn---'
+  str="""
+       GR 
+  | (GR S)-
+  """
   window.timer_is_on=0
   # "/samples/happy_birthday" in URL
   if window.location.pathname.indexOf("/samples/") > -1

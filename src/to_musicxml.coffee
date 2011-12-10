@@ -334,6 +334,7 @@ beat_is_all_dashes= (beat) ->
   
 to_musicxml= (composition_data) ->
   context=
+    in_slur:false
     slur_number:0
     measure_number:2
   ary=[]
@@ -438,8 +439,10 @@ note_template_str='''
               <voice>1</voice>
               {{type_and_dots}}
               {{lyric}}
-              <notations>{{tied}}{{begin_slur}}{{end_slur}}</notations>
-    </note>
+              <notations>{{tied}}{{ornament_before_slur_end}}
+              {{begin_slur}}{{end_slur}}{{ornament_after_slur_begin}}</notations>
+             </note>
+             {{after_ornaments}}
 '''
 templates.note = _.template(note_template_str)
 
@@ -477,7 +480,16 @@ draw_note = (pitch,context) ->
   console.log "Entering draw_note, pitch is #{pitch}" if !running_under_node()
   if pitch.my_type is "dash"
     return "" if !pitch.pitch_to_use_for_tie?
-  [before_ornaments,after_ornaments]=draw_ornaments(pitch)
+  [before_ornaments,after_ornaments]=draw_ornaments(pitch,context)
+  ornament_before_slur_end=""
+  if (orn = get_ornament(pitch)) and orn.placement is "before"
+    ornament_before_slur_end="""
+          <slur number="#{context.slur_number}" type="stop"/>
+    """
+  if (orn = get_ornament(pitch)) and orn.placement is "after"
+    ornament_after_slur_begin="""
+          <slur number="#{context.slur_number}" type="start"/>
+    """
   if pitch.dash_to_tie? and pitch.dash_to_tie is true
     pitch.normalized_pitch=pitch.pitch_to_use_for_tie.normalized_pitch
     pitch.octave=pitch.pitch_to_use_for_tie.octave
@@ -533,13 +545,15 @@ draw_note = (pitch,context) ->
   begin_slur = end_slur =""
   if item_has_attribute(pitch,"end_slur")
     end_slur="""
-<slur number="#{context.slur_number}" type="stop"/>
+<slur number="#{context.slur_number-1}" type="stop"/>
     """
+    context.in_slur=false
 
-  if item_has_attribute(pitch,"begin_slur")
+  if item_has_attribute(pitch,"begin_slur") 
     begin_slur="""
-<slur number="#{context.slur_number++}" type="start"/>
+<slur number="#{++context.slur_number}" type="start"/>
     """
+    context.in_slur=true
   params=
     step: musicxml_step(pitch)
     octave:musicxml_octave(pitch)
@@ -553,7 +567,8 @@ draw_note = (pitch,context) ->
     end_slur:end_slur
     before_ornaments:before_ornaments
     after_ornaments:after_ornaments
-
+    ornament_before_slur_end: ornament_before_slur_end
+    ornament_after_slur_begin:ornament_after_slur_begin
   templates.note(params)
 
 musicxml_type_and_dots= (numerator,denominator) ->
@@ -567,10 +582,26 @@ musicxml_type_and_dots= (numerator,denominator) ->
     return alternate # return something
   looked_up_duration
    
-
+# for grace notes before the main note
 grace_note_template_str =  """
       <note>
-        <grace/>
+        <grace {{steal_time}} />
+        <pitch>
+          <step>{{step}}</step>
+          <octave>{{octave}}</octave>
+        </pitch>
+        <voice>1</voice>
+        <type>{{type}}</type>
+        {{beaming_begin}}
+        {{beaming_end}}
+        <notations>{{slur_start}}{{slur_end}}</notations>
+      </note>
+  """
+
+templates.grace_note = _.template(grace_note_template_str)
+
+grace_note_after_template_str =  """
+        <grace steal-time-previous="{{steal_time_percentage}}"/>
         <pitch>
           <step>{{step}}</step>
           <octave>{{octave}}</octave>
@@ -578,25 +609,60 @@ grace_note_template_str =  """
         <voice>1</voice>
         <type>{{type}}</type>
       </note>
-  """
+"""
 
-templates.grace_note = _.template(grace_note_template_str)
+templates.grace_note_after = _.template(grace_note_after_template_str)
 
-draw_grace_note = (ornament_item) ->
+draw_grace_note = (ornament_item,which,len,steal_time="",placement,context) ->
+  beaming_begin=beaming_end=""
+  if which is 0
+    beaming_begin="""
+        <beam number="1">begin</beam>
+        <beam number="2">begin</beam>
+    """
+  if which is 0 and placement is "before" and context.in_slur is false
+    slur_start="""
+    <slur number="#{++context.slur_number}" type="start"/>
+    """
+  if which is (len-1) and placement is "after" and context.in_slur is false
+    slur_end="""
+    <slur number="#{context.slur_number}" type="stop"/>
+    """
+  if which is (len-1) 
+    beaming_end="""
+        <beam number="1">end</beam>
+        <beam number="2">end</beam>
+    """
   params=
-    step:"G"
-    octave:"4"
-    type:"16th"
+    step:musicxml_step(ornament_item)
+    octave:musicxml_octave(ornament_item)
+    type:"<span>32nd</span>"
+    beaming_begin:beaming_begin
+    beaming_end:beaming_end
+    slur_start:slur_start
+    slur_end:slur_end
+    steal_time:steal_time
   templates.grace_note(params)
 
-draw_ornaments = (pitch) ->
+draw_ornaments = (pitch,context) ->
   console.log "Entering draw_ornaments",pitch if !running_under_node()
   before_ary=[]
   ornament=get_ornament(pitch)
   return ['',''] if !ornament
   if ornament.placement is "before"
-    before_ary=(draw_grace_note(x) for x in ornament.ornament_items)
-  [before_ary.join("/n"),""]
+    len=ornament.ornament_items.length
+    steal_time=""
+    before_ary=(draw_grace_note(x,ctr,len,steal_time,ornament.placement,context) for x,ctr in ornament.ornament_items)
+    return [before_ary.join("/n"),""]
+  if ornament.placement is "after"
+    len=ornament.ornament_items.length
+    num=50/len
+    steal_time="""
+      steal-time-previous="#{num}"
+    """
+    after_ary=(draw_grace_note(x,ctr,len,steal_time,ornament.placement,context) for x,ctr in ornament.ornament_items)
+    return ["",after_ary.join('')]
+  ["",""]
 
 musicxml_step = (pitch) ->
   pitch.normalized_pitch[0]
