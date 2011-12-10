@@ -77,6 +77,7 @@ should be used to indicate the melismas
   - Endings are entered as follows: 1.________ or 2._____ Current lilypond support for endings is poor.
   - It is possible to mix ABC, Devanagri, and AACM notations in the same composition, but each line of notation must be in only one style.
   - Supports ornaments (Sargam only for now). Ornaments can be entered either to RIGHT or LEFT of the note to be ornamented(on one of the lines above the note). You can put dots above/below the ornament pitch to indicate the octave. Lilypond renderer displays the (right hand) ornaments as looped 32th grace notes. Be sure to include a "|"(barline) or "-"(dash) in the main line of music, otherwise the parser has problems.
+  - Since DoReMiScript also supports chords such as G, G7, this may cause problems for ornaments that start with an ABC letter. In this case you can delimit the ornament as follows: <GRmGPmGm>. Chord symbols take precedence, so that Dm above the main line is interpreted as the chord Dm rather than a Dm ornament.
   - Code base is written in coffeescript
   - (Programmes only:)Command line tools are available via npm:
     - First install [npm](http://npmjs.org)
