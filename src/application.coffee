@@ -16,8 +16,10 @@ $(document).ready ->
       type:'GET'
       url:'/js/composition.mustache'
       dataType:'txt'
+      async:false
       success: (data) ->
         to_musicxml.templates.composition=_.template(data)
+        $('#run_parser').trigger('click')
     $.ajax(params)
 
   setup_to_musicxml()
@@ -97,7 +99,7 @@ $(document).ready ->
        S
   |(Sr  n)
   '''
-  str='SRG'
+  str='SRG-'
   root.debug=true
   window.timer_is_on=0
   # "/samples/happy_birthday" in URL
@@ -226,6 +228,8 @@ $(document).ready ->
 
   $('#show_lilypond_output').click ->
     $('#lilypond_output').toggle()
+  $('#show_musicxml_source').click ->
+    $('#musicxml_source').toggle()
 
   $('#show_lilypond_source').click ->
     $('#lilypond_source').toggle()
@@ -246,7 +250,7 @@ $(document).ready ->
       composition_data= parser.parse(src)
       composition_data.source=src
       composition_data.lilypond=to_lilypond(composition_data)
-      #composition_data.musicxml=to_musicxml(composition_data)
+      composition_data.musicxml=to_musicxml(composition_data)
       window.the_composition=composition_data
       $('#parse_tree').text("Parsing completed with no errors \n"+JSON.stringify(composition_data,null,"  "))
       if composition_data.warnings.length > 0
@@ -254,11 +258,13 @@ $(document).ready ->
         $('#warnings_div').show()
       $('#parse_tree').hide()
       $('#rendered_doremi_script').html(to_html(composition_data))
-      $('#lilypond_source').html(composition_data.lilypond)
+      $('#lilypond_source').text(composition_data.lilypond)
+      $('#musicxml_source').text(composition_data.musicxml)
       # TODO: combine with the above line..
       adjust_slurs_in_dom()
       canvas = $("#rendered_in_staff_notation")[0]
     catch err
+      console.log "err parsing, err is",err
       window.parse_errors= window.parse_errors + "\n"+ err
       $('#parse_tree').text(window.parse_errors)
       $('#parse_tree').show()
@@ -267,10 +273,10 @@ $(document).ready ->
       window.last_val=$('#entry_area').val()
       parser.is_parsing=false
 
-  $('#run_parser').trigger('click')
   $('#parse_tree').hide()
   $('#lilypond_output').hide()
   $('#lilypond_source').hide()
+  $('#musicxml_source').hide()
   window.do_timer()
 
 

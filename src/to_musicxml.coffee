@@ -10,74 +10,9 @@ _.templateSettings = {
 if require?
   templates.composition = _.template(fs.readFileSync(__dirname + '/composition.mustache', 'UTF-8'))
 
-  # TODO: dashes at beginning of measure need to be rendered as 
-  # rests in lilypond!!
-  # Note that the parser produces something like this for
-  # -- --S- 
-  #
-  # composition
-  #   line
-  #     measure
-  #       beat
-  #         dash 
-  #           numerator:2
-  #           denominator:2
-  #           rest: true #### NOTICE ###
-  #           source: "-"
-  #         dash
-  #           source: "-"
-  #       whitespace
-  #       beat
-  #         dash
-  #           numerator:2
-  #           denominator:4
-  #           source: "-"
-  #         dash
-  #           source: "-"
-  #         pitch:
-  #           source: "S"
-  #           numerator:2
-  #           denominator:2
-  #         dash:
-  #           source: "-"
-  #
-  #
-  #   So that the parser has marked off 1 1/2 beats as rests
-  #   Note that Sargam only has rests at the beginning of a line by
-  #   my interpretation!!
 debug=true
 
 root = exports ? this
- 
-is_valid_key= (str) ->
-  ary= [
-    "c"
-    "d"
-    "e"
-    "f"
-    "g"
-    "a"
-    "b"
-    "cs"
-    "df"
-    "ds"
-    "ef"
-    "fs"
-    "gb"
-    "gs"
-    "ab"
-    "as"
-    "bf"
-  ]
-  _.indexOf(ary,str) > -1
-
-extract_lyrics= (composition_data) ->
-  ary=[]
-  for sargam_line in composition_data.lines
-    for item in all_items_in_line(sargam_line,[])
-      @log "extract_lyrics-item is",item
-      ary.push item.syllable if item.syllable
-  ary
 
 get_attribute= (composition_data,key) ->
   return null if !composition_data.attributes
@@ -106,21 +41,20 @@ my_inspect= (obj) ->
 
 
 
-fraction_to_musicxml_step_and_dots = (frac) ->
+fraction_to_musicxml_type_and_dots = 
   "2/1":"<type>half</type>"
   "3/1":"<type>half</type><dot/>"
   "4/1":"<type>whole</type>"
   "5/1":"<type>whole</type><dot/><dot/>"
   "1/1":"<type>quarter</type>"
-  "1/1":"<type>quarter</type>"
-  "1/1":"<type>quarter</type>"
-  "1/1":"<type>quarter</type>"
   "1/2":"<type>eighth</type>"
   "1/3": "<type>eighth</type>"  # 1/3 1/5 1/7 all 8th notes so one beat will beam together
+  "1/4": "<type>16th</type>"
+  "1/8": "<type>32nd</type>"
   "1/9":"<type>eighth</type>"
   "1/11":"<type>eighth</type>"
   "1/13":"<type>eighth</type>"
-  "1/5":"sixteenth"
+  "1/5": "<type>16th</type>"
   "2/5":"<type>eighth</type>"
   "3/5":"<type>eighth</type><dot/>" #TODO should be tied
   "4/5":"<type>quarter</type>" #TODO should be tied
@@ -134,19 +68,16 @@ fraction_to_musicxml_step_and_dots = (frac) ->
   "12/12":"<type>quarter</type>"
   "13/13":"<type>quarter</type>"
   "1/7": "<type>thirtysecond</type>" # ??? correct???hhhhhhhhhh
-  "2/7": "<type>sixteenth</type>" # ??? correct???hhhhhhhhhh
-  "3/7": "<type>sixteenth</type><dot/>" # ??? correct???hhhhhhhhhh
+  "2/7": "<type>16th</type>" # ??? correct???hhhhhhhhhh
+  "3/7": "<type>16th</type><dot/>" # ??? correct???hhhhhhhhhh
   "4/7": "<type>eighth</type>" # ??? correct???hhhhhhhhhh
   "5/7": "<type>eighth</type><dot/><dot/>" # ??? correct???hhhhhhhhhh
-  "6/7": "<type>eighth</type><dot/><dot/>" # ??? correct???hhhhhhhhhh
-  "6/8": "<type>eighth</type><dot/>"
-  "2/3": "<type>quarter</type>"
-  "2/8": "<type>sixteenth</type>"
-  "3/8": "<type>sixteenth</type><dot/>"  # 1/4 + 1/8
+  "2/8": "<type>16th</type>"
+  "3/8": "<type>16th</type><dot/>"  # 1/4 + 1/8
   "5/8": "<type>eighth</type>"   # TODO: WRONG
   "4/8": "<type>eighth</type>"
   "7/8": "<type>eighth</type><dot/><dot/>" # 1/2 + 1/4 + 1/8
-  "1/6": "<type>sixteenth</type>"
+  "1/6": "<type>16th</type>"
   "2/6": "<type>eighth</type>"
   "3/6": "<type>quarter</type>" # not sure??
   "4/6":"<type>quarter</type>" # NOT SURE ????
@@ -155,11 +86,10 @@ fraction_to_musicxml_step_and_dots = (frac) ->
   "3/3":"<type>quarter</type>"
   "4/4":"<type>quarter</type>"
   "8/8":"<type>quarter</type>"
-  "1/4":"<type>sixteenth</type>"
+  "1/4":"<type>16th</type>"
   "2/4":"<type>eighth</type>"
   "3/4":"<type>eighth</type><dot/>"
-  "3/8":"<type>sixteenth</type><dot/>"
-
+  "3/8":"<type>16th</type><dot/>"
 
 get_ornament = (pitch) ->
   return false if !pitch.attributes?
@@ -371,6 +301,29 @@ notation_is_in_sargam= (composition_data) ->
   @log "in notation_is_in_sargam"
   _.detect(composition_data.lines, (line) -> is_sargam_line(line))
 
+is_valid_key= (str) ->
+  ary= [
+    "c"
+    "d"
+    "e"
+    "f"
+    "g"
+    "a"
+    "b"
+    "cs"
+    "df"
+    "ds"
+    "ef"
+    "fs"
+    "gb"
+    "gs"
+    "ab"
+    "as"
+    "bf"
+  ]
+  _.indexOf(ary,str) > -1
+
+
 beat_is_all_dashes= (beat) ->
   fun = (item) ->
     return true if !item.my_type?
@@ -448,20 +401,42 @@ to_musicxml= (composition_data) ->
   templates.composition(params)
   return templates.composition(params)
 
-
-#
+"""
+            <note default-y="-30.00" default-x="108.08">
+                <pitch>
+                    <step>G</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>2</duration>
+                <voice>1</voice>
+                <type>eighth</type>
+                <stem>up</stem>
+                <beam number="1">begin</beam>
+                <lyric number="1">
+                    <syllabic>begin</syllabic>
+                    <text>Yes</text>
+                </lyric>
+                <lyric number="2">
+                    <syllabic>begin</syllabic>
+                    <text>Sud</text>
+                </lyric>
+            </note>
+"""
 note_template_str='''
             <note>
-                <pitch>
-                    <step>{{step}}</step>
-                    {{alter}}
-                    <octave>{{octave}}</octave>
-                    {{type_and_dots}}
-                    <duration>{{duration}}</duration>
-                </pitch>
-                <voice>1</voice>
-            </note>
-  '''
+              <pitch>
+                <step>{{step}}</step>
+                {{alter}}
+                <octave>{{octave}}</octave>
+              </pitch>
+              <duration>{{duration}}</duration>
+              {{tie}}
+              <voice>1</voice>
+              {{type_and_dots}}
+              {{lyric}}
+              <notations>{{tied}}</notations>
+    </note>
+'''
 templates.note = _.template(note_template_str)
 
 
@@ -487,17 +462,31 @@ x= 2/16 *96
 example- 2/4
 
 2/4 * 1/4 *24 = 2/4 * 6 = 3
+                <lyric number="1">
+                    <syllabic>begin</syllabic>
+                    <text>Yes</text>
+                </lyric>
 
 """
 draw_note = (pitch) ->
-  if pitch.fraction_total?
-    fraction=new Fraction(pitch.fraction_total.numerator,pitch.fraction_total.denominator)
-  else
-    fraction=new Fraction(pitch.numerator,pitch.denominator)
+  console.log "Entering draw_note, pitch is #{pitch}" if !running_under_node()
+  if pitch.my_type is "dash"
+    return "" if !pitch.pitch_to_use_for_tie?
+  if pitch.dash_to_tie? and pitch.dash_to_tie is true
+    pitch.normalized_pitch=pitch.pitch_to_use_for_tie.normalized_pitch
+    pitch.octave=pitch.pitch_to_use_for_tie.octave
+  if pitch.my_type is "dash"
+    return if pitch.dash_to_tie? and pitch.dash_to_tie is false
+  console.log "" if !running_under_node()
+  #if pitch.fraction_total?
+  #  fraction=new Fraction(pitch.fraction_total.numerator,pitch.fraction_total.denominator)
+  #else
+  fraction=new Fraction(pitch.numerator,pitch.denominator)
 
   divisions_per_quarter=24
   frac2=fraction.multiply(divisions_per_quarter)
   duration=frac2.numerator
+  console.log "frac2 is",frac2 if !running_under_node()
   if pitch.denominator not in [0,1,2,4,8,16,32,64,128] 
      x=2
      if pitch.denominator is 6
@@ -506,22 +495,54 @@ draw_note = (pitch) ->
        x=4
        #ary.push "\\times #{x}/#{beat.subdivisions} { "
        #in_times=true #hack
-     duration=divisions_per_quarter/2
+     duration=divisions_per_quarter/x
+  if pitch.fraction_array?
+    f=pitch.fraction_array[0]
+  else
+    f=pitch
+  console.log "numerator,denominator",f.numerator,f.denominator if !running_under_node()
+
+  type_and_dots= musicxml_type_and_dots(f.numerator,f.denominator)
+  tie=""
+  tied=""
+  if pitch.tied?
+    tie="""
+    <tie type="start"/>
+    """
+    tied="""
+    <tied type="start"/>
+    """
+  if pitch.my_type is "dash" and pitch.dash_to_tie is true
+    tied2="""
+    <tied type="end"/>
+    """
+    tied=tied+tied2
+  lyric=""
+  if pitch.syllable?
+    lyric="""
+     <lyric number="1">
+       <text>#{pitch.syllable}</text>
+     </lyric>
+    """
   params=
     step: musicxml_step(pitch)
     octave:musicxml_octave(pitch)
-    duration:frac2.numerator
+    duration:duration
     alter:musicxml_alter(pitch)
-    type_and_dots:musicxml_type_and_dots(pitch.numerator,pitch.denominator)
+    type_and_dots:type_and_dots
+    tied:tied
+    tie:tie
+    lyric:lyric
   templates.note(params)
 
 musicxml_type_and_dots= (numerator,denominator) ->
+  console.log "musicxml_type_and_dots(#{numerator},#{denominator}" if !running_under_node()
   if numerator is denominator
-    return "<type>eighth</type>"
+    return "<type>quarter</type>"
   frac="#{numerator}/#{denominator}"
-  looked_up_duration=fraction_to_musicxml_step_and_dots[frac]
+  looked_up_duration=fraction_to_musicxml_type_and_dots[frac]
   if !looked_up_duration?
-    alternate= "<type>sixteenth</type>"
+    alternate= "<type>16th</type>"
     return alternate # return something
   looked_up_duration
     
@@ -550,6 +571,7 @@ draw_measure= (measure,ctr) ->
   for item in all_items(measure)
     #console.log "item"
     ary.push(draw_note(item)) if item.my_type is "pitch"
+    ary.push(draw_note(item)) if item.my_type is "dash"
   #console.log "ary is",ary
   # 1st measure gets combined with clef
   measure="""
