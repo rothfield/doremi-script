@@ -364,10 +364,10 @@ root.ParserHelper=
     for item in items
       item.column=pos
       if (item.my_type is "ornament") and (item.source[0] is "<")
-        console.log("measure_columns,buggy case",item) if !running_under_node()
+        #console.log("measure_columns,buggy case",item) if !running_under_node()
         item.column=item.column + 1
       if (item.my_type is "pitch") and (item.source[0] is "(")
-        console.log("measure_columns,buggy case",item) if !running_under_node()
+        #console.log("measure_columns,buggy case",item) if !running_under_node()
         item.column=item.column + 1
       if item.items?
         pos=this.measure_columns(item.items,pos)

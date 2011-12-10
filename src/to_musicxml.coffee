@@ -239,7 +239,7 @@ templates.note = _.template(note_template_str)
 
 draw_note = (pitch,context) ->
   context.dont_slur_ornament=  item_has_attribute(pitch,"begin_slur") or context.in_slur
-  console.log "Entering draw_note, pitch is #{pitch}" if !running_under_node()
+  #console.log "Entering draw_note, pitch is #{pitch}" if !running_under_node()
   if pitch.my_type is "dash"
     return "" if !pitch.pitch_to_use_for_tie?
   [before_ornaments,after_ornaments]=draw_ornaments(pitch,context)
@@ -248,7 +248,7 @@ draw_note = (pitch,context) ->
     pitch.octave=pitch.pitch_to_use_for_tie.octave
   if pitch.my_type is "dash"
     return if pitch.dash_to_tie? and pitch.dash_to_tie is false
-  console.log "" if !running_under_node()
+  #console.log "" if !running_under_node()
   #if pitch.fraction_total?
   #  fraction=new Fraction(pitch.fraction_total.numerator,pitch.fraction_total.denominator)
   #else
@@ -257,7 +257,7 @@ draw_note = (pitch,context) ->
   divisions_per_quarter=24
   frac2=fraction.multiply(divisions_per_quarter)
   duration=frac2.numerator
-  console.log "frac2 is",frac2 if !running_under_node()
+  #console.log "frac2 is",frac2 if !running_under_node()
   if pitch.denominator not in [0,1,2,4,8,16,32,64,128] 
      x=2
      if pitch.denominator is 6
@@ -271,7 +271,7 @@ draw_note = (pitch,context) ->
     f=pitch.fraction_array[0]
   else
     f=pitch
-  console.log "numerator,denominator",f.numerator,f.denominator if !running_under_node()
+  #console.log "numerator,denominator",f.numerator,f.denominator if !running_under_node()
 
   type_and_dots= musicxml_type_and_dots(f.numerator,f.denominator)
   tie=""
@@ -323,7 +323,7 @@ draw_note = (pitch,context) ->
   templates.note(params)
 
 musicxml_type_and_dots= (numerator,denominator) ->
-  console.log "musicxml_type_and_dots(#{numerator},#{denominator}" if !running_under_node()
+  #console.log "musicxml_type_and_dots(#{numerator},#{denominator}" if !running_under_node()
   if numerator is denominator
     return "<type>quarter</type>"
   frac="#{numerator}/#{denominator}"
@@ -372,7 +372,7 @@ draw_grace_note = (ornament_item,which,len,steal_time="",placement,context) ->
   templates.grace_note(params)
 
 draw_ornaments = (pitch,context) ->
-  console.log "Entering draw_ornaments",pitch if !running_under_node()
+  #console.log "Entering draw_ornaments",pitch if !running_under_node()
   before_ary=[]
   ornament=get_ornament(pitch)
   return ['',''] if !ornament

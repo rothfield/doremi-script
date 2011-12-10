@@ -105,6 +105,7 @@ $(document).ready ->
        GR 
   | (GR S)-
   """
+  str=""
   window.timer_is_on=0
   # "/samples/happy_birthday" in URL
   if window.location.pathname.indexOf("/samples/") > -1
@@ -148,7 +149,7 @@ $(document).ready ->
         alert "Generating staff notation failed"
         $('#lilypond_png').attr('src','none.jpg')
       success: (some_data,text_status) ->
-        console.log "success,fname is",some_data.fname
+        #console.log "success,fname is",some_data.fname
         setup_links(some_data.fname)
         #window.location = String(window.location).replace(/\#.*$/, "") + "#staff_notation"
         $('.generated_by_lilypond').show()
@@ -269,7 +270,7 @@ $(document).ready ->
       adjust_slurs_in_dom()
       canvas = $("#rendered_in_staff_notation")[0]
     catch err
-      console.log "err parsing, err is",err
+      #console.log "err parsing, err is",err
       window.parse_errors= window.parse_errors + "\n"+ err
       $('#parse_tree').text(window.parse_errors)
       $('#parse_tree').show()
