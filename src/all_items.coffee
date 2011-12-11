@@ -16,6 +16,6 @@ root.all_items= (tree,items=[]) ->
   for an_item in tree.items
     do (an_item) =>
       items.push an_item #if !an_item.items?
-      items.concat this.all_items(an_item,items)
+      items.concat root.all_items(an_item,items)
   return [tree].concat(items)
 

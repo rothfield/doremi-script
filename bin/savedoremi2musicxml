@@ -4,13 +4,10 @@ var fs = require('fs');
 var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 
 var filename = process.argv[2];
-if (filename) {
-  var cwd=process.cwd();
-  var filepath = path.join(cwd, filename);
-  var source=fs.readFileSync(filepath, 'utf8')
-} else {
-var source= fs.readFileSync('/dev/stdin').toString()
-}
+var cwd=process.cwd();
+
+var filepath = path.join(cwd, filename);
+var source=fs.readFileSync(filepath, 'utf8')
 _console = require(lib+'/doremi-script/underscore.logger.js') 
 _console.level  = _console.constructor.WARN
 _ = require("underscore")._ 

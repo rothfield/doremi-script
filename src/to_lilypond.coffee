@@ -41,6 +41,10 @@
 debug=true
 
 root = exports ? this
+if require?
+  shared=require('./shared.js')
+  root._ = require("underscore")._
+  root._.extend(root,shared)
 
 is_valid_key= (str) ->
   ary= [
@@ -62,19 +66,19 @@ is_valid_key= (str) ->
     "as"
     "bf"
   ]
-  _.indexOf(ary,str) > -1
+  root._.indexOf(ary,str) > -1
 
 extract_lyrics= (composition_data) ->
   ary=[]
   for sargam_line in composition_data.lines
-    for item in all_items_in_line(sargam_line,[])
+    for item in root.all_items(sargam_line,[])
       @log "extract_lyrics-item is",item
       ary.push item.syllable if item.syllable
   ary
 
 get_attribute= (composition_data,key) ->
   return null if !composition_data.attributes
-  att=_.detect(composition_data.attributes.items, (item) ->
+  att=root._.detect(composition_data.attributes.items, (item) ->
     item.key is key
     )
   return null if !att
@@ -174,11 +178,11 @@ calculate_lilypond_duration= (numerator,denominator) ->
 
 get_ornament = (pitch) ->
   return false if !pitch.attributes?
-  _.detect(pitch.attributes, (attribute) -> attribute.my_type is "ornament")
+  root._.detect(pitch.attributes, (attribute) -> attribute.my_type is "ornament")
   
 has_mordent = (pitch) ->
   return false if !pitch.attributes?
-  _.detect(pitch.attributes, (attribute) -> attribute.my_type is "mordent")
+  root._.detect(pitch.attributes, (attribute) -> attribute.my_type is "mordent")
 
 lookup_lilypond_pitch= (pitch) ->
   lilypond_pitch_map[pitch.normalized_pitch]
@@ -212,14 +216,14 @@ lilypond_grace_notes = (ornament) ->
   ary.join ' '
 
 get_chord= (item) ->
-  if e =_.detect(item.attributes, (x) -> x.my_type is "chord_symbol")
+  if e =root._.detect(item.attributes, (x) -> x.my_type is "chord_symbol")
     return """
     ^"#{e.source}"
     """
   ""
 
 get_ending= (item) ->
-  if e =_.detect(item.attributes, (x) -> x.my_type is "ending")
+  if e =root._.detect(item.attributes, (x) -> x.my_type is "ending")
     return """
     ^"#{e.source}"
     """
@@ -374,7 +378,7 @@ is_sargam_line= (line) ->
 
 notation_is_in_sargam= (composition_data) ->
   @log "in notation_is_in_sargam"
-  _.detect(composition_data.lines, (line) -> is_sargam_line(line))
+  root._.detect(composition_data.lines, (line) -> is_sargam_line(line))
 
 beat_is_all_dashes= (beat) ->
   fun = (item) ->
@@ -382,7 +386,7 @@ beat_is_all_dashes= (beat) ->
     return true if item.my_type is "dash"
     return false if item.my_type is "pitch"
     return true
-  all_items_in_line(beat).every(fun)
+  root.all_items(beat).every(fun)
   
 to_lilypond= (composition_data) ->
   ary=[]
@@ -396,8 +400,7 @@ to_lilypond= (composition_data) ->
     in_times=false #hack
     @log "processing #{line.source}"
     all=[]
-    x=all_items_in_line(line,all)
-    @log("in to_lilypond, all_items_in_line x=",x)
+    x=root.all_items(line,all)
     last_pitch=null
     for item in all
       if item.my_type in ["pitch","barline","measure"] or item.is_barline
@@ -525,21 +528,5 @@ text = \\lyricmode {
   """
   lilypond_template
 
-all_items_in_line= (line_or_item,items=[]) ->
-  # TODO: dry this up
-  # return (recursively) items in the line_or_item, delves into the hierarchy
-  # looks for an items property and if so, recurses to it.
-  # line 
-  #   measure
-  #     beat
-  #       item
-  if  (!line_or_item.items)
-     return [line_or_item]
-  for an_item in line_or_item.items
-    do (an_item) =>
-      items.push an_item #if !an_item.items?
-      items.concat all_items_in_line(an_item,items)
-  @log 'all_items_in_line returns', items
-  return [line_or_item].concat(items)
 
 root.to_lilypond=to_lilypond
