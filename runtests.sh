@@ -16,4 +16,9 @@ echo "`wc -l tmp/doremi2ly.out`"
 echo "testing command line utility doremiparse with input | SRG"
 echo "| SRG" | doremiparse > tmp/doremiparse.out ; 
 echo "`wc -l tmp/doremiparse.out`"
+echo "SRG\n|  m" | doremi2musicxml > tmp/doremi2musicxml.xml; musicxml2ly tmp/doremi2musicxml.xml -o tmp/doremi2musicxml.xml.ly 
+echo "`wc -l tmp/doremi2musicxml.xml.ly`"
+
+cat samples/bansuri.txt | doremi2musicxml > tmp/bansuri.xml
+echo "`wc -l tmp/bansuri.xml`"
 

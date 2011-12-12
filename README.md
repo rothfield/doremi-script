@@ -1,7 +1,7 @@
 DoremiScript
 ============
 
-**DoremiScript** is a small language for creating [letter based musical notation](http://en.wikipedia.org/wiki/Letter_notation). It currently supports western ABC style notation, [Numbered notation](http://http://en.wikipedia.org/wiki/Numbered_musical_notation) using 1234567, [Sargam](http://en.wikipedia.org/wiki/Swara) notation using english letters SrRgGmMPdnN as used at the AACM for notating Ragas, and [Devanagri notation in Bhatkande style](http://en.wikipedia.org/wiki/Musical_notation#India) using Devanagri letters for the sargam letters. **DoremiScript** lets you write letter music notation using an easy-to-read, easy-to-write plain text format, then nicely formats it using css and html. DoremiScript can also generate standard western notation via a [Lilypond](http://lilypond.org) converter. 
+**DoremiScript** is a small language for creating [letter based musical notation](http://en.wikipedia.org/wiki/Letter_notation). It currently supports western ABC style notation, [Numbered notation](http://http://en.wikipedia.org/wiki/Numbered_musical_notation) using 1234567, [Sargam](http://en.wikipedia.org/wiki/Swara) notation using english letters SrRgGmMPdnN as used at the AACM for notating Ragas, and [Devanagri notation in Bhatkande style](http://en.wikipedia.org/wiki/Musical_notation#India) [(See also)](http://www.omenad.net/page.php?goPage=http%3A%2F%2Fwww.omenad.net%2Farticles%2Fomeswarlipi.htm) using Devanagri letters for the sargam letters. **DoremiScript** lets you write letter music notation using an easy-to-read, easy-to-write plain text format, then nicely formats it using css and html. DoremiScript can also generate standard western notation via a [Lilypond](http://lilypond.org) converter. 
 
 Try the [online version](http://ragapedia.com)
 
@@ -71,15 +71,18 @@ should be used to indicate the melismas
   - Use the tilde character **~** to indicate an ornament which is displayed as 
 # &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    &#x1D19D;&#x1D19D;
   - Supports tala markings +023456 for notating classical North Indian rhythmical cycles such as teental. The **+** indicates (usually) the first beat of the rhythmical cycle. The tala markings indicate the claps(taali) and non-claps(kaali) that delimit the rhythmic cycle.  
-  - Generates [lilypond](http://lilypond.org) as an interchange format, which can be used to generate western staff notation and midi
+  - Generates [lilypond](http://lilypond.org) as a high quality interchange format, which can be used to generate western staff notation and midi.
+  - Generates [musicxml](http://en.wikipedia.org/wiki/MusicXML) as a common music notation format. MusicXML can be imported into hundreds of notation packages. Note that the lilypond export is of higher quality. Currently supports the following: lyrics, before grace notes,title.
+  - Parser is easy to modify and is generated from a PEG grammar using a parsing expression grammar [peg.js])https://github.com/dmajda/pegjs)
   - Parser is easy to modify and is generated from a PEG grammar using a parsing expression grammar [peg.js])https://github.com/dmajda/pegjs)
   - DoremiScript grammar is [here](https://raw.github.com/rothfield/doremi-script/master/src/grammars/doremiscript.peg.js)
   - Endings are entered as follows: 1.________ or 2._____ Current lilypond support for endings is poor.
   - It is possible to mix ABC, Devanagri, and AACM notations in the same composition, but each line of notation must be in only one style.
-  - Supports ornaments (Sargam only for now). Ornaments can be entered either to RIGHT or LEFT of the note to be ornamented(on one of the lines above the note). You can put dots above/below the ornament pitch to indicate the octave. Lilypond renderer displays the (right hand) ornaments as looped 32th grace notes. Be sure to include a "|"(barline) or "-"(dash) in the main line of music, otherwise the parser has problems.
-  - Since DoReMiScript also supports chords such as G, G7, this may cause problems for ornaments that start with an ABC letter. In this case you can delimit the ornament as follows: <GRmGPmGm>. Chord symbols take precedence, so that Dm above the main line is interpreted as the chord Dm rather than a Dm ornament.
+  - Supports ornaments (Sargam only for now). Ornaments can be entered either to RIGHT or LEFT of the note to be ornamented(on one of the lines above the note). You can put dots above/below the ornament pitch to indicate the octave. Lilypond renderer displays the (right hand) ornaments as looped 32th grace notes. **Important note**: Support for ornaments to the 'right' of a note seems to be very poor among software vendors, probably because the 'standard' way to right ornaments is *before* a note. Therefore it is probably advisable to not use the right hand ornaments as it may cause data interchange problems down the line. 
+  - For best results it is best to start each main line of music with the barline character ("|")
+  - Since DoReMiScript also supports chords such as G, G7, this may cause problems for ornaments that start with an ABC letter. In this case you can delimit the ornament with angle brackets **<>**. Chord symbols take precedence, so that Dm above the main line is interpreted as the chord Dm rather than a Dm ornament.
   - Code base is written in coffeescript
-  - (Programmes only:)Command line tools are available via npm:
+  - Command line tools are available via npm:
     - First install [npm](http://npmjs.org)
     - Then install the **doremi-script** package:
     - npm install doremi-script
@@ -92,6 +95,8 @@ should be used to indicate the melismas
         - cat composition.txt | doremi2ly | lilypond -o composition -
       - Create a standalone html page composition.html from composition.txt:
         - cat composition.txt | doremi2htmldoc > composition.html
+      - Open DoremiScript file in musescore:
+        - cat composition.txt | doremi2musicxml  > composition.xml ; mscore composition.xml
   - This project borrows ideas from [ABC musical notation](http://en.wikipedia.org/wiki/ABC_notation), [lilypond](http://lilypond.org), and [markdown](http://en.wikipedia.org/wiki/Markdown).
   - Special thanks to George Ruckert, Ali Akbar Khan and the authors of peg.js, lilypond, and coffeescript.
   - The online version is best used with Firefox.

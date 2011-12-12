@@ -96,6 +96,7 @@ to_musicxml= (composition) ->
     composer:""  # TODO
     poet:""
     encoding_date:""
+    fifths:musicxml_fifths(composition)
     mode: root.get_mode(composition)
   templates.composition(params)
 
@@ -244,10 +245,30 @@ draw_grace_note = (ornament_item,which,len,steal_time="",placement,context) ->
     steal_time:steal_time
   templates.grace_note(params)
 
+musicxml_fifths = (composition) ->
+  mode=root.get_mode(composition)
+  return 0 if !mode
+  return 0 if mode is ""
+  hash=
+    lydian: 1
+    major: 0
+    mixolydian:-1
+    dorian:-2
+    minor:-3
+    aolian:-3
+    phrygian:-4
+    locrian:-5
+  result=hash[mode]
+  if !result
+    return 0
+  result
+
 draw_ornaments = (pitch,context) ->
   before_ary=[]
   ornament=root.get_ornament(pitch)
   return ['',''] if !ornament
+  # NOTE- change after ornaments to before, as musescore doesn't support
+  ornament.placement = "before" if ornament.placement is "after"
   if ornament.placement is "before"
     len=ornament.ornament_items.length
     steal_time=""
