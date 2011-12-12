@@ -455,6 +455,7 @@ to_lilypond= (composition_data) ->
     ary.push "\\break\n"
   mode = get_attribute(composition_data,'Mode')
   mode or= "major"
+  mode=mode.toLowerCase()
   composer = get_attribute(composition_data,"Author")
   composer_snippet=""
   if composer
@@ -464,6 +465,7 @@ to_lilypond= (composition_data) ->
 
   title = get_attribute(composition_data,"Title")
   time = get_attribute(composition_data,"TimeSignature")
+ 
   if (key_is_valid=is_valid_key(composition_data.key))
     transpose_snip="\\transpose c' #{composition_data.key}'" 
   else

@@ -82,7 +82,9 @@ root.ParserHelper=
               
     # Certain attributes get set on the data object
     # TODO: dry
-    if x=get_attribute(@composition_data,"Key") then this.composition_data.key =x
+    if x=get_attribute(@composition_data,"TimeSignature") then this.composition_data.time_signature =x.toLowerCase()
+    if x=get_attribute(@composition_data,"Mode") then this.composition_data.mode =x.toLowerCase()
+    if x=get_attribute(@composition_data,"Key") then this.composition_data.key =x.toLowerCase()
     if x=get_attribute(@composition_data,"Filename") then this.composition_data.filename =x
     if x=get_attribute(@composition_data,"Title") then this.composition_data.title=x
     @mark_partial_measures()

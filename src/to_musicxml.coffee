@@ -95,9 +95,11 @@ to_musicxml= (composition) ->
     title:root.get_title(composition)
     composer:""  # TODO
     poet:""
+    beats:musicxml_beats(composition)
     encoding_date:""
     fifths:musicxml_fifths(composition)
-    mode: root.get_mode(composition)
+    mode_directive:mode_directive(composition)
+    mode: composition.mode
   templates.composition(params)
 
 note_template_str='''
@@ -119,6 +121,15 @@ note_template_str='''
              {{after_ornaments}}
 '''
 templates.note = root._.template(note_template_str)
+
+musicxml_beats= (composition) ->
+  time_signature=composition.time_signature
+  console.log 
+  return 4 if !time_signature
+  return 4 if time_signature is ""
+  result = /^([0-9]+)\//.exec(time_signature)
+  return 4 if !result?
+  return result[1]
 
 draw_note = (pitch,context) ->
   if pitch.my_type is "dash"
@@ -158,7 +169,7 @@ draw_note = (pitch,context) ->
     """
   if pitch.my_type is "dash" and pitch.dash_to_tie is true
     tied2="""
-    <tied type="end"/>
+    <tied type="stop"/>
     """
     tied=tied2+tied  # TODO:review
   begin_slur = end_slur =""
@@ -206,7 +217,24 @@ musicxml_type_and_dots= (numerator,denominator) ->
     alternate= "<type>16th</type>"
     return alternate # return something
   looked_up_duration
-   
+
+mode_directive = (composition) ->
+  return "" if composition.mode is "major"
+  return templates.directive({words:composition.mode})
+
+directive_template_str = """
+			<direction placement="above">
+				<direction-type>
+					<words default-x="-1" default-y="15" font-size="medium" font-weight="normal">{{words}} 
+					</words>
+				</direction-type>
+			</direction>
+"""
+templates.directive = root._.template(directive_template_str)
+
+
+display_mode= (composition) ->
+
 grace_note_template_str =  """
       <note>
         <grace {{steal_time}} />
@@ -246,7 +274,7 @@ draw_grace_note = (ornament_item,which,len,steal_time="",placement,context) ->
   templates.grace_note(params)
 
 musicxml_fifths = (composition) ->
-  mode=root.get_mode(composition)
+  mode=composition.mode
   return 0 if !mode
   return 0 if mode is ""
   hash=

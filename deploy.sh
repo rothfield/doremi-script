@@ -8,6 +8,7 @@ THIRD_PARTY_DIR=$WEBAPP_DIR/public/js/third_party
 
 cp src/shims.js lib/doremi-script
 cp src/shims.js $WEBAPP_DIR/public/js
+echo "copying src/*.mustache $WEBAPP_DIR/public/js"
 cp src/*.mustache $WEBAPP_DIR/public/js
 
 echo "WEBAPP_DIR is" $WEBAPP_DIR

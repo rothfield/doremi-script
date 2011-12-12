@@ -24,8 +24,6 @@ end
 
 
 before do
-  puts '[Params]'
-  p params
 end
 
 get '/' do
@@ -72,13 +70,11 @@ end
 post '/lilypond.txt' do
   comp=settings.comp
   dir=File.join('public','compositions')
-  puts params.inspect      
   return "no data param" if !params["data"]
   data=params["data"]
   save_to_samples=params['save_to_samples']
   doremi_script_source=params["doremi_script_source"]
   musicxml=params["musicxml"]
-  puts "params.data is #{params['data']}" 
   filename=params["fname"] || ""
   simple_file_name=sanitize_filename(filename)
   fname="#{simple_file_name}_#{Time.new.to_i}"
@@ -109,7 +105,6 @@ post '/lilypond.txt' do
   if $?.exitstatus > 0 # failed
     return {:error => true,:midi => "",:lilypond_output => result, :png => ""}.to_json
   end
-  puts "result of running lilypond is <<#{result}>>"
   `rm #{fp}.ps`
   `cp #{fp}.ly #{comp}/last.ly`
   ary=[]
@@ -118,9 +113,7 @@ post '/lilypond.txt' do
     Dir.chdir("public/compositions") do
       ary=Dir.glob("#{fname}*") 
     end
-    puts "ary is #{ary.inspect}"
     ary.each do |x| 
-     puts "x is #{x}"
      x =~ /^.*\.(.*)$/
      suffix=$1
      fp= "#{comp}/#{x}"
@@ -128,7 +121,6 @@ post '/lilypond.txt' do
     `cp #{fp} ./samples/#{simple_file_name}.#{suffix}`
     end
   end
-  # puts "result2.length is #{result2[0..20]}..."
   #midi=`openssl enc -base64 -in #{fp}.midi`
   #puts "midi is #{midi[0..20]}..."
   content_type :json

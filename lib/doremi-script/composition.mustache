@@ -66,15 +66,16 @@
                     <fifths>{{fifths}}</fifths>
                     <mode>{{mode}}</mode>
                 </key>
-                <time symbol="common">
-                    <beats>4</beats>
-                    <beat-type>4</beat-type>
+                <time>
+                        <beats>{{beats}}</beats>
+                        <beat-type>4</beat-type>
                 </time>
                 <clef>
                     <sign>G</sign>
                     <line>2</line>
                 </clef>
             </attributes>
+            {{mode_directive}}
             {{body}}
     </part>
 </score-partwise>
