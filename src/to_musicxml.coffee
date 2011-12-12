@@ -87,7 +87,7 @@ to_musicxml= (composition) ->
         ary.push draw_measure(item,context)
         context.measure_number++
 
-  composer = root.get_attribute(composition,"Author")
+  composer = root.get_composition_attribute(composition,"Author")
   time = root.get_time(composition)
   params=
     body:ary.join(" ")
@@ -100,10 +100,12 @@ to_musicxml= (composition) ->
     fifths:musicxml_fifths(composition)
     mode_directive:mode_directive(composition)
     mode: composition.mode
+    transpose:musicxml_transpose(composition)
   templates.composition(params)
 
 note_template_str='''
             {{before_ornaments}}
+            {{chord}}
             <note>
               <pitch>
                 <step>{{step}}</step>
@@ -197,8 +199,13 @@ draw_note = (pitch,context) ->
     end_slur:end_slur
     before_ornaments:before_ornaments
     after_ornaments:after_ornaments
+    chord:music_xml_chord(pitch)
   templates.note(params)
 
+music_xml_chord = (pitch) ->
+  chord=get_item_attribute(pitch,"chord_symbol")
+  return "" if !chord? or (chord is "")
+  templates.chord({chord:chord.source})
 
 musicxml_lyric = (pitch,context) ->
   return "" if !pitch.syllable? or pitch.syllable is ""
@@ -220,7 +227,17 @@ musicxml_type_and_dots= (numerator,denominator) ->
 
 mode_directive = (composition) ->
   return "" if composition.mode is "major"
-  return templates.directive({words:composition.mode})
+  return templates.mode_directive({words:composition.mode})
+
+
+directive_for_chord_template_str="""
+            <direction placement="above">
+                <direction-type>
+		<words default-x="-1" default-y="15" font-size="medium" font-weight="normal">{{chord}}</words>
+                </direction-type>
+            </direction>
+"""
+templates.chord = root._.template(directive_for_chord_template_str)
 
 directive_template_str = """
 			<direction placement="above">
@@ -232,6 +249,24 @@ directive_template_str = """
 """
 templates.directive = root._.template(directive_template_str)
 
+transpose_template_str = """
+        <transpose>
+          <diatonic>{{diatonic}}</diatonic>
+          <chromatic>{{chromatic}}</chromatic>
+        </transpose>
+"""
+templates.transpose = root._.template(transpose_template_str)
+
+mode_directive_template_str = """
+			<direction placement="above">
+				<direction-type>
+					<words default-x="-1" default-y="15" font-size="medium" font-weight="normal">{{words}} 
+					</words>
+				</direction-type>
+			</direction>
+"""
+templates.directive = root._.template(directive_template_str)
+templates.mode_directive = root._.template(mode_directive_template_str)
 
 display_mode= (composition) ->
 
@@ -295,8 +330,7 @@ draw_ornaments = (pitch,context) ->
   before_ary=[]
   ornament=root.get_ornament(pitch)
   return ['',''] if !ornament
-  # NOTE- change after ornaments to before, as musescore doesn't support
-  ornament.placement = "before" if ornament.placement is "after"
+  return "" if ornament.placement is "after" # currently not supported
   if ornament.placement is "before"
     len=ornament.ornament_items.length
     steal_time=""
@@ -312,6 +346,10 @@ draw_ornaments = (pitch,context) ->
     return ["",after_ary.join('')]
   ["",""]
 
+musicxml_transpose = (composition) ->
+  orig="d"
+  templates.transpose({diatonic:1,chromatic:2})
+  
 musicxml_step = (pitch) ->
   return "" if !pitch
   return "" if !pitch.normalized_pitch?

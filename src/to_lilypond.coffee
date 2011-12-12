@@ -453,7 +453,7 @@ to_lilypond= (composition_data) ->
       in_times=false
     emit_tied_array(last_pitch,tied_array,ary) if tied_array.length >0 
     ary.push "\\break\n"
-  mode = get_attribute(composition_data,'Mode')
+  mode = get_mode(composition_data,'Mode')
   mode or= "major"
   mode=mode.toLowerCase()
   composer = get_attribute(composition_data,"Author")

@@ -1,11 +1,12 @@
 root = exports ? this
-root.get_attribute= (composition,key) ->
+root.get_composition_attribute= (composition,key) ->
   return null if !composition.attributes
-  att=_.detect(composition.attributes.items, (item) ->
-    item.key is key
-    )
-  return null if !att
-  att.value
+  if composition.attributes.items?
+    att=_.detect(composition.attributes.items, (item) ->
+      item.key is key
+      )
+    return null if !att
+    return att.value
 
 root.log= (x) ->
   return if !@debug?
@@ -42,23 +43,30 @@ root.my_clone = (obj) ->
   newInstance
 
 root.get_title = (composition) ->
-  get_attribute(composition,"Title")
+  get_composition_attribute(composition,"Title")
 
 root.get_mode = (composition) ->
-  mode = get_attribute(composition,'Mode')
+  mode = get_composition_attribute(composition,'Mode')
   mode or= "major"
 
 root.get_time = (composition) ->
-  get_attribute(composition,"TimeSignature")
+  get_composition_attribute(composition,"TimeSignature")
 
 root.get_ornament = (pitch) ->
   return null if !pitch.attributes?
   _.detect(pitch.attributes, (attribute) -> attribute.my_type is "ornament")
   
+# TODO: make more regular data structure between composition.attributes
+# and item.attributes
+root.get_item_attribute = (item,key) ->
+  return null if !item.attributes?
+  _.detect(item.attributes, (attribute) -> attribute.my_type is key)
+
 root.has_mordent = (pitch) ->
   return false if !pitch.attributes?
   _.detect(pitch.attributes, (attribute) -> attribute.my_type is "mordent")
 
+# TODO: move into lilypond file
 root.get_chord= (item) ->
   if e =_.detect(item.attributes, (x) -> x.my_type is "chord_symbol")
     return """

@@ -59,7 +59,6 @@ root.ParserHelper=
 
   parse_composition: (attributes,lines) ->
     attributes=null if (attributes=="")
-    title="Untitled"
     @log("in composition, attributes is")
     @my_inspect(attributes)
     to_string= () ->
@@ -70,8 +69,8 @@ root.ParserHelper=
       "\n#{str}"
     @composition_data =
       my_type:"composition"
-      title:title
-      filename: "untitled"
+      title:""
+      filename: ""
       attributes: attributes
       lines: _.flatten(lines)
       warnings:@warnings
@@ -79,12 +78,20 @@ root.ParserHelper=
       toString:to_string
               
     # Certain attributes get set on the data object
-    # TODO: dry
-    if x=get_attribute(@composition_data,"TimeSignature") then this.composition_data.time_signature =x.toLowerCase()
-    if x=get_attribute(@composition_data,"Mode") then this.composition_data.mode =x.toLowerCase()
-    if x=get_attribute(@composition_data,"Key") then this.composition_data.key =x.toLowerCase()
-    if x=get_attribute(@composition_data,"Filename") then this.composition_data.filename =x
-    if x=get_attribute(@composition_data,"Title") then this.composition_data.title=x
+    x=get_composition_attribute(@composition_data,"TimeSignature")
+    this.composition_data.time_signature = x or "4/4"
+    x=get_composition_attribute(@composition_data,"Mode")
+    x= x.toLowerCase if x?
+    this.composition_data.mode = x or "major"
+    x=get_composition_attribute(@composition_data,"Key")
+    
+    # TODO: put key validations here?
+    x=x.toLowerCase() if x?
+    this.composition_data.key = x or "c"
+    x=get_composition_attribute(@composition_data,"Filename")
+    this.composition_data.filename =x
+    x=get_composition_attribute(@composition_data,"Title")
+    composition_data.title= x or "Untitled"
     @mark_partial_measures()
     @composition_data
   
