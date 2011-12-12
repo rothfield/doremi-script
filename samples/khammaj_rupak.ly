@@ -1,11 +1,11 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{ title = "Khammaj k"  }
+\header{ title = "Khammaj"  }
 \include "english.ly"
 %{
 Filename:khammaj_rupak
-Title: Khammaj k
+Title: Khammaj
 Key: d
 Mode: mixolydian
 TimeSignature: 7/4

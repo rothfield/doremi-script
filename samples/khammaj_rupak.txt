@@ -1,5 +1,5 @@
 Filename:khammaj_rupak
-Title: Khammaj k
+Title: Khammaj
 Key: d
 Mode: mixolydian
 TimeSignature: 7/4

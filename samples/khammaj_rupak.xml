@@ -6,7 +6,7 @@
         <work-title></work-title>
     </work>
     <movement-number></movement-number>
-    <movement-title>Khammaj k</movement-title>
+    <movement-title>Khammaj</movement-title>
     <identification>
             <creator type="composer"></creator>
             <creator type="poet"></creator>
@@ -35,7 +35,7 @@
         </page-layout>
     </defaults>
     <credit page="1">
-            <credit-words font-size="24" default-y="1626.98" default-x="595.238" justify="center" valign="top">Khammaj k</credit-words>
+            <credit-words font-size="24" default-y="1626.98" default-x="595.238" justify="center" valign="top">Khammaj</credit-words>
     </credit>
     <part-list>
         <score-part id="P1">
@@ -66,15 +66,21 @@
                     <fifths>-1</fifths>
                     <mode>mixolydian</mode>
                 </key>
-                <time symbol="common">
-                    <beats>4</beats>
-                    <beat-type>4</beat-type>
+                <time>
+                        <beats>7</beats>
+                        <beat-type>4</beat-type>
                 </time>
                 <clef>
                     <sign>G</sign>
                     <line>2</line>
                 </clef>
             </attributes>
+            <direction placement="above">
+	<direction-type>
+		<words default-x="-1" default-y="15" font-size="medium" font-weight="normal">mixolydian 
+		</words>
+	</direction-type>
+</direction>
             
 
 <note>
@@ -118,7 +124,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
   
@@ -148,7 +154,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
   
@@ -178,7 +184,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
  
@@ -225,7 +231,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
   
@@ -255,7 +261,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
   
@@ -285,7 +291,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
  
@@ -317,7 +323,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/><tied type="start"/>
+  <notations><tied type="stop"/><tied type="start"/>
   </notations>
  </note>
   
@@ -332,7 +338,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
   
@@ -362,7 +368,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
   
@@ -392,7 +398,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
  

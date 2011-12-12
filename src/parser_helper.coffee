@@ -7,8 +7,6 @@ root.ParserHelper=
   # THESE METHODS WILL GET MIXED IN THE PEG PARSER (for now)
   # look at top of peg parser, need to manually add new methods for now
 
-  trim: (val) ->
-     if String::trim? then val.trim() else val.replace /^\s+|\s+$/g, ""
 
   sa_helper: (source,normalized) ->
     # save a little typing
@@ -328,11 +326,6 @@ root.ParserHelper=
     (_.select(all_items(beat), (item) ->
       (item.my_type=="pitch" || item.my_type=="dash"))).length
 
-  item_has_attribute: (item,attr_name) ->
-      return false if  !item.attributes?
-      _.detect item.attributes,  (attr) ->
-         return false if !attr.my_type?
-         attr.my_type is attr_name
 
   parens_unbalanced: (line) ->
     @log("entering parens_unbalanced")
@@ -340,9 +333,9 @@ root.ParserHelper=
     @log("ary is")
     this.my_inspect(ary)
     x= _.select ary,  (item) =>
-      @item_has_attribute item,'begin_slur'
+      item_has_attribute item,'begin_slur'
     y= _.select ary,  (item) =>
-      @item_has_attribute item,'end_slur'
+      item_has_attribute item,'end_slur'
     if x.length isnt y.length
       @warnings.push "Error on line ? unbalanced parens, line was #{line.source} Note that parens are used for slurs and should bracket pitches as so (S--- R)--- and NOT  (S--) "
       return true

@@ -15,6 +15,9 @@ root.log= (x) ->
 root.running_under_node= ->
   module? && module.exports
 
+root.trim = (val) ->
+  if String::trim? then val.trim() else val.replace /^\s+|\s+$/g, ""
+
 root.my_inspect= (obj) ->
   return if ! debug?
   return if !debug
@@ -23,6 +26,12 @@ root.my_inspect= (obj) ->
     console.log(util.inspect(obj,false,null))
     return
   console.log obj
+
+root.item_has_attribute = (item,attr_name) ->
+  return false if  !item.attributes?
+  _.detect item.attributes,  (attr) ->
+    return false if !attr.my_type?
+    attr.my_type is attr_name
 
 root.my_clone = (obj) ->
   if not obj? or typeof obj isnt 'object'

@@ -63,18 +63,24 @@
             <attributes>
                 <divisions>24</divisions>
                 <key>
-                    <fifths>0</fifths>
+                    <fifths>-4</fifths>
                     <mode>phrygian</mode>
                 </key>
-                <time symbol="common">
-                    <beats>4</beats>
-                    <beat-type>4</beat-type>
+                <time>
+                        <beats>4</beats>
+                        <beat-type>4</beat-type>
                 </time>
                 <clef>
                     <sign>G</sign>
                     <line>2</line>
                 </clef>
             </attributes>
+            <direction placement="above">
+	<direction-type>
+		<words default-x="-1" default-y="15" font-size="medium" font-weight="normal">phrygian 
+		</words>
+	</direction-type>
+</direction>
             
 
 <note>
@@ -88,7 +94,7 @@
   <voice>1</voice>
   <type>eighth</type>
   <lyric number="1">
-  <text>ban-</text>
+   <text>ban-</text>
 </lyric>
   <notations>
   <slur number="1" type="start"/></notations>
@@ -146,7 +152,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>su-</text>
+   <text>su-</text>
 </lyric>
   <notations>
   </notations>
@@ -163,7 +169,7 @@
   <voice>1</voice>
   <type>eighth</type>
   <lyric number="1">
-  <text>ri</text>
+   <text>ri</text>
 </lyric>
   <notations>
   <slur number="2" type="start"/></notations>
@@ -236,7 +242,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>ba-</text>
+   <text>ba-</text>
 </lyric>
   <notations><tied type="start"/>
   </notations>
@@ -253,7 +259,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
   
@@ -268,7 +274,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>ja</text>
+   <text>ja</text>
 </lyric>
   <notations>
   </notations>
@@ -285,7 +291,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>ra-</text>
+   <text>ra-</text>
 </lyric>
   <notations>
   </notations>
@@ -304,7 +310,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>hi</text>
+   <text>hi</text>
 </lyric>
   <notations><tied type="start"/>
   </notations>
@@ -321,7 +327,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
   
@@ -336,12 +342,57 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>dhu-</text>
+   <text>dhu-</text>
 </lyric>
   <notations>
   </notations>
  </note>
-  
+  <note>
+  <grace  />
+  <pitch>
+    <step>A</step>
+          
+    <octave>4</octave>
+  </pitch>
+  <voice>1</voice>
+  <type><span>32nd</span></type>
+</note>/n<note>
+  <grace  />
+  <pitch>
+    <step>C</step>
+          
+    <octave>5</octave>
+  </pitch>
+  <voice>1</voice>
+  <type><span>32nd</span></type>
+</note>/n<note>
+  <grace  />
+  <pitch>
+    <step>B</step>
+          <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <voice>1</voice>
+  <type><span>32nd</span></type>
+</note>/n<note>
+  <grace  />
+  <pitch>
+    <step>A</step>
+          
+    <octave>4</octave>
+  </pitch>
+  <voice>1</voice>
+  <type><span>32nd</span></type>
+</note>/n<note>
+  <grace  />
+  <pitch>
+    <step>B</step>
+          <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <voice>1</voice>
+  <type><span>32nd</span></type>
+</note>
 <note>
   <pitch>
     <step>B</step>
@@ -353,57 +404,12 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>na</text>
+   <text>na</text>
 </lyric>
   <notations>
   </notations>
  </note>
- <note>
-  <grace steal-time-previous="10" />
-  <pitch>
-    <step>A</step>
-          
-    <octave>4</octave>
-  </pitch>
-  <voice>1</voice>
-  <type><span>32nd</span></type>
-</note><note>
-  <grace steal-time-previous="10" />
-  <pitch>
-    <step>C</step>
-          
-    <octave>5</octave>
-  </pitch>
-  <voice>1</voice>
-  <type><span>32nd</span></type>
-</note><note>
-  <grace steal-time-previous="10" />
-  <pitch>
-    <step>B</step>
-          <alter>-1</alter>
-    <octave>4</octave>
-  </pitch>
-  <voice>1</voice>
-  <type><span>32nd</span></type>
-</note><note>
-  <grace steal-time-previous="10" />
-  <pitch>
-    <step>A</step>
-          
-    <octave>4</octave>
-  </pitch>
-  <voice>1</voice>
-  <type><span>32nd</span></type>
-</note><note>
-  <grace steal-time-previous="10" />
-  <pitch>
-    <step>B</step>
-          <alter>-1</alter>
-    <octave>4</octave>
-  </pitch>
-  <voice>1</voice>
-  <type><span>32nd</span></type>
-</note>
+ 
 </measure> <measure number="5">
 
 <note>
@@ -417,7 +423,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>ma-</text>
+   <text>ma-</text>
 </lyric>
   <notations>
   </notations>
@@ -434,7 +440,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>dhu-</text>
+   <text>dhu-</text>
 </lyric>
   <notations>
   </notations>
@@ -451,7 +457,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>ra</text>
+   <text>ra</text>
 </lyric>
   <notations>
   </notations>
@@ -468,7 +474,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>kan-</text>
+   <text>kan-</text>
 </lyric>
   <notations>
   </notations>
@@ -487,7 +493,7 @@
   <voice>1</voice>
   <type>eighth</type>
   <lyric number="1">
-  <text>nai-</text>
+   <text>nai-</text>
 </lyric>
   <notations>
   <slur number="3" type="start"/></notations>
@@ -606,7 +612,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>ya</text>
+   <text>ya</text>
 </lyric>
   <notations>
   <slur number="4" type="start"/></notations>
@@ -640,7 +646,7 @@
   <voice>1</voice>
   <type>16th</type>
   <lyric number="1">
-  <text>khe-</text>
+   <text>khe-</text>
 </lyric>
   <notations>
   <slur number="5" type="start"/></notations>
@@ -702,7 +708,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
    
@@ -717,7 +723,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>la-</text>
+   <text>la-</text>
 </lyric>
   <notations>
   </notations>
@@ -734,7 +740,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>ta</text>
+   <text>ta</text>
 </lyric>
   <notations>
   </notations>
@@ -753,7 +759,7 @@
   <voice>1</voice>
   <type>eighth</type>
   <lyric number="1">
-  <text>ga-</text>
+   <text>ga-</text>
 </lyric>
   <notations>
   <slur number="6" type="start"/></notations>
@@ -815,12 +821,30 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>wa-</text>
+   <text>wa-</text>
 </lyric>
   <notations>
   </notations>
  </note>
-  
+  <note>
+  <grace  />
+  <pitch>
+    <step>G</step>
+          
+    <octave>4</octave>
+  </pitch>
+  <voice>1</voice>
+  <type><span>32nd</span></type>
+</note>/n<note>
+  <grace  />
+  <pitch>
+    <step>F</step>
+          
+    <octave>4</octave>
+  </pitch>
+  <voice>1</voice>
+  <type><span>32nd</span></type>
+</note>
 <note>
   <pitch>
     <step>F</step>
@@ -832,30 +856,12 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>ta</text>
+   <text>ta</text>
 </lyric>
   <notations>
   </notations>
  </note>
- <note>
-  <grace steal-time-previous="25" />
-  <pitch>
-    <step>G</step>
-          
-    <octave>4</octave>
-  </pitch>
-  <voice>1</voice>
-  <type><span>32nd</span></type>
-</note><note>
-  <grace steal-time-previous="25" />
-  <pitch>
-    <step>F</step>
-          
-    <octave>4</octave>
-  </pitch>
-  <voice>1</voice>
-  <type><span>32nd</span></type>
-</note>
+ 
 </measure> <measure number="9">
 
 <note>
@@ -869,7 +875,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>ho-</text>
+   <text>ho-</text>
 </lyric>
   <notations><tied type="start"/>
   </notations>
@@ -886,7 +892,7 @@
   <voice>1</voice>
   <type>quarter</type>
   
-  <notations><tied type="end"/>
+  <notations><tied type="stop"/>
   </notations>
  </note>
   
@@ -901,7 +907,7 @@
   <voice>1</voice>
   <type>quarter</type>
   <lyric number="1">
-  <text>ri</text>
+   <text>ri</text>
 </lyric>
   <notations>
   </notations>
