@@ -90,7 +90,7 @@ root.ParserHelper=
     # TODO: put key validations here?
     this.composition_data.key = x or "C"
     x=get_composition_attribute(@composition_data,"Filename")
-    this.composition_data.filename =x
+    this.composition_data.filename = x or ""
     x=get_composition_attribute(@composition_data,"Title")
     composition_data.title= x or "Untitled"
     @mark_partial_measures()
