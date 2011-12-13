@@ -12,7 +12,7 @@ Source:AAK
 Mode: phrygian
 Filename: bansuri.sargam
 Time: 4/4
-Key: d
+Key: D
 
 
           

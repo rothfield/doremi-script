@@ -265,7 +265,6 @@ mode_directive_template_str = """
 				</direction-type>
 			</direction>
 """
-templates.directive = root._.template(directive_template_str)
 templates.mode_directive = root._.template(mode_directive_template_str)
 
 display_mode= (composition) ->
@@ -347,7 +346,27 @@ draw_ornaments = (pitch,context) ->
   ["",""]
 
 musicxml_transpose = (composition) ->
-  orig="d"
+
+  return "" if composition.key is "C"
+  # arry is [diatonic,chromatic]
+  lookup =
+    "Db": [1,1]
+    "C#": [0,1]
+    "D":[1,2]
+    "Eb":[2,3]
+    "E":[2,4]
+    "F":[3,5]
+    "F#":[3,6]
+    "G":[4,7]
+    "G#":[4,8]
+    "Ab":[5,8]
+    "A":[5,9]
+    "Bb":[6,10]
+    "A#":[5,10]
+    "B":[6,11]
+  
+  [diatonic,chromatic]=  lookup[composition.key] or  [0,0]
+  return "" if diatonic is 0
   templates.transpose({diatonic:1,chromatic:2})
   
 musicxml_step = (pitch) ->

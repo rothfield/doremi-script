@@ -81,13 +81,14 @@ root.ParserHelper=
     x=get_composition_attribute(@composition_data,"TimeSignature")
     this.composition_data.time_signature = x or "4/4"
     x=get_composition_attribute(@composition_data,"Mode")
-    x= x.toLowerCase if x?
+    x= x.toLowerCase() if x?
     this.composition_data.mode = x or "major"
     x=get_composition_attribute(@composition_data,"Key")
-    
+    if  x? and ! valid_abc_pitch(x)
+       warnings.push("Invalid key #{x}. Valid keys are C,D,Eb,F# etc")
+       x="C"
     # TODO: put key validations here?
-    x=x.toLowerCase() if x?
-    this.composition_data.key = x or "c"
+    this.composition_data.key = x or "C"
     x=get_composition_attribute(@composition_data,"Filename")
     this.composition_data.filename =x
     x=get_composition_attribute(@composition_data,"Title")

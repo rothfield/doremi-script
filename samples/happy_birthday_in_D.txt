@@ -1,6 +1,6 @@
 Title: Happy Birthday
 Filename: happy_birthday_in_D
-Key: c
+Key: C
 Author: Traditional
 TimeSignature: 3/4
 

@@ -1,6 +1,6 @@
 Filename:khammaj_rupak_in_7_4
 Title: Khammaj Theme in Rupak
-Key: d
+Key: D
 Mode: mixolydian
 TimeSignature: 7/4
            

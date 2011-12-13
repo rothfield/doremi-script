@@ -46,27 +46,6 @@ if require?
   root._ = require("underscore")._
   root._.extend(root,shared)
 
-is_valid_key= (str) ->
-  ary= [
-    "c"
-    "d"
-    "e"
-    "f"
-    "g"
-    "a"
-    "b"
-    "cs"
-    "df"
-    "ds"
-    "ef"
-    "fs"
-    "gb"
-    "gs"
-    "ab"
-    "as"
-    "bf"
-  ]
-  root._.indexOf(ary,str) > -1
 
 extract_lyrics= (composition_data) ->
   ary=[]
@@ -387,7 +366,12 @@ beat_is_all_dashes= (beat) ->
     return false if item.my_type is "pitch"
     return true
   root.all_items(beat).every(fun)
-  
+ 
+lilypond_transpose=(composition) ->
+  return "" if composition_data.key is "C"
+  fixed=composition_data.key[0].toLowerCase()
+  return "\\transpose c' #{lilypond_pitch_map[composition.key]}'"
+
 to_lilypond= (composition_data) ->
   ary=[]
   in_times=false #hack
@@ -465,14 +449,7 @@ to_lilypond= (composition_data) ->
 
   title = get_attribute(composition_data,"Title")
   time = get_attribute(composition_data,"TimeSignature")
- 
-  if (key_is_valid=is_valid_key(composition_data.key))
-    transpose_snip="\\transpose c' #{composition_data.key}'" 
-  else
-    transpose_snip=""
-    if composition_data.key?
-      @log("#{composition_data.key} is invalid")
-      composition_data.warnings.push "Invalid key. Valid keys are cdefgab etc. Use a Mode: directive to set the mode(major,minor,aeolian, etc). See the lilypond documentation for more info"
+  transpose_snip=lilypond_transpose(composition_data)
   # Don't transpose non-sargam notation TODO:review
   if ! notation_is_in_sargam(composition_data)
     transpose_snip=""
@@ -480,9 +457,9 @@ to_lilypond= (composition_data) ->
   key_snippet= """
   \\key c \\#{mode}
   """
-  if ! notation_is_in_sargam(composition_data) and key_is_valid
+  if ! notation_is_in_sargam(composition_data)
     key_snippet= """
-    \\key #{composition_data.key} \\#{mode}
+    \\key #{lilypond_pitch_map[composition_data.key]} \\#{mode}
     """
   
   title_snippet=""

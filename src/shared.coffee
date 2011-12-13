@@ -28,6 +28,11 @@ root.my_inspect= (obj) ->
     return
   console.log obj
 
+root.valid_abc_pitch = (str) ->
+  str in ["C","C#","Db","D","D#","Eb",
+        "E","F","F#","Gb","G",
+        "G#","Ab","A","A#","Bb","B"]
+
 root.item_has_attribute = (item,attr_name) ->
   return false if  !item.attributes?
   _.detect item.attributes,  (attr) ->
