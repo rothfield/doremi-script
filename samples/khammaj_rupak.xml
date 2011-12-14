@@ -74,6 +74,10 @@
                     <sign>G</sign>
                     <line>2</line>
                 </clef>
+                <transpose>
+  <diatonic>1</diatonic>
+  <chromatic>2</chromatic>
+</transpose>
             </attributes>
             <direction placement="above">
 	<direction-type>
@@ -82,6 +86,7 @@
 	</direction-type>
 </direction>
             
+
 
 <note>
   <pitch>
@@ -98,6 +103,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>C</step>
@@ -113,6 +119,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>C</step>
@@ -128,6 +135,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>E</step>
@@ -143,6 +151,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>E</step>
@@ -158,6 +167,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>F</step>
@@ -173,6 +183,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>F</step>
@@ -190,6 +201,7 @@
  
 </measure> <measure number="2">
 
+
 <note>
   <pitch>
     <step>G</step>
@@ -205,6 +217,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>A</step>
@@ -220,6 +233,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>A</step>
@@ -235,6 +249,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>B</step>
@@ -250,6 +265,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>B</step>
@@ -265,6 +281,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>C</step>
@@ -280,6 +297,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>C</step>
@@ -297,6 +315,7 @@
  
 </measure> <measure number="3">
 
+
 <note>
   <pitch>
     <step>B</step>
@@ -312,6 +331,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>B</step>
@@ -327,6 +347,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>B</step>
@@ -342,6 +363,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>C</step>
@@ -357,6 +379,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>C</step>
@@ -372,6 +395,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>D</step>
@@ -387,6 +411,7 @@
   </notations>
  </note>
   
+
 <note>
   <pitch>
     <step>D</step>

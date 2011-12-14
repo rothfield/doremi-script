@@ -410,3 +410,92 @@ draw_measure= (measure,context) ->
 to_musicxml.templates=templates
 
 root.to_musicxml=to_musicxml
+
+
+composition_template_str = '''
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+    <work>
+        <work-number></work-number>
+        <work-title></work-title>
+    </work>
+    <movement-number></movement-number>
+    <movement-title>{{movement_title}}</movement-title>
+    <identification>
+            <creator type="composer">{{composer}}</creator>
+            <creator type="poet">{{poet}}</creator>
+        <rights></rights>
+        <encoding>
+            <software>DoremiScript</software>
+            <encoding-date>{{encoding_date}}</encoding-date>
+            <software>DoremiScript</software>
+        </encoding>
+        <source></source>
+    </identification>
+    <defaults>
+        <scaling>
+            <millimeters>7.056</millimeters>
+            <tenths>40</tenths>
+        </scaling>
+        <page-layout>
+            <page-height>1683.67</page-height>
+            <page-width>1190.48</page-width>
+            <page-margins type="both">
+                <left-margin>56.6893</left-margin>
+                <right-margin>56.6893</right-margin>
+                <top-margin>56.6893</top-margin>
+                <bottom-margin>113.379</bottom-margin>
+            </page-margins>
+        </page-layout>
+    </defaults>
+    <credit page="1">
+            <credit-words font-size="24" default-y="1626.98" default-x="595.238" justify="center" valign="top">{{title}}</credit-words>
+    </credit>
+    <part-list>
+        <score-part id="P1">
+            <part-name></part-name>
+            <score-instrument id="P1-I3">
+                <instrument-name></instrument-name>
+            </score-instrument>
+            <midi-instrument id="P1-I3">
+                <midi-channel>1</midi-channel>
+                <midi-program>1</midi-program>
+            </midi-instrument>
+        </score-part>
+    </part-list>
+    <part id="P1">
+        <measure number="0" implicit="yes">
+            <print>
+                <system-layout>
+                    <system-margins>
+                        <left-margin>-0.00</left-margin>
+                        <right-margin>0.00</right-margin>
+                    </system-margins>
+                    <top-system-distance>252.10</top-system-distance>
+                </system-layout>
+            </print>
+            <attributes>
+                <divisions>24</divisions>
+                <key>
+                    <fifths>{{fifths}}</fifths>
+                    <mode>{{mode}}</mode>
+                </key>
+                <time>
+                        <beats>{{beats}}</beats>
+                        <beat-type>4</beat-type>
+                </time>
+                <clef>
+                    <sign>G</sign>
+                    <line>2</line>
+                </clef>
+                {{transpose}}
+            </attributes>
+            {{mode_directive}}
+            {{body}}
+    </part>
+</score-partwise>
+
+'''
+templates.composition = root._.template(composition_template_str)
+

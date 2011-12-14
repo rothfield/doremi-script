@@ -1,4 +1,4 @@
-#  $ = jQuery
+$ = jQuery
 
 root = exports ? this
 
@@ -11,18 +11,7 @@ $(document).ready ->
   if Zepto?
     _.debug("***Using zepto.js instead of jQuery***")
   debug=false
-  setup_to_musicxml= () ->
-    params=
-      type:'GET'
-      url:'/js/composition.mustache'
-      dataType:'txt'
-      async:false
-      success: (data) ->
-        to_musicxml.templates.composition=_.template(data)
-        $('#run_parser').trigger('click')
-    $.ajax(params)
 
-  setup_to_musicxml()
   setup_samples_dropdown= () ->
     params=
       type:'GET'
@@ -58,6 +47,7 @@ $(document).ready ->
         $('#sample_compositions').val("Load sample compositions")
         setup_links(filepath)
         $('.generated_by_lilypond').show()
+        $('#run_parser').trigger('click')
     $.ajax(params)
 
   # Handler for samples dropdown
@@ -127,6 +117,7 @@ $(document).ready ->
       window.timer_is_on=1
       window.timed_count()
   parser=DoremiScriptParser
+  parser.is_parsing=false
   window.parse_errors=""
   $('#show_parse_tree').click ->
       $('#parse_tree').toggle()
@@ -149,7 +140,6 @@ $(document).ready ->
         alert "Generating staff notation failed"
         $('#lilypond_png').attr('src','none.jpg')
       success: (some_data,text_status) ->
-        #console.log "success,fname is",some_data.fname
         setup_links(some_data.fname)
         #window.location = String(window.location).replace(/\#.*$/, "") + "#staff_notation"
         $('.generated_by_lilypond').show()
@@ -240,21 +230,20 @@ $(document).ready ->
   $('#show_lilypond_source').click ->
     $('#lilypond_source').toggle()
 
-  $('#run_parser').click ->
+
+  run_parser = () ->
     return if parser.is_parsing
     window.parse_errors=""
     $('#parse_tree').text('parsing...')
     try
+      parser.is_parsing=true
       $('#warnings_div').hide()
       $('#warnings_div').html("")
-      parser.is_parsing=true
       src= $('#entry_area').val()
-      #src2=src.replace(/(\n|\r\f)[\t ]+(\n|\r\f)/g, "\n\n")
-      #src2=src2.replace(/(\n|\r\f)[\t ]+$/g, "\n")
-      #console.log(src2)
-      #composition_data= parser.parse (src=$('#entry_area').val())
       composition_data= parser.parse(src)
       composition_data.source=src
+      # TODO: not really necessary on every keystroke!!
+      # TODO: think when to run these.
       composition_data.lilypond=to_lilypond(composition_data)
       composition_data.musicxml=to_musicxml(composition_data)
       window.the_composition=composition_data
@@ -274,15 +263,79 @@ $(document).ready ->
       window.parse_errors= window.parse_errors + "\n"+ err
       $('#parse_tree').text(window.parse_errors)
       $('#parse_tree').show()
-      throw err
     finally
       window.last_val=$('#entry_area').val()
       parser.is_parsing=false
+
+  $('#run_parser').click ->
+      run_parser()
+
+  get_current_line_of_text_area = (obj) ->
+    get_current_line_of(obj.value,obj.selectionStart,obj.selectionEnd)
+
+  get_current_line_of = (val,sel_start,sel_end) ->
+    # doesn't use dom
+    # extract current line from some text given start and
+    # end positions representing current section
+    to_left_of_cursor=val.slice(0,sel_start)
+    to_right_of_cursor=val.slice(sel_end)
+    pos_of_start_of_line=to_left_of_cursor.lastIndexOf('\n')
+    if pos_of_start_of_line is -1
+      start_of_line_to_end=val
+    else
+      start_of_line_to_end=val.slice(pos_of_start_of_line+1)
+    index_of_end_of_line=start_of_line_to_end.indexOf('\n')
+    if index_of_end_of_line is -1
+      line=start_of_line_to_end
+    else
+      line=start_of_line_to_end.slice(0,index_of_end_of_line)
+    line
+
+  handle_key_stroke = (event) ->
+    # The purpose of this code is to filter the characters as the
+    # user types to make it easier to enter notes. For example, if the
+    # user is entering the main line of sargam, then it is nice to automatically convert a "s" or "p" that the user types into uppercase "S" or "P".
+    # For now use a primitive test to see if the user is "in" a sargam line.
+    # In the future, can add feature to constrain to notes in mode or a "NotesUsed" attribute
+    el=this
+    val=el.value
+    sel_start=el.selectionStart
+    sel_end=el.selectionEnd
+    to_left_of_cursor=val.slice(0,sel_start)
+    to_right_of_cursor=val.slice(sel_end)
+    pos_of_start_of_line=to_left_of_cursor.lastIndexOf('\n')
+    if pos_of_start_of_line is -1
+      start_of_line_to_end=val
+    else
+      start_of_line_to_end=val.slice(pos_of_start_of_line+1)
+    index_of_end_of_line=start_of_line_to_end.indexOf('\n')
+    if index_of_end_of_line is -1
+      line=start_of_line_to_end
+    else
+      line=start_of_line_to_end.slice(0,index_of_end_of_line)
+    line=get_current_line_of_text_area(el)
+    if event.which in [115,112]
+       if (line.indexOf('|') > -1)
+         hash=
+           112:"P"
+           115:"S"
+         char=hash[event.which]
+         event.preventDefault()
+         el.value="#{to_left_of_cursor}#{char}#{to_right_of_cursor}"
+         #window.last_val=el.value
+         el.setSelectionRange(sel_start+1,sel_start+1)
+         el.focus()
+         #$('#run_parser').click
+
+
+  $('#entry_area').keypress(handle_key_stroke)
 
   $('#parse_tree').hide()
   $('#lilypond_output').hide()
   $('#lilypond_source').hide()
   $('#musicxml_source').hide()
   window.do_timer()
+
+
 
 
