@@ -124,6 +124,14 @@ note_template_str='''
 '''
 templates.note = root._.template(note_template_str)
 
+barline_template_str='''
+            <barline location="{{location}}">
+                <bar-style>{{bar_style}}</bar-style>
+            </barline>
+
+'''
+templates.barline = root._.template(barline_template_str)
+
 musicxml_beats= (composition) ->
   time_signature=composition.time_signature
   console.log 
@@ -388,13 +396,46 @@ musicxml_alter = (pitch) ->
 
 musicxml_octave = (pitch) ->
   pitch.octave + 4
-musicxml_duration = (pitch) ->
-  1 # TODO  
 
+
+barline_type_to_musicxml_barline_style_hash=
+  left_repeat:"" 
+
+musicxml_barline = (barline,location="right",context) ->
+  if barline.my_type is "left_repeat"
+    return """
+    <barline location="#{location}">
+       <repeat direction="forward" times="2"/>
+    </barline>
+    """
+  if barline.my_type is "right_repeat"
+    return """
+    <barline location="#{location}">
+       <repeat direction="backward" times="2"/>
+    </barline>
+    """
+  if barline.my_type is "double_barline"  
+     # || in DoremiScript, should print out as a heavy barline
+     # note that MusicScore doesn't support heavy-heavy !!
+    return """ 
+    <barline location="#{location}">
+    <bar-style>light-light</bar-style>
+    </barline>
+    """
+  # TODO: review-
+  # Don't output anything for regular barline ??
+  return ""
+  #templates.barline({location:location,bar_style:""})
+
+draw_barline = (barline,location,context) ->
+  musicxml_barline(barline,location,context)
 
 draw_measure= (measure,context) ->
   ary=[]
-  for item in root.all_items(measure)
+  for item,ctr in root.all_items(measure)
+    if item.is_barline
+      barline_location= if ctr is 0 then "left" else "right"
+      ary.push(draw_barline(item,barline_location,context)) 
     ary.push(draw_note(item,context)) if item.my_type is "pitch"
     ary.push(draw_note(item,context)) if item.my_type is "dash"
   measure="""
