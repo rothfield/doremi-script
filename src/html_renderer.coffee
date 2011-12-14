@@ -23,7 +23,7 @@ lookup_simple = (str) ->
     "~"   : "~" #mordent
     ":|"  : ":|"
     "|"  : "|"
-    "||"  : "|" #double barline
+    "||"  : "||" #double barline- TODO: use css to bring them closer
     "%"  : "%"
     "|]"  : "|" # final barline
     "[|"  : "|" # reverse final barline
@@ -250,7 +250,7 @@ to_html_doc= (composition,full_url="http://ragapedia.com",css="",js="") ->
   <script type="text/javascript">
   #{js}
   $(document).ready(function() {
-      return adjust_slurs_in_dom()
+      return dom_fixes()
   })
   </script>
 <script id="source" type="text/html">

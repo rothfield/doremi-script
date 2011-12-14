@@ -1,6 +1,6 @@
 # Uses module pattern, exports adjust_slurs_in_dom
 # Usage:
-# adjust_slurs_in_dom()
+# dom_fixes()
 root = exports ? this
 
 
@@ -20,6 +20,10 @@ expand_note_widths_to_accomodate_syllables= () ->
   for syllable,index in syllables
     continue if index is (len-1) 
     $syllable=$(syllable)
+    # $syllable.val() seems not to work in zepto
+    syl_str=syllable.textContent || syllable.innerText # zepto fix
+    is_word_end=syl_str[syl_str.length-1] isnt "-"
+    extra2= if is_word_end then 5 else 0
     $next=$(syllables[index+1])
     width=$syllable.width()
     left=$next.offset().left
@@ -27,17 +31,16 @@ expand_note_widths_to_accomodate_syllables= () ->
     continue if $next.offset().top  !=  $syllable.offset().top
     next_left=$next.offset().left
     syl_right=$syllable.offset().left + width
-    if syl_right > next_left 
+    if (syl_right + extra2) > next_left
       $par=$syllable.parent()
       $note=$('span.note',$par)
       margin_right=$note.css("margin-right")
       existing_margin_right=0
       extra=5
-      $note.css("margin-right","#{ existing_margin_right + (syl_right - next_left)+ extra}px")
-
-adjust_slurs_in_dom= () ->
+      $note.css("margin-right","#{ existing_margin_right + syl_right - next_left + extra + extra2}px")
 
 
+fallback_if_utf8_characters_not_supported= () ->
   if !window.left_repeat_width?
     x=$('#testing_utf_support')
     x.show()
@@ -53,8 +56,7 @@ adjust_slurs_in_dom= () ->
       attr=obj.attr(tag)
       obj.html(attr)
 
-    
-
+adjust_slurs_in_dom= () ->
   $('span[data-begin-slur-id]').each  (index) ->
     pos2=$(this).offset()
     attr=$(this).attr("data-begin-slur-id")
@@ -66,17 +68,25 @@ adjust_slurs_in_dom= () ->
       _.error "adjust_slurs_in_dom, negative width"
       return
     $(slur).css {width: pos2.left- pos1.left + $(this).width()}
+
+fix_before_ornaments= () ->
+  # For the case of the ornament that is placed before the pitch,
+  # use css to set margin-left to the negative of the width!!
+  #
+  # Source looks like:
+  #
+  # Pmg
+  #    R
   $('span.ornament.placement_before').each (index) ->
-    # For the case of the ornament that is placed before the pitch,
-    # use css to set margin-left to the negative of the width!!
-    #
-    # Source looks like:
-    #
-    # Pmg
-    #    R
     el=$(this)
     el.css('margin-left',"-#{el.width()}px")
 
+
+dom_fixes = () ->
+  adjust_slurs_in_dom()
+  fallback_if_utf8_characters_not_supported()
+  fix_before_ornaments()
   expand_note_widths_to_accomodate_syllables()
 
-root.adjust_slurs_in_dom=adjust_slurs_in_dom
+root.dom_fixes=dom_fixes
+

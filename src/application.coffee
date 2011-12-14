@@ -256,7 +256,7 @@ $(document).ready ->
       $('#lilypond_source').text(composition_data.lilypond)
       $('#musicxml_source').text(composition_data.musicxml)
       # TODO: combine with the above line..
-      adjust_slurs_in_dom()
+      dom_fixes()
       canvas = $("#rendered_in_staff_notation")[0]
     catch err
       #console.log "err parsing, err is",err
