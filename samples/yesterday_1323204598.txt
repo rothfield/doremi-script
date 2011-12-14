@@ -1,5 +1,5 @@
 Filename: yesterday
-Key: f
+Key: F
 Mode: major
 Title: Yesterday
 Author: McCartney
