@@ -78,7 +78,7 @@
             </attributes>
             
             
-
+ 
 
 <note>
   <pitch>
@@ -86,31 +86,999 @@
     
     <octave>4</octave>
   </pitch>
-  <duration>24</duration>
-  <tie type="start"/>
-  <voice>1</voice>
-  <type>quarter</type>
+  <duration>6</duration>
   
-  <notations><tied type="start"/>
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>D</step>
+    <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>E</step>
+    <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>F</step>
+    
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>G</step>
+    
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>A</step>
+    <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>B</step>
+    <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>D</step>
+    <alter>-1</alter>
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>E</step>
+    <alter>-1</alter>
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>F</step>
+    
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>G</step>
+    
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>A</step>
+    <alter>-1</alter>
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>B</step>
+    <alter>-1</alter>
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>D</step>
+    <alter>-1</alter>
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>E</step>
+    <alter>-1</alter>
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>F</step>
+    
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>G</step>
+    
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>A</step>
+    <alter>-1</alter>
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>B</step>
+    <alter>-1</alter>
+    <octave>6</octave>
+  </pitch>
+  <duration>12</duration>
+  
+  <voice>1</voice>
+  <type>eighth</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+</measure> <measure number="2">
+
+</measure> <measure number="3">
+
+
+<note>
+  <pitch>
+    <step>B</step>
+    <alter>-1</alter>
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>A</step>
+    <alter>-1</alter>
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>G</step>
+    
+    <octave>6</octave>
+  </pitch>
+  <duration>12</duration>
+  
+  <voice>1</voice>
+  <type>eighth</type>
+  
+  <notations>
   </notations>
  </note>
    
 
 <note>
   <pitch>
+    <step>F</step>
+    
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>E</step>
+    <alter>-1</alter>
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>D</step>
+    <alter>-1</alter>
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>6</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>B</step>
+    <alter>-1</alter>
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>A</step>
+    <alter>-1</alter>
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>G</step>
+    
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>F</step>
+    
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>E</step>
+    <alter>-1</alter>
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>D</step>
+    <alter>-1</alter>
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>5</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
     <step>C</step>
     
     <octave>4</octave>
   </pitch>
-  <duration>24</duration>
+  <duration>6</duration>
   
   <voice>1</voice>
-  <type>quarter</type>
+  <type>16th</type>
   
-  <notations><tied type="stop"/>
+  <notations>
   </notations>
  </note>
   
+
+<note>
+  <pitch>
+    <step>B</step>
+    <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>A</step>
+    <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>G</step>
+    
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>F</step>
+    
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>E</step>
+    <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>D</step>
+    <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+ 
+</measure> <measure number="4">
+
+</measure> <measure number="5">
+
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>4</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>B</step>
+    <alter>-1</alter>
+    <octave>3</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>A</step>
+    <alter>-1</alter>
+    <octave>3</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>G</step>
+    
+    <octave>3</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>F</step>
+    
+    <octave>3</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>E</step>
+    <alter>-1</alter>
+    <octave>3</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>D</step>
+    <alter>-1</alter>
+    <octave>3</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>3</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>3</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>B</step>
+    <alter>-1</alter>
+    <octave>2</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>A</step>
+    <alter>-1</alter>
+    <octave>2</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>G</step>
+    
+    <octave>2</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>F</step>
+    
+    <octave>2</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>E</step>
+    <alter>-1</alter>
+    <octave>2</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>D</step>
+    <alter>-1</alter>
+    <octave>2</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>2</octave>
+  </pitch>
+  <duration>6</duration>
+  
+  <voice>1</voice>
+  <type>16th</type>
+  
+  <notations>
+  </notations>
+ </note>
+ 
 </measure>
     </part>
 </score-partwise>

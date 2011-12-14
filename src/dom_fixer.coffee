@@ -4,15 +4,24 @@
 root = exports ? this
 
 
-adjust_slurs_in_dom= () ->
+expand_note_widths_to_accomodate_syllables= () ->
+  ###
+       Example:
+   RS S
+   yes-ter-day
 
+   The html renderer blindly lays out the syllables underneath
+   the corresponding notes without regard to the syllables colliding
+   with each other. Examine each syllable, and if the next syllable
+   collides, then adjust the width of the NOTE accordingly     
+  ###
   syllables=$('span.syllable').get()
   len=syllables.length
   for syllable,index in syllables
     continue if index is (len-1) 
     $syllable=$(syllable)
     $next=$(syllables[index+1])
-    width=$syllable.offset().width
+    width=$syllable.width()
     left=$next.offset().left
     # on different line case
     continue if $next.offset().top  !=  $syllable.offset().top
@@ -25,6 +34,9 @@ adjust_slurs_in_dom= () ->
       existing_margin_right=0
       extra=5
       $note.css("margin-right","#{ existing_margin_right + (syl_right - next_left)+ extra}px")
+
+adjust_slurs_in_dom= () ->
+
 
   if !window.left_repeat_width?
     x=$('#testing_utf_support')
@@ -63,5 +75,8 @@ adjust_slurs_in_dom= () ->
     # Pmg
     #    R
     el=$(this)
-    el.css('margin-left',"-#{el.offset().width}px")
+    el.css('margin-left',"-#{el.width()}px")
+
+  expand_note_widths_to_accomodate_syllables()
+
 root.adjust_slurs_in_dom=adjust_slurs_in_dom

@@ -1,4 +1,4 @@
-$ = jQuery
+#  $ = jQuery
 
 root = exports ? this
 
