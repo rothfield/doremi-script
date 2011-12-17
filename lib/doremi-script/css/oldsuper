@@ -1,0 +1,279 @@
+
+/*** ESSENTIAL STYLES ***/
+.sf-menu, .sf-menu * {
+	margin:			0;
+	padding:		0;
+	list-style:		none;
+}
+.sf-menu {
+	line-height:	1.0;
+}
+.sf-menu ul {
+	position:		absolute;
+	top:			-999em;
+	width:			10em; /* left offset of submenus need to match (see below) */
+}
+.sf-menu ul li {
+	width:			100%;
+}
+.sf-menu li:hover {
+	visibility:		inherit; /* fixes IE7 'sticky bug' */
+}
+.sf-menu li {
+	float:			left;
+	position:		relative;
+}
+.sf-menu a {
+	display:		block;
+	position:		relative;
+}
+.sf-menu li:hover ul,
+.sf-menu li.sfHover ul {
+	left:			0;
+	top:			2.5em; /* match top ul list item height */
+	z-index:		99;
+}
+ul.sf-menu li:hover li ul,
+ul.sf-menu li.sfHover li ul {
+	top:			-999em;
+}
+ul.sf-menu li li:hover ul,
+ul.sf-menu li li.sfHover ul {
+	left:			10em; /* match ul width */
+	top:			0;
+}
+ul.sf-menu li li:hover li ul,
+ul.sf-menu li li.sfHover li ul {
+	top:			-999em;
+}
+ul.sf-menu li li li:hover ul,
+ul.sf-menu li li li.sfHover ul {
+	left:			10em; /* match ul width */
+	top:			0;
+}
+
+/*** DEMO SKIN ***/
+.sf-menu {
+	float:			left;
+	margin-bottom:	1em;
+}
+.sf-menu a {
+	border-left:	1px solid #fff;
+	border-top:		1px solid #CFDEFF;
+	padding: 		.75em 1em;
+	text-decoration:none;
+}
+.sf-menu a, .sf-menu a:visited  { /* visited pseudo selector so IE6 applies text colour*/
+	color:			#13a;
+}
+.sf-menu li {
+	background:		#BDD2FF;
+}
+.sf-menu li li {
+	background:		#AABDE6;
+}
+.sf-menu li li li {
+	background:		#9AAEDB;
+}
+.sf-menu li:hover, .sf-menu li.sfHover,
+.sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
+	background:		#CFDEFF;
+	outline:		0;
+}
+
+/*** arrows **/
+.sf-menu a.sf-with-ul {
+	padding-right: 	2.25em;
+	min-width:		1px; /* trigger IE7 hasLayout so spans position accurately */
+}
+.sf-sub-indicator {
+	position:		absolute;
+	display:		block;
+	right:			.75em;
+	top:			1.05em; /* IE6 only */
+	width:			10px;
+	height:			10px;
+	text-indent: 	-999em;
+	overflow:		hidden;
+	background:		url('../images/arrows-ffffff.png') no-repeat -10px -100px; /* 8-bit indexed alpha png. IE6 gets solid image only */
+}
+a > .sf-sub-indicator {  /* give all except IE6 the correct values */
+	top:			.8em;
+	background-position: 0 -100px; /* use translucent arrow for modern browsers*/
+}
+/* apply hovers to modern browsers */
+a:focus > .sf-sub-indicator,
+a:hover > .sf-sub-indicator,
+a:active > .sf-sub-indicator,
+li:hover > a > .sf-sub-indicator,
+li.sfHover > a > .sf-sub-indicator {
+	background-position: -10px -100px; /* arrow hovers for modern browsers*/
+}
+
+/* point right for anchors in subs */
+.sf-menu ul .sf-sub-indicator { background-position:  -10px 0; }
+.sf-menu ul a > .sf-sub-indicator { background-position:  0 0; }
+/* apply hovers to modern browsers */
+.sf-menu ul a:focus > .sf-sub-indicator,
+.sf-menu ul a:hover > .sf-sub-indicator,
+.sf-menu ul a:active > .sf-sub-indicator,
+.sf-menu ul li:hover > a > .sf-sub-indicator,
+.sf-menu ul li.sfHover > a > .sf-sub-indicator {
+	background-position: -10px 0; /* arrow hovers for modern browsers*/
+}
+
+/*** shadows for all but IE6 ***/
+.sf-shadow ul {
+	background:	url('../images/shadow.png') no-repeat bottom right;
+	padding: 0 8px 9px 0;
+	-moz-border-radius-bottomleft: 17px;
+	-moz-border-radius-topright: 17px;
+	-webkit-border-top-right-radius: 17px;
+	-webkit-border-bottom-left-radius: 17px;
+}
+.sf-shadow ul.sf-shadow-off {
+	background: transparent;
+}
+right: 1px solid #333;
+	font-size: 1em;
+	color: #fff;
+}
+
+/* set width of top level menu, float them left and give them position relative so that the 2nd tier menu's will sit under them */
+#menubar li {
+	float: left;
+	width: 9em;
+	position: relative;
+}
+
+/* 2nd tier and lower sub menus move off screen until required */
+#menubar li ul {
+	background-color: #454545;
+	background-repeat: no-repeat;
+	border-right: 1px solid #333333;
+	border-bottom: 1px solid #333333;
+	border-left: 1px solid #333333;
+	display: none;
+	margin-left: -1px;
+	position: absolute;
+	top: -999em;
+}
+
+/* give 2nd tier and lower sub menus a width and remove bullets */
+#menubar li ul, #menubar ul li {
+	list-style: none;
+	width: 9em;
+}
+
+#menubar ul li a {
+	border-right: 0; /* remove right border from 2nd tier and lower links */
+}
+
+#menubar li:hover ul, #menubar li.sfHover ul {
+	top: 2em; /* position 2nd tier menu under the top level menu */
+}
+
+#menubar li:hover a, #menubar a:hover, #menubar a:focus, #menubar a:active, #menubar li.sfHover a, #menubar li.current {
+	color: #fff;
+	background-color: #454545;
+}
+
+#menubar li:hover ul, #menubar li.sfHover ul, #menubar a:focus ul, body #menubar li.hover ul {
+	display: block;
+}
+
+#menubar ul a:hover, #menubar ul a:focus {
+	background-color: #000!important;
+	color: #FFFFFF!important;
+}
+
+/**** Position of third tier of nav ****/
+ /* Note that this rule must appear here in the code order in order for it to override previous positioning rules so that this and subsequent nested submenus still remain hidden when the parent submenu is shown. Do not group these selectors with other top:-999em rules */
+#menubar li:hover li ul, #menubar li.sfHover li ul {
+	top:-999em; /* hide submenu in screen-reader and search-engine friendly way */
+}
+
+/* DO NOT attempt to group these selectors with similar earlier rules. The code order is important so the rules override previous ones correctly */
+#menubar li li:hover ul, /* this pure CSS hover is overridden by the .superfish rules below which are applied only when JavaScript is available. This way, the menu degrades to regular CSS dropdown when JavaScript is unavailable */ ul#menubar li li.sfHover ul /* this is the familiar IE6 hover support. With Superfish, all browsers use this rule when JS is available. This is because the JS needs to be able to control hide and reveal delays and animations without the pure CSS rule intruding. Note the tag selector ul#menubar instead of just #menubar - this gives it the most specificity of all and makes it trump all other positioning rules, including the .superfish overrides below */ {
+	left:9em; /* VARIABLE. Offset subsequent submenus to the right by the amount you set for the submenu widths (see #menubar ul rules above) */
+	top:-1px; /* position subsequent submenus horizontally aligned to parent li */
+	border-top: 1px solid #333;
+}
+
+/* The single backslash \ character inside this comment causes IE5 Mac to ignore the following rule. */
+
+#menubar li {
+	width: auto;
+}
+
+/**** Very important ****/
+/* this negates the pure CSS hovers so submenu remains hidden and JS controls when and how it appears. This is in turn is overridden by the .sfHover rules above as they have greater specificity */
+/* notice there are three selectors here. You need three for a four tier menu system. If you had a five tier system you would copy the last selector of these three and paste it below to create a fourth selector and add another li just after the .superfish part. On the other hand if you only had a three tiered menu you could delete the third line here and save some file size.*/
+.superfish li:hover ul, .superfish li li:hover ul, .superfish li li li:hover ul {
+	top: -999em; /* hide submenu in screen-reader and search-engine friendly way */
+}
+
+/* 
+5. Form Styles
+*/
+
+fieldset {
+	border: none;
+	border-top: 1px solid #555;
+	margin-top: 1em;
+	padding: 0 1em 1em;
+}
+
+legend span {
+	display: block;
+	font-size: 0.875em;
+	padding: 0 0.25em;
+}
+
+label {
+	display: block;
+	float: left;
+	font-size: 0.875em;
+	padding: 0 0.25em 0 0;
+	text-align: right;
+	width: 8em; /* can be reset on individual basis as required */
+}
+
+form div {
+	margin-top: 8px;
+}
+
+label.hide-it {
+	color: #fff; /* must be same colour as document background */
+}
+
+/* 
+6. Error Styles
+*/
+#errors {
+	margin: 0 0 10px 0;
+	padding: 5px 10px;
+	border: #FC6 1px solid;
+	background-color: #FFC;
+}
+
+#errors h3 {
+	margin-top: 0;
+	color: #C00;
+}
+
+#errors ul {
+	list-style: disc;
+	margin-left: 1em;
+	padding-left: 1em;
+}
+
+.error {
+	background-color: #FFC;
+}
+
+/* 
+7. Google Maps
+*/
+#wagmp_map_1 {
+}
