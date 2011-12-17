@@ -472,6 +472,8 @@ to_lilypond= (composition_data) ->
   composition_data.source="" if !composition_data.source?
   src1= composition_data.source.replace /%\{/gi, "% {"
   src= src1.replace /\{%/gi, "% }"
+
+
   lilypond_template= """
   #(ly:set-option 'midi-extension "mid")
   \\version "2.12.3"

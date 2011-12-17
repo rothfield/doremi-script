@@ -105,6 +105,10 @@ root.ParserHelper=
     # TODO: put key validations here?
     this.composition_data.key = x or "C"
     x=get_composition_attribute(@composition_data,"Filename")
+    if x? and x isnt ""
+      if (/^[a-zA-Z0-9_]+$/.test(x) is false)
+        warnings.push("Filename must consist of alphanumeric characters plus underscores only")
+        x="untitled"
     this.composition_data.filename = x or "untitled"
     x=get_composition_attribute(@composition_data,"Title")
     composition_data.title= x or "Untitled"

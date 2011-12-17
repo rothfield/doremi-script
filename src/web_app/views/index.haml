@@ -44,7 +44,7 @@
         %li
           %a#download_html.saved_to_server{:href => "", :target => "_blank"} HTML Page
         %li
-          %a#download_png.generated_by_lilypond{:href => "", :target => "_blank"} png
+          %a#download_jpeg.generated_by_lilypond{:href => "", :target => "_blank"} jpeg 
         %li
           %a#download_pdf.generated_by_lilypond{:href => "", :target => "_blank"} pdf
         %li
@@ -76,8 +76,8 @@
 %div#rendered_doremi_script
 %br/
 %br/
-%br/
-%br/
+%div#western_notation_div
+
 #reopen
   Use this link to re-open the composition:
   %a#reopen_link{:href => "", :target => "_blank"}
@@ -85,7 +85,9 @@
   %input#url_to_reopen{:type => "text", :value => ""}/
 %br/
 %br/
-%div
-  %img#lilypond_png.generated_by_lilypond{:src => "/images/none.png"}/
 %p Author: John Rothfield - rthfield@sonic.net
-%span#testing_utf_support.note.left_repeat{:style => "display:none"} 𝄆
+%span#testing_utf_support.note.left_repeat{:style => "display:none"} 
+#large_div{:style => 'width:1000px'}
+  %img#lilypond_jpeg.generated_by_lilypond{:src => "/images/none.png"}
+
+

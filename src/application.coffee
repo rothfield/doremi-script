@@ -165,13 +165,13 @@ $(document).ready ->
   setup_links= (filename) ->
     console.log "setup_links"
     without_suffix=filename.substr(0, filename.lastIndexOf('.txt')) || filename
-    for typ in ["png","pdf","mid","ly","txt","xml","html"]
+    for typ in ["jpeg","pdf","mid","ly","txt","xml","html"]
       snip = """
       window.open('#{without_suffix}.#{typ}'); return false; 
       """
       $("#download_#{typ}").attr('href',full_path="#{without_suffix}.#{typ}")
-      if typ is 'png'
-        $('#lilypond_png').attr('src',full_path)
+      if typ is 'jpeg'
+        $('#lilypond_jpeg').attr('src',full_path)
       $("#download_#{typ}").attr('onclick',snip)
   
   setup_links_after_save= (filename) ->
@@ -202,7 +202,26 @@ $(document).ready ->
         $('.generated_by_lilypond').show()
         run_parser()
     $.ajax(params)
-  
+
+  save_to_server = (save_to_samples=false)  ->
+    my_data =
+      doremi_script_source: $('#entry_area').val()
+      lilypond: to_lilypond(window.the_composition)
+      musicxml:to_musicxml(window.the_composition)
+      html_page: generate_html_page_aux(window.the_composition)
+      fname:window.the_composition.filename
+      save_to_samples: save_to_samples
+    obj=
+      type:'POST'
+      url:'/save'
+      dataType: "json"
+      data: my_data
+      error: (some_data) ->
+        alert "Saving to server failed"
+      success: (some_data,text_status) ->
+        redirect_helper(some_data.fname)
+    $.ajax(obj)
+
   # Handler for samples dropdown
   sample_compositions_click = ->
     return if this.selectedIndex is 0
@@ -214,7 +233,7 @@ $(document).ready ->
     reader=new FileReader()
     reader.onload =  (evt) ->
       $('#entry_area').val evt.target.result
-      $('#lilypond_png').attr('src',"")
+      $('#lilypond_jpeg').attr('src',"")
       $('#open_div').hide()
     reader.readAsText(file, "")
 
@@ -270,30 +289,15 @@ $(document).ready ->
       $('#parse_tree').toggle()
   $('a#show_open').click ->
       $('#open_div').show()
+      $('#file').focus()
   $('#save_to_server').click =>
+    save_to_server()
           #composition_data.lilypond=to_lilypond(composition_data)
           #composition_data.musicxml=to_musicxml(composition_data)
-    my_data =
-      doremi_script_source: $('#entry_area').val()
-      lilypond: to_lilypond(window.the_composition)
-      musicxml:to_musicxml(window.the_composition)
-      html_page: generate_html_page_aux(window.the_composition)
-      fname:window.the_composition.filename
-      save_to_samples: $('#save_to_samples2').val() is "on"
-    obj=
-      type:'POST'
-      url:'/save'
-      dataType: "json"
-      data: my_data
-      error: (some_data) ->
-        alert "Saving to server failed"
-      success: (some_data,text_status) ->
-        redirect_helper(some_data.fname)
-    $.ajax(obj)
 
 
   $('#generate_staff_notation').click =>
-    $('#lilypond_png').attr('src',"")
+    $('#lilypond_jpeg').attr('src',"")
     $('.generated_by_lilypond').hide()
     my_data =
       as_html:true
@@ -309,7 +313,7 @@ $(document).ready ->
       data: my_data
       error: (some_data) ->
         alert "Generating staff notation failed"
-        $('#lilypond_png').attr('src','none.jpg')
+        $('#lilypond_jpeg').attr('src','none.jpg')
       success: (some_data,text_status) ->
         redirect_helper(some_data.fname)
     $.ajax(obj)
@@ -334,7 +338,8 @@ $(document).ready ->
 
   $('#show_lilypond_source').click ->
     $('#lilypond_source').toggle()
-
+  $('#save_to_samples').click ->
+    save_to_server(true)
   $('#run_parser').click ->
       run_parser()
   $('#entry_area').keypress(handle_key_stroke)

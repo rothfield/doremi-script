@@ -127,7 +127,7 @@ p a:focus {
 
 #menubar {
 	background-color: #010101;
-	background-image: url(../images/dark.jpg);
+/*	background-image: url(../images/dark.jpg); oops. couldn't find dark.jpg !!  */
 	background-repeat: repeat-x;
 	border-bottom: 1px solid #333;
 	border-left: 1px solid #000;
@@ -136,7 +136,7 @@ p a:focus {
 	float: left; /* contain li floats by floating the ul left */
 	line-height: 1; /* this enables the top position of the #menubar li:hover ul, #menubar li.sfHover ul rule to be calculated by adding this figure to the padding on #menubar a 1em + 2 x 0.5em = 2em */
 	margin-bottom: 1em;
-	width: 100%;
+	width: auto; 
 }
 
 #menubar a {

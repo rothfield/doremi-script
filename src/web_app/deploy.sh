@@ -3,18 +3,18 @@
 sudo killall -9 ruby
 cd ../..
 WEBAPP_DIR=./src/web_app
-THIRD_PARTY_DIR=$WEBAPP_DIR/public/js/third_party/
+WEBAPP_THIRD_PARTY_DIR=$WEBAPP_DIR/public/js/third_party/
+
 mkdir -p $WEBAPP_DIR/public/js/third_party
+mkdir -p $WEBAPP_DIR/public/compositions
 
 cp src/shims.js lib/doremi-script
 
-mkdir -p $WEBAPP_DIR/public/compositions
-mkdir -p $WEBAPP_DIR/public/js/third_party
 echo "copying src/*.mustache $WEBAPP_DIR/public/js"
 cp src/*.mustache $WEBAPP_DIR/public/js/
 cp src/shims.js $WEBAPP_DIR/public/js/
-echo "copying $THIRD_PARTY_DIR files to $WEBAPP_DIR "
-cp -r ./vendor/third_party/* $THIRD_PARTY_DIR/
+echo "copying vendor/third_party to $WEBAPP_THIRD_PARTY_DIR "
+cp -r ./vendor/third_party/* $WEBAPP_THIRD_PARTY_DIR/
 
 cd $WEBAPP_DIR
 echo "Running rackup. Access the app at http://localhost:9292/"

@@ -33,6 +33,7 @@ class DoremiApp < Sinatra::Application
 
 enable :sessions
 set :port,9292
+disable :logging  # since rack by default also logs
 
 require 'json'
 configure do
@@ -110,7 +111,7 @@ get '/list_samples' do
      x =~ /^(.*).(txt|sargam)$/
     "/samples/#{$1}"
   end
-  ary2.to_json
+  ary2.sort.to_json
 end
 
 post '/generate_html_page' do
@@ -133,12 +134,13 @@ get %r{/compositions/([a-z_A-Z0-9]+)$} do
 end
 
 
-get '/compositions' do
+get %r{^/compositions(/)?$} do
   ary=[]
   @compositions=Dir.chdir("public/compositions") do
     ary=Dir.entries('.').sort {|b,a| File.stat(a).mtime <=> File.stat(b).mtime}
   end
   @compositions= @compositions.find_all {|i|  i =~ /\.txt$/ }
+  @compositions.sort!
   haml :compositions
 end
 
@@ -146,6 +148,7 @@ end
 post '/save' do
   comp=settings.comp
   dir=File.join('public','compositions')
+  samples_dir=File.join('public','samples')
   html=params["html_page"]
   lilypond=params["lilypond"]
   save_to_samples=params['save_to_samples']
@@ -172,13 +175,17 @@ post '/save' do
      x =~ /^.*\.(.*)$/
      suffix=$1
      fp= "#{comp}/#{x}"
-    `cp #{fp} ../../samples/#{simple_file_name}.#{suffix}`
-    `cp #{fp} ./samples/#{simple_file_name}.#{suffix}`
+    `cp #{fp} #{samples_dir}/#{simple_file_name}.#{suffix}`
     end
+  end
+  if save_to_samples
+    name="/compositions/#{fname}"
+  else
+    name="/samples/#{fname}"
   end
   content_type :json
   {:error => false, 
-   :fname => "/compositions/#{fname}"
+   :fname => name
   }.to_json
 end
 
@@ -201,7 +208,10 @@ post '/lilypond.txt' do
   File.open("#{archive}.txt", 'w') {|f| f.write(doremi_script_source) }
   File.open("#{fp}.txt", 'w') {|f| f.write(doremi_script_source) }
   File.open("#{fp}.xml", 'w') {|f| f.write(musicxml) }
-  result=`lilypond --png  -o #{fp} #{fp}.ly  2>&1`
+  result=`lilypond -o #{fp} #{fp}.ly  2>&1`
+  result2= `./lily2image -r=72 -f=jpg #{fp}.ly 2>&1`  
+  result=result+"  "+result2
+  # `mv #{fp}.preview.png #{fp}.png`
   # lilypond will create files like untitled_1319780034-page1.png
   # ... page2.png etc  if pdf is multi page
   # For now, if it does it, only display first page
@@ -225,7 +235,7 @@ post '/lilypond.txt' do
   `rm #{fp}.ps`
   `cp #{fp}.ly #{comp}/last.ly`
   ary=[]
-
+  puts "*****save_to_sampls is"+save_to_samples 
   if save_to_samples 
     Dir.chdir("public/compositions") do
       ary=Dir.glob("#{fname}*") 
@@ -234,8 +244,7 @@ post '/lilypond.txt' do
      x =~ /^.*\.(.*)$/
      suffix=$1
      fp= "#{comp}/#{x}"
-    `cp #{fp} ../../samples/#{simple_file_name}.#{suffix}`
-    `cp #{fp} ./samples/#{simple_file_name}.#{suffix}`
+    `cp #{fp} ./public/samples/#{simple_file_name}.#{suffix}`
     end
   end
   #midi=`openssl enc -base64 -in #{fp}.midi`

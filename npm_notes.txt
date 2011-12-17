@@ -1,2 +1,0 @@
-  "johns_notes": "need to install nodeunit,coffee-script and pegjs",
-  "johns notes2""using npm install -g coffee-script@1.1.2 pegjs underscore nodeunit",
