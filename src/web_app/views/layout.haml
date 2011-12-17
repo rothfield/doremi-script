@@ -1,0 +1,41 @@
+!!!
+%html
+  %head
+    :javascript
+      if (!window.console) {
+        window.console = {
+                     log: function() {}
+                   };
+      }
+    %title DoremiScript Letter Music Notation
+    %link{:rel=>"shortcut icon", :href=> "/favicon.ico" }
+    %link{:href => "/css/superfish.css", :media => "all", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "/css/application.css", :media => "all", :rel => "stylesheet", :type => "text/css"}/
+    %meta{:content => "text/html;charset=utf-8", "http-equiv" => "Content-Type"}/
+    /
+      zepto is an alternative
+      <script type="text/javascript" src="/js/third_party/zepto.min.js"></script>
+    %script{:src => "/js/third_party/jquery.js", :type => "text/javascript"}
+    %script{:src => "/js/third_party/jquery.autogrow-textarea.js", :type => "text/javascript"}
+    %script{:src => "/js/third_party/superfish.js", :type => "text/javascript"}
+    %script{:src => "/js/third_party/underscore.js", :type => "text/javascript"}
+    %script{:src => "/js/underscore.logger.js", :type => "text/javascript"}
+    %script{:src => "/js/shims.js", :type => "text/javascript"}
+    %script{:src => "/js/all_items.js", :type => "text/javascript"}
+    %script{:src => "/js/shared.js", :type => "text/javascript"}
+    %script{:src => "/js/third_party/fraction.js", :type => "text/javascript"}
+    %script{:src => "/js/tree_iterators.js", :type => "text/javascript"}
+    %script{:src => "/js/parser_helper.js", :type => "text/javascript"}
+    %script{:src => "/js/to_lilypond.js", :type => "text/javascript"}
+    %script{:src => "/js/to_musicxml.js", :type => "text/javascript"}
+    %script{:src => "/js/doremi_script_parser.js", :type => "text/javascript"}
+    %script{:src => "/js/dom_fixer.js", :type => "text/javascript"}
+    %script{:src => "/js/html_renderer.js", :type => "text/javascript"}
+    %script{:src => "/js/application.js", :type => "text/javascript"}
+    / stash css and javascript here when necessary to generate a standalone page.
+    %script#css_for_html_doc{:type => "text/html"}
+    %script#zepto_for_html_doc{:type => "text/html"}
+    %script#dom_fixer_for_html_doc{:type => "text/html"}
+    %script#testing_utf_support{:type => "text/html"}
+  %body
+    = yield

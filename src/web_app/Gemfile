@@ -1,0 +1,10 @@
+source :rubygems
+
+gem "oa-oauth", :require => "omniauth/oauth"
+gem 'dm-core'
+gem 'dm-sqlite-adapter'
+gem 'dm-migrations'
+gem 'sinatra'
+gem 'haml'
+
+

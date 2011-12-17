@@ -19,6 +19,6 @@ echo "`wc -l tmp/doremiparse.out`"
 echo "SRG\n|  m" | doremi2musicxml | tee > tmp/doremi2musicxml.xml; musicxml2ly tmp/doremi2musicxml.xml -o tmp/doremi2musicxml.xml.ly 
 echo "`wc -l tmp/doremi2musicxml.xml.ly`"
 
-cat samples/bansuri.txt | doremi2musicxml | tee > tmp/bansuri.xml
+cat src/web_app/public/samples/bansuri.txt | doremi2musicxml | tee > tmp/bansuri.xml
 echo "`wc -l tmp/bansuri.xml`"
 

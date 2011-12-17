@@ -1,4 +1,4 @@
-WEB_DIR="./webapp/doremi_web/public/js/" 
+WEB_DIR="./src/web_app/public/js/" 
 LIB_DIR="./lib/doremi-script"
 echo "compiling to $WEB_DIR"
 echo "compiling to $LIB_DIR"

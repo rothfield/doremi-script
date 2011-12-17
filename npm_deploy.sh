@@ -1,7 +1,7 @@
 #!/bin/bash
 # copy files as necessary for npm package
 CSS_DIR=./lib/doremi-script/css
-SRC_WEBAPP_DIR=./src/web_app/
+SRC_WEBAPP_DIR=./src/web_app/public
 
 rm -rf $CSS_DIR
 echo "move css  to $CSS_DIR"

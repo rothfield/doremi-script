@@ -78,6 +78,21 @@ root.ParserHelper=
       toString:to_string
               
     # Certain attributes get set on the data object
+    x=get_composition_attribute(@composition_data,"NotesUsed")
+    valid=true
+    if x? and (/^[sSrRgGmMpPdDnN]*$/.test(x) is false)
+       warnings.push("ForceSargamChars should be all sargam characters, for example 'SrGmMdN'")
+       valid=false
+    this.composition_data.notes_used = x  || ""
+    hash={}
+    if x and valid
+      split_chars=this.composition_data.force_sargam_chars.split('')
+      for char in split_chars
+        lower=char.toLowerCase(char)
+        if char in ['S','R','G','M','P','D','N'] 
+          if (lower not in split_chars)
+            hash[char.toLowerCase(char)]=char
+    composition_data.force_sargam_chars_hash=hash
     x=get_composition_attribute(@composition_data,"TimeSignature")
     this.composition_data.time_signature = x or "4/4"
     x=get_composition_attribute(@composition_data,"Mode")
@@ -90,7 +105,7 @@ root.ParserHelper=
     # TODO: put key validations here?
     this.composition_data.key = x or "C"
     x=get_composition_attribute(@composition_data,"Filename")
-    this.composition_data.filename = x or ""
+    this.composition_data.filename = x or "untitled"
     x=get_composition_attribute(@composition_data,"Title")
     composition_data.title= x or "Untitled"
     @mark_partial_measures()
