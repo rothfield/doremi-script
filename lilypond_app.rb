@@ -10,7 +10,7 @@ configure do
 end
 
 set :comp, "#{Dir.pwd}/public/compositions"
-set :port,80  if `hostname`.chomp == 'ragapedia'
+#set :port,80  if `hostname`.chomp == 'ragapedia'
 set :haml, :format => :html5
 
 def sanitize_filename(filename)
@@ -81,7 +81,8 @@ get '/lilypond_to_jpg' do
       `convert #{fp}-page*.jpeg -append #{fp}.jpeg`
     end
   error=false
-  fname = "http://localhost:9292/compositions/#{fname}.jpg"
+  
+  fname = "http://ragapedia.com:9292/compositions/#{fname}.jpg"
   if $?.exitstatus > 0 # failed
     error=true
     fname=""
