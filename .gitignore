@@ -1,0 +1,9 @@
+compositions
+ignore
+*.swp
+*.swo
+tmp
+snip
+temp.html
+tmp.*
+test.*
