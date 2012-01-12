@@ -5,7 +5,7 @@ root = exports ? this
 debug=false
 
 if module? and module.exports?
-  sys = require('sys')
+  sys = require('util')
   Fraction=require('./third_party/fraction.js').Fraction
 
 exports.test_fractions_constructor_reduces_improper_fractions = (test) ->

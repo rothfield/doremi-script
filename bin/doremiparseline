@@ -1,0 +1,16 @@
+#!/usr/bin/env node 
+var path = require('path');
+var fs = require('fs');
+var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
+
+_console = require(lib+'/doremi-script/underscore.logger.js') 
+_console.level  = _console.constructor.WARN
+_ = require("underscore")._ 
+_.mixin(_console.toObject())
+
+require(lib+'/doremi-script/doremi_script_line_parser.js')
+var parser=DoremiScriptLineParser
+var source= fs.readFileSync('/dev/stdin').toString()
+var composition=parser.parse(source)
+composition.source=source
+process.stdout.write(util.inspect(composition,false,null)+"\n")

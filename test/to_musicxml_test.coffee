@@ -9,7 +9,7 @@ _ = require("underscore")._ if require?
 
 
 require './doremi_script_parser.js'
-sys = require('sys')
+sys = require('util')
 utils=require './tree_iterators.js'
 _console.level  = Logger.INFO
 _.mixin(_console.toObject())

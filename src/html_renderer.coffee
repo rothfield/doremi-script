@@ -4,11 +4,9 @@
 
 root = exports ? this
 
-#"Global" to this module
-@id_ctr=new Date().getTime()
+id_ctr=new Date().getTime() - 1326011100000
 
 last_slur_id=-1
-
 lookup_simple = (str) ->
   # for displaying characters where there is not font support 
   # in the browser
@@ -104,9 +102,9 @@ draw_ornament_item= (item) ->
 
 draw_ornament= (ornament) ->
   x=(draw_ornament_item(orn_item) for orn_item in ornament.ornament_items).join('')
-  @id_ctr++
+  id_ctr++
   """
-  <span id="#{@id_ctr}" class="upper_attribute ornament placement_#{ornament.placement}">#{x}</span>
+  <span id="#{id_ctr}" class="upper_attribute ornament placement_#{ornament.placement}">#{x}</span>
   """
 
 draw_pitch_sign = (my_source) ->
@@ -189,6 +187,7 @@ draw_item= (item) ->
       do (attribute) =>
         return "" if attribute.my_type=="upper_octave_indicator"
         if (attribute.my_type=="begin_slur")
+          console.log "begin slur"
           id_ctr++
           last_slur_id=id_ctr
           return """
@@ -272,6 +271,12 @@ draw_attributes = (attributes)->
       ).join('\n')
   "<div class='attribute_section'>#{attrs}</div>"
 
+
+line_to_html= (line) ->
+  # returns the text of an html div rendering the line
+  draw_line(line)
+  #"<div class='composition'>#{line}</div>"
+
 to_html= (composition) ->
   # returns the text of an html div rendering the composition.
   attrs=draw_attributes(composition.attributes)
@@ -279,4 +284,5 @@ to_html= (composition) ->
   "<div class='composition'>#{attrs}#{lines}</div>"
 
 root.to_html=to_html
+root.line_to_html=line_to_html
 root.to_html_doc=to_html_doc

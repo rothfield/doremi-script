@@ -30,6 +30,12 @@ Key: D
                 Pm ~
 | (d-Pm  g) P  m | r - S :|
    ga-      wa-ta  ho- ri
+
+               .
+              <g>
+            .   . .
+| g m d n | S - r S |
+ji-na ja-u san-ga
   
 %}
 melody = {
@@ -40,11 +46,12 @@ melody = {
 \partial 4*1  \bar "|:"  c'8( df'8 \bar "|"  \acciaccatura {c'32}bf4) c'4 ef'8( f'8 g'8 \acciaccatura {bf'32}af'8) \bar "|"  g'4~^"i" g'4 g'4 g'4 \bar "|"  g'4~^"IV" g'4 a'4 \afterGrace bf'4( { a'32[ c''32 bf'32 a'32 bf'32]) } \bar "|"  \break
  \bar "|"  g'4 af'4\mordent g'4 af'4 \bar "|"  g'8( f'8 g'16 f'16 bf'16 g'16) \acciaccatura {f'32[ ef'32 f'32]}ef'4( f'4) \bar "|"  g'16( af'16 bf'16 c''16~) c''4 ef''4 c''4 \bar "|"  \break
  \bar "|"  af'8( g'16 f'16 ef'4) g'4 \afterGrace f'4( { g'32[ f'32]) } \bar "|"  \partial 4*3  df'4~\mordent df'4 c'4 \bar ":|"  \break
+ \bar "|"  ef'4 f'4 af'4 bf'4 \bar "|"  c''4~ c''4 \acciaccatura {ef''32}df''4 c''4 \bar "|"  \break
 
 }
 
 text = \lyricmode {
-ban- su- ri ba- ja ra- hi dhu- na ma- dhu- ra kan- nai- ya khe- la- ta ga- wa- ta ho- ri
+ban- su- ri ba- ja ra- hi dhu- na ma- dhu- ra kan- nai- ya khe- la- ta ga- wa- ta ho- ri ji- na ja- u san- ga
 }
 
 \score{

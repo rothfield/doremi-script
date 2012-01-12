@@ -1,0 +1,107 @@
+!!! Strict
+%html{:lang => "en", "xml:lang" => "en", :xmlns => "http://www.w3.org/1999/xhtml"}
+  %head
+    %title Simple Horizontal CSS Drop-Down Menu Demo
+    %meta{:content => "text/html; charset=utf-8", "http-equiv" => "Content-Type"}/
+    %meta{:content => "Tom@Lwis (http://www.lwis.net/free-css-drop-down-menu/)", :name => "author"}/
+    %meta{:content => " css, dropdowns, dropdown menu, drop-down, menu, navigation, nav, horizontal, vertical left-to-right, vertical right-to-left, horizontal linear, horizontal upwards, cross browser, internet explorer, ie, firefox, safari, opera, browser, lwis", :name => "keywords"}/
+    %meta{:content => "Clean, standards-friendly, modular framework for dropdown menus", :name => "description"}/
+    %link{:href => "css/dropdown/themes/default/helper.css", :media => "screen", :rel => "stylesheet", :type => "text/css"}/
+    / Beginning of compulsory code below
+    %link{:href => "css/dropdown/dropdown.css", :media => "screen", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "css/dropdown/themes/default/default.css", :media => "screen", :rel => "stylesheet", :type => "text/css"}/
+    /[if lt IE 7]
+      <script type="text/javascript" src="js/jquery/jquery.js"></script>
+      <script type="text/javascript" src="js/jquery/jquery.dropdown.js"></script>
+    / / END
+  %body
+    %h1 Simple Horizontal CSS Drop-Down Menu Demo
+    / Beginning of compulsory code below
+    %ul#nav.dropdown.dropdown-horizontal
+      %li
+        %a{:href => "./"} Home
+      %li.dir
+        About Us
+        %ul
+          %li
+            %a{:href => "./"} History
+          %li
+            %a{:href => "./"} Our Vision
+          %li.dir
+            %a{:href => "./"} The Team
+            %ul
+              %li
+                %a{:href => "./"} Brigita
+              %li
+                %a{:href => "./"} John
+              %li
+                %a{:href => "./"} Michael
+              %li
+                %a{:href => "./"} Peter
+              %li
+                %a{:href => "./"} Sarah
+          %li
+            %a{:href => "./"} Clients
+          %li
+            %a{:href => "./"} Testimonials
+          %li
+            %a{:href => "./"} Press
+          %li
+            %a{:href => "./"} FAQs
+      %li.dir
+        Services
+        %ul
+          %li
+            %a{:href => "./"} Product Development
+          %li
+            %a{:href => "./"} Delivery
+          %li
+            %a{:href => "./"} Shop Online
+          %li
+            %a{:href => "./"} Support
+          %li
+            %a{:href => "./"} Training &amp; Consulting
+      %li.dir
+        Products
+        %ul
+          %li.dir
+            %a{:href => "./"} New
+            %ul
+              %li
+                %a{:href => "./"} Corporate Use
+              %li
+                %a{:href => "./"} Private Use
+          %li.dir
+            %a{:href => "./"} Used
+            %ul
+              %li
+                %a{:href => "./"} Corporate Use
+              %li
+                %a{:href => "./"} Private Use
+          %li
+            %a{:href => "./"} Featured
+          %li
+            %a{:href => "./"} Top Rated
+          %li
+            %a{:href => "./"} Prices
+      %li
+        %a{:href => "./"} Gallery
+      %li
+        %a{:href => "./"} Events
+      %li
+        %a{:href => "./"} Careers
+      %li.dir.rtl
+        %a{:href => "./"} Contact Us
+        %ul
+          %li
+            %a{:href => "./"} Enquiry Form
+          %li.dir
+            %a{:href => "./"} Map &amp; Driving Directions
+            %ul
+              %li
+                %a{:href => "./"} Map
+              %li
+                %a{:href => "./"} Driving Directions
+          %li
+            %a{:href => "./"} Your Feedback
+    / / END

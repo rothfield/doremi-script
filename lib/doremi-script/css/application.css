@@ -11,7 +11,9 @@ h2.step {
   background-color: lavender;
   border: 1px solid black;
 }
-
+div#western_notation_div {
+  border: 2px dotted #CCCCCC;
+}
 div#open_div {
   display:none
 }
@@ -43,8 +45,7 @@ span.note_wrapper {
     padding-left: 10px;
 }
 textarea#entry_area, textarea.entry_area {
-    white-space: nowrap;
-    overflow: auto;
+    /* don't try nowrap or overflow: auto. Causes problems in chrome */
     font-family: monospace; 
     font-size: 18px;
     padding-left: 10px;

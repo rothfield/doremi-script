@@ -1,0 +1,6 @@
+ForceSargamChars: SrGmMdN
+Raga: Lalit
+Filename: hijohn
+
+| N r G mM | mmmm
+  .

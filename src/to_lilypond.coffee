@@ -372,7 +372,7 @@ lilypond_transpose=(composition) ->
   fixed=composition_data.key[0].toLowerCase()
   return "\\transpose c' #{lilypond_pitch_map[composition.key]}'"
 
-to_lilypond= (composition_data) ->
+to_lilypond= (composition_data,options={}) ->
   ary=[]
   in_times=false #hack
   at_beginning_of_first_measure_of_line=false
@@ -473,6 +473,8 @@ to_lilypond= (composition_data) ->
   src1= composition_data.source.replace /%\{/gi, "% {"
   src= src1.replace /\{%/gi, "% }"
 
+  if options.omit_header
+    title_snippet=composer_snippet=""
 
   lilypond_template= """
   #(ly:set-option 'midi-extension "mid")

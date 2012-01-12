@@ -49,7 +49,7 @@ fallback_if_utf8_characters_not_supported= () ->
       window.left_repeat_width=0
     x.hide()
   #  $('body').append("left_repeat_width is #{window.left_repeat_width}")
-  if (window.left_repeat_width is 0) or (window.left_repeat_width > 10) 
+  if (window.left_repeat_width is 0) or (window.left_repeat_width > 20)
     tag="data-fallback-if-no-utf8-chars"
     $("span[#{tag}]").each  (index) ->
       obj=$(this)

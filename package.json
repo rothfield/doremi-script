@@ -15,7 +15,8 @@
     "doremi2html":  "./bin/doremi2html",
     "doremi2ly":  "./bin/doremi2ly",
     "doremi2musicxml":  "./bin/doremi2musicxml",
-    "doremiparse":  "./bin/doremiparse"
+    "doremiparse":  "./bin/doremiparse",
+    "doremiparseline":  "./bin/doremiparseline"
   },
   "homepage": "http://ragapedia.com",
   "repository": {

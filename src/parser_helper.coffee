@@ -36,6 +36,8 @@ root.ParserHelper=
     uppers= '' if  uppers.length is 0
     # doesn't include lyrics
     my_items = _.flatten(_.compact([uppers,sargam,lowers]))
+    my_items2 = _.flatten(_.compact([uppers,sargam,lowers,lyrics]))
+    sargam.source=(x=(item.source for item in my_items2)).join("\n")
     #add a group_line_no to each source line
     ctr=0
     for upper in uppers
@@ -58,6 +60,8 @@ root.ParserHelper=
     sargam
 
   parse_composition: (attributes,lines) ->
+    ctr=0
+    line.index=ctr++ for line in lines
     attributes=null if (attributes=="")
     @log("in composition, attributes is")
     @my_inspect(attributes)
@@ -83,35 +87,48 @@ root.ParserHelper=
     if x? and (/^[sSrRgGmMpPdDnN]*$/.test(x) is false)
        warnings.push("ForceSargamChars should be all sargam characters, for example 'SrGmMdN'")
        valid=false
-    this.composition_data.notes_used = x  || ""
+    @composition_data.notes_used = x  || ""
     hash={}
     if x and valid
-      split_chars=this.composition_data.force_sargam_chars.split('')
+      split_chars=@composition_data.force_sargam_chars.split('')
       for char in split_chars
         lower=char.toLowerCase(char)
         if char in ['S','R','G','M','P','D','N'] 
           if (lower not in split_chars)
             hash[char.toLowerCase(char)]=char
-    composition_data.force_sargam_chars_hash=hash
+    @composition_data.force_sargam_chars_hash=hash
     x=get_composition_attribute(@composition_data,"TimeSignature")
-    this.composition_data.time_signature = x or "4/4"
+    @composition_data.time_signature = x or "4/4"
+    x=get_composition_attribute(@composition_data,"id")
+    if x?
+      @composition_data.id=x
+    else
+      @composition_data.id=new Date().getTime()
     x=get_composition_attribute(@composition_data,"Mode")
     x= x.toLowerCase() if x?
-    this.composition_data.mode = x or "major"
+    @composition_data.mode = x or "major"
     x=get_composition_attribute(@composition_data,"Key")
     if  x? and ! valid_abc_pitch(x)
        warnings.push("Invalid key #{x}. Valid keys are C,D,Eb,F# etc")
        x="C"
     # TODO: put key validations here?
-    this.composition_data.key = x or "C"
+    @composition_data.key = x or "C"
     x=get_composition_attribute(@composition_data,"Filename")
     if x? and x isnt ""
       if (/^[a-zA-Z0-9_]+$/.test(x) is false)
         warnings.push("Filename must consist of alphanumeric characters plus underscores only")
         x="untitled"
-    this.composition_data.filename = x or "untitled"
+    @composition_data.filename = x or "untitled"
     x=get_composition_attribute(@composition_data,"Title")
-    composition_data.title= x or "Untitled"
+    @composition_data.title= x or "Untitled"
+    x=get_composition_attribute(@composition_data,"Source")
+    @composition_data.source= x or ""
+    x=get_composition_attribute(@composition_data,"Author")
+    @composition_data.author= x or ""
+    x=get_composition_attribute(@composition_data,"Raga")
+    @composition_data.raga= x if x?
+    x=get_composition_attribute(@composition_data,"staff_notation_url")
+    @composition_data.staff_notation_url= x if x?
     @mark_partial_measures()
     @composition_data
   
@@ -180,7 +197,6 @@ root.ParserHelper=
       source: source
       usable_source: usable_source
       ornament_items: items
-    #console.log "ORNAMENT:",ornament
     ornament
 
 

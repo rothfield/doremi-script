@@ -910,6 +910,159 @@
   <barline location="right">
    <repeat direction="backward" times="2"/>
 </barline>
+</measure> <measure number="10">
+ 
+
+<note>
+  <pitch>
+    <step>E</step>
+    <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <duration>24</duration>
+  
+  <voice>1</voice>
+  <type>quarter</type>
+  <lyric number="1">
+   <text>ji-</text>
+</lyric>
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>F</step>
+    
+    <octave>4</octave>
+  </pitch>
+  <duration>24</duration>
+  
+  <voice>1</voice>
+  <type>quarter</type>
+  <lyric number="1">
+   <text>na</text>
+</lyric>
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>A</step>
+    <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <duration>24</duration>
+  
+  <voice>1</voice>
+  <type>quarter</type>
+  <lyric number="1">
+   <text>ja-</text>
+</lyric>
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>B</step>
+    <alter>-1</alter>
+    <octave>4</octave>
+  </pitch>
+  <duration>24</duration>
+  
+  <voice>1</voice>
+  <type>quarter</type>
+  <lyric number="1">
+   <text>u</text>
+</lyric>
+  <notations>
+  </notations>
+ </note>
+  
+</measure> <measure number="11">
+
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>5</octave>
+  </pitch>
+  <duration>24</duration>
+  <tie type="start"/>
+  <voice>1</voice>
+  <type>quarter</type>
+  <lyric number="1">
+   <text>san-</text>
+</lyric>
+  <notations><tied type="start"/>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>5</octave>
+  </pitch>
+  <duration>24</duration>
+  
+  <voice>1</voice>
+  <type>quarter</type>
+  
+  <notations><tied type="stop"/>
+  </notations>
+ </note>
+  <note>
+  <grace  />
+  <pitch>
+    <step>E</step>
+          <alter>-1</alter>
+    <octave>5</octave>
+  </pitch>
+  <voice>1</voice>
+  <type><span>32nd</span></type>
+</note>
+
+<note>
+  <pitch>
+    <step>D</step>
+    <alter>-1</alter>
+    <octave>5</octave>
+  </pitch>
+  <duration>24</duration>
+  
+  <voice>1</voice>
+  <type>quarter</type>
+  <lyric number="1">
+   <text>ga</text>
+</lyric>
+  <notations>
+  </notations>
+ </note>
+  
+
+<note>
+  <pitch>
+    <step>C</step>
+    
+    <octave>5</octave>
+  </pitch>
+  <duration>24</duration>
+  
+  <voice>1</voice>
+  <type>quarter</type>
+  
+  <notations>
+  </notations>
+ </note>
+  
 </measure>
     </part>
 </score-partwise>
