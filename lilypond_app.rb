@@ -64,7 +64,6 @@ get '/lilypond_to_jpg' do
     #
     ########################
     result2= `./bin/lily2image -r=72 -f=jpg #{fp}.ly 2>&1`  
-    `mv  #{fp}.jpeg #{fp}.jpg`
     result=result+result2
     # may create files like: bansuriv3-page1.jpeg
     # lilypond will create files like untitled_1319780034-page1.jpeg
@@ -76,13 +75,14 @@ get '/lilypond_to_jpg' do
     #
     ###################################
     page1="#{fp}-page1.jpeg"
-    if false #File.file? page1
+    if File.file? page1
       puts "converting multiple pages using convert. #{fp}-page*.jpeg"
       `convert #{fp}-page*.jpeg -append #{fp}.jpeg`
     end
+    `mv  #{fp}.jpeg #{fp}.jpg`
   error=false
   
-  fname = "http://ragapedia.com:9292/compositions/#{fname}.jpg"
+  fname = "http://ragapedia.com/compositions/#{fname}.jpg"
   if $?.exitstatus > 0 # failed
     error=true
     fname=""
