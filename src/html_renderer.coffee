@@ -21,7 +21,7 @@ lookup_simple = (str) ->
     "~"   : "~" #mordent
     ":|"  : ":|"
     "|"  : "|"
-    "||"  : "||" #double barline- TODO: use css to bring them closer
+    "||"  : "||" # Use css to move them close together
     "%"  : "%"
     "|]"  : "|" # final barline
     "[|"  : "|" # reverse final barline
@@ -36,11 +36,11 @@ lookup_html_entity = (str) ->
     "#"    : "&#9839;" # sharp sign
     "."    : "&bull;"
     "*"    : "&bull;"
-    "|:"  : "&#x1d106"
+    "|:"  : "&#x1d106"  # left repeat
   # U+1D19D for the half Pralltriller, and adding U+1D1A0
     "~"   : "&#x1D19D&#x1D19D" #mordent
     ":|"  : "&#x1d107"
-    "|"  : "&#x1d100"
+    "|"  : "&#x1d100" # single_barline
     "||"  : "&#x1d101" #double barline
     "%"  : "&#x1d10E"
     "|]"  : "&#x1d102" # final barline

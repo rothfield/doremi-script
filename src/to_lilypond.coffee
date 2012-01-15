@@ -275,9 +275,7 @@ lookup_lilypond_barline= (barline_type) ->
     "double_barline":'''
       \\bar "||" 
     '''
-    "single_barline":'''
-      \\bar "|" 
-    '''
+    "single_barline":"|"
     "left_repeat":'''
       \\bar "|:" 
     '''
@@ -480,8 +478,11 @@ to_lilypond= (composition_data,options={}) ->
   #(ly:set-option 'midi-extension "mid")
   \\version "2.12.3"
   \\include "english.ly"
-  \\header{ #{title_snippet} #{composer_snippet} }
-  \\include "english.ly"
+  \\header{ 
+  #{title_snippet}
+  #{composer_snippet}
+  tagline = ""  % removed 
+  }
 %{
 #{src}  
 %}
@@ -505,7 +506,12 @@ text = \\lyricmode {
   }
   \\new Lyrics \\lyricsto "one" \\text
 >>
-\\layout { }
+\\layout {
+  \\context {
+       \\Score
+    \\remove "Bar_number_engraver"
+  } 
+  }
 \\midi { }
 }
   """

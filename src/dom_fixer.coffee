@@ -41,16 +41,22 @@ expand_note_widths_to_accomodate_syllables= () ->
 
 
 fallback_if_utf8_characters_not_supported= () ->
-  if !window.left_repeat_width?
-    x=$('#testing_utf_support')
-    x.show()
-    window.left_repeat_width=$(x).width()
-    if !window.left_repeat_width?
-      window.left_repeat_width=0
-    x.hide()
-  #  $('body').append("left_repeat_width is #{window.left_repeat_width}")
-  if (window.left_repeat_width is 0) or (window.left_repeat_width > 20)
+  # If the browser supports utf8 music characters
+  # then the width of single barline and left repeat will
+  # NOT be the same.
+  if !window.ok_to_use_utf8_music_characters?
+    #console.log("Testing utf8 support") 
+    width1=$('#utf_left_repeat').show().width()
+    width2=$('#utf_single_barline').show().width()
+    $('#utf_left_repeat').hide()
+    $('#utf_single_barline').hide()
+    #console.log("width of left_repeat is",width1) 
+    #console.log("width of single_barline is",width2) 
+    window.ok_to_use_utf8_music_characters= (width1 isnt width2)
+  if ! window.ok_to_use_utf8_music_characters
+    #console.log("Falling back to ascii characters")
     tag="data-fallback-if-no-utf8-chars"
+    $("span[#{tag}]").addClass('dont_use_utf8_chars')
     $("span[#{tag}]").each  (index) ->
       obj=$(this)
       attr=obj.attr(tag)
