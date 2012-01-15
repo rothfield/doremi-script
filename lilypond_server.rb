@@ -11,6 +11,8 @@ class LilypondServer < Sinatra::Application
   end
   
   set :comp, "#{Dir.pwd}/public/compositions"
+  set :lily2image, "#{Dir.pwd}/bin/lily2image"
+#  set :lilypond, "/usr/local/bin/lilypond"
   #set :port,80  if `hostname`.chomp == 'ragapedia'
   set :haml, :format => :html5
   
@@ -33,7 +35,7 @@ class LilypondServer < Sinatra::Application
   
   
   get '/' do
-    "Usage: get /lilypond_to_jpg?fname=..&lilypond=...&doremi_script_source="
+    "#{ENV["SHELL"]} - ENV[PATH] is   #{ ENV["PATH"]} - whoami is #{`whoami`} - pwd is #{`pwd`} - Usage: get /lilypond_to_jpg?fname=..&lilypond=...&doremi_script_source="
   end
   
   post '/lilypond_to_jpg' do
@@ -64,7 +66,8 @@ class LilypondServer < Sinatra::Application
       #  Requires lilypond 2.12.3  !!!!! and nbm
       #
       ########################
-      result2= `./bin/lily2image -r=72 -f=jpg #{fp}.ly 2>&1`  
+      
+      result2= `#{settings.lily2image} -r=72 -f=jpg #{fp}.ly 2>&1`  
       result=result+result2
       # may create files like: bansuriv3-page1.jpeg
       # lilypond will create files like untitled_1319780034-page1.jpeg
