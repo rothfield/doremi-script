@@ -47,7 +47,12 @@ lookup_html_entity = (str) ->
     "[|"  : "&#x1d103" # reverse final barline
   LOOKUP[str]
 
+draw_lyrics_section=(lyrics_section) ->
+  "<div class='stave lyrics_section'>#{lyrics_section.source}</div>"
+
 draw_line= (line) ->
+  # The concept of line has expanded to include a lyrics section
+  return draw_lyrics_section(line) if line.my_type is 'lyrics_section'
   x=(draw_item(item) for item in line.items).join('')
   "<div class='stave sargam_line'>#{x}</div>"
 

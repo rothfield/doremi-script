@@ -719,6 +719,35 @@ exports.test_abc = (test) ->
   #test.ok(x.indexOf('kommal_indicator') > -1,"#{x} -line should have kommal indicator")
   test.done()
 
+exports.test_lyrics_section = (test) ->
+  debug=true
+  str1 = '''
+Title: Happy Birthday to You 
+  
+  Happy birthday to you
+  Happy birthday to you
+  Happy birthday dear Ji-im
+  Happy birthday to you
+
+| -- -- P-P | D P S | N
+        . .   . .     .
+'''
+  str = '''
+  Hello
+
+| S
+'''
+  composition = test_parses(str,test)
+  #_.info("in test_lyrics_section composition is #{composition}")
+  #_.info("in test_lyrics_section composition.lyrics_sections is #{composition.lyrics_sections}")
+  test.equal(composition.lines[0].my_type,"lyrics_section","First 'line' should be lyrics_section")
+  #console.log JSON.stringify(composition.lines[0],null," ")
+  #test.equal(1, composition.lyrics_sections.length,"composition should have a lyrics_sections attribute")
+  #test.ok(composition.title, composition.lyrics_sections,"composition should have a lyrics_sections attribute")
+  #test.ok(composition.title, composition.lyrics_sections[0].source.indexOf( )
+  debug=false
+  test.done()
+
 exports.test_title = (test) ->
   str = '''
 Title: The entertainer 

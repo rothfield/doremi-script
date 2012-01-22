@@ -1,12 +1,21 @@
 debug=false
 
 root = exports ? this
+if exports?
+  Hypher=require('./third_party/hypher/hypher.js')
+  english = require('./third_party/hyphenation_patterns/en-us.js')
+else
+  english=window.english
+  Hypher=window.Hypher
+
+hypher = new Hypher(english,{minLength:1})
 
 
 root.ParserHelper=
   # THESE METHODS WILL GET MIXED IN THE PEG PARSER (for now)
   # look at top of peg parser, need to manually add new methods for now
 
+  hypher: hypher
 
   sa_helper: (source,normalized) ->
     # save a little typing
@@ -30,7 +39,38 @@ root.ParserHelper=
         slurring_state=true if item_has_attribute item,'begin_slur'
         slurring_state=false if item_has_attribute item,'end_slur'
       
+  parse_lyrics_section: (lyrics_lines) ->
+    console.log "parse_lyrics_section"
+    if lyrics_lines is ""
+      source=""
+    else
+      source= (line.source for line in lyrics_lines).join("\n")
+
+    all_words=(for line in lyrics_lines
+      # should it be item.word? TODO:review
+      item.syllable for item in line.items when item.my_type is "syllable")
+    all_words= _.flatten all_words
+    hy_ary=[]
+    hyphenated_words=(
+      for word in all_words
+        result=hypher.hyphenate(word.toLowerCase()))
+    hyphenated_words= _.flatten hyphenated_words
+    hyphenated_words= hypher.hyphenateText(all_words.join(' '))
+    soft_hyphen="\u00AD"
+    hyphenated_words= hyphenated_words.split(soft_hyphen).join('-')
+
+    {
+       my_type: "lyrics_section"
+       source: source
+       lyrics_lines: lyrics_lines
+       line_warnings: [] # HACK. Add these attributes so it looks like line
+       items:[]
+       all_words:all_words
+       hyphenated_words: hyphenated_words # hyphenated_words or hyphenated_syllables
+    }
+
   parse_line: (uppers,sargam,lowers,lyrics) ->
+    @line_warnings=[] # reset global
     lyrics = '' if lyrics.length is 0
     lowers= '' if  lowers.length is 0
     uppers= '' if  uppers.length is 0
@@ -56,10 +96,22 @@ root.ParserHelper=
     my_lowers=_.flatten(_.compact([lowers]))
     attribute_lines=_.flatten(_.compact([uppers,lowers,lyrics]))
     this.assign_attributes(sargam,attribute_lines)
+    # TODO: Have this done using lyrics section! at a top level
     this.assign_lyrics(sargam,lyrics)
+    sargam.line_warnings=@line_warnings
     sargam
 
+  assign_syllables_from_lyrics_sections :(composition) ->
+    console.log "assign_syllables_from_lyrics_sections"
+    syls=[]
+    for line in composition.lines
+      if line.my_type is "lyrics_section"
+        syls.concat line.all_syllables
+
   parse_composition: (attributes,lines) ->
+    #lines= (x for x in my_lines when x.my_type isnt 'lyrics_section')
+    #lyrics_sections= (x for x in my_lines when x.my_type is 'lyrics_section')
+    #console.log "lyrics_sections",lyrics_sections
     ctr=0
     line.index=ctr++ for line in lines
     attributes=null if (attributes=="")
@@ -85,7 +137,7 @@ root.ParserHelper=
     x=get_composition_attribute(@composition_data,"NotesUsed")
     valid=true
     if x? and (/^[sSrRgGmMpPdDnN]*$/.test(x) is false)
-       warnings.push("ForceSargamChars should be all sargam characters, for example 'SrGmMdN'")
+       this.warnings.push("ForceSargamChars should be all sargam characters, for example 'SrGmMdN'")
        valid=false
     @composition_data.notes_used = x  || ""
     hash={}
@@ -109,18 +161,18 @@ root.ParserHelper=
     @composition_data.mode = x or "major"
     x=get_composition_attribute(@composition_data,"Key")
     if  x? and ! valid_abc_pitch(x)
-       warnings.push("Invalid key #{x}. Valid keys are C,D,Eb,F# etc")
+       this.warnings.push("Invalid key #{x}. Valid keys are C,D,Eb,F# etc")
        x="C"
     # TODO: put key validations here?
     @composition_data.key = x or "C"
     x=get_composition_attribute(@composition_data,"Filename")
     if x? and x isnt ""
       if (/^[a-zA-Z0-9_]+$/.test(x) is false)
-        warnings.push("Filename must consist of alphanumeric characters plus underscores only")
+        this.warnings.push("Filename must consist of alphanumeric characters plus underscores only")
         x="untitled"
     @composition_data.filename = x or "untitled"
     x=get_composition_attribute(@composition_data,"Title")
-    @composition_data.title= x or "Untitled"
+    @composition_data.title= x or "" # "Untitled"
     x=get_composition_attribute(@composition_data,"Source")
     @composition_data.source= x or ""
     x=get_composition_attribute(@composition_data,"Author")
@@ -130,6 +182,7 @@ root.ParserHelper=
     x=get_composition_attribute(@composition_data,"staff_notation_url")
     @composition_data.staff_notation_url= x if x?
     @mark_partial_measures()
+    assign_syllables_from_lyrics_sections :(@composition_data)
     @composition_data
   
   parse_sargam_pitch: (begin_slur,musical_char,end_slur) ->
@@ -241,6 +294,7 @@ root.ParserHelper=
 
   mark_partial_measures: ()->
     for sargam_line in @composition_data.lines
+      continue if sargam_line.my_type is 'lyrics_section'
       @log "processing #{sargam_line.source}"
       measures=  (item for item in sargam_line.items when item.my_type is "measure")
       @log 'mark_partial_measures: measures', measures
@@ -380,7 +434,7 @@ root.ParserHelper=
     y= _.select ary,  (item) =>
       item_has_attribute item,'end_slur'
     if x.length isnt y.length
-      @warnings.push "Error on line ? unbalanced parens, line was #{line.source} Note that parens are used for slurs and should bracket pitches as so (S--- R)--- and NOT  (S--) "
+      this.push_warning "Error on line ? unbalanced parens, line was #{line.source} Note that parens are used for slurs and should bracket pitches as so (S--- R)--- and NOT  (S--) "
       return true
     false
 
@@ -433,9 +487,13 @@ root.ParserHelper=
       s.attributes = [] if !s.attributes?
       s.attributes.push(ornament)
       return
-    @warnings.push "#{ornament.my_type} (#{ornament.source}) not to right "+
+    this.push_warning "#{ornament.my_type} (#{ornament.source}) not to right "+
             "or left of pitch , column is #{ornament.column}"
 
+
+  push_warning: (str) ->
+    @warnings.push str
+    @line_warnings.push str
 
   check_semantics: (sargam,sarg_obj,attribute,sargam_nodes) ->
     # return false if the attribute is not to be added to sarg_obj
@@ -450,7 +508,7 @@ root.ParserHelper=
       handle_ornament(sargam,sarg_obj,attribute,sargam_nodes)
       return false
     if (!sarg_obj)
-      @warnings.push "Attribute #{attribute.my_type} (#{attribute.source}) above/below nothing, column is #{attribute.column}"
+      push_warning "Attribute #{attribute.my_type} (#{attribute.source}) above/below nothing, column is #{attribute.column}"
       return false
     if attribute.my_type is "kommal_indicator"
       # TODO: review
@@ -458,18 +516,18 @@ root.ParserHelper=
       if srgmpdn_in_devanagri.indexOf(sarg_obj.source) > -1
         sarg_obj.normalized_pitch=sarg_obj.normalized_pitch+"b"
         return true
-      @warnings.push "Error on line ?, column "+sarg_obj.column + "kommal indicator below non-devanagri pitch. Type of obj was #{sarg_obj.my_type}. sargam line was:"+sargam.source
+      push_warning "Error on line ?, column "+sarg_obj.column + "kommal indicator below non-devanagri pitch. Type of obj was #{sarg_obj.my_type}. sargam line was:"+sargam.source
       return false
       #if sarg_obj.source 
     if attribute.octave?
       if (sarg_obj.my_type isnt 'pitch')
-        @warnings.push "Error on line ?, column "+sarg_obj.column + "#{attribute.my_type} below non-pitch. Type of obj was #{sarg_obj.my_type}. sargam line was:"+sargam.source
+        push_warning "Error on line ?, column "+sarg_obj.column + "#{attribute.my_type} below non-pitch. Type of obj was #{sarg_obj.my_type}. sargam line was:"+sargam.source
         return false
       sarg_obj.octave=attribute.octave
       return false # as we consumed the attribute
     if attribute.syllable?
       if (sarg_obj.my_type isnt 'pitch')
-        @warnings.push "Error on line ?, column "+sarg_obj.column + "syllable #{attribute.syllable} below non-pitch. Type of obj was #{sarg_obj.my_type}. sargam line was:"+sargam.source
+        push_warning "Error on line ?, column "+sarg_obj.column + "syllable #{attribute.syllable} below non-pitch. Type of obj was #{sarg_obj.my_type}. sargam line was:"+sargam.source
         return false
       sarg_obj.syllable=attribute.syllable
       return false # as we consumed the attribute

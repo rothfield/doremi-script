@@ -175,6 +175,7 @@ lilypond_grace_note_pitch = (pitch) ->
   "#{lilypond_pitch}#{lilypond_octave}#{duration}"
 
 lilypond_grace_notes = (ornament) ->
+  # TODO: review whether there should be a slur or not
   # generate a series of grace notes for an ornament
   #  c1 \afterGrace d1( { c16[ d]) } c1
   #  In the above line, generate what is between {}
@@ -256,7 +257,8 @@ normalized_pitch_to_lilypond= (pitch) ->
   grace1=grace2=grace_notes=""
   if ornament?.placement is "after"
     grace1 = "\\afterGrace "
-    grace2="( { #{lilypond_grace_notes(ornament)}) }"
+    #grace2="( { #{lilypond_grace_notes(ornament)}) }"
+    grace2=" { #{lilypond_grace_notes(ornament)} }"
   if ornament?.placement is "before"
   #  \acciaccatura { e16 d16 } c4
     grace1= "\\acciaccatura {#{lilypond_grace_notes(ornament)}}"
