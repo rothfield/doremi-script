@@ -24,6 +24,21 @@ root.ParserHelper=
       normalized_pitch:normalized
     obj
 
+
+  assign_lyrics2: (sargam,syls) ->
+    return if !syls
+    return if syls is ""
+    slurring_state=false
+
+    for item in this.all_items(sargam)
+      do (item) =>
+        return if item.my_type != "pitch"
+        return if syls.length is 0
+        if !slurring_state
+          item.syllable = syls.shift()
+        slurring_state=true if item_has_attribute item,'begin_slur'
+        slurring_state=false if item_has_attribute item,'end_slur'
+
   assign_lyrics: (sargam,lyrics) ->
     return if !lyrics?
     return if lyrics is ""
@@ -58,7 +73,6 @@ root.ParserHelper=
     hyphenated_words= hypher.hyphenateText(all_words.join(' '))
     soft_hyphen="\u00AD"
     hyphenated_words= hyphenated_words.split(soft_hyphen).join('-')
-
     {
        my_type: "lyrics_section"
        source: source
@@ -107,6 +121,8 @@ root.ParserHelper=
     for line in composition.lines
       if line.my_type is "lyrics_section"
         syls.concat line.all_syllables
+      if line.my_type is "sargam_line"
+        this.assign_lyrics2 line,syls
 
   parse_composition: (attributes,lines) ->
     #lines= (x for x in my_lines when x.my_type isnt 'lyrics_section')
@@ -125,6 +141,7 @@ root.ParserHelper=
       "\n#{str}"
     @composition_data =
       my_type:"composition"
+      apply_hyphenated_lyrics:false
       title:""
       filename: ""
       attributes: attributes
@@ -170,6 +187,7 @@ root.ParserHelper=
       if (/^[a-zA-Z0-9_]+$/.test(x) is false)
         this.warnings.push("Filename must consist of alphanumeric characters plus underscores only")
         x="untitled"
+    # TODO: dry or simply put all attributes the same way!
     @composition_data.filename = x or "untitled"
     x=get_composition_attribute(@composition_data,"Title")
     @composition_data.title= x or "" # "Untitled"
@@ -181,8 +199,14 @@ root.ParserHelper=
     @composition_data.raga= x if x?
     x=get_composition_attribute(@composition_data,"staff_notation_url")
     @composition_data.staff_notation_url= x if x?
+    x=get_composition_attribute(@composition_data,"ApplyHyphenatedLyrics")
+    if x="true"
+      x=true
+    else
+      x=false
+    @composition_data.apply_hyphenated_lyrics =  x or false 
     @mark_partial_measures()
-    assign_syllables_from_lyrics_sections :(@composition_data)
+    assign_syllables_from_lyrics_sections(@composition_data) if  @composition_data.apply_hyphenated_lyrics
     @composition_data
   
   parse_sargam_pitch: (begin_slur,musical_char,end_slur) ->

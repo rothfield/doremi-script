@@ -719,6 +719,21 @@ exports.test_abc = (test) ->
   #test.ok(x.indexOf('kommal_indicator') > -1,"#{x} -line should have kommal indicator")
   test.done()
 
+exports.test_apply_hyphenated_lyrics_attribute =(test) ->
+  debug=true
+  str = '''
+  ApplyHyphenatedLyrics: true
+
+  Hello
+
+  | S R
+  '''
+  composition = test_parses(str,test)
+  test.equal(composition.lines[0].my_type,"lyrics_section","First 'line' should be lyrics_section")
+  test.equal(composition[x="apply_hyphenated_lyrics"],true,"#{x} attribute of composition should have been set true")
+  debug=false
+  test.done()
+ 
 exports.test_lyrics_section = (test) ->
   debug=true
   str1 = '''
