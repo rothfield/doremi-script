@@ -7,8 +7,9 @@ if exports?
 else
   english=window.english
   Hypher=window.Hypher
-
-hypher = new Hypher(english,{minLength:1})
+#hypher = new Hypher(english,{ leftmin:2, rightmin:2, minLength:1})
+# Had to add leftmin and rightmin to en-us. TODO: review
+hypher = new Hypher(english,{ minLength:1})
 
 
 root.ParserHelper=
@@ -25,19 +26,6 @@ root.ParserHelper=
     obj
 
 
-  assign_lyrics2: (sargam,syls) ->
-    return if !syls
-    return if syls is ""
-    slurring_state=false
-
-    for item in this.all_items(sargam)
-      do (item) =>
-        return if item.my_type != "pitch"
-        return if syls.length is 0
-        if !slurring_state
-          item.syllable = syls.shift()
-        slurring_state=true if item_has_attribute item,'begin_slur'
-        slurring_state=false if item_has_attribute item,'end_slur'
 
   assign_lyrics: (sargam,lyrics) ->
     return if !lyrics?
@@ -72,7 +60,11 @@ root.ParserHelper=
     hyphenated_words= _.flatten hyphenated_words
     hyphenated_words= hypher.hyphenateText(all_words.join(' '))
     soft_hyphen="\u00AD"
-    hyphenated_words= hyphenated_words.split(soft_hyphen).join('-')
+    hyphenated_words_str= hyphenated_words.split(soft_hyphen).join('-')
+    regex = new RegExp /([^ -]+)/
+    regex=/([^- ]+[- ]?)/g
+    hyphenated_words=hyphenated_words_str.match regex
+    console.log hyphenated_words
     {
        my_type: "lyrics_section"
        source: source
@@ -115,12 +107,29 @@ root.ParserHelper=
     sargam.line_warnings=@line_warnings
     sargam
 
+  assign_lyrics2: (sargam,syls) ->
+    console.log("entering assign_lyrics2-syls is",syls)
+    console.log("entering assign_lyrics2-sargam is",sargam)
+    return if !syls
+    return if syls is ""
+    slurring_state=false
+
+    for item in this.all_items(sargam)
+      do (item) =>
+        return if item.my_type != "pitch"
+        return if syls.length is 0
+        if !slurring_state
+          item.syllable = syls.shift()
+        slurring_state=true if item_has_attribute item,'begin_slur'
+        slurring_state=false if item_has_attribute item,'end_slur'
+
   assign_syllables_from_lyrics_sections :(composition) ->
-    console.log "assign_syllables_from_lyrics_sections"
+    console.log "entering assign_syllables_from_lyrics_sections"
     syls=[]
     for line in composition.lines
+      console.log "in for loop, line is", line.my_type
       if line.my_type is "lyrics_section"
-        syls.concat line.all_syllables
+        syls= syls.concat line.hyphenated_words
       if line.my_type is "sargam_line"
         this.assign_lyrics2 line,syls
 
