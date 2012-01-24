@@ -56,8 +56,8 @@ class LilypondServer < Sinatra::Application
     # The -f stops rm from generating an error message
     `rm -f #{fp}-page*png`
     File.open("#{fp}.ly", 'w') {|f| f.write(lilypond) }
-    File.open("#{archive}.txt", 'w') {|f| f.write(doremi_script_source) }
-    File.open("#{fp}.txt", 'w') {|f| f.write(doremi_script_source) }
+    File.open("#{archive}.doremi_script.txt", 'w') {|f| f.write(doremi_script_source) }
+    File.open("#{fp}.doremi_script.txt", 'w') {|f| f.write(doremi_script_source) }
     result=`lilypond -o #{fp} #{fp}.ly  2>&1`
       #########################3
       #
