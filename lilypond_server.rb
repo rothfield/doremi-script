@@ -35,7 +35,7 @@ class LilypondServer < Sinatra::Application
   
   
   get '/' do
-    "#{ENV["SHELL"]} - ENV[PATH] is   #{ ENV["PATH"]} - whoami is #{`whoami`} - pwd is #{`pwd`} - Usage: get /lilypond_to_jpg?fname=..&lilypond=...&doremi_script_source="
+    "#{ENV["SHELL"]} - ENV[PATH] is   #{ ENV["PATH"]} - whoami is #{`whoami`} - pwd is #{`pwd`} - Usage: get /lilypond_to_jpg?fname=..&lilypond=...&doremi_source="
   end
   
   post '/lilypond_to_jpg' do
@@ -45,7 +45,7 @@ class LilypondServer < Sinatra::Application
     return "no lilypond param" if !params["lilypond"]
     return "no fname param" if !params["fname"]
     lilypond=params["lilypond"]
-    doremi_script_source=params["doremi_script_source"]
+    doremi_source=params["doremi_source"]
     filename=params["fname"] || ""
     simple_file_name=sanitize_filename(filename)
     fname="#{simple_file_name}"
@@ -56,8 +56,8 @@ class LilypondServer < Sinatra::Application
     # The -f stops rm from generating an error message
     `rm -f #{fp}-page*png`
     File.open("#{fp}.ly", 'w') {|f| f.write(lilypond) }
-    File.open("#{archive}.doremi_script.txt", 'w') {|f| f.write(doremi_script_source) }
-    File.open("#{fp}.doremi_script.txt", 'w') {|f| f.write(doremi_script_source) }
+    File.open("#{archive}.doremi_script.txt", 'w') {|f| f.write(doremi_source) }
+    File.open("#{fp}.doremi_script.txt", 'w') {|f| f.write(doremi_source) }
     result=`lilypond -o #{fp} #{fp}.ly  2>&1`
       #########################3
       #
