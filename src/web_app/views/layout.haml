@@ -25,6 +25,17 @@
     %script{:src => "/js/third_party/jquery.js", :type => "text/javascript"}
     %script{:src => "/js/third_party/jquery.autogrow-textarea.js", :type => "text/javascript"}
     %script{:src => "/js/third_party/underscore.js", :type => "text/javascript"}
+    <script type="text/javascript">
+    // Hack part 1- to make Hypher.js work in the browser.
+    window.module= {exports:[]}
+    </script>
+    %script{:src => "js/third_party/hypher/hypher.js", :type => "text/javascript"}
+    %script{:src => "js/third_party/hyphenation_patterns/en-us.js", :type => "text/javascript"}
+    <script type="text/javascript">
+    // Hack part 2 to make Hypher.js work in the browser
+    window.english=window.module.exports 
+    window.module=undefined;
+    </script>
     %script{:src => "/js/underscore.logger.js", :type => "text/javascript"}
     %script{:src => "/js/shims.js", :type => "text/javascript"}
     %script{:src => "/js/all_items.js", :type => "text/javascript"}

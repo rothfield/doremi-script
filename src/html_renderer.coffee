@@ -48,7 +48,8 @@ lookup_html_entity = (str) ->
   LOOKUP[str]
 
 draw_lyrics_section=(lyrics_section) ->
-  "<div class='stave lyrics_section'>#{lyrics_section.source}</div>"
+  without_dashes=lyrics_section.source.replace(/-/g,'')
+  "<div title='Lyrics Section' class='stave lyrics_section'>#{without_dashes}</div>"
 
 draw_line= (line) ->
   # The concept of line has expanded to include a lyrics section
@@ -282,7 +283,9 @@ line_to_html= (line) ->
   draw_line(line)
   #"<div class='composition'>#{line}</div>"
 
+
 to_html= (composition) ->
+  # composition is the parsed composition
   # returns the text of an html div rendering the composition.
   attrs=draw_attributes(composition.attributes)
   lines=(draw_line(item) for item in composition.lines).join('\n')

@@ -724,7 +724,7 @@ exports.test_apply_hyphenated_lyrics_attribute =(test) ->
   str = '''
   ApplyHyphenatedLyrics: true
 
-  Hello john
+  Hello john many zany egos
 
   | SRG
   '''
@@ -732,6 +732,20 @@ exports.test_apply_hyphenated_lyrics_attribute =(test) ->
   test.equal(composition.lines[0].my_type,"lyrics_section","First 'line' should be lyrics_section")
   test.equal(composition[x="apply_hyphenated_lyrics"],true,"#{x} attribute of composition should have been set true")
   my_inspect(composition)
+  debug=false
+  test.done()
+  
+exports.test_id = (test) ->
+  debug=true
+  id=1234
+  str = """
+Title: Happy Birthday to You 
+id: #{id}
+  
+| S |
+"""
+  composition = test_parses(str,test)
+  test.equal(composition.id,id,"expected id to be #{id}")
   debug=false
   test.done()
  
