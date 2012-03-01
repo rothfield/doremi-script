@@ -20,7 +20,7 @@ class LilypondServer < Sinatra::Application
     name=filename.strip
      # NOTE: File.basename doesn't work right with Windows paths on Unix
      # get only the filename, not the whole path
-     name.gsub! /^.*(\\|\/)/, ''
+     name.gsub!(/^.*(\\|\/)/, '')
   
      # Finally, replace all non alphanumeric, underscore 
      # or periods with underscore
@@ -39,6 +39,7 @@ class LilypondServer < Sinatra::Application
   end
   
   post '/lilypond_to_jpg' do
+    #return "#{params.inspect}"
     puts "in lilypond_to_jpg, params are #{params.inspect}"
     comp=settings.comp
     dir=File.join('public','compositions')
@@ -46,6 +47,8 @@ class LilypondServer < Sinatra::Application
     return "no fname param" if !params["fname"]
     lilypond=params["lilypond"]
     doremi_source=params["doremi_source"]
+    musicxml_source=params["musicxml_source"]
+    html_doc=params["html_doc"] || ""
     filename=params["fname"] || ""
     simple_file_name=sanitize_filename(filename)
     fname="#{simple_file_name}"
@@ -54,57 +57,53 @@ class LilypondServer < Sinatra::Application
     fp= "#{comp}/#{fname}"
     archive="#{comp}/#{simple_file_name}_backup_#{Time.new.to_i}"
     # The -f stops rm from generating an error message
-    `rm -f #{fp}-page*png`
-    File.open("#{fp}.ly", 'w') {|f| f.write(lilypond) }
-    File.open("#{archive}.doremi_script.txt", 'w') {|f| f.write(doremi_source) }
-    File.open("#{fp}.doremi_script.txt", 'w') {|f| f.write(doremi_source) }
-    result=`lilypond -o #{fp} #{fp}.ly  2>&1`
-      #########################3
-      #
-      # Use lily2image to create better images for web
-      #  http://code.google.com/p/lily2image/
-      #  Requires lilypond 2.12.3  !!!!! and nbm
-      #
-      ########################
+      File.open("#{fp}.ly", 'w') {|f| f.write(lilypond) }
+      File.open("#{archive}.doremi_script.txt", 'w') {|f| f.write(doremi_source) }
+      File.open("#{fp}.doremi_script.txt", 'w') {|f| f.write(doremi_source) }
+      File.open("#{fp}.xml", 'w') {|f| f.write(musicxml_source) }
+      File.open("#{fp}.html", 'w') {|f| f.write(html_doc) }
+      if params["dont_generate_staff_notation"] !="true"
+        
+      `rm -f #{fp}-page*png`
+      result=`lilypond -o #{fp} #{fp}.ly  2>&1`
+        #########################3
+        #
+        # Use lily2image to create better images for web
+        #  http://code.google.com/p/lily2image/
+        #  Requires lilypond 2.12.3  !!!!! and nbm
+        #
+        ########################
+        
+        result2= `#{settings.lily2image} -r=72 -f=jpg #{fp}.ly 2>&1`  
+        result=result+result2
+        # may create files like: bansuriv3-page1.jpeg
+        # lilypond will create files like untitled_1319780034-page1.jpeg
+        # if piece is long
+        ####################################3
+        #
+        # COMBINE MULTI-PAGE jpegs if multiple pages
+        # REQUIRES IMAGEMAGICK
+        #
+        ###################################
+        page1="#{fp}-page1.jpeg"
+        if File.file? page1
+          puts "converting multiple pages using convert. #{fp}-page*.jpeg"
+          `convert #{fp}-page*.jpeg -append #{fp}.jpeg`
+        end
+        `mv  #{fp}.jpeg #{fp}.jpg`
+      error=false
       
-      result2= `#{settings.lily2image} -r=72 -f=jpg #{fp}.ly 2>&1`  
-      result=result+result2
-      # may create files like: bansuriv3-page1.jpeg
-      # lilypond will create files like untitled_1319780034-page1.jpeg
-      # if piece is long
-      ####################################3
-      #
-      # COMBINE MULTI-PAGE jpegs if multiple pages
-      # REQUIRES IMAGEMAGICK
-      #
-      ###################################
-      page1="#{fp}-page1.jpeg"
-      if File.file? page1
-        puts "converting multiple pages using convert. #{fp}-page*.jpeg"
-        `convert #{fp}-page*.jpeg -append #{fp}.jpeg`
+      if $?.exitstatus > 0 # failed
+        error=true
+        fname=""
       end
-      `mv  #{fp}.jpeg #{fp}.jpg`
-    error=false
-    
+      `rm #{fp}.ps`
+      end
     fname = "/compositions/#{fname}.jpg"
-    if $?.exitstatus > 0 # failed
-      error=true
-      fname=""
-    end
-    `rm #{fp}.ps`
     `cp #{fp}.ly #{comp}/last.ly`
     json={:error => error, 
      :fname => fname,
      :lilypond_output => result
     }.to_json
-    callback = params.delete('callback') # jsonp
-    if callback
-      content_type :js
-      response = "#{callback}(#{json})" 
-    else
-      content_type :json
-      response = json
-    end
-    response
   end
 end 
