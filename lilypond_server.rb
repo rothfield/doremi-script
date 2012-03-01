@@ -39,8 +39,6 @@ class LilypondServer < Sinatra::Application
   end
   
   post '/lilypond_to_jpg' do
-    #return "#{params.inspect}"
-    puts "in lilypond_to_jpg, params are #{params.inspect}"
     comp=settings.comp
     dir=File.join('public','compositions')
     return "no lilypond param" if !params["lilypond"]
@@ -50,6 +48,7 @@ class LilypondServer < Sinatra::Application
     musicxml_source=params["musicxml_source"]
     html_doc=params["html_doc"] || ""
     filename=params["fname"] || ""
+    dont=params["dont_generate_staff_notation"] == "true" 
     simple_file_name=sanitize_filename(filename)
     fname="#{simple_file_name}"
     archive="#{simple_file_name}_#{Time.new.to_i}"
@@ -62,8 +61,7 @@ class LilypondServer < Sinatra::Application
       File.open("#{fp}.doremi_script.txt", 'w') {|f| f.write(doremi_source) }
       File.open("#{fp}.xml", 'w') {|f| f.write(musicxml_source) }
       File.open("#{fp}.html", 'w') {|f| f.write(html_doc) }
-      if params["dont_generate_staff_notation"] !="true"
-        
+      if !dont
       `rm -f #{fp}-page*png`
       result=`lilypond -o #{fp} #{fp}.ly  2>&1`
         #########################3
