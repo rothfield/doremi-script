@@ -1,6 +1,0 @@
-ForceSargamChars: SrGmMdN
-Raga: Lalit
-Filename: lalit
-
-| N r G mM | mmmm
-  .

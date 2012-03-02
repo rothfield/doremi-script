@@ -7,12 +7,9 @@ LIB_DIR=./lib/doremi-script/
 LIB=./lib/doremi-script/doremi_script_parser.js
 LIB2=./lib/doremi-script/doremi_script_line_parser.js
 echo "building parser and line parser to $LIB_DIR"
-WEBAPP=./src/web_app/public/js/
 echo "Running pegjs on $GRAMMAR to create parser in $LIB"
 $PEGJS -e DoremiScriptParser ./src/$GRAMMAR $LIB 
 $PEGJS -e DoremiScriptLineParser ./src/line.peg.js $LIB2 
-echo "copying to $WEBAPP"
-cp $LIB $WEBAPP
 
 
 

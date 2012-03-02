@@ -1,8 +1,0 @@
-ForceSargamChars: SrGmMdN
-Raga: Lalit
-Filename: lalit1.
-
-Happy birthday
-
-| N r G mM | mmmm
-  .
