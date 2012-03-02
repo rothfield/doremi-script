@@ -4,18 +4,18 @@ var fs = require('fs');
 sys = require('sys')
 var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 
-_console = require(lib+'/doremi-script/underscore.logger.js') 
+_console = require(lib+'/doremi-script-base/underscore.logger.js') 
 _console.level  = _console.constructor.WARN
 _ = require("underscore")._ 
 _.mixin(_console.toObject())
 
-require(lib+'/doremi-script/doremi_script_parser.js')
-css=fs.readFileSync(lib+'/doremi-script/css/application.css','utf8').toString()
+require(lib+'/doremi-script-base/doremi_script_parser.js')
+css=fs.readFileSync(lib+'/doremi-script-base/css/application.css','utf8').toString()
 // js/third_party/zepto.unminified.js'
-var js=fs.readFileSync(lib+'/doremi-script/third_party/zepto.unminified.js','utf8').toString()
-var more_js=fs.readFileSync(lib+'/doremi-script/dom_fixer.js','utf8').toString()
+var js=fs.readFileSync(lib+'/doremi-script-base/third_party/zepto.unminified.js','utf8').toString()
+var more_js=fs.readFileSync(lib+'/doremi-script-base/dom_fixer.js','utf8').toString()
 var parser=DoremiScriptParser
-var to_html=require(lib+'/doremi-script/html_renderer.js').to_html
+var to_html=require(lib+'/doremi-script-base/html_renderer.js').to_html
 var source= fs.readFileSync('/dev/stdin').toString()
 var composition=parser.parse(source)
 process.stdout.write(to_html(composition))

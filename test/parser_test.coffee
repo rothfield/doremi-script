@@ -1,4 +1,4 @@
-root = exports ? this
+root =exports ? this
 
 debug=false
 global._console ||= require('./underscore.logger.js') if global?
@@ -27,7 +27,7 @@ _.mixin(_console.toObject())
 
 my_inspect = (x) ->
   return if !debug?
-  console.log "debug is #{debug}"
+  #console.log "debug is #{debug}"
   return if !debug
   return if !JSON?
   console.log(JSON.stringify(arg,null," ")) for arg in arguments
@@ -62,9 +62,9 @@ first_line = (composition_data) ->
     composition_data.lines[0]
 
 test_parses = (str,test,msg="") ->
-  _.debug("Entering test_parses, str is #{str}")
+  _.debug("Entering test_parses, str is #{str}") if false
   composition=parser.parse(str)
-  _.debug("in test_parses,composition is #{composition}")
+  _.debug("in test_parses,composition is #{composition}") if false
   composition
   ###
   test.doesNotThrow(-> result=parser.parse(str))
@@ -710,17 +710,18 @@ exports.test_kommal_indicator = (test) ->
   test.done()
 
 exports.test_abc = (test) ->
+  console.log "entering test_abc"
   str = '''
         C#D#F#G#A#B#DbEbGbAbBbCC#DbDD#EbEFF#GbGAbAA#BbBB# 
         '''
   composition = test_parses(str,test)
   line=first_sargam_line(composition)
-  x=sys.inspect(line,true,null)
+  #x=sys.inspect(line,true,null) if false
   #test.ok(x.indexOf('kommal_indicator') > -1,"#{x} -line should have kommal indicator")
   test.done()
 
 exports.test_apply_hyphenated_lyrics_attribute =(test) ->
-  debug=true
+  debug=false
   str = '''
   ApplyHyphenatedLyrics: true
 

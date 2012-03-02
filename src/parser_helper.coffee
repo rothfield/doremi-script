@@ -528,7 +528,7 @@ root.ParserHelper=
 
 
   push_warning: (str) ->
-    console.log "in push_warning, str=",str
+    #console.log "in push_warning, str=",str
     @warnings.push str
     @line_warnings.push str
 
