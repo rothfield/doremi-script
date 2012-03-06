@@ -3,12 +3,12 @@ var path = require('path');
 var fs = require('fs');
 var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 
-_console = require(lib+'/doremi-script-base/underscore.logger.js') 
+_console = require(lib+'/doremi_script_base/underscore.logger.js') 
 _console.level  = _console.constructor.WARN
 _ = require("underscore")._ 
 _.mixin(_console.toObject())
 
-require(lib+'/doremi-script-base/doremi_script_line_parser.js')
+require(lib+'/doremi_script_base/doremi_script_line_parser.js')
 var parser=DoremiScriptLineParser
 var source= fs.readFileSync('/dev/stdin').toString()
 var composition=parser.parse(source)

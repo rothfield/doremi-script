@@ -3,9 +3,9 @@
 # Puts compiled grammar into both lib and the web app public directory
 PEGJS=./node_modules/pegjs/bin/pegjs
 GRAMMAR=doremiscript.peg.js
-LIB_DIR=./lib/doremi-script-base/
-LIB=./lib/doremi-script-base/doremi_script_parser.js
-LIB2=./lib/doremi-script-base/doremi_script_line_parser.js
+LIB_DIR=./lib/doremi_script_base/
+LIB=./lib/doremi_script_base/doremi_script_parser.js
+LIB2=./lib/doremi_script_base/doremi_script_line_parser.js
 echo "building parser and line parser to $LIB_DIR"
 echo "Running pegjs on $GRAMMAR to create parser in $LIB"
 $PEGJS -e DoremiScriptParser ./src/$GRAMMAR $LIB 

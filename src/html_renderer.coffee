@@ -48,8 +48,11 @@ lookup_html_entity = (str) ->
   LOOKUP[str]
 
 draw_lyrics_section=(lyrics_section) ->
-  without_dashes=lyrics_section.source.replace(/-/g,'')
-  "<div title='Lyrics Section' class='stave lyrics_section'>#{without_dashes}</div>"
+  # For now, display hyphens
+  without_dashes=lyrics_section.unhyphenated_source.replace(/-/g,'')
+  #without_dashes=lyrics_section.source
+  x="<div title='Lyrics Section' class='stave lyrics_section unhyphenated'>#{lyrics_section.unhyphenated_source}</div>"
+  x+"<div title='Lyrics Section' class='stave lyrics_section hyphenated'>#{lyrics_section.hyphenated_source}</div>"
 
 draw_line= (line) ->
   # The concept of line has expanded to include a lyrics section
@@ -182,7 +185,9 @@ draw_item= (item) ->
     simple=lookup_simple(item.source)
     fallback="data-fallback-if-no-utf8-chars='#{simple}'"
   my_source=if source2? then source2 else item.source
-  my_source=(Array(item.source.length+1).join "&nbsp;") if item.my_type=="whitespace"
+  #my_source=(Array(item.source.length+1).join "&nbsp;") if item.my_type=="whitespace"
+  #### HANDLING OF WHITESPACE - 3/2/2012 whitespace is now considered insignificant. Only output 1 space
+  my_source="&nbsp;" if item.my_type=="whitespace"
   my_source="" if !my_source?
   title=""
   upper_attributes_html=""

@@ -56,7 +56,10 @@ parse_without_reporting_error = (str) ->
     _.debug("Didn't parse")
 
 first_sargam_line =  (composition_data) ->
-    composition_data.lines[0]
+  console.log "entering first_sargam_line, composition_data is #{my_inspect(composition_data)}"
+  #console.log "entering first_sargam_line, composition_data.lines is #{my_inspect(composition_data['lines'])}"
+  result = (line for line in composition_data.lines when true ) #line.my_type is "sargam_line")
+  result[0]
 
 first_line = (composition_data) ->
     composition_data.lines[0]
@@ -332,16 +335,28 @@ exports.test_gives_warning_if_unmatched_parens_for_slurs = (test) ->
 
 exports.test_syllable_assigned_using_melismas = (test) ->
   str = '''
+  ApplyHyphenatedLyrics: true
+
+  he-llo john
+
   | (SR G)m P
-  he-llo     john 
 
   '''
   composition=test_parses(str,test)
+  lines=composition.lines
+  line=lines[1]
+  # TODO
+  test.done()
+
+exports.test_syllable = (test) ->
+  str = '''
+  | S
+    foobar
+  '''
+  composition=test_parses(str,test)
   line=first_sargam_line(composition)
-  my_pitch=utils.tree_find(line, (item) -> item.syllable is "llo" )
-  test.equal("m",my_pitch.source)
-  my_pitch=utils.tree_find(line, (item) -> item.source is "R" )
-  test.ok(!my_pitch.syllable?,"R is part of a slur SRG an should not be assigned a syllable")
+  my_pitch=utils.tree_find(line, (item) -> item.syllable is "foobar" )
+  test.equal("S",my_pitch.source)
   test.done()
 
 exports.test_upper_octave_assigned_to_note_below_it = (test) ->

@@ -8,13 +8,13 @@ var cwd=process.cwd();
 
 var filepath = path.join(cwd, filename);
 var source=fs.readFileSync(filepath, 'utf8')
-_console = require(lib+'/doremi-script-base/underscore.logger.js') 
+_console = require(lib+'/doremi_script_base/underscore.logger.js') 
 _console.level  = _console.constructor.WARN
 _ = require("underscore")._ 
 _.mixin(_console.toObject())
 
-require(lib+'/doremi-script-base/doremi_script_parser.js')
-var to_musicxml=require(lib+'/doremi-script-base/to_musicxml.js').to_musicxml
+require(lib+'/doremi_script_base/doremi_script_parser.js')
+var to_musicxml=require(lib+'/doremi_script_base/to_musicxml.js').to_musicxml
 var parser=DoremiScriptParser
 var composition=parser.parse(source)
 composition.source=source

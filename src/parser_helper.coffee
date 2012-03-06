@@ -7,7 +7,7 @@ if exports?
 else
   english=window.english
   Hypher=window.Hypher
-#hypher = new Hypher(english,{ leftmin:2, rightmin:2, minLength:1})
+#hypher = new Hypher(english,{ leftmin:2, rightmin:2, minLength:2})
 # Had to add leftmin and rightmin to en-us. TODO: review
 hypher = new Hypher(english,{ minLength:1})
 #console.log "english.leftmin,rightmin,",english.leftmin,english.rightmin
@@ -29,6 +29,7 @@ root.ParserHelper=
 
 
   assign_lyrics: (sargam,lyrics) ->
+    #console.log "entering assign_lyrics",sargam,lyrics
     return if !lyrics?
     return if lyrics is ""
     slurring_state=false
@@ -65,10 +66,18 @@ root.ParserHelper=
     regex = new RegExp /([^ -]+)/
     regex=/([^- ]+[- ]?)/g
     hyphenated_words=hyphenated_words_str.match regex
+    ary=(for line in lyrics_lines
+      hyphenated_line=hypher.hyphenateText(line.source)
+      hyphenated_line.split(soft_hyphen).join('-')
+    )
+    hyphenated_source=ary.join("\n")
+    without_dashes=source.replace(/-/g,'')
     #console.log hyphenated_words
     {
        my_type: "lyrics_section"
        source: source
+       hyphenated_source:hyphenated_source
+       unhyphenated_source:source.replace(/-/g,'')
        lyrics_lines: lyrics_lines
        line_warnings: [] # HACK. Add these attributes so it looks like line
        items:[]
@@ -81,10 +90,8 @@ root.ParserHelper=
     lyrics = '' if lyrics.length is 0
     lowers= '' if  lowers.length is 0
     uppers= '' if  uppers.length is 0
-    # doesn't include lyrics
-    my_items = _.flatten(_.compact([uppers,sargam,lowers]))
-    my_items2 = _.flatten(_.compact([uppers,sargam,lowers,lyrics]))
-    sargam.source=(x=(item.source for item in my_items2)).join("\n")
+    my_items = _.flatten(_.compact([uppers,sargam,lowers,lyrics]))
+    sargam.source=(x=(item.source for item in my_items)).join("\n")
     #add a group_line_no to each source line
     ctr=0
     for upper in uppers
@@ -104,7 +111,7 @@ root.ParserHelper=
     attribute_lines=_.flatten(_.compact([uppers,lowers,lyrics]))
     this.assign_attributes(sargam,attribute_lines)
     # TODO: Have this done using lyrics section! at a top level
-    this.assign_lyrics(sargam,lyrics)
+    #this.assign_lyrics(sargam,lyrics)
     sargam.line_warnings=@line_warnings
     sargam
 
@@ -563,9 +570,11 @@ root.ParserHelper=
       sarg_obj.octave=attribute.octave
       return false # as we consumed the attribute
     if attribute.syllable?
+      #console.log("check_semantics, syllable case")
       if (sarg_obj.my_type isnt 'pitch')
         this.push_warning "Error on line ?, column "+sarg_obj.column + " syllable #{attribute.syllable} below non-pitch. Type of obj was #{sarg_obj.my_type}. sargam line was:\n"+sargam.source
         return false
+      #console.log("setting syllable in check_semantics")
       sarg_obj.syllable=attribute.syllable
       return false # as we consumed the attribute
     true

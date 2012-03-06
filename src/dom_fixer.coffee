@@ -3,7 +3,17 @@
 # dom_fixes()
 root = exports ? this
 
+add_left_margin_to_notes_with_left_superscripts= () ->
+  $('span.note_wrapper *.ornament.placement_before').each (index) ->
+    parent=$(this).parent()
+    current_margin_left=parseInt($(parent).css('margin-left').replace('px', ''))
+    $(parent).css('margin-left',current_margin_left + $(this).width())
 
+add_right_margin_to_notes_with_right_superscripts= () ->
+  $('span.note_wrapper *.ornament.placement_after').each (index) ->
+    parent=$(this).parent()
+    current_margin_right=parseInt($(parent).css('margin-right').replace('px', ''))
+    $(parent).css('margin-right',current_margin_right + $(this).width())
 expand_note_widths_to_accomodate_syllables= () ->
   ###
        Example:
@@ -89,10 +99,13 @@ fix_before_ornaments= () ->
 
 
 dom_fixes = () ->
-  adjust_slurs_in_dom()
+  # Order matters!
   fallback_if_utf8_characters_not_supported()
   fix_before_ornaments()
+  add_left_margin_to_notes_with_left_superscripts()
+  add_right_margin_to_notes_with_right_superscripts()
   expand_note_widths_to_accomodate_syllables()
+  adjust_slurs_in_dom()
 
 root.dom_fixes=dom_fixes
 
