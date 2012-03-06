@@ -5,44 +5,29 @@ Lilypond server is a small server implemented in sinatra that provides a web api
 
 The server uses [lily2image](http://code.google.com/p/lily2image/) to create web friendly lilypond output. The generated jpg file is saved on the server under the public/compositions directory. The filename to save it under is passed in the params.
 
+For security reasons the server now does not accept the ly parameter from the browser. The ly parameter is the lilypond source which is input to lilypond. The server will generate the ly file using doremi2ly which should result in a safe lilypond file.
+
 Requirements:
 
 - LilyPond 2.12.3
 - netpbm
 - Ruby
 - Sinatra
-
-NOTE: The server serves up jsonp data. Since the lilypond source may be large and the jsonp uses 'GET', this may be a problem if the web server has limits for 'GET' data. For now I'm using the 'thin' server.
-
+- doremi-script-base -
+- doremi-script from npm
 
 
 On debian, install lilypond from source in order to get the correct version. Install netpbm via apt
 
 Usage:
 
-The api accepts json or jsonp. Here is some sample coffeescript code
-that uses jQuery and jsonP:
+The API will soon be changed to the following:
 
-      url='http://localhost:9292/lilypond_to_jpg'
-      my_data =
-        fname: "composition_#{self.id()}"
-        lilypond: lilypond_source
-        doremi_script_source: self.doremi_script_source() 
-      obj=
-        dataType : "jsonp",
-        timeout : 10000
-        type:'GET'
-        url: url
-        data: my_data
-        error: (some_data) ->
-          alert("Couldn't connect to staff notation generator server at #{url}")
-          self.staff_notation_url(NONE_URL)
-        success: (some_data,text_status) ->
-          self.generating_staff_notation(false)
-          self.composition_lilypond_output(some_data.lilypond_output)
-          if some_data.error
-            self.staff_notation_url(NONE_URL)
-            return
-          self.staff_notation_url(some_data.fname)
-      $.ajax(obj)
+The api accepts json as follows
+  {
+    doremi_source: "| S"
+    dont_generate_staff_notation: "true"
+  }
+
+
 

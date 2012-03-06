@@ -2,18 +2,21 @@ require 'sinatra'
 require 'json'
 
 class LilypondServer < Sinatra::Application
-
+  # Note: Need to install node and doremiscript tools :
+  # Something like:
+  # npm install doremi-script
+  # Note: had to do the following:
+  # sudo su ; cd /usr/bin ; ln -s /usr/local/bin/node
+  #
   set :port,9292
   
   configure do
     mime_type :xml, 'text/plain'
     mime_type :ly, 'text/plain'
   end
-  
   set :comp, "#{Dir.pwd}/public/compositions"
+  set :doremi2ly, "/usr/local/bin/doremi2ly"
   set :lily2image, "#{Dir.pwd}/bin/lily2image"
-#  set :lilypond, "/usr/local/bin/lilypond"
-  #set :port,80  if `hostname`.chomp == 'ragapedia'
   set :haml, :format => :html5
   
   def sanitize_filename(filename)
@@ -56,11 +59,15 @@ class LilypondServer < Sinatra::Application
     fp= "#{comp}/#{fname}"
     archive="#{comp}/#{simple_file_name}_backup_#{Time.new.to_i}"
     # The -f stops rm from generating an error message
-      File.open("#{fp}.ly", 'w') {|f| f.write(lilypond) }
       File.open("#{archive}.doremi_script.txt", 'w') {|f| f.write(doremi_source) }
       File.open("#{fp}.doremi_script.txt", 'w') {|f| f.write(doremi_source) }
       File.open("#{fp}.xml", 'w') {|f| f.write(musicxml_source) }
       File.open("#{fp}.html", 'w') {|f| f.write(html_doc) }
+      # I don't accept ly file from browser for security reasons. Run the 
+      # parser on the server and save ly file. This should avoid evil
+      # lilypond files
+      doremi2ly_result= `cat #{fp}.doremi_script.txt | #{settings.doremi2ly} > #{fp}.ly 2>&1`  
+      
       if !dont
       `rm -f #{fp}-page*png`
       result=`lilypond -o #{fp} #{fp}.ly  2>&1`
@@ -101,7 +108,8 @@ class LilypondServer < Sinatra::Application
     `cp #{fp}.ly #{comp}/last.ly`
     json={:error => error, 
      :fname => fname,
-     :lilypond_output => result
+     :lilypond_output => result,
+     :doremi2ly_output => doremi2ly_result
     }.to_json
   end
 end 
