@@ -3,6 +3,13 @@
 # dom_fixes()
 root = exports ? this
 
+add_right_margin_to_notes_with_pitch_signs= () ->
+  # TODO: DRY with others
+  $('span.note_wrapper *.pitch_sign').each (index) ->
+    parent=$(this).parent()
+    current_margin_right=parseInt($(parent).css('margin-right').replace('px', ''))
+    $(parent).css('margin-right',current_margin_right + $(this).width())
+
 add_left_margin_to_notes_with_left_superscripts= () ->
   $('span.note_wrapper *.ornament.placement_before').each (index) ->
     parent=$(this).parent()
@@ -104,6 +111,7 @@ dom_fixes = () ->
   fix_before_ornaments()
   add_left_margin_to_notes_with_left_superscripts()
   add_right_margin_to_notes_with_right_superscripts()
+  add_right_margin_to_notes_with_pitch_signs()
   expand_note_widths_to_accomodate_syllables()
   adjust_slurs_in_dom()
 

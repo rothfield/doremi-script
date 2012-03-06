@@ -556,7 +556,7 @@ root.ParserHelper=
       return false
     if attribute.my_type is "kommal_indicator"
       # TODO: review
-      srgmpdn_in_devanagri="\u0938\u0930\u095A\u092E\u092a\u0927"
+      srgmpdn_in_devanagri="\u0938\u0930\u095A\u092E\u092a\u0927\u0929"
       if srgmpdn_in_devanagri.indexOf(sarg_obj.source) > -1
         sarg_obj.normalized_pitch=sarg_obj.normalized_pitch+"b"
         return true
