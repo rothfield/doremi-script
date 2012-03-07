@@ -255,14 +255,21 @@ to_html_doc= (composition,full_url="http://ragapedia.com",css="",js="") ->
       <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     </head>
   <body>
+
+<div class="composition_headers">
+          <h1 class="composition_title">#{composition.title}</h1>
+          <h2 class="composition_author">#{composition.author}</h2>
+          <!--  Each line consists of a textarea, some controls, and the rendered html. The textarea and controls are hidden unless the user is editting the line. When the user is editting the line, the rendered html is hidden -->
+                    </div>
     <div id="rendered_sargam">
       #{rendered_composition}
     </div>
-  <span id="testing_utf_support" style="display:none" class="note left_repeat">&#x1d106;</span>
+    <span class="note testing_utf_support" id="utf_left_repeat" style="display: none; ">&#x1d106;</span>
+    <span id="utf_single_barline" class="note testing_utf_support" style="display: none; ">&#x1d100;</span>
   <script type="text/javascript">
   #{js}
   $(document).ready(function() {
-      return dom_fixes()
+      dom_fixes()
   })
   </script>
 <script id="source" type="text/html">
@@ -294,7 +301,9 @@ line_to_html= (line) ->
 to_html= (composition) ->
   # composition is the parsed composition
   # returns the text of an html div rendering the composition.
-  attrs=draw_attributes(composition.attributes)
+  attrs=""
+  if false
+    attrs=draw_attributes(composition.attributes)
   lines=(draw_line(item) for item in composition.lines).join('\n')
   "<div class='composition'>#{attrs}#{lines}</div>"
 
