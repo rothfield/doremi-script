@@ -158,7 +158,7 @@ root.ParserHelper=
       "\n#{str}"
     @composition_data =
       my_type:"composition"
-      apply_hyphenated_lyrics:false
+      apply_hyphenated_lyrics:true # Defaults to true
       title:""
       filename: ""
       attributes: attributes
@@ -220,9 +220,11 @@ root.ParserHelper=
     x=get_composition_attribute(@composition_data,"ApplyHyphenatedLyrics")
     if x is "true"
       x=true
-    else
+    else if x is "false"
       x=false
-    @composition_data.apply_hyphenated_lyrics =  x #(x or false)
+    else
+      x=true #default
+    @composition_data.apply_hyphenated_lyrics =  x 
     @mark_partial_measures()
     assign_syllables_from_lyrics_sections(@composition_data) if  @composition_data.apply_hyphenated_lyrics
     @composition_data
