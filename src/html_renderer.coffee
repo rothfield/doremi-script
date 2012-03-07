@@ -58,6 +58,7 @@ draw_line= (line) ->
   # The concept of line has expanded to include a lyrics section
   return draw_lyrics_section(line) if line.my_type is 'lyrics_section'
   x=(draw_item(item) for item in line.items).join('')
+  # TODO: dry
   "<div class='stave sargam_line'>#{x}</div>"
 
 draw_measure= (measure) ->
@@ -241,6 +242,7 @@ to_html_doc= (composition,full_url="http://ragapedia.com",css="",js="") ->
   #
   rendered_composition=to_html(composition)
   """
+  <!DOCTYPE html>
   <html>
     <head>
     <style type="text/css">
