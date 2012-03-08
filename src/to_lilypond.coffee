@@ -475,7 +475,8 @@ to_lilypond= (composition_data,options={}) ->
 
   if options.omit_header
     title_snippet=composer_snippet=""
-
+  # TODO: add to doremi-script and gui
+  beats_per_minute=200
   lilypond_template= """
   #(ly:set-option 'midi-extension "mid")
   \\version "2.12.3"
@@ -514,7 +515,12 @@ text = \\lyricmode {
     \\remove "Bar_number_engraver"
   } 
   }
-\\midi { }
+\\midi { 
+  \\context {
+    \\Score
+    tempoWholesPerMinute = #(ly:make-moment #{beats_per_minute} 4)
+   }
+ }
 }
   """
   lilypond_template

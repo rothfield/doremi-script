@@ -1,27 +1,27 @@
-# Uses module pattern, exports adjust_slurs_in_dom
+# Uses module pattern, exports  dom_fixes()
 # Usage:
 # dom_fixes()
 root = exports ? this
 
-add_right_margin_to_notes_with_pitch_signs= () ->
+add_right_margin_to_notes_with_pitch_signs= (context=null) ->
   # TODO: DRY with others
-  $('span.note_wrapper *.pitch_sign').each (index) ->
+  $('span.note_wrapper *.pitch_sign',context).each (index) ->
     parent=$(this).parent()
     current_margin_right=parseInt($(parent).css('margin-right').replace('px', ''))
     $(parent).css('margin-right',current_margin_right + $(this).width())
 
-add_left_margin_to_notes_with_left_superscripts= () ->
-  $('span.note_wrapper *.ornament.placement_before').each (index) ->
+add_left_margin_to_notes_with_left_superscripts= (context=null) ->
+  $('span.note_wrapper *.ornament.placement_before',context).each (index) ->
     parent=$(this).parent()
     current_margin_left=parseInt($(parent).css('margin-left').replace('px', ''))
     $(parent).css('margin-left',current_margin_left + $(this).width())
 
-add_right_margin_to_notes_with_right_superscripts= () ->
-  $('span.note_wrapper *.ornament.placement_after').each (index) ->
+add_right_margin_to_notes_with_right_superscripts= (context=null) ->
+  $('span.note_wrapper *.ornament.placement_after',context).each (index) ->
     parent=$(this).parent()
     current_margin_right=parseInt($(parent).css('margin-right').replace('px', ''))
     $(parent).css('margin-right',current_margin_right + $(this).width())
-expand_note_widths_to_accomodate_syllables= () ->
+expand_note_widths_to_accomodate_syllables= (context=null) ->
   ###
        Example:
    RS S
@@ -32,7 +32,7 @@ expand_note_widths_to_accomodate_syllables= () ->
    with each other. Examine each syllable, and if the next syllable
    collides, then adjust the width of the NOTE accordingly     
   ###
-  syllables=$('span.syllable').get()
+  syllables=$('span.syllable',context).get()
   len=syllables.length
   for syllable,index in syllables
     continue if index is (len-1) 
@@ -57,7 +57,7 @@ expand_note_widths_to_accomodate_syllables= () ->
       $note.css("margin-right","#{ existing_margin_right + syl_right - next_left + extra + extra2}px")
 
 
-fallback_if_utf8_characters_not_supported= () ->
+fallback_if_utf8_characters_not_supported= (context=null) ->
   # If the browser supports utf8 music characters
   # then the width of single barline and left repeat will
   # NOT be the same.
@@ -73,14 +73,14 @@ fallback_if_utf8_characters_not_supported= () ->
   if ! window.ok_to_use_utf8_music_characters
     #console.log("Falling back to ascii characters")
     tag="data-fallback-if-no-utf8-chars"
-    $("span[#{tag}]").addClass('dont_use_utf8_chars')
-    $("span[#{tag}]").each  (index) ->
+    $("span[#{tag}]",context).addClass('dont_use_utf8_chars')
+    $("span[#{tag}]",context).each  (index) ->
       obj=$(this)
       attr=obj.attr(tag)
       obj.html(attr)
 
-adjust_slurs_in_dom= () ->
-  $('span[data-begin-slur-id]').each  (index) ->
+adjust_slurs_in_dom= (context=null) ->
+  $('span[data-begin-slur-id]',context).each  (index) ->
     pos2=$(this).offset()
     attr=$(this).attr("data-begin-slur-id")
     slur=$("##{attr}")
@@ -92,7 +92,7 @@ adjust_slurs_in_dom= () ->
       return
     $(slur).css {width: pos2.left- pos1.left + $(this).width()}
 
-fix_before_ornaments= () ->
+fix_before_ornaments= (context=null) ->
   # For the case of the ornament that is placed before the pitch,
   # use css to set margin-left to the negative of the width!!
   #
@@ -100,20 +100,26 @@ fix_before_ornaments= () ->
   #
   # Pmg
   #    R
-  $('span.ornament.placement_before').each (index) ->
+  $('span.ornament.placement_before',context).each (index) ->
     el=$(this)
     el.css('margin-left',"-#{el.width()}px")
 
 
 dom_fixes = () ->
+  # apply fixes divs that have NOT been fixed
+  # div.stave is the output of the html renderer
+  context=$("div.stave:not([data-dom-fixed='true'])")
+  console.log "entering dom_fixes, context is",context
+  console.log "entering dom_fixes, context.size() is",context.size()
   # Order matters!
-  fallback_if_utf8_characters_not_supported()
-  fix_before_ornaments()
-  add_left_margin_to_notes_with_left_superscripts()
-  add_right_margin_to_notes_with_right_superscripts()
-  add_right_margin_to_notes_with_pitch_signs()
-  expand_note_widths_to_accomodate_syllables()
-  adjust_slurs_in_dom()
-
+  fallback_if_utf8_characters_not_supported(context)
+  fix_before_ornaments(context)
+  add_left_margin_to_notes_with_left_superscripts(context)
+  add_right_margin_to_notes_with_right_superscripts(context)
+  add_right_margin_to_notes_with_pitch_signs(context)
+  expand_note_widths_to_accomodate_syllables(context)
+  adjust_slurs_in_dom(context)
+  # Mark divs as fixed
+  context.attr('data-dom-fixed','true')
 root.dom_fixes=dom_fixes
 
