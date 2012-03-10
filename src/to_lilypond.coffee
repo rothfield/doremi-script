@@ -353,7 +353,8 @@ emit_tied_array=(last_pitch,tied_array,ary) ->
  
 is_sargam_line= (line) ->
   return false if !line.kind?
-  line.kind.indexOf('sargam') > -1
+  return true if line.kind.indexOf('sargam') > -1
+  return true if line.kind.indexOf('number') > -1 # 3/10/2012
 
 notation_is_in_sargam= (composition_data) ->
   @log "in notation_is_in_sargam"
@@ -367,10 +368,10 @@ beat_is_all_dashes= (beat) ->
     return true
   root.all_items(beat).every(fun)
  
-lilypond_transpose=(composition) ->
+lilypond_transpose=(composition_data) ->
   return "" if composition_data.key is "C"
   fixed=composition_data.key[0].toLowerCase()
-  return "\\transpose c' #{lilypond_pitch_map[composition.key]}'"
+  return "\\transpose c' #{lilypond_pitch_map[composition_data.key]}'"
 
 to_lilypond= (composition_data,options={}) ->
   ary=[]
