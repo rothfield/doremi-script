@@ -105,12 +105,7 @@ fix_before_ornaments= (context=null) ->
     el.css('margin-left',"-#{el.width()}px")
 
 
-dom_fixes = () ->
-  # apply fixes divs that have NOT been fixed
-  # div.stave is the output of the html renderer
-  context=$("div.stave:not([data-dom-fixed='true'])")
-  console.log "entering dom_fixes, context is",context
-  console.log "entering dom_fixes, context.size() is",context.size()
+dom_fixes = (context=$('body')) ->
   # Order matters!
   fallback_if_utf8_characters_not_supported(context)
   fix_before_ornaments(context)
@@ -119,7 +114,6 @@ dom_fixes = () ->
   add_right_margin_to_notes_with_pitch_signs(context)
   expand_note_widths_to_accomodate_syllables(context)
   adjust_slurs_in_dom(context)
-  # Mark divs as fixed
-  context.attr('data-dom-fixed','true')
+
 root.dom_fixes=dom_fixes
 

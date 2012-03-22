@@ -175,6 +175,7 @@ draw_pitch= (pitch) ->
 
 draw_item= (item) ->
   return draw_pitch(item) if item.my_type is "pitch"
+  return "" if item.my_type is "ignored_whitespace"
   return "" if item.my_type is "begin_beat"
   return "" if item.my_type is "end_beat"
   return draw_beat(item) if item.my_type is "beat"
