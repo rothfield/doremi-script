@@ -81,7 +81,7 @@ data-fallback-if-no-utf8-chars='#'
   "not expected"
   "S\n."
   '''
-<span class="lower_octave_1">&bull;</span>
+  <span data-column="0" class="lower_octave_1">&bull;</span>
   '''
   "Testing html for lower octave span"
   'C   C7\nS  -'

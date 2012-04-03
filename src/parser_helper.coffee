@@ -29,7 +29,9 @@ root.ParserHelper=
 
 
   assign_lyrics: (sargam,lyrics) ->
-    #console.log "entering assign_lyrics",sargam,lyrics
+    # This assigns the lyrics lines underneath the main line of
+    # notes.
+    console.log "entering assign_lyrics",sargam,lyrics if debug
     return if !lyrics?
     return if lyrics is ""
     slurring_state=false
@@ -39,13 +41,14 @@ root.ParserHelper=
       do (item) =>
         return if item.my_type != "pitch"
         return if syls.length is 0
-        if !slurring_state 
+        if !slurring_state
           item.syllable = syls.shift()
         slurring_state=true if item_has_attribute item,'begin_slur'
         slurring_state=false if item_has_attribute item,'end_slur'
       
   parse_lyrics_section: (lyrics_lines) ->
-    #console.log "parse_lyrics_section"
+    # This is for the lyrics section (not the lyrics underneath main line)
+    console.log "parse_lyrics_section" if debug
     if lyrics_lines is ""
       source=""
     else
@@ -116,6 +119,7 @@ root.ParserHelper=
     sargam
 
   assign_lyrics2: (sargam,syls) ->
+    # Assigns syllables to this line
     #console.log("entering assign_lyrics2-syls is",syls)
     #console.log("entering assign_lyrics2-sargam is",sargam)
     return if !syls
@@ -127,11 +131,16 @@ root.ParserHelper=
         return if item.my_type != "pitch"
         return if syls.length is 0
         if !slurring_state
-          item.syllable = syls.shift()
+          # Syllable may already be here if syllables were placed
+          # UNDERNEATH notes. In that case, don't overwrite
+          if !item.syllable?
+            item.syllable = syls.shift()
         slurring_state=true if item_has_attribute item,'begin_slur'
         slurring_state=false if item_has_attribute item,'end_slur'
 
   assign_syllables_from_lyrics_sections :(composition) ->
+    return if !composition.apply_hyphenated_lyrics
+    
     #console.log "entering assign_syllables_from_lyrics_sections"
     syls=[]
     for line in composition.lines
@@ -160,6 +169,9 @@ root.ParserHelper=
       my_type:"composition"
       apply_hyphenated_lyrics:true # Defaults to true
       title:""
+      notes_used:""
+      force_notes_used:false
+      force_notes_used_hash:{}
       filename: ""
       attributes: attributes
       lines: _.flatten(lines)
@@ -171,20 +183,22 @@ root.ParserHelper=
     x=get_composition_attribute(@composition_data,"NotesUsed")
     valid=true
     if x? and (/^[sSrRgGmMpPdDnN]*$/.test(x) is false)
-       this.warnings.push("ForceSargamChars should be all sargam characters, for example 'SrGmMdN'")
+       this.warnings.push("NotesUsed should be all pitches/sargam characters, for example 'SrGmMdN'")
        valid=false
-    @composition_data.notes_used = x  || ""
+    @composition_data.notes_used = (x || "")
     hash={}
     if x and valid
-      split_chars=@composition_data.force_sargam_chars.split('')
+      split_chars=@composition_data.notes_used.split('')
       for char in split_chars
         lower=char.toLowerCase(char)
         if char in ['S','R','G','M','P','D','N'] 
           if (lower not in split_chars)
             hash[char.toLowerCase(char)]=char
-    @composition_data.force_sargam_chars_hash=hash
+    @composition_data.force_notes_used_hash=hash
     x=get_composition_attribute(@composition_data,"TimeSignature")
-    @composition_data.time_signature = x or "4/4"
+    @composition_data.time_signature = x || "4/4"
+    x=get_composition_attribute(@composition_data,"ForceNotesUsed")
+    @composition_data.force_notes_used = x || false
     x=get_composition_attribute(@composition_data,"id")
     #console.log "x is #{x}"
     if x?
