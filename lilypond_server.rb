@@ -44,9 +44,8 @@ class LilypondServer < Sinatra::Application
   post '/lilypond_to_jpg' do
     comp=settings.comp
     dir=File.join('public','compositions')
-    return "no lilypond param" if !params["lilypond"]
     return "no fname param" if !params["fname"]
-    lilypond=params["lilypond"]
+    return "no doremi_source param" if !params["doremi_source"]
     doremi_source=params["doremi_source"]
     musicxml_source=params["musicxml_source"]
     html_doc=params["html_doc"] || ""
