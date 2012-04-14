@@ -253,6 +253,14 @@ normalized_pitch_to_lilypond= (pitch) ->
   # to render a slur.
   # The acciatura in lilypond don't require parens to get lilypond
   # to render a slur.
+  #
+
+  EXAMPLES = '''
+\partial 4*2  | \afterGrace c'4( { b32[ d'32 c'32 b32 c'32] } c'8) d'8 \break
+\partial 4*2  | \afterGrace c'4~ { b32[ d'32 c'32 b32 c'32] } c'8 d'8 \break
+ \partial 4*2  | c'4~ c'8 d'8 \break
+ '''
+  #
   ornament=get_ornament(pitch)
   grace1=grace2=grace_notes=""
   if ornament?.placement is "after"
@@ -373,71 +381,84 @@ lilypond_transpose=(composition_data) ->
   fixed=composition_data.key[0].toLowerCase()
   return "\\transpose c' #{lilypond_pitch_map[composition_data.key]}'"
 
-to_lilypond= (composition_data,options={}) ->
+line_to_lilypond = (line,options={}) ->
+  line_to_lilypond_array(line,options).join ' '
+
+line_to_lilypond_array = (line,options={}) ->
+  # Line is a line from the parsed doremi_script
+  # Returns an array of items - join them with a string
   ary=[]
   in_times=false #hack
   at_beginning_of_first_measure_of_line=false
   dashes_at_beginning_of_line_array=[]
   tied_array=[]
+  at_beginning_of_first_measure_of_line=false
+  in_times=false #hack
+  @log "processing #{line.source}"
+  all=[]
+  x=root.all_items(line,all)
+  last_pitch=null
+  for item in all
+    if item.my_type in ["pitch","barline","measure"] or item.is_barline
+      emit_tied_array(last_pitch,tied_array,ary) if tied_array.length >0 
 
-  for line in composition_data.lines
-    at_beginning_of_first_measure_of_line=false
-    in_times=false #hack
-    @log "processing #{line.source}"
-    all=[]
-    x=root.all_items(line,all)
-    last_pitch=null
-    for item in all
-      if item.my_type in ["pitch","barline","measure"] or item.is_barline
-        emit_tied_array(last_pitch,tied_array,ary) if tied_array.length >0 
-
-      # TODO refactor
-      # TODO: barlines should get attributes like endings too and talas too!
-      if in_times
-        if item.my_type is "beat" or item.my_type is "barline"
-          ary.push "}"
-          in_times=false
-      @log "processing #{item.source}, my_type is #{item.my_type}"
-      if item.my_type=="pitch"
-        last_pitch=item  #use this to help render ties better(hopefully)
-        if dashes_at_beginning_of_line_array.length > 0
-          for dash in dashes_at_beginning_of_line_array
-            ary.push normalized_pitch_to_lilypond(dash)
-          dashes_at_beginning_of_line_array=[]
-        ary.push normalized_pitch_to_lilypond(item) 
-      if item.is_barline
-        ary.push(lookup_lilypond_barline(item.my_type))
-      if item.my_type is "beat"
-         beat=item
-         if beat.subdivisions not in [0,1,2,4,8,16,32,64,128] and !beat_is_all_dashes(beat)
-             @log "odd beat.subdivisions=",beat.subdivisions
-             x=2
-             if beat.subdivisions is 6
-               x=4
-             if  beat.subdivisions is 5
-               x=4
-             ary.push "\\times #{x}/#{beat.subdivisions} { "
-             in_times=true #hack
-      if item.my_type is "dash"
-        if !item.dash_to_tie and item.numerator? #THEN its at beginning of line!
-          @log "pushing item onto dashes_at_beginning_of_line_array"
-          dashes_at_beginning_of_line_array.push item
-        if item.dash_to_tie
-          #TODO:review
-
-          ary.push normalized_pitch_to_lilypond(item)
-          item=null
-      if item? and item.my_type is "measure"
-         measure=item
-         if measure.is_partial
-            ary.push "\\partial 4*#{measure.beat_count} "
-      if item? and item.dash_to_tie
-        tied_array.push item if item?
+    # TODO refactor
+    # TODO: barlines should get attributes like endings too and talas too!
     if in_times
-      ary.push "}"
-      in_times=false
-    emit_tied_array(last_pitch,tied_array,ary) if tied_array.length >0 
-    ary.push "\\break\n"
+      if item.my_type is "beat" or item.my_type is "barline"
+        ary.push "}"
+        in_times=false
+    @log "processing #{item.source}, my_type is #{item.my_type}"
+    if item.my_type=="pitch"
+      last_pitch=item  #use this to help render ties better(hopefully)
+      if dashes_at_beginning_of_line_array.length > 0
+        for dash in dashes_at_beginning_of_line_array
+          ary.push normalized_pitch_to_lilypond(dash)
+        dashes_at_beginning_of_line_array=[]
+      ary.push normalized_pitch_to_lilypond(item) 
+    if item.is_barline
+      ary.push(lookup_lilypond_barline(item.my_type))
+    if item.my_type is "beat"
+       beat=item
+       if beat.subdivisions not in [0,1,2,4,8,16,32,64,128] and !beat_is_all_dashes(beat)
+           @log "odd beat.subdivisions=",beat.subdivisions
+           x=2
+           if beat.subdivisions is 6
+             x=4
+           if  beat.subdivisions is 5
+             x=4
+           ary.push "\\times #{x}/#{beat.subdivisions} { "
+           in_times=true #hack
+    if item.my_type is "dash"
+      if !item.dash_to_tie and item.numerator? #THEN its at beginning of line!
+        @log "pushing item onto dashes_at_beginning_of_line_array"
+        dashes_at_beginning_of_line_array.push item
+      if item.dash_to_tie
+        #TODO:review
+
+        ary.push normalized_pitch_to_lilypond(item)
+        item=null
+    if item? and item.my_type is "measure"
+       measure=item
+       if measure.is_partial
+         # Lilypond partial measures:
+         # \partial duration
+         # where duration is the rhythmic length of the interval 
+         # before the start of the first complete measure:
+         ary.push "\\partial 4*#{measure.beat_count} "
+    if item? and item.dash_to_tie
+      tied_array.push item if item?
+  if in_times
+    ary.push "}"
+    in_times=false
+  emit_tied_array(last_pitch,tied_array,ary) if tied_array.length >0 
+  ary.push "\\break\n"
+  ary
+
+to_lilypond= (composition_data,options={}) ->
+  ary=[]
+  for line in composition_data.lines
+    ary= ary.concat line_to_lilypond_array line,options
   mode = composition_data.mode #get_mode(composition_data,'Mode')
   mode or= "major"
   mode=mode.toLowerCase()
@@ -528,3 +549,4 @@ text = \\lyricmode {
 
 
 root.to_lilypond=to_lilypond
+root.line_to_lilypond=line_to_lilypond

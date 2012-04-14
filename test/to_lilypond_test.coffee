@@ -25,6 +25,7 @@ _.mixin(_console.toObject())
 });`
 
 to_lilypond=require('./to_lilypond.js').to_lilypond
+line_to_lilypond=require('./to_lilypond.js').line_to_lilypond
 
 parser=DoremiScriptParser
 
@@ -70,6 +71,24 @@ exports.test_all = (test) ->
     #Lilypond output was #{lily}" )
   _.each_slice(test_data,3,fun)
   test.done()
+
+exports.test_after_ornaments_with_untied_note = (test) ->
+  #debug=true
+  _console.level  = Logger.INFO
+  str= '''
+     R
+  | G 
+  '''
+  composition=parser.parse(str)
+  _.debug "test_to_lilypond:composition is #{composition}"
+  _.debug("test_to_lilypond, str is \n#{str}\n")
+  lily=line_to_lilypond(composition.lines[0])
+  _.debug(lily)
+  expected="\\afterGrace e'4 { d'32 }"
+  test.ok(lily.indexOf(expected) > -1,"FAILED*** Expected output of \n\n#{str}\n\n to include #{expected}. Output was\n-------------- \n\n#{lily}\n\n-----------")
+  test.done()
+
+
 
 #exports.test_combines_whole_beat_rests_within_a_measure = (test) ->
 #  debug=true
