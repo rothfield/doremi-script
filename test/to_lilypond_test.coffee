@@ -72,7 +72,7 @@ exports.test_all = (test) ->
   _.each_slice(test_data,3,fun)
   test.done()
 
-exports.test_after_ornaments_with_untied_note = (test) ->
+exports.test_after_ornament = (test) ->
   #debug=true
   _console.level  = Logger.INFO
   str= '''
@@ -84,10 +84,99 @@ exports.test_after_ornaments_with_untied_note = (test) ->
   _.debug("test_to_lilypond, str is \n#{str}\n")
   lily=line_to_lilypond(composition.lines[0])
   _.debug(lily)
-  expected="\\afterGrace e'4 { d'32 }"
+  expected="\\afterGrace e'4( { d'32) }"
   test.ok(lily.indexOf(expected) > -1,"FAILED*** Expected output of \n\n#{str}\n\n to include #{expected}. Output was\n-------------- \n\n#{lily}\n\n-----------")
+
+  display_success(str,expected)
   test.done()
 
+#\partial 4*2  | r8 \afterGrace c'8( { b32[ d'32 c'32 b32 c'32] } c'4) | \partial 4*1  b4 \break
+
+
+
+exports.test_after_ornament_with_tied_pitch = (test) ->
+  _console.level  = Logger.INFO
+  str= '''
+      RG
+  | -G   -- 
+  '''
+  composition=parser.parse(str)
+  _.debug "test_to_lilypond:composition is #{composition}"
+  _.debug("test_to_lilypond, str is \n#{str}\n")
+  lily=line_to_lilypond(composition.lines[0])
+  _.debug(lily)
+  # Note that in this case, a slur () is used instead of
+  # lilypond's usual tie (~)
+  expected= '''
+  r8 \\afterGrace e'8( { d'32[ e'32] } e'4) 
+  '''
+  test.ok(lily.indexOf(expected) > -1,"FAILED*** Expected output of \n\n#{str}\n\n to include #{expected}. Output was\n-------------- \n\n#{lily}\n\n-----------")
+
+  display_success(str,expected)
+  test.done()
+
+
+exports.test_after_ornament_gets_beamed_and_slurred = (test) ->
+
+  #debug=true
+  _console.level  = Logger.INFO
+  str= '''
+     RG
+  | G 
+  '''
+  composition=parser.parse(str)
+  _.debug "test_to_lilypond:composition is #{composition}"
+  _.debug("test_to_lilypond, str is \n#{str}\n")
+  lily=line_to_lilypond(composition.lines[0])
+  _.debug(lily)
+  # Note the brackets, which beams things
+  expected="\\afterGrace e'4( { d'32[ e'32)] }"
+  test.ok(lily.indexOf(expected) > -1,"FAILED*** Expected output of \n\n#{str}\n\n to include #{expected}. Output was\n-------------- \n\n#{lily}\n\n-----------")
+
+  display_success(str,expected)
+  test.done()
+
+exports.test_after_ornaments_with_slurred_notes = (test) ->
+  #debug=true
+  _console.level  = Logger.INFO
+  str= '''
+      RG
+  | (G    m)
+  '''
+  composition=parser.parse(str)
+  _.debug "test_to_lilypond:composition is #{composition}"
+  _.debug("test_to_lilypond, str is \n#{str}\n")
+  lily=line_to_lilypond(composition.lines[0])
+  _.debug(lily)
+  expected='''
+  \\afterGrace e'4( { d'32[ e'32] } f'4)
+  '''
+  test.ok(lily.indexOf(expected) > -1,"FAILED*** Expected output of \n\n#{str}\n\n to include #{expected}. Output was\n-------------- \n\n#{lily}\n\n-----------")
+
+  display_success(str,expected)
+  test.done()
+
+exports.test_after_ornaments_within_slurred_phrase_should_not_include_slurs = (test) ->
+  #debug=true
+  _console.level  = Logger.INFO
+  str= '''
+       <Gm>
+  | (P m   G R)
+  '''
+  composition=parser.parse(str)
+  _.debug "test_to_lilypond:composition is #{composition}"
+  _.debug("test_to_lilypond, str is \n#{str}\n")
+  lily=line_to_lilypond(composition.lines[0])
+  _.debug(lily)
+  expected='''
+  g'4( \\afterGrace f'4 { e'32[ f'32] } e'4 d'4)
+  '''
+  test.ok(lily.indexOf(expected) > -1,"FAILED*** Expected output of \n\n#{str}\n\n to include #{expected}. Output was\n-------------- \n\n#{lily}\n\n-----------")
+
+  display_success(str,expected)
+  test.done()
+display_success= (str,expected) ->
+  _.info("✔ Testing \n\n#{str}\n\n ->\n #{expected}")
 
 
 #exports.test_combines_whole_beat_rests_within_a_measure = (test) ->

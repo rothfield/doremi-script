@@ -174,7 +174,7 @@ lilypond_grace_note_pitch = (pitch) ->
   return "???#{pitch.octave}" if !lilypond_octave?
   "#{lilypond_pitch}#{lilypond_octave}#{duration}"
 
-lilypond_grace_notes = (ornament) ->
+lilypond_grace_notes = (ornament,suppress_slurs=true) ->
   # TODO: review whether there should be a slur or not
   # generate a series of grace notes for an ornament
   #  c1 \afterGrace d1( { c16[ d]) } c1
@@ -186,12 +186,15 @@ lilypond_grace_notes = (ornament) ->
   begin_slur="("
   begin_slur=""
   end_slur=")"
+  if suppress_slurs
+    begin_slur=""
+    end_slur=""
   if needs_beam
     begin_beam="["
     end_beam="]"
   ary[0]= "#{ary[0]}#{begin_slur}#{begin_beam}" 
   length=ary.length
-  ary[length-1]="#{ary[length-1]}#{end_beam}" 
+  ary[length-1]="#{ary[length-1]}#{end_slur}#{end_beam}" 
   # TODO: end slur??????????
   ary.join ' '
 
@@ -209,7 +212,12 @@ get_ending= (item) ->
     """
   ""
 
-normalized_pitch_to_lilypond= (pitch) ->
+normalized_pitch_to_lilypond= (pitch,context={last_pitch: {},in_slur:false}) ->
+  special_case=false
+  if pitch.dash_to_tie and has_after_ornament(context.last_pitch)
+    #console.log "***SPECIAL CASE"
+    special_case=true
+  console.log "context.in_slur is ", context.in_slur if false
   # Render a pitch/dash as lilypond
   # needs work
   chord=get_chord(pitch)
@@ -236,8 +244,18 @@ normalized_pitch_to_lilypond= (pitch) ->
   mordent = if has_mordent(pitch) then "\\mordent" else ""
   begin_slur = if item_has_attribute(pitch,"begin_slur") then "("  else ""
   end_slur  =  if item_has_attribute(pitch,"end_slur") then ")" else ""
+  in_slur=false
+  if item_has_attribute(pitch,"begin_slur")
+    in_slur=true
+  if item_has_attribute(pitch,"end_slur")
+    in_slur=true
+  console.log "in_slur is",in_slur if false
+  suppress_slurs=in_slur
+  if context.in_slur
+    suppress_slurs=true
   lilypond_symbol_for_tie=  if pitch.tied? then '~' else ''
-  #If you want to end a note with a grace, 
+  # From lilypond docs:
+  # If you want to end a note with a grace, 
   # use the \afterGrace command. It takes two 
   # arguments: the main note, and the 
   # grace notes following the main note.
@@ -264,13 +282,27 @@ normalized_pitch_to_lilypond= (pitch) ->
   ornament=get_ornament(pitch)
   grace1=grace2=grace_notes=""
   if ornament?.placement is "after"
+    if pitch.tied?
+      suppress_slurs=true
+    if context.in_slur
+      suppress_slurs=true
+    if !context.in_slur #TODO: unfunkify
+      begin_slur="("
     grace1 = "\\afterGrace "
     #grace2="( { #{lilypond_grace_notes(ornament)}) }"
-    grace2=" { #{lilypond_grace_notes(ornament)} }"
+    grace2=" { #{lilypond_grace_notes(ornament,suppress_slurs)} }"
   if ornament?.placement is "before"
   #  \acciaccatura { e16 d16 } c4
-    grace1= "\\acciaccatura {#{lilypond_grace_notes(ornament)}}"
-  "#{grace1}#{lilypond_pitch}#{lilypond_octave}#{duration}#{lilypond_symbol_for_tie}#{mordent}#{begin_slur}#{end_slur}#{ending}#{chord}#{grace2}"
+    suppress_slurs=true # FOR NOW
+    grace1= "\\acciaccatura {#{lilypond_grace_notes(ornament,suppress_slurs)}}"
+  extra_end_slur=""
+  if special_case
+    extra_end_slur=")"
+  # Don't use tie if ornament is after!
+  if (ornament?.placement is "after") and pitch.tied?
+    console.log "OMG"
+    lilypond_symbol_for_tie=""
+  "#{grace1}#{lilypond_pitch}#{lilypond_octave}#{duration}#{lilypond_symbol_for_tie}#{mordent}#{begin_slur}#{extra_end_slur}#{end_slur}#{ending}#{chord}#{grace2}"
 
 
 lookup_lilypond_barline= (barline_type) ->
@@ -327,6 +359,7 @@ lilypond_pitch_map=
 
 
 emit_tied_array=(last_pitch,tied_array,ary) ->
+  console.log "********emit_tied_array"
 
   return if !last_pitch?
   return if tied_array.length is 0
@@ -357,7 +390,13 @@ emit_tied_array=(last_pitch,tied_array,ary) ->
   obj.tied= last.tied
   @log "leaving emit_tied_array"
   tied_array.length=0 # clear it
-  ary.push normalized_pitch_to_lilypond(obj)
+  console.log "****",has_after_ornament(last_pitch)
+  if has_after_ornament(last_pitch)
+    # TODO: in this case, if the previous pitch had an after grace, then
+    # add a right paren !!! April 14,2012
+    console.log "ADD CODE TO ADD RIGHT PARENT TO THIS PITCH",obj
+
+  ary.push normalized_pitch_to_lilypond(obj,{last_pitch:last_pitch})
  
 is_sargam_line= (line) ->
   return false if !line.kind?
@@ -382,11 +421,19 @@ lilypond_transpose=(composition_data) ->
   return "\\transpose c' #{lilypond_pitch_map[composition_data.key]}'"
 
 line_to_lilypond = (line,options={}) ->
+  console.log "line_to_lilypond"
   line_to_lilypond_array(line,options).join ' '
+
+has_after_ornament = (pitch) ->
+  return false if !pitch?
+  ornament=get_ornament(pitch)
+  return false if !ornament?
+  ornament?.placement is "after"
 
 line_to_lilypond_array = (line,options={}) ->
   # Line is a line from the parsed doremi_script
   # Returns an array of items - join them with a string
+  in_slur=false
   ary=[]
   in_times=false #hack
   at_beginning_of_first_measure_of_line=false
@@ -399,6 +446,9 @@ line_to_lilypond_array = (line,options={}) ->
   x=root.all_items(line,all)
   last_pitch=null
   for item in all
+    if item_has_attribute(item,"begin_slur") 
+      in_slur=true
+
     if item.my_type in ["pitch","barline","measure"] or item.is_barline
       emit_tied_array(last_pitch,tied_array,ary) if tied_array.length >0 
 
@@ -413,9 +463,9 @@ line_to_lilypond_array = (line,options={}) ->
       last_pitch=item  #use this to help render ties better(hopefully)
       if dashes_at_beginning_of_line_array.length > 0
         for dash in dashes_at_beginning_of_line_array
-          ary.push normalized_pitch_to_lilypond(dash)
+          ary.push normalized_pitch_to_lilypond(dash,{last_pitch:last_pitch})
         dashes_at_beginning_of_line_array=[]
-      ary.push normalized_pitch_to_lilypond(item) 
+      ary.push normalized_pitch_to_lilypond(item,{in_slur:  in_slur,last_pitch:last_pitch})
     if item.is_barline
       ary.push(lookup_lilypond_barline(item.my_type))
     if item.my_type is "beat"
@@ -435,8 +485,9 @@ line_to_lilypond_array = (line,options={}) ->
         dashes_at_beginning_of_line_array.push item
       if item.dash_to_tie
         #TODO:review
-
-        ary.push normalized_pitch_to_lilypond(item)
+        console.log "dash_to_tie case!!***"
+        console.log "dash_to_tie case!!***last_pitch is",last_pitch
+        ary.push normalized_pitch_to_lilypond(item,{last_pitch: last_pitch})
         item=null
     if item? and item.my_type is "measure"
        measure=item
@@ -448,9 +499,13 @@ line_to_lilypond_array = (line,options={}) ->
          ary.push "\\partial 4*#{measure.beat_count} "
     if item? and item.dash_to_tie
       tied_array.push item if item?
+    # TODO: why/how can item be null???
+    if item? and item_has_attribute(item,"end_slur") 
+      in_slur=false
   if in_times
     ary.push "}"
     in_times=false
+  console.log "tied_array",tied_array.length
   emit_tied_array(last_pitch,tied_array,ary) if tied_array.length >0 
   ary.push "\\break\n"
   ary
