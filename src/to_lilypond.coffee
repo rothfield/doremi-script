@@ -215,7 +215,7 @@ get_ending= (item) ->
 normalized_pitch_to_lilypond= (pitch,context={last_pitch: {},in_slur:false}) ->
   special_case=false
   if pitch.dash_to_tie and has_after_ornament(context.last_pitch)
-    #console.log "***SPECIAL CASE"
+    console.log "***SPECIAL CASE" if false
     special_case=true
   console.log "context.in_slur is ", context.in_slur if false
   # Render a pitch/dash as lilypond
@@ -300,7 +300,7 @@ normalized_pitch_to_lilypond= (pitch,context={last_pitch: {},in_slur:false}) ->
     extra_end_slur=")"
   # Don't use tie if ornament is after!
   if (ornament?.placement is "after") and pitch.tied?
-    console.log "OMG"
+    console.log "OMG" if false
     lilypond_symbol_for_tie=""
   "#{grace1}#{lilypond_pitch}#{lilypond_octave}#{duration}#{lilypond_symbol_for_tie}#{mordent}#{begin_slur}#{extra_end_slur}#{end_slur}#{ending}#{chord}#{grace2}"
 
@@ -359,7 +359,7 @@ lilypond_pitch_map=
 
 
 emit_tied_array=(last_pitch,tied_array,ary) ->
-  console.log "********emit_tied_array"
+  console.log "********emit_tied_array" if false
 
   return if !last_pitch?
   return if tied_array.length is 0
@@ -390,11 +390,11 @@ emit_tied_array=(last_pitch,tied_array,ary) ->
   obj.tied= last.tied
   @log "leaving emit_tied_array"
   tied_array.length=0 # clear it
-  console.log "****",has_after_ornament(last_pitch)
+  console.log "****",has_after_ornament(last_pitch) if false
   if has_after_ornament(last_pitch)
     # TODO: in this case, if the previous pitch had an after grace, then
     # add a right paren !!! April 14,2012
-    console.log "ADD CODE TO ADD RIGHT PARENT TO THIS PITCH",obj
+    console.log "ADD CODE TO ADD RIGHT PARENT TO THIS PITCH",obj if false
 
   ary.push normalized_pitch_to_lilypond(obj,{last_pitch:last_pitch})
  
@@ -421,7 +421,7 @@ lilypond_transpose=(composition_data) ->
   return "\\transpose c' #{lilypond_pitch_map[composition_data.key]}'"
 
 line_to_lilypond = (line,options={}) ->
-  console.log "line_to_lilypond"
+  console.log "line_to_lilypond" if false
   line_to_lilypond_array(line,options).join ' '
 
 has_after_ornament = (pitch) ->
@@ -485,8 +485,8 @@ line_to_lilypond_array = (line,options={}) ->
         dashes_at_beginning_of_line_array.push item
       if item.dash_to_tie
         #TODO:review
-        console.log "dash_to_tie case!!***"
-        console.log "dash_to_tie case!!***last_pitch is",last_pitch
+        console.log "dash_to_tie case!!***" if false
+        console.log "dash_to_tie case!!***last_pitch is",last_pitch if false
         ary.push normalized_pitch_to_lilypond(item,{last_pitch: last_pitch})
         item=null
     if item? and item.my_type is "measure"
@@ -505,7 +505,7 @@ line_to_lilypond_array = (line,options={}) ->
   if in_times
     ary.push "}"
     in_times=false
-  console.log "tied_array",tied_array.length
+  console.log "tied_array",tied_array.length if false
   emit_tied_array(last_pitch,tied_array,ary) if tied_array.length >0 
   ary.push "\\break\n"
   ary
