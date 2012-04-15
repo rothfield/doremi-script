@@ -96,6 +96,7 @@ exports.test_after_ornament = (test) ->
 
 exports.test_after_ornament_with_tied_pitch = (test) ->
   _console.level  = Logger.INFO
+  #
   str= '''
       RG
   | -G   -- 
