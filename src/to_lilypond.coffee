@@ -477,7 +477,8 @@ line_to_lilypond_array = (line,options={}) ->
              x=4
            if  beat.subdivisions is 5
              x=4
-           ary.push "\\times #{x}/#{beat.subdivisions} { "
+           disable_tuplet_numbers="\\override TupletNumber #'stencil = ##f"
+           ary.push "#{disable_tuplet_numbers} \\times #{x}/#{beat.subdivisions} { "
            in_times=true #hack
     if item.my_type is "dash"
       if !item.dash_to_tie and item.numerator? #THEN its at beginning of line!

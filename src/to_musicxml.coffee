@@ -6,6 +6,7 @@
 root = exports ? this
 
 fs= require 'fs' if require?
+Handlebars=require 'handlebars' if require?
 if require?
   shared=require('./shared.js')
   root._ = require("underscore")._

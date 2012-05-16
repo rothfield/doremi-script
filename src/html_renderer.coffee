@@ -54,9 +54,9 @@ draw_lyrics_section=(lyrics_section) ->
   x="<div title='Lyrics Section' class='stave lyrics_section unhyphenated'>#{lyrics_section.unhyphenated_source}</div>"
   x+"<div title='Lyrics Section' class='stave lyrics_section hyphenated'>#{lyrics_section.hyphenated_source}</div>"
 
-draw_line= (line) ->
+draw_line= (line,model) ->
   # The concept of line has expanded to include a lyrics section
-  return draw_lyrics_section(line) if line.my_type is 'lyrics_section'
+  return draw_lyrics_section(line, {show_hyphenated_lyrics: => model.show_hyphenated_lyrics}) if line.my_type is 'lyrics_section'
   x=(draw_item(item) for item in line.items).join('')
   # TODO: dry
   "<div class='stave sargam_line'>#{x}</div>"
@@ -251,7 +251,7 @@ to_html_doc= (composition,full_url="http://ragapedia.com",css="",js="") ->
     </style>
       <title>#{composition.title}</title>
       <!--
-      <link media="all" type="text/css" href="#{full_url}/css/application.css" rel="stylesheet">
+      <link media="all" type="text/css" href="#{full_url}/css/doremi.css" rel="stylesheet">
        -->
       <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     </head>
@@ -293,9 +293,9 @@ draw_attributes = (attributes)->
   "<div class='attribute_section'>#{attrs}</div>"
 
 
-line_to_html= (line) ->
+line_to_html= (line,model={}) ->
   # returns the text of an html div rendering the line
-  draw_line(line)
+  draw_line(line,model)
   #"<div class='composition'>#{line}</div>"
 
 
@@ -305,7 +305,7 @@ to_html= (composition) ->
   attrs=""
   if false
     attrs=draw_attributes(composition.attributes)
-  lines=(draw_line(item) for item in composition.lines).join('\n')
+  lines=(draw_line(item,composition) for item in composition.lines).join('\n')
   "<div class='composition'>#{attrs}#{lines}</div>"
 
 root.to_html=to_html

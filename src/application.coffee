@@ -141,7 +141,7 @@ $(document).ready ->
   get_css = () ->
     params=
       type:'GET'
-      url:'/css/application.css'
+      url:'/css/doremi.css'
       dataType:'text'
       success: (data) ->
         $('#css_for_html_doc').html(data)

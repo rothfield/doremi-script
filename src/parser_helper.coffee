@@ -168,6 +168,7 @@ root.ParserHelper=
     @composition_data =
       my_type:"composition"
       apply_hyphenated_lyrics:true # Defaults to true
+      show_hyphenated_lyrics:false
       title:""
       notes_used:""
       force_notes_used:false
@@ -195,8 +196,12 @@ root.ParserHelper=
           if (lower not in split_chars)
             hash[char.toLowerCase(char)]=char
     @composition_data.force_notes_used_hash=hash
+    x=get_composition_attribute(@composition_data,"StaffNotationUrl")
+    @composition_data.staff_notation_url = x || ""
     x=get_composition_attribute(@composition_data,"TimeSignature")
     @composition_data.time_signature = x || "4/4"
+    x=get_composition_attribute(@composition_data,"ShowHyphenatedLyrics")
+    @composition_data.show_hyphenated_lyrics = x || false
     x=get_composition_attribute(@composition_data,"ForceNotesUsed")
     @composition_data.force_notes_used = x || false
     x=get_composition_attribute(@composition_data,"id")
