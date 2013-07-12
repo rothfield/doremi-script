@@ -168,16 +168,18 @@ SECTION = (ATTRIBUTE_SECTION | SARGAM_SECTION | LYRICS_SECTION)
 LYRICS_SECTION (* verse,chorus,paragraph. Lines of lyrics *)
   = LYRICS_LINE ('\n' LYRICS_LINE)*
 
+
+LYRICS_SEPARATOR= (" "+ | ("-" + " "*))
 LYRICS_LINE (* line of syllables *)
-  = " "* LYRICS_LINE_ITEM ( (  " "+    | ("-" " "*))   LYRICS_LINE_ITEM)*  " "* 
+  = " "* LYRICS_LINE_ITEM ( LYRICS_SEPARATOR LYRICS_LINE_ITEM)*  LYRICS_SEPARATOR* 
 
 LYRICS_LINE_ITEM (* items in lyrics line, ie a word or a syllable. ie he-llo john gives 3 items, 3 syllables . Don't distinguish he- from john *)
-  = SYLLABLE | HYPHENATED_SYLLABLE
+  = SYLLABLE
 
 HYPHENATED_SYLLABLE 
   = #"[a-zA-Z'!]+"  &"-" 
 SYLLABLE (* for example he- or world *)
-  = #"[a-zA-Z'!]+"      !"-" 
+  = #"[a-zA-Z'!]+"
 
 
 EMPTY_LINE2= WHITE_SPACE '\n'  (* TODO *)
