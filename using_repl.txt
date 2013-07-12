@@ -1,0 +1,16 @@
+(ns whatever (:use [instatest.core]))
+		(get-parser "SSS" :start :COMPOSITION)
+		=>  [:COMPOSITION [:SECTION [:SARGAM_SECTION [:COMPOUND_LINE [:SARGAM_LINE [:WHITE_SPACE ""] [:MEASURE [:BEAT [:BEAT_UNDELIMITED [:BEAT_UNDELIMITED_ITEM [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:S "S"]]]] [:BEAT_UNDELIMITED_ITEM [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:S "S"]]]] [:BEAT_UNDELIMITED_ITEM [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:S "S"]]]]]]]]]]]]
+
+
+(ns whatever (:use [instaparse.core :as insta]))
+		(view-tree sequential? seq x
+		 :node->descriptor (fn [n] {:label (when (number? n) n)}))
+
+		(def x (get-parser "SSS" :start :COMPOSITION))
+
+
+		(defn spans [t]
+		 (if (sequential? t)
+			(cons (cons (insta/span t) t) (map spans (next t)))
+			t))

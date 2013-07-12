@@ -1,0 +1,158 @@
+<BARLINE>  (* a musical barline or repeat *)
+  = 
+  REVERSE_FINAL_BARLINE  |
+  FINAL_BARLINE  |
+  DOUBLE_BARLINE  |
+  LEFT_REPEAT  |
+  RIGHT_REPEAT  |
+  SINGLE_BARLINE 
+
+REVERSE_FINAL_BARLINE  (* ie [|, a reverse final barline *)
+  = <'[' "|">
+
+FINAL_BARLINE (* ie |], a final barline *)
+  = <'|' ']'>
+
+DOUBLE_BARLINE (* ie ||, a solid barline *)
+  = <'|' '|'>
+
+SINGLE_BARLINE (* ie | *)
+  = <'|'> ! ('|' | ']' | ':')
+LEFT_REPEAT (* ie |:  *)
+  = <'|' ':'>
+
+RIGHT_REPEAT (* ie :| *)
+  = <':' '|'>
+	
+	
+	
+FLAT_OR_SHARP = '#' | 'b'
+(*  Letters SrRgGmMPdDnN in latin script  *)
+  S_FLAT  = <'S' 'b'>
+  S_SHARP  = <   'S' '#'  >
+  SARGAM_RE_SHARP  = <   'R' '#'  >
+  SARGAM_GA_SHARP  = <   'G' '#'   >
+  SARGAM_PA_SHARP  = <   'P' '#'   >
+  SARGAM_PA_FLAT   = <   'P' 'b'   >
+  SARGAM_DHA_SHARP  = <   'D' '#'   >
+  SARGAM_NI_SHARP   = <   'N' '#'  >
+  SARGAM_PA_FLAT    = <   'P' 'b'   >
+  S  = <   'S' ! FLAT_OR_SHARP  >
+  r = <   'r' ! FLAT_OR_SHARP  >
+  R  = <   'R' ! FLAT_OR_SHARP  >
+  g = <   'g' ! FLAT_OR_SHARP  >
+  G = <   'G' ! FLAT_OR_SHARP  >
+  m = <   'm' ! FLAT_OR_SHARP  >
+  M = <   'M' ! FLAT_OR_SHARP  >
+  P = <   'P' ! FLAT_OR_SHARP  >
+  d = <   'd' ! FLAT_OR_SHARP  >
+  D = <   'D' ! FLAT_OR_SHARP  >
+  n = <   'n' ! FLAT_OR_SHARP  >
+  N = <   'N' ! FLAT_OR_SHARP  >
+
+<SARGAM_MUSICAL_CHAR>  = 
+    S_FLAT |
+    S_SHARP |
+    SARGAM_RE_SHARP |
+    SARGAM_GA_SHARP |
+    SARGAM_PA_SHARP |
+    SARGAM_PA_FLAT |
+    SARGAM_DHA_SHARP |
+    SARGAM_NI_SHARP |
+    SARGAM_PA_FLAT |
+    S |
+    r |
+    R |
+    g |
+    G |
+    m |
+    M |
+    P |
+    d |
+    D |
+    n |
+    N 
+BEGIN_SLUR_OF_PITCH = <'('>
+END_SLUR_OF_PITCH = <')'>
+
+<SARGAM_PITCH> = (* a sargam pitch ie SrR.. *)
+     BEGIN_SLUR_OF_PITCH? SARGAM_MUSICAL_CHAR END_SLUR_OF_PITCH?  
+		 
+<SPACE>  (* space or tab char *)
+  = ' '
+
+<WHITE_SPACE> (* white space *)
+   = <  #'\s*'  >
+
+BEGIN_BEAT_SYMBOL  (* symbol to use to indicate start of beat *)
+  = <  '<' >
+END_BEAT_SYMBOL  (* Symbol to use to indicate end of beat *)
+  = <  '>'  >
+
+(* TODO *)
+BEAT = BEAT_DELIMITED | !BEGIN_BEAT_SYMBOL BEAT_UNDELIMITED
+<BEAT_DELIMITED> (* ie <S R G m> . Useful if lyrics wouldn't line up otherwise!. use <Srgm> or <S r g m> to group pithes into a single beat. The <> delimiters correspond to the lower loop in the aacm notation system *)
+  = <BEGIN_BEAT_SYMBOL> BEAT_DELIMITED_ITEM+ <END_BEAT_SYMBOL>
+
+BEAT_DELIMITED_ITEM (* inside of a delimited beat, ie S--  R--  G- *)
+  = BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES / SARGAM_PITCH / DASH / <WHITE_SPACE>
+
+LINE_NUMBER (* ie 1) 2) 3) etc TODO: allow x)     *)
+ = DIGITS  <')'>  WHITE_SPACE
+
+<DIGITS> = #'\d+'
+
+BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES (* "<S  - - R >" *) = SARGAM_PITCH (WHITE_SPACE | DASH)+
+
+DASH (* ie a -, used as a rhythmical placeholder. IE S--R--G- *)
+   = <'-'>
+REPEAT_SYMBOL = '%'
+
+UNDELIMITED_SARGAM_PITCH_WITH_DASHES (* for example 'S--'  *)
+  = SARGAM_PITCH DASH+
+
+<BEAT_UNDELIMITED> (* beats can be indicated by a group of pitches that consist only of pitches and dashes such as 'S--R--G-'   Can't contain spaces *)
+  = BEAT_UNDELIMITED_ITEM+ 
+
+<BEAT_UNDELIMITED_ITEM> (* inside of a simple beat, ie S--R--G- Note that undelimited beats cannot contain spaces *)
+  = UNDELIMITED_SARGAM_PITCH_WITH_DASHES / 
+    SARGAM_PITCH / 
+    DASH 
+
+<NON_BARLINE> 
+  =
+    WHITE_SPACE /  
+    BEAT_DELIMITED / 
+    BEAT_UNDELIMITED / 
+    SARGAM_PITCH / 
+    DASH  
+
+MEASURE 
+  = BARLINE NON_BARLINE+ (BARLINE / &LINE_END )
+
+LINE_END (* eol or eof *)
+(* TODO: was EOF or EOL *)
+  =   EOL | ""
+
+EOL = LINE_END_CHAR ""
+
+LINE_END_CHAR= '\r' '\n' / '\r' / '\n' / ''  (* review epsilon here *)
+
+
+
+
+SARGAM_LINE_ITEM  (* an item in the main line *)
+  = MEASURE /
+    WHITE_SPACE /  
+    BEAT_DELIMITED / 
+    BEAT_UNDELIMITED / 
+    SARGAM_PITCH / 
+    DASH / 
+    BARLINE / 
+    REPEAT_SYMBOL 
+
+
+
+SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or more measures followed by line end *)
+  = LINE_NUMBER?  MEASURE+ LINE_END
+
