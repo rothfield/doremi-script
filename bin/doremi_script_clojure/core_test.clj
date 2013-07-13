@@ -11,7 +11,7 @@
     (slurp (clojure.java.io/resource "doremi_script_clojure/doremiscript.ebnf")))
   )
 
-(defn parse-succeeded3
+(defn good-parse
 	"Returns true if parse succeded and the list of expected values are in the 
 	flattened parse tree"
 	[txt start expected]
@@ -45,7 +45,7 @@
 		(clojure.java.io/resource 
 			"doremi_script_clojure/fixtures/yesterday_no_chords.doremiscript.txt"))]
 	(pprint txt)
-	(is (true? (parse-succeeded3 txt :COMPOSITION ["Yesterday"])))
+	(is (good-parse txt :COMPOSITION ["Yesterday"]))
 	))
 
 (deftest composition-with-attributes-lyrics-and-sargam-section
@@ -53,39 +53,39 @@
 		(clojure.java.io/resource 
 			"doremi_script_clojure/fixtures/georgia.doremiscript.txt"))]
 	(pprint txt)
-	(is (true? (parse-succeeded3 txt :COMPOSITION ["Georgia",:UPPER_OCTAVE_DOT,".",:TALA])))
+	(is (good-parse txt :COMPOSITION ["Georgia",:UPPER_OCTAVE_DOT,".",:TALA]))
 	))
 
 
 
 (deftest lower-octave-line
-	(is (true? (parse-succeeded3 ". : _" :LOWER_OCTAVE_LINE [:LOWER_OCTAVE_DOT :KOMMAL_INDICATOR ])))
-		)
+	(is (good-parse ". : _" :LOWER_OCTAVE_LINE [:LOWER_OCTAVE_DOT :KOMMAL_INDICATOR ])))
+		
 
 (deftest dot
-	(is (true? (parse-succeeded3 "." :DOT [:DOT "."])))
-	(is (true? (parse-succeeded3 "*" :DOT [:DOT "*"])))
-	(is (true? (parse-succeeded3 "*" :LOWER_OCTAVE_DOT [:DOT "*"])))
-	(is (true? (parse-succeeded3 "." :LOWER_OCTAVE_DOT [:DOT "."])))
-	(is (true? (parse-succeeded3 "*" :UPPER_OCTAVE_DOT [:DOT "*"])))
-	(is (true? (parse-succeeded3 "." :UPPER_OCTAVE_DOT [:DOT "."])))
+	(is (good-parse "." :DOT [:DOT "."]))
+	(is (good-parse "*" :DOT [:DOT "*"]))
+	(is (good-parse "*" :LOWER_OCTAVE_DOT [:DOT "*"]))
+	(is (good-parse "." :LOWER_OCTAVE_DOT [:DOT "."]))
+	(is (good-parse "*" :UPPER_OCTAVE_DOT [:DOT "*"]))
+	(is (good-parse "." :UPPER_OCTAVE_DOT [:DOT "."]))
 		)
 
 
 (deftest sargam-pitch-can-include-left-slur
-	(is (true? (parse-succeeded3 "(S" :SARGAM_PITCH [:BEGIN_SLUR :S ])))
+	(is (good-parse "(S" :SARGAM_PITCH [:BEGIN_SLUR :S ]))
 		)
 (deftest lower-octave-dot
-	(is (true? (parse-succeeded3 "." :LOWER_OCTAVE_DOT ["."])))
-		)
+	(is (good-parse "." :LOWER_OCTAVE_DOT ["."])))
+		
 (deftest kommal_underscore
-	(is (true? (parse-succeeded3 "_" :KOMMAL_INDICATOR ["_"])))
-		)
+	(is (good-parse "_" :KOMMAL_INDICATOR ["_"])))
+		
 
 
 (deftest lower-lower-octave
-	(is (true? (parse-succeeded3 ":" :LOWER_LOWER_OCTAVE_SYMBOL [":"])))
-		)
+	(is (good-parse ":" :LOWER_LOWER_OCTAVE_SYMBOL [":"])))
+		
 
 (defn parse-fails? [text-to-parse starting-production]
 	(let [result (my-get-parser text-to-parse :start starting-production)]
@@ -178,19 +178,20 @@
 		))
 
 (deftest sargam-ornament
-	(is (true? (parse-succeeded3 "PMDP" :SARGAM_ORNAMENT  [:P :D]))))
+	(is (good-parse "PMDP" :SARGAM_ORNAMENT  [:P :D])))
 (deftest alternate_ending
-	(is (true? (parse-succeeded3 "1._____" :ALTERNATE_ENDING_INDICATOR  [])))
-	(is (true? (parse-succeeded3 "3_____" :ALTERNATE_ENDING_INDICATOR  [])))
- )
+	(is (good-parse "1._____" :ALTERNATE_ENDING_INDICATOR  []))
+	(is (good-parse "3_____" :ALTERNATE_ENDING_INDICATOR  [])))
+ 
   
 
 (deftest syllable-with-hyphen
-	(is (true? (parse-succeeded3 "foo-   bar baz-" :LYRICS_LINE ["foo"]))))
+	(is (good-parse "foo-   bar baz-" :LYRICS_LINE ["foo"])))
 
 (deftest syllable-with-hyphen-bad-case
   ;;; TODO: change EBNF
-  (is (true? (parse-succeeded3 "foo-   bar baz---" :LYRICS_LINE ["foo"]))))
+  (is (good-parse "foo-   bar baz---" :LYRICS_LINE ["foo"])))
+
 (deftest composition-attributes-and-sargam-sections
 	(let [txt "foo:bar  \ndog:cat    \n\n | S R G | "
 		result (my-get-parser txt :total false :start :COMPOSITION )
@@ -236,9 +237,9 @@
     )
 	)
 (deftest attribute-line
-	(is (true? (parse-succeeded3 "foo:bar" :ATTRIBUTE_LINE ["foo" "bar" ])))
-	(is (true? (parse-succeeded3 "foo : bar" :ATTRIBUTE_LINE ["foo" "bar" ])))
-	(is (true? (parse-succeeded3 "foo : bar    " :ATTRIBUTE_LINE ["foo" "bar" ])))
+	(is (good-parse "foo:bar" :ATTRIBUTE_LINE ["foo" "bar" ]))
+	(is (good-parse "foo : bar" :ATTRIBUTE_LINE ["foo" "bar" ]))
+	(is (good-parse "foo : bar    " :ATTRIBUTE_LINE ["foo" "bar" ]))
 )
 (deftest attribute-section
 	(let [result (my-get-parser "foo:bar\ncat:dog" :start :ATTRIBUTE_SECTION )
@@ -253,7 +254,7 @@
 	)
 
 (deftest attributes
-	(is (true? (parse-succeeded3 "foo:bar" :ATTRIBUTE_LINE ["foo" "bar"]))))
+	(is (good-parse "foo:bar" :ATTRIBUTE_LINE ["foo" "bar"])))
 
 (deftest line-number
 	(let [result (my-get-parser "1)" :start :LINE_NUMBER )
@@ -273,62 +274,62 @@
     )
 	)
 (deftest sargam-line-simple
-	(is (true? (parse-succeeded3 "| S R |" :SARGAM_LINE [:S :R :BEAT ]))))
+	(is (good-parse "| S R |" :SARGAM_LINE [:S :R :BEAT ])))
 
 
 
 
 (deftest beat-can-be-delimited-with-angle-brackets
-	(is (true? (parse-succeeded3 "<S>" :BEAT_DELIMITED [:S :BEAT_DELIMITED ]))))
+	(is (good-parse "<S>" :BEAT_DELIMITED [:S :BEAT_DELIMITED ])))
 
 (deftest beat-can-be-delimited-with-angle-brackets-more-than-one-note-with-spaces
-	(is (true? (parse-succeeded3 "<S r>" :BEAT_DELIMITED [:S :r :BEAT_DELIMITED ]))))
+	(is (good-parse "<S r>" :BEAT_DELIMITED [:S :r :BEAT_DELIMITED ])))
 
 (deftest sargam-pitch-can-include-right-slur
-	(is (true? (parse-succeeded3 "S)" :SARGAM_PITCH [:S :END_SLUR ]))))
+	(is (good-parse "S)" :SARGAM_PITCH [:S :END_SLUR ])))
 
 (deftest parses-double-barline
-	(is (true? (parse-succeeded3 "||" :DOUBLE_BARLINE [:DOUBLE_BARLINE ]))))
+	(is (good-parse "||" :DOUBLE_BARLINE [:DOUBLE_BARLINE ])))
 
 (deftest doesnt-parse-single-barline-when-it-sees-double-barline
-	(is (true? (parse-fails? "||" :SINGLE_BARLINE ))
-		""))
+	(is (parse-fails? "||" :SINGLE_BARLINE ))
+		"")
 
 (deftest test-left-repeat
-	(is (true? (parse-succeeded3 "|:" :LEFT_REPEAT [:LEFT_REPEAT ]))))
+	(is (good-parse "|:" :LEFT_REPEAT [:LEFT_REPEAT ])))
 
 (deftest test-final-barline
-	(is (true? (parse-succeeded3 "|]" :FINAL_BARLINE [:FINAL_BARLINE ]))))
+	(is (good-parse "|]" :FINAL_BARLINE [:FINAL_BARLINE ])))
 
 (deftest test-reverse-final-barline
-	(is (true? (parse-succeeded3 "[|" :REVERSE_FINAL_BARLINE [:REVERSE_FINAL_BARLINE ]))))
+	(is (good-parse "[|" :REVERSE_FINAL_BARLINE [:REVERSE_FINAL_BARLINE ])))
 
 
 (deftest test-right-repeat
-	(is (true? (parse-succeeded3 ":|" :RIGHT_REPEAT [:RIGHT_REPEAT ]))))
+	(is (good-parse ":|" :RIGHT_REPEAT [:RIGHT_REPEAT ])))
 
 
 (deftest test-tala
   (let [start :TALA
         items "+2034567"]
-	     (is (true? (parse-succeeded3 "+" :TALA ["+"])))
-	     (is (true? (parse-succeeded3 "0" :TALA ["0"])))
-	     (is (true? (parse-succeeded3 "2" :TALA ["2"])))
+	     (is (good-parse "+" :TALA ["+"]))
+	     (is (good-parse "0" :TALA ["0"]))
+	     (is (good-parse "2" :TALA ["2"]))
    )
   )
  
 
-(deftest test-dash
-	(is (true? (parse-succeeded3 "-" :DASH [:DASH ]))))
+(deftest dash
+	(is (good-parse "-" :DASH [:DASH ])))
 
 (deftest test-repeat-symbol
-	(is (true? (parse-succeeded3 "%" :REPEAT_SYMBOL [:REPEAT_SYMBOL ])) ""))
+	(is (good-parse "%" :REPEAT_SYMBOL [:REPEAT_SYMBOL ])) "")
 
 (defn test-some
 	[]
 	(sargam-pitch-can-include-left-slur)
 	(composition-with-attributes-lyrics-and-sargam-section)
-	(test-dash)
+	(dash)
 	(attributes)
 	(parses-double-barline)
 	(test-final-barline)
@@ -354,3 +355,4 @@
 ;  
 ;(composition-with-attributes-lyrics-and-sargam-section)
 ;(yesterday_no_chords)
+(dash)
