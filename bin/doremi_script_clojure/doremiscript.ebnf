@@ -1,8 +1,28 @@
+(*  EBNF for doremi-script - This is for the clojure instaparse libarary *)
+(* Grammar for AACM/Bhatkande style sargam/letter notation by John Rothfield 707 538-5133, cell 707 331-2700  rthfield@sonic.net *)
+
 COMPOSITION (* a musical piece *)
   = SECTION ('\n' EMPTY_LINE2+  SECTION)*  EMPTY_LINE2*
-(* perhaps paragraphs would be better instead of lines, or goupings, or section *)
+
+SECTION = (ATTRIBUTE_SECTION | SARGAM_SECTION | LYRICS_SECTION) 
 
 
+SARGAM_SECTION 
+(* main line of music. multiple lines including syllables etc,delimited by empty line. There is an order, optional upper octave lines followed by main line of sargam followed by optional lyrics line *)
+  =  (UPPER_OCTAVE_LINE "\n")*  SARGAM_LINE ('\n' (LYRICS_LINE | LOWER_OCTAVE_LINE))*
+
+
+ATTRIBUTE_SECTION (* Header lines *)
+= ATTRIBUTE_LINE ('\n' ATTRIBUTE_LINE)* 
+
+
+LYRICS_SECTION (* verse,chorus,paragraph. Lines of lyrics *)
+  = LYRICS_LINE ('\n' LYRICS_LINE)*
+
+EMPTY_LINE2= WHITE_SPACE? '\n'  (* TODO *)
+
+
+(************** Barlines **********************)
 BARLINE  (* a musical barline or repeat *)
   = 
   REVERSE_FINAL_BARLINE  |
@@ -29,7 +49,7 @@ LEFT_REPEAT (* ie |:  *)
 RIGHT_REPEAT (* ie :| *)
   = ':' '|'
 	
-	
+(****   Pitches ************)	
 	
 FLAT_OR_SHARP = '#' | 'b'
 (*  Letters SrRgGmMPdDnN in latin script  *)
@@ -83,7 +103,7 @@ END_SLUR = ')'
 SARGAM_PITCH = (* a sargam pitch ie SrR.. *)
      BEGIN_SLUR? SARGAM_MUSICAL_CHAR END_SLUR?  
 		 
-SPACE  (* space or tab char *)
+SPACE  (* space *)
   = ' '
 
 WHITE_SPACE (* ONE OR MORE SPACES *)
@@ -96,7 +116,8 @@ END_BEAT_SYMBOL  (* Symbol to use to indicate end of beat *)
 
 (* TODO *)
 BEAT = BEAT_DELIMITED | !BEGIN_BEAT_SYMBOL BEAT_UNDELIMITED
-BEAT_DELIMITED (* ie S R G m> . Useful if lyrics wouldn't line up otherwise!. use Srgm> or S r g m> to group pithes into a single beat. The > delimiters correspond to the lower loop in the aacm notation system *)
+
+BEAT_DELIMITED (* ie <S R G m> . Useful if lyrics wouldn't line up otherwise!. use Srgm> or S r g m> to group pithes into a single beat. The > delimiters correspond to the lower loop in the aacm notation system *)
   = BEGIN_BEAT_SYMBOL BEAT_DELIMITED_ITEM+ END_BEAT_SYMBOL
 
 BEAT_DELIMITED_ITEM (* inside of a delimited beat, ie S--  R--  G- *)
@@ -105,9 +126,9 @@ BEAT_DELIMITED_ITEM (* inside of a delimited beat, ie S--  R--  G- *)
 LINE_NUMBER (* ie 1) 2) 3) etc TODO: allow x)     *)
  = DIGITS  ')'  WHITE_SPACE?
 
-DIGITS = #'\d+'
+DIGITS = (* One or more digits *)  #'\d+'
 
-BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES (* "S  - - R >" *) = SARGAM_PITCH (WHITE_SPACE | DASH)+
+BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES (* <S  - - R >" *) = SARGAM_PITCH (WHITE_SPACE | DASH)+
 
 DASH (* ie a -, used as a rhythmical placeholder. IE S--R--G- *)
    = '-'
@@ -158,17 +179,6 @@ SARGAM_LINE_ITEM  (* an item in the main line *)
 EMPTY_LINE = WHITE_SPACE* LINE_END 
 
 
-ATTRIBUTE_SECTION (* Header lines *)
-= ATTRIBUTE_LINE ('\n' ATTRIBUTE_LINE)* 
-
-SARGAM_SECTION=COMPOUND_LINE
-
-SECTION = (ATTRIBUTE_SECTION | SARGAM_SECTION | LYRICS_SECTION) 
-
-LYRICS_SECTION (* verse,chorus,paragraph. Lines of lyrics *)
-  = LYRICS_LINE ('\n' LYRICS_LINE)*
-
-
 LYRICS_SEPARATOR= (" "+ | ("-" + " "*))
 LYRICS_LINE (* line of syllables *)
   = " "* LYRICS_LINE_ITEM ( LYRICS_SEPARATOR LYRICS_LINE_ITEM)*  LYRICS_SEPARATOR* 
@@ -182,11 +192,8 @@ SYLLABLE (* for example he- or world *)
   = #"[a-zA-Z'!]+"
 
 
-EMPTY_LINE2= WHITE_SPACE? '\n'  (* TODO *)
 
 
-COMPOUND_LINE 
-  =  (UPPER_OCTAVE_LINE "\n")*  SARGAM_LINE ('\n' (LYRICS_LINE | LOWER_OCTAVE_LINE))*
 
 UPPER_OCTAVE_LINE (* can put upper octave dots or semicolons for upper upper octave (. or :). Also tala symbols +203   *)
   = WHITE_SPACE? UPPER_OCTAVE_LINE_ITEM+ 
@@ -245,16 +252,14 @@ KOMMAL_INDICATOR (* For the traditional bhatkande notation. for devanagri, indic
  = "_"
 
 
-LINE (* main line of music. multiple lines including syllables etc,delimited by empty line. There is an order, optional upper octave lines followed by main line of sargam followed by optional lyrics line *)
-(*  = COMPOUND_LINE / SIMPLE_LINE / LYRICS_SECTION *)
-= COMPOUND_LINE 
 
 ATTRIBUTE_LINE (* ie Author: John Rothfield *)
 = KEY WHITE_SPACE?   ":" WHITE_SPACE? VALUE WHITE_SPACE?
 
-KEY= #"\w+"
+KEY= (* ie Author *)  #"\w+"
 
-VALUE=  (* Value can have embedded spaces *)
+VALUE=  (* Attribute value can have embedded spaces.  *)
+(* Non-space followed by (spaces | non-space)*
 #"[^\n\r ](( *)[^\n\r ])*"
 
 SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or more measures followed by line end *)
