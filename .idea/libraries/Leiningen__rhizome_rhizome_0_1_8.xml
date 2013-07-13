@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: rhizome:rhizome:0.1.8">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/rhizome/rhizome/0.1.8/rhizome-0.1.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

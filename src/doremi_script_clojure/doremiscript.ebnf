@@ -87,7 +87,7 @@ SPACE  (* space or tab char *)
   = ' '
 
 WHITE_SPACE (* white space *)
-=    #' *'   
+=    #' +'   
 
 BEGIN_BEAT_SYMBOL  (* symbol to use to indicate start of beat *)
   =   '<' 
@@ -103,7 +103,7 @@ BEAT_DELIMITED_ITEM (* inside of a delimited beat, ie S--  R--  G- *)
   = BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES / SARGAM_PITCH / DASH / WHITE_SPACE
 
 LINE_NUMBER (* ie 1) 2) 3) etc TODO: allow x)     *)
- = DIGITS  ')'  WHITE_SPACE
+ = DIGITS  ')'  WHITE_SPACE?
 
 DIGITS = #'\d+'
 
@@ -132,7 +132,7 @@ NON_BARLINE
 
 
 MEASURE 
-  = WHITE_SPACE* BEAT (WHITE_SPACE* BEAT)*  WHITE_SPACE*
+  = WHITE_SPACE* BEAT (WHITE_SPACE BEAT)*  WHITE_SPACE?
 
 LINE_END (* eol or eof *)
 (* TODO: was EOF or EOL *)
@@ -182,7 +182,7 @@ SYLLABLE (* for example he- or world *)
   = #"[a-zA-Z'!]+"
 
 
-EMPTY_LINE2= WHITE_SPACE '\n'  (* TODO *)
+EMPTY_LINE2= WHITE_SPACE? '\n'  (* TODO *)
 
 
 COMPOUND_LINE 
@@ -203,5 +203,5 @@ KEY= #"\w+"
 VALUE=#"([^\n\r])+"
 
 SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or more measures followed by line end *)
-  = LINE_NUMBER?  WHITE_SPACE BARLINE? MEASURE (BARLINE MEASURE)*  BARLINE? WHITE_SPACE*
+  = LINE_NUMBER?  WHITE_SPACE? BARLINE? MEASURE (BARLINE MEASURE)*  BARLINE? WHITE_SPACE?
 
