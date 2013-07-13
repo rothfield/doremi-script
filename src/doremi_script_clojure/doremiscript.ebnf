@@ -181,15 +181,17 @@ EMPTY_LINE = WHITE_SPACE* LINE_END
 
 LYRICS_SEPARATOR= (" "+ | ("-" + " "*))
 LYRICS_LINE (* line of syllables *)
-  = " "* LYRICS_LINE_ITEM ( LYRICS_SEPARATOR LYRICS_LINE_ITEM)*  LYRICS_SEPARATOR* 
+  = WHITE_SPACE? SYLLABLE (LYRICS_LINE_ITEM)*
 
-LYRICS_LINE_ITEM (* items in lyrics line, ie a word or a syllable. ie he-llo john gives 3 items, 3 syllables . Don't distinguish he- from john *)
-  = SYLLABLE
+LYRICS_LINE_ITEM (* items in lyrics line, ie a word or a syllable. ie he-llo john gives 3 items, 3 syllables *)
+  = SYLLABLE | WHITE_SPACE
 
-HYPHENATED_SYLLABLE 
-  = #"[a-zA-Z'!]+"  &"-" 
-SYLLABLE (* for example he- or world *)
-  = #"[a-zA-Z'!]+"
+SYLLABLE= HYPHENATED_SYLLABLE | NON_HYPHENATED_SYLLABLE
+HYPHENATED_SYLLABLE (* ends in a hyphen *)
+  = #"[a-zA-Z'!]+-" 
+
+NON_HYPHENATED_SYLLABLE (* Doesn't end in hyphen  *)
+  = #"[a-zA-Z'!]+" !"-"
 
 
 

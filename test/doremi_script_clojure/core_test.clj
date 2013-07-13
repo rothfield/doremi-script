@@ -5,7 +5,10 @@
 		[clojure.walk :refer :all ]
 		[instaparse.core :as insta]
 		))
-
+(defn slurp-fixture [file-name]
+    (slurp (clojure.java.io/resource 
+					 (str "doremi_script_clojure/fixtures/" file-name))))
+  
 (def my-get-parser 
   (insta/parser
     (slurp (clojure.java.io/resource "doremi_script_clojure/doremiscript.ebnf")))
@@ -15,7 +18,7 @@
 	"Returns true if parse succeded and the list of expected values are in the 
 	flattened parse tree"
 	[txt start expected]
-	(println "Testing " txt "with start " start " and expected " expected)
+	(println "Testing <<\n" txt ">>/n" "with start " start " and expected " expected)
 	(let [ result 
 		(my-get-parser txt :total false
 			:start start)
@@ -41,9 +44,12 @@
 		)))
 
 (deftest yesterday_no_chords
-	(let [txt (slurp 
+	(let [txt2 (slurp 
 		(clojure.java.io/resource 
-			"doremi_script_clojure/fixtures/yesterday_no_chords.doremiscript.txt"))]
+			"doremi_script_clojure/fixtures/yesterday_no_chords.doremiscript.txt"))
+						txt (slurp-fixture "yesterday_no_chords.doremiscript.txt") 
+						 ]
+
 	(pprint txt)
 	(is (good-parse txt :COMPOSITION ["Yesterday"]))
 	))
@@ -93,49 +99,25 @@
 		)
 	)
 
-(deftest sargamNotes
-	(let [txt "SrRgGmMPdDnNSbS#R#G#MP#D#N#"
-		result (my-get-parser txt :start :BEAT )
-		flattened (flatten result)]
-    ; (println txt result)
-    ;(println "flattend is " flattened)
-    (is (some #(= :S %) flattened))
-    (is (some #(= :r %) flattened))
-    (is (= 1 (count (filter #(= :BEAT %) flattened))) "beat count off")
-    )
-	)
-; (is (some #(= :LINE_NUMBER %)  flattened))
-(deftest composition
-	(let [
-		txt "foo:bar\ncat:dog\n\n | S R G R |\n"
-		result (my-get-parser txt :total true :start :COMPOSITION )
-		flattened (flatten result)]
-		(println "parsing " txt)
-		(println result)
-    ;(println flattened)
-    (is (some #(= "foo" %) flattened))
-    (is (some #(= "bar" %) flattened))
-    (is (some #(= "cat" %) flattened))
-    (is (some #(= "dog" %) flattened))
-    )
-	)
-(deftest syllable
-	(let [txt "foo"
-		result (my-get-parser txt :total false :start :SYLLABLE )
-		flattened (flatten result)]
-    ;(pprint result)
-    (is (some #(= :SYLLABLE %) flattened))
-    (is (some #(= "foo" %) flattened))
-    ))
-(deftest lyrics-section
-	(let [txt "  Georgia georgia\nNo peace I find ba-by"
-		result (my-get-parser txt :total true :start :LYRICS_SECTION )
-		flattened (flatten result)]
-    ;(pprint result)
-    (is (some #(= :SYLLABLE %) flattened))
-    (is (some #(= "ba" %) flattened))
-    ))
+(deftest sargam-notes
+	(let [txt "SrRgGmMPdDnNSbS#R#G#MP#D#N#"]
+	(is (good-parse txt :BEAT [:S :Sb :N :Nsharp])))
+)
 
+(deftest composition
+	(let 
+		[txt "foo:bar\ncat:dog\n\n | S R G R |\n"]
+	(is (good-parse txt :COMPOSITION ["foo" "bar" "cat" "dog"])))
+)
+
+(deftest syllable
+	(is (good-parse "foo" :SYLLABLE  ["foo"])))
+
+
+(deftest lyrics-section1
+	(let [txt "  Georgia georgia\nNo peace I find ba-by"]
+	     (is (good-parse txt :LYRICS_SECTION   [:HYPHENATED_SYLLABLE ])))
+    )
 
 (deftest upper-octave-line-item
 	(let [txt "."
@@ -152,33 +134,16 @@
 		(is (some #(= "+" %) flattened))
 		(is (some #(= "2" %) flattened))
 		))
-(deftest lyrics-section
-	(let [txt "  Georgia georgia\nNo peace I find ba-by"
-		result (my-get-parser txt :total true :start :LYRICS_SECTION )
-		flattened (flatten result)]
-    ;(pprint result)
-    (is (some #(= :SYLLABLE %) flattened))
-    (is (some #(= "ba" %) flattened))
-    ))
 
 
 
 
 
 
-(deftest lyrics-line
-	(let [txt "  he-llo  dolly"
-		result (my-get-parser txt :total true :start :LYRICS_LINE )
-		flattened (flatten result)]
-		(pprint result)
-		(is (some #(= :SYLLABLE %) flattened))
-		(is (some #(= "he" %) flattened))
-		(is (some #(= "llo" %) flattened))
-		(is (some #(= "dolly" %) flattened))
-		))
 
 (deftest sargam-ornament
 	(is (good-parse "PMDP" :SARGAM_ORNAMENT  [:P :D])))
+
 (deftest alternate_ending
 	(is (good-parse "1._____" :ALTERNATE_ENDING_INDICATOR  []))
 	(is (good-parse "3_____" :ALTERNATE_ENDING_INDICATOR  [])))
@@ -186,11 +151,8 @@
   
 
 (deftest syllable-with-hyphen
-	(is (good-parse "foo-   bar baz-" :LYRICS_LINE ["foo"])))
+	(is (good-parse "foo-   bar baz-" :LYRICS_LINE ["foo-"])))
 
-(deftest syllable-with-hyphen-bad-case
-  ;;; TODO: change EBNF
-  (is (good-parse "foo-   bar baz---" :LYRICS_LINE ["foo"])))
 
 (deftest composition-attributes-and-sargam-sections
 	(let [txt "foo:bar  \ndog:cat    \n\n | S R G | "
@@ -355,4 +317,7 @@
 ;  
 ;(composition-with-attributes-lyrics-and-sargam-section)
 ;(yesterday_no_chords)
-(dash)
+;(dash)
+;(sargam-notes)
+;(composition)
+(lyrics-section1)
