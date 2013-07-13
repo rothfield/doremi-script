@@ -8,7 +8,7 @@
   (println x "Hello, World!")
   1)
 
-(def get-parser 
+(def get-parser22 
   (insta/parser
     (slurp (clojure.java.io/resource "doremi_script_clojure/doremiscript.ebnf")))
   )

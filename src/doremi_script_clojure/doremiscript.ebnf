@@ -86,7 +86,7 @@ SARGAM_PITCH = (* a sargam pitch ie SrR.. *)
 SPACE  (* space or tab char *)
   = ' '
 
-WHITE_SPACE (* white space *)
+WHITE_SPACE (* ONE OR MORE SPACES *)
 =    #' +'   
 
 BEGIN_BEAT_SYMBOL  (* symbol to use to indicate start of beat *)
@@ -186,21 +186,76 @@ EMPTY_LINE2= WHITE_SPACE? '\n'  (* TODO *)
 
 
 COMPOUND_LINE 
-  =  (UPPER_OCTAVE_LINE "\n")*  SARGAM_LINE ('\n' LYRICS_LINE)*
+  =  (UPPER_OCTAVE_LINE "\n")*  SARGAM_LINE ('\n' (LYRICS_LINE | LOWER_OCTAVE_LINE))*
 
 UPPER_OCTAVE_LINE (* can put upper octave dots or semicolons for upper upper octave (. or :). Also tala symbols +203   *)
-  = #" *" UPPER_OCTAVE_LINE_ITEM (#" +" UPPER_OCTAVE_LINE_ITEM)* 
+  = WHITE_SPACE? UPPER_OCTAVE_LINE_ITEM+ 
 
-UPPER_OCTAVE_LINE_ITEM= #"([^\n\r\t ])+"
+UPPER_OCTAVE_LINE_ITEM2= #"([^\n\r\t ])+"
+
+SARGAM_ORNAMENT (* in upper line NRSNS *)
+  = SARGAM_ORNAMENT_ITEM+ 
+
+SARGAM_ORNAMENT_ITEM
+  = SARGAM_PITCH 
+
+MORDENT = "~" 
+
+
+ALTERNATE_ENDING_INDICATOR 
+(*   1._______ 2.___ etc. The period is optional. Must have either dot or underscores. TODO: accepts 1_.___ which is not exactly what I want.  *)
+
+= #"[1-3]"  #"[\._]+" 
+UPPER_OCTAVE_LINE_ITEM (* Things above notes, including talas, octaves,chords, and 1st and second ending symbols *)
+  = WHITE_SPACE | UPPER_OCTAVE_DOT | TALA | 
+	    SARGAM_ORNAMENT | MORDENT | UPPER_UPPER_OCTAVE_SYMBOL | ALTERNATE_ENDING_INDICATOR 
+	(*
+     DELIMITED_SARGAM_ORNAMENT  / 
+     WHITE_SPACE / 
+     UPPER_OCTAVE_DOT /
+     ALTERNATE_ENDING_INDICATOR /
+     TALA /
+     MORDENT /
+     UPPER_UPPER_OCTAVE_SYMBOL /
+     CHORD_SYMBOL /
+     SARGAM_ORNAMENT  
+   *)
+UPPER_OCTAVE_DOT= DOT 
+
+DOT = (*  Period and asterisk are allowed *)
+  #"[\.*]"
+
+UPPER_UPPER_OCTAVE_SYMBOL=":"
+
+TALA (* tala markings. ie +203 for tintal. 012 for rupak *)
+  = #"[+1203456]"
+
+LOWER_OCTAVE_LINE (* can put lower octave dots or semicolons for lower-lower octave (. or :)   *)
+  = WHITE_SPACE? LOWER_OCTAVE_LINE_ITEM+ WHITE_SPACE? 
+
+LOWER_OCTAVE_LINE_ITEM  = "q"
+
+
+LOWER_OCTAVE_LINE_ITEM =  WHITE_SPACE | LOWER_OCTAVE_DOT |
+          LOWER_LOWER_OCTAVE_SYMBOL | KOMMAL_INDICATOR  
+
+LOWER_OCTAVE_DOT= DOT
+LOWER_LOWER_OCTAVE_SYMBOL=":"
+KOMMAL_INDICATOR (* For the traditional bhatkande notation. for devanagri, indicates a flatted note, since devanagri seems not to have lowercase *)
+ = "_"
+
+
 LINE (* main line of music. multiple lines including syllables etc,delimited by empty line. There is an order, optional upper octave lines followed by main line of sargam followed by optional lyrics line *)
 (*  = COMPOUND_LINE / SIMPLE_LINE / LYRICS_SECTION *)
 = COMPOUND_LINE 
 
 ATTRIBUTE_LINE (* ie Author: John Rothfield *)
-= KEY " "*   ":" VALUE " "*
+= KEY WHITE_SPACE?   ":" WHITE_SPACE? VALUE WHITE_SPACE?
 
 KEY= #"\w+"
-VALUE=#"([^\n\r])+"
+
+VALUE=  (* Value can have embedded spaces *)
+#"[^\n\r ](( *)[^\n\r ])*"
 
 SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or more measures followed by line end *)
   = LINE_NUMBER?  WHITE_SPACE? BARLINE? MEASURE (BARLINE MEASURE)*  BARLINE? WHITE_SPACE?

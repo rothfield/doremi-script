@@ -6,13 +6,18 @@
 		[instaparse.core :as insta]
 		))
 
+(def my-get-parser 
+  (insta/parser
+    (slurp (clojure.java.io/resource "doremi_script_clojure/doremiscript.ebnf")))
+  )
+
 (defn parse-succeeded3
 	"Returns true if parse succeded and the list of expected values are in the 
 	flattened parse tree"
 	[txt start expected]
 	(println "Testing " txt "with start " start " and expected " expected)
 	(let [ result 
-		(get-parser txt :total false
+		(my-get-parser txt :total false
 			:start start)
 		flattened (flatten result)]
 		(letfn [(my-helper [x]
@@ -35,29 +40,62 @@
 				))
 		)))
 
+(deftest yesterday_no_chords
+	(let [txt (slurp 
+		(clojure.java.io/resource 
+			"doremi_script_clojure/fixtures/yesterday_no_chords.doremiscript.txt"))]
+	(pprint txt)
+	(is (true? (parse-succeeded3 txt :COMPOSITION ["Yesterday"])))
+	))
 
 (deftest composition-with-attributes-lyrics-and-sargam-section
 	(let [txt (slurp 
 		(clojure.java.io/resource 
-			"doremi_script_clojure/georgia.doremiscript.txt"))]
+			"doremi_script_clojure/fixtures/georgia.doremiscript.txt"))]
 	(pprint txt)
-	(is (true? (parse-succeeded3 txt :COMPOSITION ["Georgia"])))
+	(is (true? (parse-succeeded3 txt :COMPOSITION ["Georgia",:UPPER_OCTAVE_DOT,".",:TALA])))
 	))
+
+
+
+(deftest lower-octave-line
+	(is (true? (parse-succeeded3 ". : _" :LOWER_OCTAVE_LINE [:LOWER_OCTAVE_DOT :KOMMAL_INDICATOR ])))
+		)
+
+(deftest dot
+	(is (true? (parse-succeeded3 "." :DOT [:DOT "."])))
+	(is (true? (parse-succeeded3 "*" :DOT [:DOT "*"])))
+	(is (true? (parse-succeeded3 "*" :LOWER_OCTAVE_DOT [:DOT "*"])))
+	(is (true? (parse-succeeded3 "." :LOWER_OCTAVE_DOT [:DOT "."])))
+	(is (true? (parse-succeeded3 "*" :UPPER_OCTAVE_DOT [:DOT "*"])))
+	(is (true? (parse-succeeded3 "." :UPPER_OCTAVE_DOT [:DOT "."])))
+		)
+
 
 (deftest sargam-pitch-can-include-left-slur
 	(is (true? (parse-succeeded3 "(S" :SARGAM_PITCH [:BEGIN_SLUR :S ])))
 		)
+(deftest lower-octave-dot
+	(is (true? (parse-succeeded3 "." :LOWER_OCTAVE_DOT ["."])))
+		)
+(deftest kommal_underscore
+	(is (true? (parse-succeeded3 "_" :KOMMAL_INDICATOR ["_"])))
+		)
 
+
+(deftest lower-lower-octave
+	(is (true? (parse-succeeded3 ":" :LOWER_LOWER_OCTAVE_SYMBOL [":"])))
+		)
 
 (defn parse-fails? [text-to-parse starting-production]
-	(let [result (get-parser text-to-parse :start starting-production)]
+	(let [result (my-get-parser text-to-parse :start starting-production)]
 		(insta/failure? result)
 		)
 	)
 
 (deftest sargamNotes
 	(let [txt "SrRgGmMPdDnNSbS#R#G#MP#D#N#"
-		result (get-parser txt :start :BEAT )
+		result (my-get-parser txt :start :BEAT )
 		flattened (flatten result)]
     ; (println txt result)
     ;(println "flattend is " flattened)
@@ -70,7 +108,7 @@
 (deftest composition
 	(let [
 		txt "foo:bar\ncat:dog\n\n | S R G R |\n"
-		result (get-parser txt :total true :start :COMPOSITION )
+		result (my-get-parser txt :total true :start :COMPOSITION )
 		flattened (flatten result)]
 		(println "parsing " txt)
 		(println result)
@@ -83,7 +121,7 @@
 	)
 (deftest syllable
 	(let [txt "foo"
-		result (get-parser txt :total false :start :SYLLABLE )
+		result (my-get-parser txt :total false :start :SYLLABLE )
 		flattened (flatten result)]
     ;(pprint result)
     (is (some #(= :SYLLABLE %) flattened))
@@ -91,22 +129,24 @@
     ))
 (deftest lyrics-section
 	(let [txt "  Georgia georgia\nNo peace I find ba-by"
-		result (get-parser txt :total true :start :LYRICS_SECTION )
+		result (my-get-parser txt :total true :start :LYRICS_SECTION )
 		flattened (flatten result)]
     ;(pprint result)
     (is (some #(= :SYLLABLE %) flattened))
     (is (some #(= "ba" %) flattened))
     ))
+
+
 (deftest upper-octave-line-item
 	(let [txt "."
-		result (get-parser txt :total true :start :UPPER_OCTAVE_LINE_ITEM )
+		result (my-get-parser txt :total true :start :UPPER_OCTAVE_LINE_ITEM )
 		flattened (flatten result)]
 		(pprint result)
 		(is (some #(= "." %) flattened))
 		))
 (deftest upper-octave-line
 	(let [txt ". + 0 2 3"
-		result (get-parser txt :total true :start :UPPER_OCTAVE_LINE )
+		result (my-get-parser txt :total true :start :UPPER_OCTAVE_LINE )
 		flattened (flatten result)]
 		(pprint result)
 		(is (some #(= "+" %) flattened))
@@ -114,7 +154,7 @@
 		))
 (deftest lyrics-section
 	(let [txt "  Georgia georgia\nNo peace I find ba-by"
-		result (get-parser txt :total true :start :LYRICS_SECTION )
+		result (my-get-parser txt :total true :start :LYRICS_SECTION )
 		flattened (flatten result)]
     ;(pprint result)
     (is (some #(= :SYLLABLE %) flattened))
@@ -128,7 +168,7 @@
 
 (deftest lyrics-line
 	(let [txt "  he-llo  dolly"
-		result (get-parser txt :total true :start :LYRICS_LINE )
+		result (my-get-parser txt :total true :start :LYRICS_LINE )
 		flattened (flatten result)]
 		(pprint result)
 		(is (some #(= :SYLLABLE %) flattened))
@@ -136,6 +176,15 @@
 		(is (some #(= "llo" %) flattened))
 		(is (some #(= "dolly" %) flattened))
 		))
+
+(deftest sargam-ornament
+	(is (true? (parse-succeeded3 "PMDP" :SARGAM_ORNAMENT  [:P :D]))))
+(deftest alternate_ending
+	(is (true? (parse-succeeded3 "1._____" :ALTERNATE_ENDING_INDICATOR  [])))
+	(is (true? (parse-succeeded3 "3_____" :ALTERNATE_ENDING_INDICATOR  [])))
+ )
+  
+
 (deftest syllable-with-hyphen
 	(is (true? (parse-succeeded3 "foo-   bar baz-" :LYRICS_LINE ["foo"]))))
 
@@ -144,21 +193,21 @@
   (is (true? (parse-succeeded3 "foo-   bar baz---" :LYRICS_LINE ["foo"]))))
 (deftest composition-attributes-and-sargam-sections
 	(let [txt "foo:bar  \ndog:cat    \n\n | S R G | "
-		result (get-parser txt :total false :start :COMPOSITION )
+		result (my-get-parser txt :total false :start :COMPOSITION )
 		flattened (flatten result)]
 		(pprint result)
 		(is (some #(= :G %) flattened))
 		))
 (deftest composition-two-attribute-sections
 	(let [txt "foo:bar  \ndog:cat    \n\nhat:bat"
-		result (get-parser txt :total true :start :COMPOSITION )
+		result (my-get-parser txt :total true :start :COMPOSITION )
 		flattened (flatten result)]
 		(pprint result)
 		(is (some #(= :ATTRIBUTE_LINE %) flattened))
 		))
 
 (deftest composition-one-attribute-no-eol
-	(let [result (get-parser "foo:bar   " :start :COMPOSITION )
+	(let [result (my-get-parser "foo:bar   " :start :COMPOSITION )
 		flattened (flatten result)]
 		(pprint result)
     ;(println flattened)
@@ -166,7 +215,7 @@
     )
 	)
 (deftest section-two-attributes-no-eol
-	(let [result (get-parser "foo:bar  \ndog:cat    " :total true :start :SECTION )
+	(let [result (my-get-parser "foo:bar  \ndog:cat    " :total true :start :SECTION )
 		flattened (flatten result)]
 		(pprint result)
     ;(println flattened)
@@ -176,7 +225,7 @@
 	)
 
 (deftest sargam-section
-	(let [result (get-parser "  | S R G - | " :start :SARGAM_SECTION )
+	(let [result (my-get-parser "  | S R G - | " :start :SARGAM_SECTION )
 		flattened (flatten result)]
     ;(println result)
     ;(println flattened)
@@ -186,10 +235,13 @@
     (is (some #(= :G %) flattened))
     )
 	)
-
-
+(deftest attribute-line
+	(is (true? (parse-succeeded3 "foo:bar" :ATTRIBUTE_LINE ["foo" "bar" ])))
+	(is (true? (parse-succeeded3 "foo : bar" :ATTRIBUTE_LINE ["foo" "bar" ])))
+	(is (true? (parse-succeeded3 "foo : bar    " :ATTRIBUTE_LINE ["foo" "bar" ])))
+)
 (deftest attribute-section
-	(let [result (get-parser "foo:bar\ncat:dog" :start :ATTRIBUTE_SECTION )
+	(let [result (my-get-parser "foo:bar\ncat:dog" :start :ATTRIBUTE_SECTION )
 		flattened (flatten result)]
     ;(println result)
     ;(println flattened)
@@ -204,7 +256,7 @@
 	(is (true? (parse-succeeded3 "foo:bar" :ATTRIBUTE_LINE ["foo" "bar"]))))
 
 (deftest line-number
-	(let [result (get-parser "1)" :start :LINE_NUMBER )
+	(let [result (my-get-parser "1)" :start :LINE_NUMBER )
 	flattened (flatten result)]
     ;(println flattened)
     (is (some #(= "1" %) flattened))
@@ -212,7 +264,7 @@
     )
 	)
 (deftest sargam-line-2
-	(let [result (get-parser "1) | S- Rgm |" :start :SARGAM_LINE )
+	(let [result (my-get-parser "1) | S- Rgm |" :start :SARGAM_LINE )
 	flattened (flatten result)]
     ;(println result)
     (is (some #(= :S %) flattened))
@@ -255,6 +307,17 @@
 (deftest test-right-repeat
 	(is (true? (parse-succeeded3 ":|" :RIGHT_REPEAT [:RIGHT_REPEAT ]))))
 
+
+(deftest test-tala
+  (let [start :TALA
+        items "+2034567"]
+	     (is (true? (parse-succeeded3 "+" :TALA ["+"])))
+	     (is (true? (parse-succeeded3 "0" :TALA ["0"])))
+	     (is (true? (parse-succeeded3 "2" :TALA ["2"])))
+   )
+  )
+ 
+
 (deftest test-dash
 	(is (true? (parse-succeeded3 "-" :DASH [:DASH ]))))
 
@@ -281,5 +344,13 @@
 ; (composition-with-attributes-lyrics-and-sargam-section)
 
 (println "loaded core-test")
-(test-some)
-(sargam-line-simple)
+;  (test-some)
+;  (sargam-line-simple)
+;  (test-tala)
+;  	(composition-with-attributes-lyrics-and-sargam-section)
+;  (dot)
+;  (yesterday_no_chords)
+;  (attribute-line)
+;  
+;(composition-with-attributes-lyrics-and-sargam-section)
+;(yesterday_no_chords)
