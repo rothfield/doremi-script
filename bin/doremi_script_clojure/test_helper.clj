@@ -6,12 +6,12 @@
 
 (defn slurp-fixture [file-name]
 	(slurp (clojure.java.io/resource 
-					 (str "doremi_script_clojure/fixtures/" file-name))))
+					 (str "resources/fixtures/" file-name))))
 
 
 (defn my-get-parser [] 
 	(insta/parser
-		(slurp (clojure.java.io/resource "doremi_script_clojure/doremiscript.ebnf")))
+		(slurp (clojure.java.io/resource "resources/doremiscript.ebnf")))
 	)
 
 (defn trunc [txt,len]

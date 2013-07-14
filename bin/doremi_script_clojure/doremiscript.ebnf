@@ -254,20 +254,8 @@ FORWARD_SLASH_CHAR  (* note that putting forward slash in regex doesn't seem to 
   = char:[a-gA-GmiMaIivV0-9+] / char:FORWARD_SLASH_CHAR
 *)
 
-CHORD_CHAR 
-   = #"[^\s]"
 
-CHORD_CHARS= #"[a-gA-GvViI][^\s]+"
-CHORD_INITIAL_CHAR
- = #"[a-gA-GvViI]"
-
-CHORD (* I IV V. Put in lookahead for 3 sargam chars. *)
-  (* Put in negative lookahead of 3 sargam characters *)
-  (* Then any number of characters except spaces *)
-  =  ! (SARGAM_MUSICAL_CHAR SARGAM_MUSICAL_CHAR SARGAM_MUSICAL_CHAR ) 
-    CHORD_CHARS
-
-
+CHORD = #"[a-gA-GvViI][^\s]*"
 
 LOWER_OCTAVE_LINE (* can put lower octave dots or semicolons for lower-lower octave (. or :)   *)
   = WHITE_SPACE? LOWER_OCTAVE_LINE_ITEM+ WHITE_SPACE? 

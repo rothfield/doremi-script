@@ -19,7 +19,33 @@
 				 (is (good-parse "." :UPPER_OCTAVE_DOT [:DOT "."]))
 				 )
 
+;;;; Ornaments
+(deftest sargam-ornament
+				 (is (good-parse "PMDP" :SARGAM_ORNAMENT  [:P :D]))
+				 ;;(is (good-parse "PM-DP" :SARGAM_ORNAMENT  [:DASH]))
+				 )
+(deftest delimited_sargam_ornament
+				 (is (good-parse "<SNRS>" :DELIMITED_SARGAM_ORNAMENT [ :S :N :R :S]))
+			   (is (good-parse "<S>" :DELIMITED_SARGAM_ORNAMENT [:S]))
+ 				 )
+(deftest delimited_sargam_ornament_is_an_ornament
+				 (is (good-parse "<SNRS>" :SARGAM_ORNAMENT [:SARGAM_ORNAMENT :S :N :R :S]))
+			   (is (good-parse "<S>" :SARGAM_ORNAMENT [:SARGAM_ORNAMENT :S]))
+ 				 )
 
+(deftest undelimited_sargam_ornament
+				 (is (good-parse "SNRS" :UNDELIMITED_SARGAM_ORNAMENT [ :S :N :R :S]))
+			   (is (good-parse "S" :UNDELIMITED_SARGAM_ORNAMENT [:S]))
+ 				 )
+(deftest undelimited_sargam_ornament_is_an_ornament
+				 (is (good-parse "SNRS" :SARGAM_ORNAMENT [:UNDELIMITED_SARGAM_ORNAMENT :S :N :R :S]))
+			   (is (good-parse "S" :SARGAM_ORNAMENT [:UNDELIMITED_SARGAM_ORNAMENT :S]))
+ 				 )
+(deftest upper_octave_line_can_contain_sargam_ornaments
+			 (is (good-parse "SNRS" :UPPER_OCTAVE_LINE [:SARGAM_ORNAMENT :S :N :R :S]))
+			   (is (good-parse "<rg>" :UPPER_OCTAVE_LINE [:SARGAM_ORNAMENT :r :g])))
+
+;;; Pitches
 (deftest sargam-pitch-can-include-left-slur
 				 (is (good-parse "(S" :SARGAM_PITCH [:BEGIN_SLUR :S ]))
 				 )
@@ -67,10 +93,8 @@
 (deftest upper-octave-line
 				 (let [txt ". + 0 2 3"]
 					 (is (good-parse txt :UPPER_OCTAVE_LINE   ["+" "2" :TALA]))))
-(deftest sargam-ornament
-				 (is (good-parse "PMDP" :SARGAM_ORNAMENT  [:P :D]))
-				 ;;(is (good-parse "PM-DP" :SARGAM_ORNAMENT  [:DASH]))
-				 )
+
+
 
 (deftest alternate_ending
 				 (is (good-parse "1._____" :ALTERNATE_ENDING_INDICATOR  []))
@@ -219,4 +243,4 @@
 ;(composition)
 ;(lyrics-section1)
 ;(upper-octave-line)
-(chord)
+;;(chord)
