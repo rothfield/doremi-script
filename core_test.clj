@@ -1,1 +1,0 @@
-test/doremi_script_clojure/core_test.clj
