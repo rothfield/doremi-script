@@ -3,23 +3,113 @@
 	{
 		"selected_items":
 		[
+			[
+				"add",
+				"add-to-map"
+			],
+			[
+				"p",
+				"position-map-for-sargam-section"
+			],
+			[
+				"s",
+				"semantic_analyzer"
+			],
+			[
+				"sem",
+				"semantic-analyzer-test"
+			],
+			[
+				"d",
+				"doremi_script_clojure"
+			],
+			[
+				"SA",
+				"SARGAM_SECTION"
+			],
+			[
+				"trunc",
+				"trunc_aux"
+			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "core_test.clj",
+			"file": "grammar_unit_tests.clj",
 			"settings":
 			{
-				"buffer_size": 8292,
+				"buffer_size": 8228,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "doremiscript-clojure.sublime-project",
+			"contents": "(ns doremi_script_clojure.analyzer-tests\n	\"Acceptance tests for doremi-script grammar. Start rule will be :COMPOSITION \n	\"\n	(:require [clojure.test :refer :all ]\n						[clojure.pprint :refer :all ]\n						[doremi_script_clojure.test-helper :refer :all ]\n						[instaparse.core :as insta]))\n",
+			"file": "test/doremi_script_clojure/analyzer.clj",
+			"file_size": 289,
+			"file_write_time": 130184120190000000,
 			"settings":
 			{
-				"buffer_size": 76,
+				"buffer_size": 289,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "(ns doremi_script_clojure.semantic-analyzer-test\n	\"Acceptance tests for semantic analyzer\n	\"\n	(:require [clojure.test :refer :all ]\n						[clojure.pprint :refer :all ]\n						[doremi_script_clojure.semantic-analyzer :refer :only [position-map-for-sargam-section] ]\n						[doremi_script_clojure.test-helper :refer :all ]\n						[instaparse.core :as insta]))\n\n\n(deftest test-position-map-for-sargam-section\n    \n)\n\n\n(test-position-map-for-sargam-section)",
+			"file": "test/doremi_script_clojure/semantic-analyzer-test.clj",
+			"file_size": 488,
+			"file_write_time": 130184128100000000,
+			"settings":
+			{
+				"buffer_size": 450,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/john/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 3307,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "project.clj",
+			"settings":
+			{
+				"buffer_size": 460,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/doremi_script_clojure/semantic_analyzer.clj",
+			"settings":
+			{
+				"buffer_size": 3722,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/john/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+			"settings":
+			{
+				"buffer_size": 90,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/doremi_script_clojure/test_helper.clj",
+			"settings":
+			{
+				"buffer_size": 1980,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "doremiscript.ebnf",
+			"settings":
+			{
+				"buffer_size": 8611,
 				"line_ending": "Unix"
 			}
 		},
@@ -35,7 +125,7 @@
 			"file": "/home/john/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
 			"settings":
 			{
-				"buffer_size": 31115,
+				"buffer_size": 31157,
 				"line_ending": "Unix"
 			}
 		}
@@ -43,31 +133,34 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 392.0,
+		"height": 192.0,
 		"selected_items":
 		[
-			[
-				"",
-				"Indentation: Reindent Lines"
-			],
 			[
 				":w",
 				":w - Save"
 			],
 			[
-				":0",
-				":0 - BOF"
-			],
-			[
 				":$",
 				":$ - EOF"
+			],
+			[
+				"",
+				"Indentation: Reindent Lines"
+			],
+			[
+				":0",
+				":0 - BOF"
 			]
 		],
 		"width": 392.0
 	},
 	"console":
 	{
-		"height": 125.0
+		"height": 125.0,
+		"history":
+		[
+		]
 	},
 	"distraction_free":
 	{
@@ -80,6 +173,15 @@
 	},
 	"file_history":
 	[
+		"/home/john/doremi-script-clojure/semantic_analyzer.clj",
+		"/home/john/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/john/doremi-script-clojure/test/doremi_script_clojure/semantic_analyzer_test.clj",
+		"/home/john/doremi-script-clojure/test/doremi_script_clojure/analyzer-tests.clj",
+		"/home/john/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/john/doremi-script-clojure/test/doremi_script_clojure/test_helper.clj",
+		"/home/john/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/john/doremi-script-clojure/doremiscript-clojure.sublime-project",
+		"/home/john/doremi-script-clojure/core_test.clj",
 		"/home/john/doremi-script-clojure",
 		"/home/john/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings"
 	],
@@ -99,6 +201,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"format",
+			"stop",
 			"deftest",
 			"ignored"
 		],
@@ -118,42 +222,156 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "core_test.clj",
+					"file": "grammar_unit_tests.clj",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8292,
+						"buffer_size": 8228,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6086,
-								6086
+								7397,
+								7397
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/Clojure/Clojure.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2802.0,
+						"translation.y": 3111.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "doremiscript-clojure.sublime-project",
+					"file": "test/doremi_script_clojure/analyzer.clj",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 76,
+						"buffer_size": 289,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								289,
+								289
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Clojure/Clojure.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "test/doremi_script_clojure/semantic-analyzer-test.clj",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 450,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								356,
+								356
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Clojure/Clojure.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/home/john/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3307,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2708,
+								2708
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 858.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "project.clj",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 460,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								460,
+								460
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Clojure/Clojure.tmLanguage",
+							"tab_size": 3,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/doremi_script_clojure/semantic_analyzer.clj",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3722,
 						"regions":
 						{
 						},
@@ -162,6 +380,33 @@
 							[
 								0,
 								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Clojure/Clojure.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/home/john/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 90,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								86,
+								86
 							]
 						],
 						"settings":
@@ -175,8 +420,66 @@
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 7,
+					"file": "test/doremi_script_clojure/test_helper.clj",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1980,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								108,
+								108
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Clojure/Clojure.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "doremiscript.ebnf",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8611,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								775,
+								775
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
 					"file": "/home/john/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+					"semi_transient": false,
 					"settings":
 					{
 						"buffer_size": 13667,
@@ -203,19 +506,20 @@
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 10,
 					"file": "/home/john/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 31115,
+						"buffer_size": 31157,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								366,
-								366
+								0,
+								0
 							]
 						],
 						"settings":
@@ -263,6 +567,7 @@
 		]
 	},
 	"menu_visible": true,
+	"project": "doremiscript-clojure.sublime-project",
 	"replace":
 	{
 		"height": 0.0
@@ -284,10 +589,24 @@
 		],
 		"width": 0.0
 	},
+	"select_symbol":
+	{
+		"height": 312.0,
+		"selected_items":
+		[
+		],
+		"width": 392.0
+	},
+	"settings":
+	{
+	},
 	"show_minimap": false,
 	"show_open_files": false,
-	"show_tabs": false,
+	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 150.0,
-	"status_bar_visible": false
+	"side_bar_width": 252.0,
+	"status_bar_visible": false,
+	"template_settings":
+	{
+	}
 }

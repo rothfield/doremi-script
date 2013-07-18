@@ -12,7 +12,15 @@ COMPOSITION (* a musical piece *)
 SECTION = (* 3 kinds of sections: attributes, lyrics and sargam.
    Typically a composition will have attributes followed by lyrics, followed
    by lines of sargam. *)
-(ATTRIBUTE_SECTION | SARGAM_SECTION | LYRICS_SECTION) 
+(SARGAM_SECTION / ATTRIBUTE_SECTION / LYRICS_SECTION) 
+
+(* TODO: Add support for ABC NUMBER and Devanagri notations
+    uppers:UPPER_OCTAVE_LINE*
+    sargam:(sargam:DEVANAGRI_SARGAM_LINE / sargam:SARGAM_LINE / sargam:ABC_SARGAM_LINE/ sargam:NUMBER_SARGAM_LINE)
+    lowers:LOWER_OCTAVE_LINE*
+    lyrics:LYRICS_LINE?
+  *)
+
 
 SARGAM_SECTION  
      (* A line of music, but is written over multiple physical lines. 
@@ -20,7 +28,18 @@ SARGAM_SECTION
       of sargam followed by optional lower octave and lyrics lines.
       Usually one or two upper lines followed by mandatory sargam line followed by
       lower octave line followed by lyrics *)
-  =  (UPPER_OCTAVE_LINE "\n")*  SARGAM_LINE ('\n' ( LOWER_OCTAVE_LINE | LYRICS_LINE))*
+
+(* Original
+   uppers:UPPER_OCTAVE_LINE*
+    sargam:(sargam:DEVANAGRI_SARGAM_LINE / sargam:SARGAM_LINE / sargam:ABC_SARGAM_LINE/ sargam:NUMBER_SARGAM_LINE)
+    lowers:LOWER_OCTAVE_LINE*
+    lyrics:LYRICS_LINE?
+
+*)
+
+  =  (UPPER_OCTAVE_LINE "\n")*  SARGAM_LINE ('\n' LOWER_OCTAVE_LINE)* ('\n' LYRICS_LINE)*
+
+
 
 SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or more measures followed by line end *)
   = LINE_NUMBER?  WHITE_SPACE? BARLINE? MEASURE (BARLINE MEASURE)*  BARLINE? WHITE_SPACE?
@@ -210,8 +229,13 @@ UPPER_OCTAVE_LINE (* can put upper octave dots or semicolons for upper upper oct
 
 UPPER_OCTAVE_LINE_ITEM2= #"([^\n\r\t ])+"
 
-SARGAM_ORNAMENT (* in upper line NRSNS *)
-  = SARGAM_ORNAMENT_ITEM+ 
+SARGAM_ORNAMENT= UNDELIMITED_SARGAM_ORNAMENT | DELIMITED_SARGAM_ORNAMENT
+
+DELIMITED_SARGAM_ORNAMENT (* in upper line <NRSNS> *)
+  =  "<" SARGAM_ORNAMENT_ITEM+  ">"
+ 
+UNDELIMITED_SARGAM_ORNAMENT (* in upper line NRSNS *)
+  = !"<" SARGAM_ORNAMENT_ITEM+ 
 
 SARGAM_ORNAMENT_ITEM
   = SARGAM_PITCH 

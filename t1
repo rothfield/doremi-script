@@ -1,2 +1,0 @@
-BEAT_UNDELIMITED "beats can be indicated by a group of pitches that consist only of pitches and dashes such as S--R--G-"
-  = beat_items:BEAT_UNDELIMITED_ITEM+ 

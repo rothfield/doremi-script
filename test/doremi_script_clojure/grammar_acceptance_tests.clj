@@ -9,8 +9,8 @@
 (deftest composition_with_only_sargam_and_no_eol
 				 (is (good-parse "S" :SARGAM_LINE [:S :MEASURE :BEAT "S"])))
 
-
-(deftest yesterday
+ 
+(deftest test-yesterday
 				 (is (good-parse 
 							 (slurp-fixture "yesterday.txt")
 							 :COMPOSITION ["Yesterday"])))
