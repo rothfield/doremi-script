@@ -4,6 +4,7 @@
             [doremi_script_clojure.semantic-analyzer :refer :all ]
             [clojure.walk :refer :all ]
             [clojure.pprint :refer :all ]
+            [clojure.stacktrace]
             [instaparse.core :as insta]
             ))
 
@@ -14,24 +15,22 @@
   (use 'doremi_script_clojure.semantic-analyzer :reload)
   (ns doremi_script_clojure.semantic-analyzer)
   (use 'clojure.stacktrace)
-   (print-stack-trace *e)
+  (print-stack-trace *e)
   )
+
+
+(def sargam-line-tag 
+  "set of tags for lines in sargam section"
+  #{ :SARGAM_LINE  :LYRICS_LINE :UPPER_OCTAVE_LINE  :LOWER_OCTAVE_LINE}
+  )
+
 
 (defn- is-line? [x]
   ;(println "x is " x)
-  (let [tag (:tag x)]
-    (if (not tag)
-      false
-      (or (= :SARGAM_LINE tag)
-          (= :LYRICS_LINE tag)
-          (= :UPPER_OCTAVE_LINE tag)
-          (= :LOWER_OCTAVE_LINE tag)
-          )
-      )
-    )
-  )
-
-
+  (if (not (map? x))
+    false
+    (not= nil (sargam-line-tag (:tag x)))
+    ))
 
 (defn position-map-for-sargam-section
   "I don't do a whole lot."
@@ -134,131 +133,179 @@
 
 (def z (get-parser2 "SRG\nhe-llo" :start :SARGAM_SECTION))
 
-(defn add-syls [sargam-line line]
-  ;; (reduce fct init-val sequence)
-  ;;(reduce add-syls sargam-line lines) 
-  )
-
-(defn apply-syls [sargam-line lyric-line]
-  ;; add each syllable in lyric line to the corresponding sargam-pitch
-  (let [lyric-positions (:positions lyric-line)
-        sargam-positions (:positions sargam-line) 
-
-        ]
-    (assert sargam-positions)
-    (assert lyric-positions)
-    (println "apply-syls, lyric-line is") (pprint lyric-line)
-    ; (insta/transform {:switch (fn [x y] [:switch y x])}
-    ; my-tree)
-    ;  (pprint (instaparse.core/transform {:SARGAM_PITCH (fn [&rest] {:tag :SARGAM_PITCH :content &rest})}      z))
-    sargam-line
-    ))
-
-(defn test-line-positions[]
-  (let [
-        local-fn  (fn [x]
-                    ;; (println "local-fn")
-                    (assoc x :positions (line-positions x)))
-        local-fn2 (fn [x]
-                    (let [ z (:tag x)]
-                      ; (println "local-fn2, x is " x)
-                      ; (println "local-fn2, z is " z)
-                      (= z :LYRICS_LINE)))
-        section (get-parser2 "| S-- - R |\nhe-llo" :start :SARGAM_SECTION)
-        lines (filter is-line? (all-nodes section))
-        lines2  (map local-fn lines)
-        ;; only one sargam-line per section
-        sargam-line (first (filter #(= (:SARGAM-LINE (:tag %))) lines2))
-        lyrics-lines (filter local-fn2 lines2)
-        sargam-line2 (reduce apply-syls sargam-line lyrics-lines)
-        ]
-    sargam-line2
-    ;(pprint lines2)
-    ;(pprint (map :tag lines2))
-    ; (println "sargam-line is") (pprint sargam-line)
-    ;(println "lyrics-lines is") (pprint lyrics-lines)
-
-    ;(println "section is ")
-    ;(pprint section)
-    ;;(println "lines is ")
-    ;;(pprint lines)
-    ;;(println "1st line_positions is")
-    ;;(pprint (line-positions  (first lines)))
-    ;;(println "2nd line_positions is")
-    ;;(pprint (second lines))
-    ;;(pprint (line-positions  (second lines)))
-    ))
-
-(defn outer [x]
-  ;(println "in outer, x is " x)
-  x
-  )
-
 (defn positionable-tag? "test whether x should have position added to it" [x]
-  (#{:SYLLABLE :SARGAM-PITCH} x)
+  (#{:SYLLABLE :SARGAM_PITCH} x)
   )
 
-;;; Have to declare mutually recursive functions
-(declare inner outer add_positions)
-(defn inner [x]
-  ;(println "in inner, x is " x)
-  ;(println "in inner, (class x) is " (class x))
-  ;(println "in inner, (seq? x) is " (seq? x))
-  ;(println "in inner, (map? x) is " (map? x))
-  ;(println "in inner, (vector? x) is " (vector? x))
-  (cond
-    (and (map? x) (positionable-tag? (:tag x)))
-      (hash-map :tag (:tag x)
-                :content  (add_positions (:content x))
-                :position (my-get-index x) 
-                )
+(defn assign-positions[tree]
+  "Return the tree with positions added to syllables and pitches"
+  (println "assign-positions-to-tree-- tree is " tree "*****")
+  (let [
+        debug false
+        ]
+    (letfn [ (fn1[x] (list 
+                       (hash-map 
+                         :tag :SARGAM_PITCH
+                         :position (my-get-index x)
+                         :content x
+                         )
+                       ))
+            (fn2 [x]
+              (if debug
+                (do
+                  (println "***fn2, x is ")
+                  (pprint x)
+                  ))
+              (list 
+                (hash-map 
+                  :tag :SYLLABLE
+                  :position (my-get-index x)
+                  :content x
+                  ))
+              )
+            ]
 
-    (map? x)
-    (do
-      ;(println "map? case")
-      (assert (:tag x))
-      (assert (:content x))
-      (hash-map :tag (:tag x)
-                :content  (add_positions (:content x))
-                )
-      )
-    (seq? x)
-    (do
-      ;(println "seq? case")
-      (conj (add_positions (rest x)) (add_positions (first x)))
-      )
-    (vector? x)
-    (do
-      ;(println "vector? case")
-      ;(println "x is")
-      ;(pprint x)
-      (vec (map add_positions x))
-      )
-    true
-    (do
-      ;(println "fall through case")
-      x) 
+      (insta/transform {:SARGAM_PITCH fn1
+                        :SYLLABLE fn2 } tree)
+      )))
+
+
+
+
+(defn assign-syllables[tree]
+  tree
+  )
+
+
+
+(defn assign-syllables [section]
+  "Assign syllables to the appropriate note base on the column.
+  Return the modified tree"
+  (let [
+        debug false 
+        sargam-line (filter (fn[x] 
+                              (and (map? x)
+                                   (= (:tag x) :SARGAM_LINE)))
+                            (:content section))
+        lyric-lines (filter (fn[x] 
+                              (and (map? x)
+                                   (= (:tag x) :LYRICS_LINE)))
+                            (:content section))
+        fn2   (fn [section lyric-line]
+                (let [
+                      ]
+                  section
+                  ))
+        fn1  (fn [section lyrics-line]
+               (let [debug true]
+                 (if debug
+                   (println "fn1-section,lyrics-line tags" (:tag section) (:tag lyrics-line))
+                   )
+                 (reduce fn2 section lyrics-line) 
+
+                 ))
+        ]
+    (if debug (pprint lyric-lines))
+    (reduce fn1 section lyric-lines) 
     ))
 
-(defn add_positions[x]
-    (walk inner outer x)
-)
 
 
-(def x (get-parser2 "S\nhi" :start :SARGAM_SECTION))
+(defn line-column-map [my-map,line]
 
-(defn test-walk[tree]
-  "Walk an enlive tree"
-  (let [result (add_positions tree)]
-    (println "Input is")
-    (pprint tree)
-    (println "Result is")
-    (pprint result)
-    (assert (not= result tree))
-    nil
+  "given a line, return a map of column number -> list of nodes
+  my-map is the existing map"
+  (let [beginning-of-line (my-get-index line)
+        fct   (fn [accumulator node]
+                (let [node-position (my-get-index node)
+                      ]
+                  (if (nil? node-position)
+                    accumulator
+                    ;; otherwise
+                    (let [
+                          key (- (my-get-index node) beginning-of-line)
+                          ]
+                      (assoc accumulator
+                             key 
+                             (conj (get accumulator key) node )
+                             )
+                      ))))
+        ]
+    ;;(pprint line)
+    ;; (println beginning-of-line)
+    (reduce    fct   my-map  (all-nodes line))
+    )) 
+
+
+(defn section-column-map [section]
+  "Given a section returns a map ,  column-number ==> list of nodes at that column"
+  (reduce line-column-map (hash-map)  (filter is-line? (:content section)))
+  )
+
+
+(defn assign-attributes [section]
+  "Assign attributes by using column numbers. Returns
+  modified section"
+  (let [
+        debug false
+        lines  (filter is-line?  (:content section))
+        sargam-line (first(filter (fn[x] (= :SARGAM_LINE (:tag x))) lines))
+        beginning-of-sargam-line (my-get-index sargam-line)
+        column-map (section-column-map section)
+        get-column-of-sargam-node 
+        (fn[node]
+          (- (my-get-index node) beginning-of-sargam-line)
+          )
+        fn1 (fn[content] 
+              (let [
+                    column (get-column-of-sargam-node content)
+                    nodes (get column-map column) 
+                    syl (last (filter #(and (map? %) (= (:tag %) :SYLLABLE)) nodes))
+                    upper-dots (filter #(and (map? %) (=(:tag %) :UPPER_OCTAVE_DOT)) nodes)
+                    lower-dots (filter #(and (map? %) (=(:tag %) :LOWER_OCTAVE_DOT)) nodes)
+                    octave  (+ (count upper-dots) 
+                               (- (count lower-dots))
+                               )
+                    ]
+
+                (println "*** in fn1;syl" syl ";" "****")
+                (println "*** in fn1;(:content syl)" (:content syl) ";" "****")
+                (if debug
+                  (do
+                    (println "*** in fn1;key,count(nodes)" column ";" (count nodes) "****")
+                    ))
+                { :tag :SARGAM_PITCH
+                 :content (assoc content 
+                                 :syllable 
+                                 (:content syl))
+                 :octave
+                 octave
+                 }
+                ))
+        ]
+    (assert beginning-of-sargam-line)
+    (assert sargam-line)
+    ;; (println "***" (my-get-index (:content sargam-line)))
+    ;;(println "***" (meta sargam-line))
+    (if debug
+      (do
+        (println "****beginning-of-sargam-line is" beginning-of-sargam-line "*****")
+        (println "***" "sargam-line" sargam-line "***")
+        (println "************assign-attributes****")
+        (println "lines" lines)
+        (println "lines" lines)
+        (println "sargam-line")
+        (pprint sargam-line)
+        ))
+    (insta/transform {:SARGAM_PITCH fn1 } section)
     ))
 
-(test-walk x)
+(def x (get-parser2 
+         "*\nDm7\nS\n*\n*\nhi-"
+         :start :SARGAM_SECTION))
 
-
-
+;;(pprint (section-column-map x))
+(pprint (assign-attributes x))
+;;(pprint (line-column-map (hash-map) (first (:content x))))
+;(println "running assign-syllables")
+;(pprint (assign-syllables x))

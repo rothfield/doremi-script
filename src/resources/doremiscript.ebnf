@@ -37,7 +37,7 @@ SARGAM_SECTION
 
 *)
 
-  =  (UPPER_OCTAVE_LINE "\n")*  SARGAM_LINE ('\n' LOWER_OCTAVE_LINE)* ('\n' LYRICS_LINE)*
+  =  (UPPER_OCTAVE_LINE <"\n">)*  SARGAM_LINE (<'\n'> LOWER_OCTAVE_LINE)* (<'\n'> LYRICS_LINE)*
 
 
 
@@ -213,7 +213,7 @@ LYRICS_LINE (* line of syllables *)
 <LYRICS_LINE_ITEM> (* items in lyrics line, ie a word or a syllable. ie he-llo john gives 3 items, 3 syllables *)
   = SYLLABLE | <WHITE_SPACE>
 
-SYLLABLE= HYPHENATED_SYLLABLE | NON_HYPHENATED_SYLLABLE
+SYLLABLE =  HYPHENATED_SYLLABLE | NON_HYPHENATED_SYLLABLE
 <HYPHENATED_SYLLABLE> (* ends in a hyphen *)
   = #"[a-zA-Z'!]+-" 
 
