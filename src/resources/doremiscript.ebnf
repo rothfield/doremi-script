@@ -7,7 +7,7 @@ COMPOSITION (* a musical piece *)
      (* Each section is separated by one or more 'empty' lines.
       The empty line can have spaces. Section doesn't include the eol.
       That allows things like "S" to parse as a COMPOSITION *)
-  = SECTION ('\n' EMPTY_LINE+  SECTION)*  EMPTY_LINE*
+  = SECTION (<'\n'> <EMPTY_LINE+>  SECTION)*  <EMPTY_LINE*>
 
 SECTION = (* 3 kinds of sections: attributes, lyrics and sargam.
    Typically a composition will have attributes followed by lyrics, followed
@@ -45,7 +45,7 @@ SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or
   = LINE_NUMBER?  WHITE_SPACE? BARLINE? MEASURE (BARLINE MEASURE)*  BARLINE? WHITE_SPACE?
 
 ATTRIBUTE_SECTION (* Key value pairs *)
-= ATTRIBUTE_LINE ('\n' ATTRIBUTE_LINE)* 
+= ATTRIBUTE_LINE (<'\n'> ATTRIBUTE_LINE)* 
 
 
 LYRICS_SECTION (* Lines of lyrics *)
@@ -291,7 +291,7 @@ KOMMAL_INDICATOR (* An underscore for flat. For the traditional bhatkande notati
 
 
 ATTRIBUTE_LINE (* ie Author: John Rothfield *)
-= KEY WHITE_SPACE?   ":" WHITE_SPACE? VALUE WHITE_SPACE?
+= KEY <WHITE_SPACE?>   <":"> <WHITE_SPACE?> VALUE <WHITE_SPACE?>
 
 KEY= (* ie Author *)  #"\w+"
 
