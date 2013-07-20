@@ -235,7 +235,7 @@
   (get-parser2 x2
          :start :SARGAM_SECTION))
 (def x3
-  (get-parser2 "Title: test1\nAuthor:  John Rothfield\n\n*\nS\n\nr\n*"
+  (get-parser2 "Title: test1\nAuthor:  John Rothfield\n\n Yes-ter-day all my\n\n*\nS\n\nr\n*"
          :start :COMPOSITION))
 
 (def x4
