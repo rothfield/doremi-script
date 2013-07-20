@@ -137,7 +137,7 @@ END_SLUR = ')'
 
 SARGAM_PITCH = (* a sargam pitch ie SrR.. *)
      BEGIN_SLUR? SARGAM_MUSICAL_CHAR END_SLUR?  
-
+SARGAM_ORNAMENT_PITCH = SARGAM_MUSICAL_CHAR 
 (***  End pitches *********************)
 		 
 SPACE  (* space *)
@@ -221,7 +221,7 @@ SYLLABLE =  HYPHENATED_SYLLABLE | NON_HYPHENATED_SYLLABLE
   = #"[a-zA-Z'!]+" !"-"
 
 UPPER_OCTAVE_LINE (* can put upper octave dots or semicolons for upper upper octave (. or :). Also tala symbols +203   *)
-  = WHITE_SPACE? UPPER_OCTAVE_LINE_ITEM+ 
+  = <WHITE_SPACE?> UPPER_OCTAVE_LINE_ITEM+ 
 
 SARGAM_ORNAMENT= UNDELIMITED_SARGAM_ORNAMENT | DELIMITED_SARGAM_ORNAMENT
 
@@ -232,7 +232,7 @@ UNDELIMITED_SARGAM_ORNAMENT (* in upper line NRSNS *)
   = !"<" SARGAM_ORNAMENT_ITEM+ 
 
 SARGAM_ORNAMENT_ITEM
-  = SARGAM_PITCH 
+  = SARGAM_ORNAMENT_PITCH 
 
 MORDENT = "~" 
 
