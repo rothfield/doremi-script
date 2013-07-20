@@ -128,56 +128,17 @@
         get-column-of-sargam-node (fn[node]
                                     (- (start-index node) beginning-of-sargam-line)
                                     )
-        fn1 (fn[content] 
+        transform-sargam-pitch (fn[content] 
               (let [
                     column (- (start-index content) beginning-of-sargam-line)
                     nodes (get column-map column) 
-                    ;; TODO: DRY
-                    mordent (last (filter #(and (map? %) (= (:tag %) :MORDENT)) nodes))
-                    syls (filter #(and (map? %) (= (:tag %) :SYLLABLE)) nodes)
-                    upper-upper-dots (filter #(and (map? %) (=(:tag %) :UPPER_UPPER_)) nodes)
-                    upper-dots (filter #(and (map? %) (=(:tag %) :UPPER_OCTAVE_DOT)) nodes)
-                    upper-upper-dots (filter #(and (map? %) (=(:tag %) :UPPER_UPPER_OCTAVE_SYMBOL)) nodes)
-                    lower-dots (filter #(and (map? %) (=(:tag %) :LOWER_OCTAVE_DOT)) nodes)
-                    lower-lower-dots (filter #(and (map? %) (=(:tag %) :LOWER_LOWER_OCTAVE_SYMBOL)) nodes)
-                    chords (filter #(and (map? %) (=(:tag %) :CHORD)) nodes)
-                    tala (:content (last (filter #(and (map? %) (=(:tag %) :TALA)) nodes)))
-                    ornaments (filter #(and (map? %) (=(:tag %) :SARGAM_ORNAMENT)) nodes)
-
-                    octave  (+ (count upper-dots) 
-                               (- (count lower-dots))
-                               (* 2 (count upper-upper-dots))
-                               (* -2 (count lower-lower-dots))
-                               )
-                    ]
-
-                { :tag :SARGAM_PITCH
-                 :content 
-                 (assoc content 
-                        :content
-                        (apply str (:content content))
-                        :syllable
-                        (first (:content (last syls)))
-                        :octave
-                        octave
-                        :chord
-                        (first (:content (last chords)))
-                        :chords
-                        (map first (map :content chords))
-                        :ornaments
-                        ornaments
-                        :tala
-                        tala
-                        :mordent
-                        (first (:content mordent))
-
-                        )
-                 }
+                  ]
+                  (set-node-attributes content nodes)
                 ))
         ]
     (assert beginning-of-sargam-line)
     (assert sargam-line)
-    (insta/transform {:SARGAM_PITCH fn1 } sargam-line)
+    (insta/transform {:SARGAM_PITCH transform-sargam-pitch } sargam-line)
     ))
 
 (pprint (assign-attributes x))
