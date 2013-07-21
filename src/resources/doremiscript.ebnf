@@ -9,7 +9,7 @@ COMPOSITION (* a musical piece *)
       That allows things like "S" to parse as a COMPOSITION *)
   = SECTION (<'\n'> <EMPTY_LINE+>  SECTION)*  <EMPTY_LINE*>
 
-SECTION = (* 3 kinds of sections: attributes, lyrics and sargam.
+<SECTION> = (* 3 kinds of sections: attributes, lyrics and sargam.
    Typically a composition will have attributes followed by lyrics, followed
    by lines of sargam. *)
 (SARGAM_SECTION / ATTRIBUTE_SECTION / LYRICS_SECTION) 

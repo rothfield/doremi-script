@@ -4,7 +4,7 @@
 		[instaparse.core :as insta]
 		))
 
-(insta/set-default-output-format! :enlive)
+;;;(insta/set-default-output-format! :enlive)
 (defn slurp-fixture [file-name]
 	(slurp (clojure.java.io/resource 
 		(str "resources/fixtures/" file-name))))

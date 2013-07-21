@@ -1,8 +1,12 @@
+Title: test semantic analyzer
+
 ~
 +    *
-     S
+:
+.     S
 *
 Dm7
+<gRg>
 g
 .
 hi-
