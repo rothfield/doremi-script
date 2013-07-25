@@ -7,7 +7,7 @@ COMPOSITION (* a musical piece *)
      (* Each section is separated by one or more 'empty' lines.
       The empty line can have spaces. Section doesn't include the eol.
       That allows things like "S" to parse as a COMPOSITION *)
-  = SECTION (<'\n'> <EMPTY_LINE+>  SECTION)*  <EMPTY_LINE*>
+  = <EMPTY_LINE*> (SECTION (<'\n'> <EMPTY_LINE+>  SECTION)*  <EMPTY_LINE*>)
 
 <SECTION> = (* 3 kinds of sections: attributes, lyrics and sargam.
    Typically a composition will have attributes followed by lyrics, followed
@@ -41,15 +41,15 @@ SARGAM_SECTION
 
 
 
-SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or more measures followed by line end *)
-  = LINE_NUMBER?  WHITE_SPACE? BARLINE? MEASURE (BARLINE MEASURE)*  BARLINE? WHITE_SPACE?
+SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or more measures followed  *)
+  = LINE_NUMBER?  <WHITE_SPACE?> BARLINE? MEASURE (BARLINE MEASURE)*  BARLINE? <WHITE_SPACE?>
 
 ATTRIBUTE_SECTION (* Key value pairs *)
 = ATTRIBUTE_LINE (<'\n'> ATTRIBUTE_LINE)* 
 
 
 LYRICS_SECTION (* Lines of lyrics *)
-  = LYRICS_LINE ('\n' LYRICS_LINE)*
+  = LYRICS_LINE (<'\n'> LYRICS_LINE)*
 
 <EMPTY_LINE>= WHITE_SPACE? '\n'  
 
@@ -137,7 +137,8 @@ END_SLUR = ')'
 
 SARGAM_PITCH = (* a sargam pitch ie SrR.. *)
      BEGIN_SLUR? SARGAM_MUSICAL_CHAR END_SLUR?  
-SARGAM_ORNAMENT_PITCH = SARGAM_MUSICAL_CHAR 
+
+<SARGAM_ORNAMENT_PITCH> = SARGAM_MUSICAL_CHAR 
 (***  End pitches *********************)
 		 
 SPACE  (* space *)
@@ -192,7 +193,7 @@ NON_BARLINE
     BEAT 
 
 MEASURE 
-  = <WHITE_SPACE*> BEAT (WHITE_SPACE BEAT)*  WHITE_SPACE?
+  = <WHITE_SPACE*> BEAT (<WHITE_SPACE> BEAT)*  <WHITE_SPACE?>
 
 (* unused
 UNUSED_SARGAM_LINE_ITEM  
@@ -225,13 +226,13 @@ UPPER_OCTAVE_LINE (* can put upper octave dots or semicolons for upper upper oct
 
 SARGAM_ORNAMENT= UNDELIMITED_SARGAM_ORNAMENT | DELIMITED_SARGAM_ORNAMENT
 
-DELIMITED_SARGAM_ORNAMENT (* in upper line <NRSNS> *)
+<DELIMITED_SARGAM_ORNAMENT> (* in upper line <NRSNS> *)
   =  "<" SARGAM_ORNAMENT_ITEM+  ">"
  
-UNDELIMITED_SARGAM_ORNAMENT (* in upper line NRSNS *)
+<UNDELIMITED_SARGAM_ORNAMENT> (* in upper line NRSNS *)
   = !"<" SARGAM_ORNAMENT_ITEM+ 
 
-SARGAM_ORNAMENT_ITEM
+<SARGAM_ORNAMENT_ITEM>
   = SARGAM_ORNAMENT_PITCH 
 
 MORDENT = "~" 
@@ -242,8 +243,14 @@ ALTERNATE_ENDING_INDICATOR
 
 = #"[1-3]"  #"[\._]+" 
 <UPPER_OCTAVE_LINE_ITEM> (* Things above notes, including talas, octaves,chords, and 1st and second ending symbols *)
-  = <WHITE_SPACE> | UPPER_OCTAVE_DOT | TALA | 
-	    SARGAM_ORNAMENT | MORDENT | UPPER_UPPER_OCTAVE_SYMBOL | ALTERNATE_ENDING_INDICATOR | CHORD
+  = <WHITE_SPACE> /
+ UPPER_OCTAVE_DOT /
+ TALA /
+     CHORD /
+	    SARGAM_ORNAMENT /
+ MORDENT /
+ UPPER_UPPER_OCTAVE_SYMBOL /
+ALTERNATE_ENDING_INDICATOR 
 	(*
      DELIMITED_SARGAM_ORNAMENT  / 
      WHITE_SPACE / 
@@ -276,12 +283,9 @@ FORWARD_SLASH_CHAR  (* note that putting forward slash in regex doesn't seem to 
 CHORD = #"[a-gA-GvViI][^\s]*"
 
 LOWER_OCTAVE_LINE (* can put lower octave dots or semicolons for lower-lower octave (. or :)   *)
-  = WHITE_SPACE? LOWER_OCTAVE_LINE_ITEM+ WHITE_SPACE? 
+  = <WHITE_SPACE?> LOWER_OCTAVE_LINE_ITEM+ <WHITE_SPACE?> 
 
-LOWER_OCTAVE_LINE_ITEM  = "q"
-
-
-LOWER_OCTAVE_LINE_ITEM =  WHITE_SPACE | LOWER_OCTAVE_DOT |
+LOWER_OCTAVE_LINE_ITEM =  <WHITE_SPACE> | LOWER_OCTAVE_DOT |
           LOWER_LOWER_OCTAVE_SYMBOL | KOMMAL_INDICATOR  
 
 LOWER_OCTAVE_DOT= DOT

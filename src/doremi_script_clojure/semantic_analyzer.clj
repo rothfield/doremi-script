@@ -26,12 +26,19 @@
 (defn- is-line? [x]
   (and (vector? x) (sargam-line-tag (first x))))
 
-(defn start-index[x]
+(defn start-index[z]
   "Looks up starting index of the node from the node's 
   metadata. Note that instaparse add the metadata when it 
   parses."
-  (:instaparse.gll/start-index (meta x)
-                               ))
+  (let [x 
+        ;;     (:instaparse.gll/start-index (meta x))
+        (instaparse.core/span z)    
+
+        ]
+    ;;(println "x" x)
+    ;; (assert x (str x))
+    ;; (assert z (str z))
+    (first x)))
 (defn my-throw[x]
   (throw (Exception. (str x))))
 
@@ -64,6 +71,7 @@
                              )
                       ))))
         ]
+    ;;(pprint (reduce fct my-map (all-nodes line)))
     (reduce fct my-map (all-nodes line))
     )) 
 
@@ -122,6 +130,16 @@
                    (* -2 (count lower-lower-dots))
                    )
         ]
+    (if false
+    (println (count upper-dots) 
+             (count lower-dots)
+             (count upper-upper-dots)
+             (count lower-lower-dots)
+      )
+      )
+
+
+    ;; Note that we support multiple syllables, ornaments, and chords per note. But only return the last (for now)
     [ :SARGAM_PITCH
      {
       :pitch
@@ -134,10 +152,12 @@
       octave
       :chord
       (last chords)
-      :chords
-      chords
-      :ornaments
-      ornaments
+      ;; :all-chords
+      ;; chords
+      :ornament   ;; just the pitches
+      (into (vector) (rest (last ornaments)))
+      ;; :all-ornaments
+      ;; (map rest ornaments)
       :tala
       tala
       :mordent
@@ -151,7 +171,7 @@
   "Assign attributes from the lower and upper lines using 
   column numbers. Returns
   modified section"
-  (if debug
+  (if false
     (do
       (println "ENTERING assign-attributes-to-section")
       (println "section-content<<<<<")
@@ -164,12 +184,23 @@
         lines section-content
         line-starts (map start-index lines)
         line-start-for  (fn[column] 
+                          ;;(println "ls" line-starts)
+                          ;;(println "lines" lines)
+                          ;;(println "column" column)
                           (last (filter (fn[x] (>= column x)) line-starts)) )
         column-for-node (fn[node]
                           (- (start-index node) (line-start-for (start-index node)))
                           )
-        transform-sargam-pitch (fn[content] 
-                                 (if debug (println "transform-sargam-pitch"))
+        transform-sargam-pitch (fn[ content & zrest] 
+                                 (if  false
+                                   (println "-----------transform-sargam-pitch zrest- is" zrest))
+                                 ;;;;(pprint zrest)
+
+                                 (if false (do
+                                             (println "transform-sargam-pitch-content is")
+                                             (pprint content) 
+                                             )
+                                   )
                                  (let [
                                        column (column-for-node content)
                                        nodes (get column-map column) 
@@ -210,90 +241,48 @@
 (defn find-first-tag[obj tag]
   (first (filter #(tag-is % tag) (all-nodes obj))))
 
-(defn assign-attributes-to-composition[composition]
-  (assert (= :COMPOSITION (first composition)))
+
+(defn transform-sargam-section[& content]
+  [:SARGAM_SECTION (assign-attributes-to-section content)]
+  )
+
+(defn reduce-attribute-line[accum attribute_line]
+  "accum is a hash map. attribute_line looks like
+  [:ATTRIBUTE_LINE [:KEY 'Title'] [:VALUE 'Help']]
+  Add a key/value pair to the hashmap and return the modified
+  hashmap.
+  "
+  (assert (= :ATTRIBUTE_LINE (first attribute_line)))
   (let [
-        transform-sargam-section 
-        (fn [& content]
-          (if debug (do
-                      (println "transform-sargam-section (fn [& content]
-                               >>>>>")
-                      (pprint content)
-                      (println ">>>>>")
-                      ))
-          [:SARGAM_SECTION
-           (assign-attributes-to-section  content)
-           ]
-          )
-        transform-attribute-section
-        (fn [& content]
-          (let [attribute-lines content] 
-            (println "attribute-lines are " attribute-lines)
-            [ :ATTRIBUTE_SECTION
-             :attributes
-             (reduce (fn[accum obj]
-                       (let [
-           ;; obj=>  [:ATTRIBUTE_LINE [:KEY "Title"] [:VALUE "test semantic analyzer"]]
-                             x (rest obj)
-                             my-key (keyword (lower-case (second (first x))))
-                             value (second (second x))
-                             ]
-                         (assoc accum  my-key value))) {} attribute-lines)
-             ]))
+        my-hash (into {} (rest attribute_line))
+        my-key (keyword (:KEY my-hash))
+        value (:VALUE my-hash)
         ]
-    (insta/transform {:SARGAM_SECTION transform-sargam-section
-                      :ATTRIBUTE_SECTION transform-attribute-section
-                      } composition)
-    ))
+    (assoc accum  my-key value)))
 
-(defn remove-last-char[txt]
-  (.substring txt 0 (- (count txt) 2)))
+(defn transform-attribute-section[& attribute-lines]
+  ;;attribute-lines looks like ( [:KEY "Title"] [:VALUE "Help"]
+  ;;;  [:ATTRIBUTE_SECTION [:ATTRIBUTE_LINE [:KEY "Title"] [:VALUE "Help"]]]
+  [ :ATTRIBUTE_SECTION
+   (reduce reduce-attribute-line {} attribute-lines)
+   ]
+  )
 
-(def x1
-  ":\n~\n+\nSNRSNS\n*\nDm7\nS\n*\n*\n:\n:\nhi-")
+(defn assign-attributes[composition]
+  (assert (= :COMPOSITION (first composition)))
+  (insta/transform {:SARGAM_SECTION transform-sargam-section
+                    :ATTRIBUTE_SECTION transform-attribute-section
+                    } composition)
+  )
 
-(def x2
-  "remove-last-char is hack because parser doesn't like trailing newline for sargam section"
-  (remove-last-char (slurp-fixture "semantic_analyzer_test.txt")))
 
+(defn parse2[txt]
+  "parse and run through semantic analyzer. Txt is doremi-script"
+  (assign-attributes (get-parser2 txt))
+  )
 
-(def x 
-  (get-parser2 x2
-               :start :COMPOSITION))
-(def x3
-  (get-parser2 "Title: test1\nAuthor:  John Rothfield\n\n Yes-ter-day all my\n\n*\nS\n\nr\n*"
-               :start :COMPOSITION))
+;;(pprint (parse2 " .\nSr"))
+(pprint (parse2 "Author: John Rothfield\nTitle: untitled\n\nRG.\nS\nhe-llo"))
+;;(pprint (parse2 (slurp-fixture "yesterday.txt")))
+;; (pprint (get-parser2 (slurp-fixture "yesterday.txt")))
 
-(def x4
-  (get-parser2 "Title: test1\n\nS"
-               :start :COMPOSITION))
-
-(def x5
-  (get-parser2 "S | r | g\nhe-llo"
-               :start :COMPOSITION))
-(def x7
-  (get-parser2 "S\nhi"
-               :start :COMPOSITION))
-
-(def x6
-  '[:SARGAM_SECTION
-    ([:SARGAM_LINE
-      [:MEASURE [:BEAT [:SARGAM_PITCH [:S "S"]]] " "]
-      :content
-      [:BARLINE [:SINGLE_BARLINE "|"]]
-      [:MEASURE [:BEAT [:SARGAM_PITCH [:r "r"]]] " "]
-      [:BARLINE [:SINGLE_BARLINE "|"]]
-      [:MEASURE [:BEAT [:SARGAM_PITCH [:g "g"]]]]]
-     [:LYRICS_LINE [:SYLLABLE "he-"] [:SYLLABLE "llo"]])]
-  )  
-
-(def x8 '[:SARGAM_LINE [:MEASURE [:BEAT [:SARGAM_PITCH [:S "S"]]]]])
-;; (pprint (assign-attributes-to-section x))
-;;(println (count (assign-attributes-to-composition x3)))
-;;(pprint x3)
-;;(println "\n\n\n")
-;; (pprint (find-first-tag x3 :KEY))
-
-;; (println (lower-case "XXX"))
-;; (pprint (assign-attributes-to-composition x7))
-(pprint (assign-attributes-to-composition x))
