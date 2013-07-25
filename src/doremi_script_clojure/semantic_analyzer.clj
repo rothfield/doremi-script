@@ -1,10 +1,8 @@
 (ns doremi_script_clojure.semantic-analyzer
   "Semantic analysis is the activity of a compiler to determine what the types of various values are, how those types interact in expressions, and whether those interactions are semantically reasonable. "
   (:require	[doremi_script_clojure.test-helper :refer :all ]
-            [doremi_script_clojure.semantic-analyzer :refer :all ]
-            [clojure.pprint :refer :all ]
-            [clojure.string :refer [lower-case]]
-            ;;;  [clojure.string/lower-case :refer :only [lower-case]] ; [lower-case ]]
+            [clojure.pprint :refer [pprint]] 
+            ;; [clojure.string :refer [lower-case]]
             [instaparse.core :as insta]
             ))
 
@@ -17,28 +15,22 @@
   )
 
 (def debug false)
+
 (def sargam-line-tag 
   "set of tags for lines in sargam section"
   #{ :SARGAM_LINE  :LYRICS_LINE :UPPER_OCTAVE_LINE  :LOWER_OCTAVE_LINE}
   )
 
-
-(defn- is-line? [x]
-  (and (vector? x) (sargam-line-tag (first x))))
-
 (defn start-index[z]
   "Looks up starting index of the node from the node's 
-  metadata. Note that instaparse add the metadata when it 
+  metadata. Note that instaparse adds the metadata when it 
   parses."
   (let [x 
-        ;;     (:instaparse.gll/start-index (meta x))
         (instaparse.core/span z)    
 
         ]
-    ;;(println "x" x)
-    ;; (assert x (str x))
-    ;; (assert z (str z))
     (first x)))
+
 (defn my-throw[x]
   (throw (Exception. (str x))))
 
@@ -50,11 +42,6 @@
 (defn line-column-map [my-map,line]
   "given a line, return a map of column number -> list of nodes
   my-map is the existing map"
-  (if debug (do
-              (println "@@@@ line-column-map. line is: ")
-              (pprint line)
-              (println "@@@@")
-              ))
   (let [beginning-of-line (start-index line)
         fct   (fn [accumulator node]
                 (let [node-position (start-index node)
@@ -71,7 +58,6 @@
                              )
                       ))))
         ]
-    ;;(pprint (reduce fct my-map (all-nodes line)))
     (reduce fct my-map (all-nodes line))
     )) 
 
@@ -108,7 +94,7 @@
 
 (defn- update-sargam-pitch-node [content nodes]
   " Use the list of nodes to update a :SARGAM_PITCH node.
-  Returns the new node. This is using enlive style.
+  Returns the new node. This is using hiccup style.
   This is for the instaparse/transform function"
   ;;(println "$$$$$ nodes!!")
   ;;(pprint nodes)
@@ -130,15 +116,6 @@
                    (* -2 (count lower-lower-dots))
                    )
         ]
-    (if false
-    (println (count upper-dots) 
-             (count lower-dots)
-             (count upper-upper-dots)
-             (count lower-lower-dots)
-      )
-      )
-
-
     ;; Note that we support multiple syllables, ornaments, and chords per note. But only return the last (for now)
     [ :SARGAM_PITCH
      {
@@ -167,49 +144,25 @@
     ))
 
 
-(defn assign-attributes-to-section [section-content]
+(defn assign-attributes-to-section [lines]
   "Assign attributes from the lower and upper lines using 
   column numbers. Returns
   modified section"
-  (if false
-    (do
-      (println "ENTERING assign-attributes-to-section")
-      (println "section-content<<<<<")
-      (pprint section-content)
-      (println "section<<<<<")
-      ))
   (let [
-        sargam-line (first (filter #(= :SARGAM_LINE (first %)) section-content))
-        column-map (section-column-map section-content)
-        lines section-content
+        sargam-line (first (filter #(= :SARGAM_LINE (first %)) lines))
+        column-map (section-column-map lines)
         line-starts (map start-index lines)
         line-start-for  (fn[column] 
-                          ;;(println "ls" line-starts)
-                          ;;(println "lines" lines)
-                          ;;(println "column" column)
                           (last (filter (fn[x] (>= column x)) line-starts)) )
+      
         column-for-node (fn[node]
                           (- (start-index node) (line-start-for (start-index node)))
                           )
         transform-sargam-pitch (fn[ content & zrest] 
-                                 (if  false
-                                   (println "-----------transform-sargam-pitch zrest- is" zrest))
-                                 ;;;;(pprint zrest)
-
-                                 (if false (do
-                                             (println "transform-sargam-pitch-content is")
-                                             (pprint content) 
-                                             )
-                                   )
                                  (let [
                                        column (column-for-node content)
                                        nodes (get column-map column) 
                                        ]
-                                   (if debug (do
-                                               (println "column" column)
-                                               (pprint nodes)
-                                               (println "ending transform-sargam-pitch")
-                                               ))
                                    (update-sargam-pitch-node content nodes)
                                    ))
         transform-sargam-ornament-pitch (fn[content] 
@@ -220,26 +173,10 @@
                                             (update-sargam-ornament-pitch-node content nodes)
                                             ))
         ]
-    (assert line-starts)
-    (assert lines)
-    (assert (>= (count lines) 0))
-    (assert sargam-line)
-    (if debug (do
-                (println "***")
-                (pprint sargam-line)
-                (println "***")
-                ))
     (insta/transform {:SARGAM_PITCH transform-sargam-pitch 
                       :SARGAM_ORNAMENT_PITCH transform-sargam-ornament-pitch
-                      } section-content)
+                      } lines)
     ))
-
-(defn tag-is[obj tag]
-  (and (vector? obj)
-       (= (first obj) tag)))
-
-(defn find-first-tag[obj tag]
-  (first (filter #(tag-is % tag) (all-nodes obj))))
 
 
 (defn transform-sargam-section[& content]
