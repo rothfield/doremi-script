@@ -2,12 +2,16 @@
 (* Grammar for AACM/Bhatkande style sargam/letter notation  *)
 (* Author: John Rothfield 707 538-5133, cell 707 331-2700  rthfield@sonic.net *)
 (* Use syntax highlighting for ocaml or applescript in your text editor *)
+(* vim: set filetype=ocaml *)
 
 COMPOSITION (* a musical piece *)
      (* Each section is separated by one or more 'empty' lines.
       The empty line can have spaces. Section doesn't include the eol.
       That allows things like "S" to parse as a COMPOSITION *)
-  = <EMPTY_LINE*> (SECTION (<'\n'> <EMPTY_LINE+>  SECTION)*  <EMPTY_LINE*>)
+  = <EMPTY_LINE*> COMPOSITION_ITEMS <EMPTY_LINE*>
+
+COMPOSITION_ITEMS=
+ SECTION (<'\n'> <EMPTY_LINE+>  SECTION)* 
 
 <SECTION> = (* 3 kinds of sections: attributes, lyrics and sargam.
    Typically a composition will have attributes followed by lyrics, followed
@@ -39,14 +43,33 @@ SARGAM_SECTION
 
   =  (UPPER_OCTAVE_LINE <"\n">)*  SARGAM_LINE (<'\n'> LOWER_OCTAVE_LINE)* (<'\n'> LYRICS_LINE)*
 
+SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or
+more measures followed  *) = LINE_NUMBER?  SARGAM_LINE_ITEMS
 
 
-SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or more measures followed  *)
-  = LINE_NUMBER?  <WHITE_SPACE?> BARLINE? MEASURE (BARLINE MEASURE)*  BARLINE? <WHITE_SPACE?>
+SARGAM_LINE_ITEMS (* consists of optional line# at beginning of line, followed by 1 or more measures followed  *)
+  = <WHITE_SPACE?> BARLINE? MEASURE (BARLINE MEASURE)*  BARLINE? <WHITE_SPACE?>
 
+
+
+(* OLD
+SARGAM_LINE_ITEM  "an item in the main line"
+  = x:MEASURE /
+    x:WHITE_SPACE /  
+    x:BEAT_DELIMITED / 
+    x:BEAT_UNDELIMITED / 
+    x:SARGAM_PITCH / 
+    x:RHYTHMICAL_DASH / 
+    x:BARLINE / 
+    x:REPEAT_SYMBOL {
+            x.attributes=[];
+            return x;
+    }
+ 
+ *)
 ATTRIBUTE_SECTION (* Key value pairs *)
-= ATTRIBUTE_LINE (<'\n'> ATTRIBUTE_LINE)* 
-
+ = ATTRIBUTE_SECTION_ITEMS
+ATTRIBUTE_SECTION_ITEMS = ATTRIBUTE_LINE (<'\n'> ATTRIBUTE_LINE)* 
 
 LYRICS_SECTION (* Lines of lyrics *)
   = LYRICS_LINE (<'\n'> LYRICS_LINE)*
@@ -88,29 +111,29 @@ RIGHT_REPEAT (* ie :| *)
 FLAT_OR_SHARP = '#' | 'b'
 
 (*  Letters SrRgGmMPdDnN in latin script  *)
-  Sb  = 'Sb'
-  Ssharp =    "S#"  
-  Rsharp  =    "R#"  
-  Gsharp  =    'G#'   
-  Psharp  =    'P#'   
-  Pb   =    'Pb'   
-  Dsharp  =    'D#'   
-  Nsharp   =    'N#'  
-  Pb    =    'Pb'   
-  S  =    'S' ! FLAT_OR_SHARP  
-  r =    'r' ! FLAT_OR_SHARP  
-  R  =    'R' ! FLAT_OR_SHARP  
-  g =    'g' ! FLAT_OR_SHARP  
-  G =    'G' ! FLAT_OR_SHARP  
-  m =    'm' ! FLAT_OR_SHARP  
-  M =    'M' ! FLAT_OR_SHARP  
-  P =    'P' ! FLAT_OR_SHARP  
-  d =    'd' ! FLAT_OR_SHARP  
-  D =    'D' ! FLAT_OR_SHARP  
-  n =    'n' ! FLAT_OR_SHARP  
-  N =    'N' ! FLAT_OR_SHARP  
+  Sb  = <"Sb">
+  Ssharp =    <"S#">  
+  Rsharp  =    <"R#">  
+  Gsharp  =    <"G#">   
+  Psharp  =    <"P#">   
+  Pb   =    <"Pb">   
+  Dsharp  =    <"D#">   
+  Nsharp   =   < "N#">  
+  Pb    =    <"Pb">   
+  S  =    <"S"> ! FLAT_OR_SHARP  
+  r =    <"r"> ! FLAT_OR_SHARP  
+  R  =   <"R"> ! FLAT_OR_SHARP  
+  g =    <"g"> ! FLAT_OR_SHARP  
+  G =    <"G"> ! FLAT_OR_SHARP  
+  m =    <"m"> ! FLAT_OR_SHARP  
+  M =    <"M"> ! FLAT_OR_SHARP  
+  P =    <"P"> ! FLAT_OR_SHARP  
+  d =    <"d"> ! FLAT_OR_SHARP  
+  D =    <"D"> ! FLAT_OR_SHARP  
+  n =    <"n"> ! FLAT_OR_SHARP  
+  N =    <"N"> ! FLAT_OR_SHARP  
 
-<SARGAM_MUSICAL_CHAR>  = 
+SARGAM_MUSICAL_CHAR  = 
     Sb |
     Ssharp |
     Rsharp |
@@ -154,23 +177,22 @@ SPACE  (* space *)
 
 (* Beats are sequences of pitches or dashes. Spaces separate beats. Beats can also be
 delimited by angle brackets, in which case white space can be used in the beat *)
-BEAT = BEAT_DELIMITED | !BEGIN_BEAT_SYMBOL BEAT_UNDELIMITED
-
-<BEAT_DELIMITED> (* ie <S R G m> . Useful if lyrics wouldn't line up otherwise!. use Srgm> or S r g m> to group pithes into a single beat. The > delimiters correspond to the lower loop in the aacm notation system *)
-  = <BEGIN_BEAT_SYMBOL> BEAT_DELIMITED_ITEM+ <END_BEAT_SYMBOL>
-
-<BEAT_DELIMITED_ITEM> (* inside of a delimited beat, ie <S--  R--  G-> *)
+BEAT = BEAT_DELIMITED | !BEGIN_BEAT_SYMBOL BEAT_UNDELIMITED 
+<BEAT_DELIMITED> (* ie <S R G m> . Useful if lyrics wouldn't line up otherwise!. 
+use Srgm> or S r g m> to group pithes into a single beat. The > delimiters correspond to the lower loop in the aacm notation system *)
+  = <BEGIN_BEAT_SYMBOL> BEAT_DELIMITED_ITEMS <END_BEAT_SYMBOL>
+BEAT_DELIMITED_ITEMS = BEAT_DELIMITED_ITEM+ <BEAT_DELIMITED_ITEM> (* inside of a delimited beat, ie <S--  R--  G-> *)
   = BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES | SARGAM_PITCH !DASH | DASH | <WHITE_SPACE>
 
 DASH =  (* ie a -, used as a rhythmical placeholder. IE S--R--G- *) 
    '-'
 
 LINE_NUMBER (*    1)    2)     3) etc     *) 
-= DIGITS  ')'  WHITE_SPACE?
+= DIGITS  <')'>  <WHITE_SPACE?>
 
-DIGITS = (* One or more digits *)  #'\d+'
+<DIGITS> = (* One or more digits *)  #'\d+'
 
-BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES (* <S  - - R >" *) = SARGAM_PITCH (WHITE_SPACE | DASH)+
+BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES (* <S  - - R > *) = SARGAM_PITCH (WHITE_SPACE | DASH)+
 
 REPEAT_SYMBOL = '%'
 
@@ -180,7 +202,9 @@ PITCH_WITH_DASHES (* for example 'S--'  *)
 
 
 <BEAT_UNDELIMITED> (* beats can be indicated by a group of pitches that consist only of pitches and dashes such as 'S--R--G-'   Can't contain spaces *)
-  = BEAT_UNDELIMITED_ITEM+ 
+  = BEAT_UNDELIMITED_ITEMS 
+BEAT_UNDELIMITED_ITEMS = BEAT_UNDELIMITED_ITEM+
+
 
 <BEAT_UNDELIMITED_ITEM> (* inside of a simple beat, ie S--R--G- Note that undelimited beats cannot contain spaces *)
   = PITCH_WITH_DASHES / 
@@ -192,8 +216,9 @@ NON_BARLINE
     WHITE_SPACE /  
     BEAT 
 
+MEASURE_ITEMS = BEAT (<WHITE_SPACE> BEAT)*
 MEASURE 
-  = <WHITE_SPACE*> BEAT (<WHITE_SPACE> BEAT)*  <WHITE_SPACE?>
+  = <WHITE_SPACE?> MEASURE_ITEMS <WHITE_SPACE?>
 
 (* unused
 UNUSED_SARGAM_LINE_ITEM  
@@ -209,12 +234,14 @@ an item in the main line
 *)
 
 LYRICS_LINE (* line of syllables *)
-  = <WHITE_SPACE?> SYLLABLE (LYRICS_LINE_ITEM)*
+  = <WHITE_SPACE?> LYRICS_LINE_ITEMS
+
+LYRICS_LINE_ITEMS = SYLLABLE (LYRICS_LINE_ITEM)*
 
 <LYRICS_LINE_ITEM> (* items in lyrics line, ie a word or a syllable. ie he-llo john gives 3 items, 3 syllables *)
   = SYLLABLE | <WHITE_SPACE>
 
-SYLLABLE =  HYPHENATED_SYLLABLE | NON_HYPHENATED_SYLLABLE
+<SYLLABLE> =  HYPHENATED_SYLLABLE | NON_HYPHENATED_SYLLABLE
 <HYPHENATED_SYLLABLE> (* ends in a hyphen *)
   = #"[a-zA-Z'!]+-" 
 
@@ -227,10 +254,12 @@ UPPER_OCTAVE_LINE (* can put upper octave dots or semicolons for upper upper oct
 SARGAM_ORNAMENT= UNDELIMITED_SARGAM_ORNAMENT | DELIMITED_SARGAM_ORNAMENT
 
 <DELIMITED_SARGAM_ORNAMENT> (* in upper line <NRSNS> *)
-  =  "<" SARGAM_ORNAMENT_ITEM+  ">"
- 
+  =  "<" SARGAM_ORNAMENT_ITEMS  ">"
+
+SARGAM_ORNAMENT_ITEMS = SARGAM_ORNAMENT_ITEM+
+
 <UNDELIMITED_SARGAM_ORNAMENT> (* in upper line NRSNS *)
-  = !"<" SARGAM_ORNAMENT_ITEM+ 
+  = !"<" SARGAM_ORNAMENT_ITEMS 
 
 <SARGAM_ORNAMENT_ITEM>
   = SARGAM_ORNAMENT_PITCH 
@@ -294,12 +323,12 @@ KOMMAL_INDICATOR (* An underscore for flat. For the traditional bhatkande notati
  = "_"
 
 
-ATTRIBUTE_LINE (* ie Author: John Rothfield *)
+<ATTRIBUTE_LINE> (* ie Author: John Rothfield *)
 = KEY <WHITE_SPACE?>   <":"> <WHITE_SPACE?> VALUE <WHITE_SPACE?>
 
-KEY= (* ie Author *)  #"\w+"
+<KEY>= (* ie Author *)  #"\w+"
 
-VALUE=  (* Attribute value can have embedded spaces.  *)
+<VALUE>=  (* Attribute value can have embedded spaces.  *)
 (* Non-space followed by (spaces | non-space)   *)
 #"[^\n\r ](( *)[^\n\r ])*"
 

@@ -3,6 +3,7 @@
 		[clojure.pprint :refer :all ]
 		[instaparse.core :as insta]
 		))
+  (use 'clojure.stacktrace)
 
 ;;;(insta/set-default-output-format! :enlive)
 (defn slurp-fixture [file-name]
@@ -14,6 +15,9 @@
 		(slurp (clojure.java.io/resource "resources/doremiscript.ebnf")))
 	)
 
+(defn zzzpst[]
+   (print-stack-trace *e)
+)
 (defn my-get-parser [] 
 	(insta/parser
 		(slurp (clojure.java.io/resource "resources/doremiscript.ebnf")))
@@ -89,4 +93,5 @@
 
 )
 
-(pprint my-transform)
+;;(pprint my-transform)
+(pprint (get-parser2 "    \nauthor:john\ntitle:untitled\n\n    RG 1.___\n1) <SS#S> SS :|\nhe-llo"))
