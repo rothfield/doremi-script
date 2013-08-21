@@ -17,10 +17,11 @@
   (print-stack-trace *e)
   (pst)
   )
-
+(def debug false)
 (defn start-index[z]
   "Looks up starting index of the node from the node's 
   metadata. instaparse adds the metadata in the parsing process"
+  "Returns the character position in the source code where the object starts"
   (first (instaparse.core/span z))    
   )
 
@@ -29,36 +30,31 @@
   (pprint x)
   (throw (Exception. (str x))))
 
-(defn all-nodes[tree]
-  "returns all nodes in the tree that are not strings"
-
-  (filter #(sequential? %) 
-          (tree-seq  #(or (vector? %) (list? %)) rest tree))
-  )
-
-
-(defn line-column-map [my-map,line]
+(defn line-column-map [my-map line]
   "my-map is a map from column number -> list of nodes
   Add nodes from line to the map"
-  (let [beginning-of-line (start-index line)
-        ]
-    (reduce (fn [accumulator node]
-              (let [column (- (start-index node) beginning-of-line) ]
-                (assoc accumulator
-                       column 
-                       (conj (get accumulator column) node)
-                       )))
-            my-map (filter #(not= nil (start-index %)) (all-nodes line))
-            )
-    )) 
+  (reduce (fn [accumulator node]
+            (let [column (- (start-index node) 
+                            (start-index line))]
+
+              (assoc accumulator
+                     column 
+                     (conj (get accumulator column) node)
+                     )))
+          my-map (filter #(not= nil (start-index %)) (tree-seq vector? rest line))
+          )) 
 
 
-(defn section-column-map [section-content]
-  "Given a section returns a map ,  column-number ==> list of nodes at that column"
-  (reduce line-column-map {}  section-content)
+(defn section-column-map [sargam-section]
+  "For a sargam section, maps column-number --> list of nodes in that column"
+  "Note that section-content consists of something like
+  [:SARGAM_SECTION upper-line sargam-line lyrics-line ]"
+
+  (reduce line-column-map {}  sargam-section)
   )
 
-(defn- update-sargam-ornament-pitch-node [content nodes]
+(defn- update-sargam-ornament-pitch-node [sargam-ornament-pitch nodes]
+  "UNFINISHED"
   " TODO: Apply the upper and lower dots found in the upper lines.
   Dots will be in same column. If positioned afterward, becomes lower dot.
   If positioned before, becomes upper dot
@@ -67,14 +63,15 @@
   sargam pitch there.
   "
   (let [
+        content (rest sargam-ornament-pitch)
         has-sargam-pitch (first  (filter #(and (vector? %) (=(first %) :SARGAM_PITCH)) nodes))
         upper-dots (if has-sargam-pitch
-                     ()
+                     ()  ;; return no dots if has sargam-pitch
                      (filter #(and (vector? %) (=(first %) :UPPER_OCTAVE_DOT)) nodes)
                      )
 
         ]
-    (into [] (concat [:SARGAM_ORNAMENT_PITCH] content))
+    sargam-ornament-pitch
     ))
 
 (def sample-beat
@@ -121,34 +118,28 @@
                     }))
   )
 
-(defn transform-beat [& beat-content]
+(defn transform-beat [beat]
   ;;(my-raise "tranform-beat")
   (if false
     (do
-      (println "entering transform-beat beat content")
-      (pprint beat-content)
+      (println "entering transform-beat beat ")
+      (pprint beat)
       (println "entering transform-beat")
       ))
-  (let [divisions (count (filter #(unit-of-rhythm %) (flatten beat-content)))
-        tree [:BEAT beat-content]
+  (let [beat-content (rest beat)
+        divisions (count (filter #(unit-of-rhythm %) (flatten beat-content)))
         transform-sargam-pitch-with-dashes
-        (fn [& content]
-          (into [] (concat [:PITCH_WITH_DASHES] content "johnwashere"))
-          )
-        tree2 (insta/transform {:PITCH_WITH_DASHES transform-sargam-pitch-with-dashes } tree)
+        (fn [sargam-pitch-with-dashes]
+          sargam-pitch-with-dashes)
         ]
-
-    (into [] (concat [:BEAT] 
-                     (rest tree2)
-                     {:divisions divisions}
-                     ))  
+    (conj beat [:divisions divisions])
     ))
 
-(defn- update-sargam-pitch-node [content nodes]
-  " Use the list of nodes to update a :SARGAM_PITCH node.
-  Returns the new node. This is using hiccup style.
-  This is for the instaparse/transform function"
+(defn- update-sargam-pitch-node [sargam-pitch nodes]
+  " Use the list of nodes to update a sargam-pitch.
+  Returns the new node."
   (let [;; TODO: DRY
+        content (rest sargam-pitch)
         mordent (last (filter #(and (vector? %) (= (first %) :MORDENT)) nodes))
         syls (filter #(and (vector? %) (= (first %) :SYLLABLE)) nodes)
         upper-upper-dots (filter #(and (vector? %) (=(first %) :UPPER_UPPER_)) nodes)
@@ -165,44 +156,43 @@
                    (* -2 (count lower-lower-dots))
                    )
         ]
-    (pprint "nodes:*****************")
-    (pprint nodes)
     ;; Note that we support multiple syllables, ornaments, and chords per note. But only return the last (for now)
-    [ :SARGAM_PITCH
-     {
-      :pitch_source
-      (second content)
-      :source
-      (second content)
-      :normalized_pitch
-      (to-normalized-pitch (first content))
-      :syllable
-      (second (last syls))
-      :octave
-      octave
-      :chord
-      (last chords)
-      :ornament   ;; just the pitches
-      (into (vector) (rest (last ornaments)))
-      :tala
-      tala
-      :mordent
-      (second mordent)
-      }
-     ]
-    ))
+    (assoc sargam-pitch 1
+           {
+            :pitch_source
+            (second content)
+            :source
+            (second content)
+            :normalized_pitch
+            (to-normalized-pitch (first content))
+            :syllable
+            (second (last syls))
+            :octave
+            octave
+            :chord
+            (last chords)
+            :ornament   ;; just the pitches
+            (into (vector) (rest (last ornaments)))
+            :tala
+            tala
+            :mordent
+            (second mordent)
+            }
+           )))
 
-(defn update-sargam-line-node[content nodes]
-  "add syllables attribute to sargam line TODO"
-  ;  (concat [:hi] '(1 2))
-  ;; (into []  (concat [:hi] '(1 2)))
-  ;;[:hi 1 2]
-  ;  
-  (into [] (concat [:SARGAM_LINE] content
-                   { :syllables 
-                    (filter #(and (vector? %) (= (first %) :SYLLABLE)) nodes)
-                    }
-                   )))
+(defn update-sargam-line-node[sargam-line nodes]
+  "add syllables attribute to sargam line"
+  (if debug
+    (do
+      (pprint "---------update-sargam-line-node -----------------")
+      (pprint "---------nodes:-----------------")
+      (pprint nodes)
+      (pprint "-------------------")
+      ))
+  (let [ syllables (filter #(and (vector? %) (= (first %) :SYLLABLE)) nodes)
+        ]
+    (if debug (do (println "syllables" syllables)))
+    (conj sargam-line [ :syllables  syllables])))
 
 
 (defn extract_sargam_line_from_sargam_section[sargam-section]
@@ -246,7 +236,7 @@
 
 
 
-(defn main[]
+(defn old-main[]
   ;; (into {} (for [i line-start j (range 0 (count line-start))] [i j]))
   ;; Use above to turn list of line starts to map of linestart --> line number
   (let [txt1  "title:yesterday\n\nSRG\r\n\nmPD"
@@ -269,65 +259,51 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn collapse-sargam-section[sargam-section]
+  "Deals with the white-space significant aspect of doremi-script"
+  "given a section like
+
+  .
+  S
+  Hi
+
+  "
+  "Returns the sargam-line with the associated objects in the same column attached
+  to the corresponding pitches/items on main line"
   "Assign attributes to the main line(sargam_line) from the lower and upper lines using 
-  column numbers. Returns a sargam-line
-  modified section"
+  column numbers. Returns a sargam-line"
   (let [
         sargam-section-content (rest sargam-section)
-        sargam-line (first (filter #(= :SARGAM_LINE (first %)) sargam-section-content))
-        column-map (section-column-map sargam-section-content)
+        sargam-line (first (filter #(and (vector? %) (= :SARGAM_LINE (first %))) sargam-section-content))
+        lyrics-line (first (filter #(and (vector? %) (= :LYRICS_LINE (first %))) sargam-section-content))
+        lyrics  (filter #(and (vector? %) (= :SYLLABLE (first %))) (tree-seq vector? rest lyrics-line))
+        column-map (section-column-map sargam-section)
         line-starts (map start-index sargam-section-content)
         line-start-for  (fn[column] 
                           (last (filter (fn[x] (>= column x)) line-starts)) )
-
         column-for-node (fn[node]
-                          (- (start-index node) (line-start-for (start-index node)))
-                          )
-        transform-sargam-pitch (fn[ content & zrest] 
-                                 (let [
-                                       column (column-for-node content)
-                                       nodes (get column-map column) 
-                                       ]
-                                   (update-sargam-pitch-node content nodes)
-                                   ))
-        transform-sargam-ornament-pitch (fn[content] 
-                                          (let [
-                                                column (column-for-node content)
-                                                nodes (get column-map column) 
-                                                ]
-                                            (update-sargam-ornament-pitch-node content nodes)
-                                            ))
-        transform-sargam-line (fn[& content] 
-                                (let [
-                                      nodes (reduce (fn[accum line]
-                                                      (concat accum 
-                                                              (filter #(vector? %) (all-nodes line))))
-                                                    () 
-                                                    sargam-section-content) 
-                                      ]
-                                  ;; (my-raise nodes)
-                                  (update-sargam-line-node content nodes)
-                                  ))
-        sargam-section-content2 (insta/transform {:SARGAM_PITCH transform-sargam-pitch 
-                                 :SARGAM_ORNAMENT_PITCH transform-sargam-ornament-pitch
-                                 :SARGAM_LINE transform-sargam-line
-                                                  :BEAT transform-beat
-                                 } sargam-section-content)
+                          (- (start-index node) (line-start-for (start-index node))))
+        my-fn (fn[x]
+                (if
+                  (not (vector? x))
+                  x
+                  ;; else
+                  (let [
+                        column (column-for-node x)
+                        nodes (get column-map column) 
+                        ]
+                    (cond
+                      (= :SARGAM_PITCH (first x))
+                      (update-sargam-pitch-node x nodes)
+                      (= :SARGAM_ORNAMENT_PITCH (first x))
+                      (update-sargam-ornament-pitch-node x nodes)
+                      (= :BEAT (first x))
+                      (transform-beat x)
+                      true
+                      x))))
+        sargam-section-content2 (postwalk my-fn sargam-section-content)
         modified-sargam-line (first (filter #(= :SARGAM_LINE (first %)) sargam-section-content2))
         ]
-    (pprint "column-map")
-    (pprint column-map)
-    (pprint "sargam-section:")
-   (pprint sargam-section)
-    (pprint "----------")
-    ;; (println "sargam-section-content")
-    ;;(pprint sargam-section-content)    
-    ;; (println "sargam-section-content")
-    ;(println "sargam-section-content2")
-    ;(pprint sargam-section-content2)
-    ;(println "zzzsargam-section-content2------------------")
-    ;;[:sargam-section-content (into []
-    modified-sargam-line
+    (conj modified-sargam-line (into [:lyrics] lyrics))
     ))
 
 
@@ -376,7 +352,7 @@
         ]
     (postwalk my-fn parse-tree))) 
 
-(pprint (my-transforms (get-parser2 "S\nhello")))
+;;  (my-transforms (get-parser2 "n\nS\nhello"))
 ;(pprint (my-transforms (get-parser2 "title:hi\n\nSRG-\nhello\n\nmPD")))
 ;; (pprint (my-transforms (get-parser2 "S\n\nR")))
 ;;(pprint (get-parser2 "S\n\nR"))
@@ -389,13 +365,24 @@
   (clojure.string/replace txt #"\r\n" "\n")
   )
 
-(defn add-source[parse-tree txt]
+(defn add-source[txt parse-tree]
   (conj parse-tree [:source txt])
   )
 
 (defn run-through-parser[txt]
   (get-parser2 txt)
   )
+
+(defn main[txt]
+  (let [
+        txt2  (rationalize-new-lines txt)
+
+        parse-tree (  (comp my-transforms fix-items-keywords (partial add-source txt2) run-through-parser) txt2) 
+        ;;((my-transforms (fix-items-keywords (add-source (run-through-parser (rationalize-new-lines txt2)) txt2)))
+        ]
+    parse-tree
+    ))
+(pprint (main "title:hi\n\nSR\nS"))
 ;;(pprint (run-through-parser "S"))
 ;;(pprint (rationalize-new-lines "\nhi\n\r\n"))
 ;;
@@ -410,4 +397,7 @@
 ;;  fix items => parse-tree  tree-walk ???
 ;;  process sargam sections  tree-walk ?? 
 ;;  turn into hash equivalent of the javascript version
-;;  generate json
+
+; generate json
+;
+;
