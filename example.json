@@ -1,5 +1,5 @@
-echo "title:example\n\nSRG\n| S   G |\nhe-llo\n\nR" | ./doremiparse
-in push_warning, str= ornament (SRG) not to right or left of pitch , column is 0
+// echo "title:example\n\nSRG\n| S   G |\nhe-llo\n\nR" | ./doremiparse
+// in push_warning, str= ornament (SRG) not to right or left of pitch , column is 0
 { my_type: 'composition',
   apply_hyphenated_lyrics: false,
   title: '',

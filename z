@@ -1,0 +1,9 @@
+        parse-tree (get-parser2 txt)
+        parse-tree2 (into parse-tree [:source
+                                      (apply subs txt 
+                                                  (instaparse.core/span parse-tree))
+                                      (postwalk add-composition-source parse-tree)
+        parse-tree3 (postwalk add-composition-source parse-tree)
+        ]
+    (pprint parse-tree2)
+    (println "line-starts")

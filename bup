@@ -2,11 +2,9 @@
   "Semantic analysis is the activity of a compiler to determine what the types of various values are, how those types interact in expressions, and whether those interactions are semantically reasonable. "
   (:require	[doremi_script_clojure.test-helper :refer :all ]
             [clojure.pprint :refer [pprint]] 
-            [clojure.walk :refer [postwalk postwalk-replace keywordize-keys]]
+            [clojure.walk :refer [postwalk]]
             [instaparse.core :as insta]
             ))
-
-
 (comment
   ;; to use in repl:
   ;; cpr runs current file in vim
@@ -16,6 +14,40 @@
   (use 'clojure.stacktrace)
   (print-stack-trace *e)
   (pst)
+  )
+
+
+(comment
+  "postwalk will process the leaves first "
+  "In this case the function I applied conj's a counter to the node
+  if the node is a vector"
+  [:COMPOSITION
+   [:SARGAM_SECTION
+    [:SARGAM_LINE [:MEASURE [:BEAT [:SARGAM_PITCH [:S "S" 1] 2] 3] 4] 5]
+    6]
+   7]
+  )
+(comment
+  "prewalk start at root and works its way down"
+  [:COMPOSITION
+   [:SARGAM_SECTION
+    [:SARGAM_LINE [:MEASURE [:BEAT [:SARGAM_PITCH [:S "S" 7] 6] 5] 4] 3]
+    2]
+   [:SARGAM_SECTION
+    [:SARGAM_LINE
+     [:MEASURE [:BEAT [:SARGAM_PITCH [:R "R" 13] 12] 11] 10]
+     9]
+    8]
+   1]
+  )
+
+
+
+(def debug false)
+
+(def sargam-line-tag 
+  "set of tags for lines in sargam section"
+  #{ :SARGAM_LINE  :LYRICS_LINE :UPPER_OCTAVE_LINE  :LOWER_OCTAVE_LINE}
   )
 
 (defn start-index[z]
@@ -165,8 +197,6 @@
                    (* -2 (count lower-lower-dots))
                    )
         ]
-    (pprint "nodes:*****************")
-    (pprint nodes)
     ;; Note that we support multiple syllables, ornaments, and chords per note. But only return the last (for now)
     [ :SARGAM_PITCH
      {
@@ -205,78 +235,15 @@
                    )))
 
 
-(defn extract_sargam_line_from_sargam_section[sargam-section]
-  (assert (= (:SARGAM_SECTION (first sargam-section))))
-  (first (filter #(= :SARGAM_LINE (first %)) (rest sargam-section)))
-  )
 
-(comment parse2[txt]
-         "parse and run through semantic analyzer. Txt is doremi-script"
-         ;;(let [
-         ;;x1 ( (comp assign-attributes get-parser2) txt)
-         ;; parse-tree2
-         ;;   (insta/transform {:SARGAM_PITCH transform-sargam-pitch1} parse-tree)
-         ;; z (my-raise parse-tree2)
-         ;;  x1 (assign-attributes parse-tree)
-         ;;sargam-sections (filter #(= :SARGAM_SECTION (first %))  (rest x1))
-         ;; attribute-sections (filter #(= :ATTRIBUTE_SECTION (first %))  (rest x1))
-         ;; lyrics-sections  (filter #(= :LYRICS_SECTION (first %))  (rest x1))
-         ;;lines  (map  extract_sargam_line_from_sargam_section sargam-sections)
-         ;;     ]
-         ; { :attributes attribute-sections
-         ;;  :lines1 sargam-sections
-         ;  :lines lines
-         ;  :lyrics lyrics-sections
-         ;  :source txt
-         ;  }
-         ; x1
-         )
-
-;;(pprint (parse2 "Author: John Rothfield\nTitle: untitled\n\nThese are all the lyrics\nSecond lyric line\n\nRG.\nS | R | G\nhe-llo\n\n |m P D - |\n\nMore:attributes"))
-;; (pprint (parse2 (slurp-fixture "yesterday.txt")))
-;; (pprint (get-parser2 (slurp-fixture "yesterday.txt")))
-
-
-;;(get-parser2 "S--R--" :start :BEAT)
-
-
-;;(pprint (get-parser2 "S-RG"))
-
-(def z (get-parser2 "title:Hello\nAuthor: John\n\nS\n\nR"))
-
-
-
-(defn main[]
-  ;; (into {} (for [i line-start j (range 0 (count line-start))] [i j]))
-  ;; Use above to turn list of line starts to map of linestart --> line number
-  (let [txt1  "title:yesterday\n\nSRG\r\n\nmPD"
-        txt (clojure.string/replace txt1 #"\r\n" "\n")
-        line-starts 
-        (concat '(0) (keep-indexed (fn [index value](if  (= value \newline) index)) txt))
-
-
-        parse-tree3 (merge (get-parser2 txt)
-                           {:source txt :line-starts line-starts})
-        ]
-    ;; (pprint parse-tree3)
-    ;; add source
-    (apply sorted-map parse-tree3)
-    ))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;  New Code  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn collapse-sargam-section[sargam-section]
+(defn collapse-sargam-section[lines]
   "Assign attributes to the main line(sargam_line) from the lower and upper lines using 
-  column numbers. Returns a sargam-line
+  column numbers. Returns
   modified section"
   (let [
-        sargam-section-content (rest sargam-section)
-        sargam-line (first (filter #(= :SARGAM_LINE (first %)) sargam-section-content))
-        column-map (section-column-map sargam-section-content)
-        line-starts (map start-index sargam-section-content)
+        sargam-line (first (filter #(= :SARGAM_LINE (first %)) lines))
+        column-map (section-column-map lines)
+        line-starts (map start-index lines)
         line-start-for  (fn[column] 
                           (last (filter (fn[x] (>= column x)) line-starts)) )
 
@@ -303,111 +270,188 @@
                                                       (concat accum 
                                                               (filter #(vector? %) (all-nodes line))))
                                                     () 
-                                                    sargam-section-content) 
+                                                    lines) 
                                       ]
                                   ;; (my-raise nodes)
                                   (update-sargam-line-node content nodes)
                                   ))
-        sargam-section-content2 (insta/transform {:SARGAM_PITCH transform-sargam-pitch 
+        lines2 (insta/transform {:SARGAM_PITCH transform-sargam-pitch 
                                  :SARGAM_ORNAMENT_PITCH transform-sargam-ornament-pitch
                                  :SARGAM_LINE transform-sargam-line
-                                                  :BEAT transform-beat
-                                 } sargam-section-content)
-        modified-sargam-line (first (filter #(= :SARGAM_LINE (first %)) sargam-section-content2))
+                                 } lines)
         ]
-    (pprint "column-map")
-    (pprint column-map)
-    (pprint "sargam-section:")
-   (pprint sargam-section)
-    (pprint "----------")
-    ;; (println "sargam-section-content")
-    ;;(pprint sargam-section-content)    
-    ;; (println "sargam-section-content")
-    ;(println "sargam-section-content2")
-    ;(pprint sargam-section-content2)
-    ;(println "zzzsargam-section-content2------------------")
-    ;;[:sargam-section-content (into []
-    modified-sargam-line
+    ;; (println "lines")
+    ;;(pprint lines)    
+    ;; (println "lines")
+    ;;(println "lines2")
+    ;; (pprint lines2)
+    (insta/transform {
+                      :BEAT transform-beat
+                      } lines2)
     ))
 
 
+(defn transform-sargam-section[& content]
+  (into [] (concat [:SARGAM_SECTION]
+                   (collapse-sargam-section content))))
 
-(defn fix-items-keywords[parse-tree]
-  "replace keywords like :COMPOSITION_ITEMS with :items"  
-  (let [my-map 
-        (apply hash-map (mapcat vector 
-                                '(:COMPOSITION_ITEMS
-                                   :SARGAM_LINE_ITEMS
-                                   :ATTRIBUTE_SECTION_ITEMS
-                                   :BEAT_DELIMITED_ITEMS
-                                   :BEAT_UNDELIMITED_ITEMS
-                                   :MEASURE_ITEMS
-                                   :LYRICS_LINE_ITEMS
-                                   :SARGAM_ORNAMENT_ITEMS
-                                   )
-                                (repeat :items))) 
+(defn reduce-attribute-line[accum attribute_line]
+  "accum is a hash map. attribute_line looks like
+  [:ATTRIBUTE_LINE [:KEY 'Title'] [:VALUE 'Help']]
+  Add a key/value pair to the hashmap and return the modified
+  hashmap.
+  "
+  (pprint attribute_line)
+  (assert (= :ATTRIBUTE_LINE (first attribute_line)))
+  (let [
+        my-hash (into {} (rest attribute_line))
+        my-key (keyword (:KEY my-hash))
+        value (:VALUE my-hash)
         ]
-    (postwalk-replace my-map parse-tree)
+    (assoc accum  (first attribute_line) (second attribute_line))
     ))
 
+(defn transform-attribute-section[& attribute-lines]
+  ;;attribute-lines looks like ( [:KEY "Title"] [:VALUE "Help"]
+  ;;;  [:ATTRIBUTE_SECTION [:ATTRIBUTE_LINE [:KEY "Title"] [:VALUE "Help"]]]
+  [ :ATTRIBUTE_SECTION
+   (reduce reduce-attribute-line {} attribute-lines)
+   ]
+  )
 
-(defn process-attribute-section[x]
-  (comment "x looks like"
-           [:ATTRIBUTE_SECTION [:ATTRIBUTE_SECTION_ITEMS "title" "Hello"]]
-           )
-  (comment 
-    "returns"
-    [:attributes {:title "Hello"}]
-    )
-  (assoc x 1 (keywordize-keys (apply array-map (rest (second x))))))
 
-(defn my-transforms[parse-tree]
-  (let [my-fn
-        (fn[x]
-          (cond
-            (not (vector? x))
-            x
-            (= :ATTRIBUTE_SECTION (first x))
-            (process-attribute-section x)
-            (= :SARGAM_SECTION (first x))
-            (collapse-sargam-section x)
-            true
-            x))
+(defn assign-attributes[composition]
+  "Takes parse tree and processes it. Assigns object based on column position
+  and other factors. Returns modified tree"
+  (assert (= :COMPOSITION (first composition)))
+  (insta/transform {:SARGAM_SECTION transform-sargam-section
+                    :ATTRIBUTE_SECTION transform-attribute-section
+                    } composition)
+  )
+
+
+
+(defn extract_sargam_line_from_sargam_section[sargam-section]
+  ;; (println "sargam-section:::")
+  ;;(pprint sargam-section)
+  ;;(my-raise "z")
+  (assert (= (:SARGAM_SECTION (first sargam-section))))
+  (first (filter #(= :SARGAM_LINE (first %)) (rest sargam-section)))
+  )
+
+(defn parse2[txt]
+  "parse and run through semantic analyzer. Txt is doremi-script"
+  (let [
+        parse-tree (get-parser2 txt) ;; original parse-tree
+        ;; parse-tree2
+        ;;   (insta/transform {:SARGAM_PITCH transform-sargam-pitch1} parse-tree)
+        ;; z (my-raise parse-tree2)
+        x1 (assign-attributes parse-tree)
+        sargam-sections (filter #(= :SARGAM_SECTION (first %))  (rest x1))
+        attribute-sections (filter #(= :ATTRIBUTE_SECTION (first %))  (rest x1))
+        lyrics-sections  (filter #(= :LYRICS_SECTION (first %))  (rest x1))
+        lines  (map  extract_sargam_line_from_sargam_section sargam-sections)
         ]
-    (postwalk my-fn parse-tree))) 
+    { :attributes attribute-sections
+     ;;  :lines1 sargam-sections
+     :lines lines
+     :lyrics lyrics-sections
+     :source txt
+     }
+    x1
+    ))
 
-(pprint (my-transforms (get-parser2 "S\nhello")))
-;(pprint (my-transforms (get-parser2 "title:hi\n\nSRG-\nhello\n\nmPD")))
-;; (pprint (my-transforms (get-parser2 "S\n\nR")))
-;;(pprint (get-parser2 "S\n\nR"))
-;;(pprint  (postwalk items-fix (get-parser2 "title:hi\n\nSRG-")))
+;(pprint (parse2 "n\nS-RG"))
+;;(pprint (parse2 "Author: John Rothfield\nTitle: untitled\n\nThese are all the lyrics\nSecond lyric line\n\nRG.\nS | R | G\nhe-llo\n\n |m P D - |\n\nMore:attributes"))
+;; (pprint (parse2 (slurp-fixture "yesterday.txt")))
+;; (pprint (get-parser2 (slurp-fixture "yesterday.txt")))
+
+
+;;(get-parser2 "S--R--" :start :BEAT)
+
+
+;;(pprint (get-parser2 "S-RG"))
+
+;;; (def z (get-parser2 "S\n\nR"))
+
+(def counter (atom 0))
+(defn walk-test-helper[x]
+  (cond (vector? x)
+        (do
+          (swap! counter inc)
+          (conj x @counter)
+          )
+        true
+        x        
+        ))
+
+
+(defn postwalk-test[tree]
+  (reset! counter 0)
+  (postwalk walk-test-helper tree)
+  ;; (prewalk walk-test-helper tree)
+  )
+
+(comment if false
+         (do
+           (println "postwalk-----")
+           (pprint (postwalk-test z))
+           (println "postwalk-----\n\n")
+           ))
+
+(defn zadd-source [node txt]
+  "txt is the original parse source"
+  (cond (not (vector? node))
+        node
+        true
+        (into node [:source (apply subs txt 
+                                   (instaparse.core/span node))]
+              )    
+        ))
+
+(comment
+  ;;  parse-tree2 (postwalk add-composition-source parse-tree)
+  (add-composition-source (fn [node]
+                            (if (and (vector? node) (= :COMPOSITION (first node)))
+                              (into node [:source (apply subs txt 
+                                                         (instaparse.core/span node))]
+                                    )    
+                              node
+                              ))
+                          )
+  )
+
+(defn main[]
+  ;; (into {} (for [i line-start j (range 0 (count line-start))] [i j]))
+  ;; Use above to turn list of line starts to map of linestart --> line number
+  (let [txt1  "SRG\r\n\nmPD"
+        txt (clojure.string/replace txt1 #"\r\n" "\n")
+        line-starts 
+        (concat '(0) (keep-indexed (fn [index value](if  (= value \newline) index)) txt))
+        parse-tree3 (into (get-parser2 txt)
+                          [:source txt :line-starts line-starts])
+        ]
+    ;; (pprint parse-tree3)
+    ;; add source
+    (apply sorted-map parse-tree3)
+    ))
+(def z (main))
+(pprint (main))
+
+(defn items-fix [x]
+  "replace :ZZZZ_ITEMS with :items  where the symbol :ZZZ_ITEMS is the first item in the list "
+  (let [first (first x)]
+  (cond (and (vector? x)
+             (keyword? (first x)) 
+             (re-find #"_ITEMS$" (str (first x))))
+        (assoc x 0 :items)
+        true
+        x)))
+
+
+
+
+(pprint  (postwalk items-fix (get-parser2 "title:hi\n\nSRG-")))
 
 
 ;;(pprint (parse2 "title:hi\n\nSR\nS"))
-;;
-(defn rationalize-new-lines[txt]
-  (clojure.string/replace txt #"\r\n" "\n")
-  )
-
-(defn add-source[parse-tree txt]
-  (conj parse-tree [:source txt])
-  )
-
-(defn run-through-parser[txt]
-  (get-parser2 txt)
-  )
-;;(pprint (run-through-parser "S"))
-;;(pprint (rationalize-new-lines "\nhi\n\r\n"))
-;;
-;;  Pseudo code:
-;;
-;;  given a string:
-;;
-;;  rationalize new lines => txt
-;;  run through parser => parse-tree
-;;  add source
-;;  add column numbers
-;;  fix items => parse-tree  tree-walk ???
-;;  process sargam sections  tree-walk ?? 
-;;  turn into hash equivalent of the javascript version
-;;  generate json

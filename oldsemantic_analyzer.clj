@@ -8,6 +8,13 @@
 
 
 (comment
+  "postwalk-replace example"
+  (postwalk-replace [4 4444] {1 {2 {4 5} {8 {9 4}} 10}})
+  ;; ==>
+  ;; {4444 {2 {4 5}, {8 {9 4}} 10}}
+  ;;
+  )
+(comment
   ;; to use in repl:
   ;; cpr runs current file in vim
   (use 'doremi_script_clojure.semantic-analyzer :reload)
@@ -16,6 +23,40 @@
   (use 'clojure.stacktrace)
   (print-stack-trace *e)
   (pst)
+  )
+
+
+(comment
+  "postwalk will process the leaves first "
+  "In this case the function I applied conj's a counter to the node
+  if the node is a vector"
+  [:COMPOSITION
+   [:SARGAM_SECTION
+    [:SARGAM_LINE [:MEASURE [:BEAT [:SARGAM_PITCH [:S "S" 1] 2] 3] 4] 5]
+    6]
+   7]
+  )
+(comment
+  "prewalk start at root and works its way down"
+  [:COMPOSITION
+   [:SARGAM_SECTION
+    [:SARGAM_LINE [:MEASURE [:BEAT [:SARGAM_PITCH [:S "S" 7] 6] 5] 4] 3]
+    2]
+   [:SARGAM_SECTION
+    [:SARGAM_LINE
+     [:MEASURE [:BEAT [:SARGAM_PITCH [:R "R" 13] 12] 11] 10]
+     9]
+    8]
+   1]
+  )
+
+
+
+(def debug false)
+
+(def sargam-line-tag 
+  "set of tags for lines in sargam section"
+  #{ :SARGAM_LINE  :LYRICS_LINE :UPPER_OCTAVE_LINE  :LOWER_OCTAVE_LINE}
   )
 
 (defn start-index[z]
@@ -165,8 +206,6 @@
                    (* -2 (count lower-lower-dots))
                    )
         ]
-    (pprint "nodes:*****************")
-    (pprint nodes)
     ;; Note that we support multiple syllables, ornaments, and chords per note. But only return the last (for now)
     [ :SARGAM_PITCH
      {
@@ -205,7 +244,87 @@
                    )))
 
 
+
+(defn collapse-sargam-section[lines]
+  "Assign attributes to the main line(sargam_line) from the lower and upper lines using 
+  column numbers. Returns
+  modified section"
+  (let [
+        sargam-line (first (filter #(= :SARGAM_LINE (first %)) lines))
+        column-map (section-column-map lines)
+        line-starts (map start-index lines)
+        line-start-for  (fn[column] 
+                          (last (filter (fn[x] (>= column x)) line-starts)) )
+
+        column-for-node (fn[node]
+                          (- (start-index node) (line-start-for (start-index node)))
+                          )
+        transform-sargam-pitch (fn[ content & zrest] 
+                                 (let [
+                                       column (column-for-node content)
+                                       nodes (get column-map column) 
+                                       ]
+                                   (update-sargam-pitch-node content nodes)
+                                   ))
+        transform-sargam-ornament-pitch (fn[content] 
+                                          (let [
+                                                column (column-for-node content)
+                                                nodes (get column-map column) 
+                                                ]
+                                            (update-sargam-ornament-pitch-node content nodes)
+                                            ))
+        transform-sargam-line (fn[& content] 
+                                (let [
+                                      nodes (reduce (fn[accum line]
+                                                      (concat accum 
+                                                              (filter #(vector? %) (all-nodes line))))
+                                                    () 
+                                                    lines) 
+                                      ]
+                                  ;; (my-raise nodes)
+                                  (update-sargam-line-node content nodes)
+                                  ))
+        lines2 (insta/transform {:SARGAM_PITCH transform-sargam-pitch 
+                                 :SARGAM_ORNAMENT_PITCH transform-sargam-ornament-pitch
+                                 :SARGAM_LINE transform-sargam-line
+                                 } lines)
+        ]
+    ;; (println "lines")
+    ;;(pprint lines)    
+    ;; (println "lines")
+    ;;(println "lines2")
+    ;; (pprint lines2)
+    (insta/transform {
+                      :BEAT transform-beat
+                      } lines2)
+    ))
+
+
+(defn transform-sargam-section[& content]
+  (into [] (concat [:SARGAM_SECTION]
+                   (collapse-sargam-section content))))
+
+(defn reduce-attribute-line[accum attribute_line]
+  "accum is a hash map. attribute_line looks like
+  [:ATTRIBUTE_LINE [:KEY 'Title'] [:VALUE 'Help']]
+  Add a key/value pair to the hashmap and return the modified
+  hashmap.
+  "
+  (pprint attribute_line)
+  (assert (= :ATTRIBUTE_SECTION_ITEMS (first attribute_line)))
+  (let [
+        my-hash (into {} (rest attribute_line))
+        my-key (keyword (:KEY my-hash))
+        value (:VALUE my-hash)
+        ]
+    (assoc accum  (first attribute_line) (second attribute_line))
+    ))
+
+
 (defn extract_sargam_line_from_sargam_section[sargam-section]
+  ;; (println "sargam-section:::")
+  ;;(pprint sargam-section)
+  ;;(my-raise "z")
   (assert (= (:SARGAM_SECTION (first sargam-section))))
   (first (filter #(= :SARGAM_LINE (first %)) (rest sargam-section)))
   )
@@ -244,7 +363,52 @@
 
 (def z (get-parser2 "title:Hello\nAuthor: John\n\nS\n\nR"))
 
+(def counter (atom 0))
+(defn walk-test-helper[x]
+  (cond (vector? x)
+        (do
+          (swap! counter inc)
+          (conj x @counter)
+          )
+        true
+        x        
+        ))
 
+
+(defn postwalk-test[tree]
+  (reset! counter 0)
+  (postwalk walk-test-helper tree)
+  ;; (prewalk walk-test-helper tree)
+  )
+
+(comment if false
+         (do
+           (println "postwalk-----")
+           (pprint (postwalk-test z))
+           (println "postwalk-----\n\n")
+           ))
+
+(defn zadd-source [node txt]
+  "txt is the original parse source"
+  (cond (not (vector? node))
+        node
+        true
+        (into node [:source (apply subs txt 
+                                   (instaparse.core/span node))]
+              )    
+        ))
+
+(comment
+  ;;  parse-tree2 (postwalk add-composition-source parse-tree)
+  (add-composition-source (fn [node]
+                            (if (and (vector? node) (= :COMPOSITION (first node)))
+                              (into node [:source (apply subs txt 
+                                                         (instaparse.core/span node))]
+                                    )    
+                              node
+                              ))
+                          )
+  )
 
 (defn main[]
   ;; (into {} (for [i line-start j (range 0 (count line-start))] [i j]))
@@ -262,21 +426,30 @@
     ;; add source
     (apply sorted-map parse-tree3)
     ))
+;;(def z (main))
+;;(pprint (main))
+
+(defn old-items-fix [x]
+  (cond (and (vector? x)
+             (keyword? (first x)) 
+             (re-find #"_ITEMS$" (str (first x))))
+        (assoc x 0 :items)
+        true
+        x))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;  New Code  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn collapse-sargam-section[sargam-section]
+(defn collapse-sargam-section[lines]
   "Assign attributes to the main line(sargam_line) from the lower and upper lines using 
-  column numbers. Returns a sargam-line
+  column numbers. Returns
   modified section"
   (let [
-        sargam-section-content (rest sargam-section)
-        sargam-line (first (filter #(= :SARGAM_LINE (first %)) sargam-section-content))
-        column-map (section-column-map sargam-section-content)
-        line-starts (map start-index sargam-section-content)
+        sargam-line (first (filter #(= :SARGAM_LINE (first %)) lines))
+        column-map (section-column-map lines)
+        line-starts (map start-index lines)
         line-start-for  (fn[column] 
                           (last (filter (fn[x] (>= column x)) line-starts)) )
 
@@ -303,34 +476,29 @@
                                                       (concat accum 
                                                               (filter #(vector? %) (all-nodes line))))
                                                     () 
-                                                    sargam-section-content) 
+                                                    lines) 
                                       ]
                                   ;; (my-raise nodes)
                                   (update-sargam-line-node content nodes)
                                   ))
-        sargam-section-content2 (insta/transform {:SARGAM_PITCH transform-sargam-pitch 
+        lines2 (insta/transform {:SARGAM_PITCH transform-sargam-pitch 
                                  :SARGAM_ORNAMENT_PITCH transform-sargam-ornament-pitch
                                  :SARGAM_LINE transform-sargam-line
-                                                  :BEAT transform-beat
-                                 } sargam-section-content)
-        modified-sargam-line (first (filter #(= :SARGAM_LINE (first %)) sargam-section-content2))
+                                 } lines)
         ]
-    (pprint "column-map")
-    (pprint column-map)
-    (pprint "sargam-section:")
-   (pprint sargam-section)
-    (pprint "----------")
-    ;; (println "sargam-section-content")
-    ;;(pprint sargam-section-content)    
-    ;; (println "sargam-section-content")
-    ;(println "sargam-section-content2")
-    ;(pprint sargam-section-content2)
-    ;(println "zzzsargam-section-content2------------------")
-    ;;[:sargam-section-content (into []
-    modified-sargam-line
+    ;; (println "lines")
+    ;;(pprint lines)    
+    ;; (println "lines")
+    ;;(println "lines2")
+    ;; (pprint lines2)
+    (insta/transform {
+                      :BEAT transform-beat
+                      } lines2)
     ))
 
 
+(defn process-sargam-section[x]
+  (assoc x 0 (collapse-sargam-section (rest x))))
 
 (defn fix-items-keywords[parse-tree]
   "replace keywords like :COMPOSITION_ITEMS with :items"  
@@ -370,16 +538,13 @@
             (= :ATTRIBUTE_SECTION (first x))
             (process-attribute-section x)
             (= :SARGAM_SECTION (first x))
-            (collapse-sargam-section x)
+            (process-sargam-section x)
             true
             x))
         ]
     (postwalk my-fn parse-tree))) 
 
-(pprint (my-transforms (get-parser2 "S\nhello")))
-;(pprint (my-transforms (get-parser2 "title:hi\n\nSRG-\nhello\n\nmPD")))
-;; (pprint (my-transforms (get-parser2 "S\n\nR")))
-;;(pprint (get-parser2 "S\n\nR"))
+(pprint (my-transforms (get-parser2 "title:hi\n\nSRG-")))
 ;;(pprint  (postwalk items-fix (get-parser2 "title:hi\n\nSRG-")))
 
 
