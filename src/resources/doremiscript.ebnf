@@ -158,8 +158,15 @@ SARGAM_MUSICAL_CHAR  =
 BEGIN_SLUR = '('
 END_SLUR = ')'
 
+BEGIN_SLUR_SARGAM_PITCH=  (*  (S   *)
+    BEGIN_SLUR SARGAM_PITCH
+
 SARGAM_PITCH = (* a sargam pitch ie SrR.. *)
-     BEGIN_SLUR? SARGAM_MUSICAL_CHAR END_SLUR?  
+     SARGAM_MUSICAL_CHAR END_SLUR?  
+
+<SARGAM_PITCH2> = (* a sargam pitch ie SrR.. *)
+      SARGAM_PITCH | BEGIN_SLUR_SARGAM_PITCH 
+
 
 <SARGAM_ORNAMENT_PITCH> = SARGAM_MUSICAL_CHAR 
 (***  End pitches *********************)
@@ -182,7 +189,7 @@ BEAT = BEAT_DELIMITED | !BEGIN_BEAT_SYMBOL BEAT_UNDELIMITED
 use Srgm> or S r g m> to group pithes into a single beat. The > delimiters correspond to the lower loop in the aacm notation system *)
   = <BEGIN_BEAT_SYMBOL> BEAT_DELIMITED_ITEMS <END_BEAT_SYMBOL>
 BEAT_DELIMITED_ITEMS = BEAT_DELIMITED_ITEM+ <BEAT_DELIMITED_ITEM> (* inside of a delimited beat, ie <S--  R--  G-> *)
-  = BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES | SARGAM_PITCH !DASH | DASH | <WHITE_SPACE>
+  = BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES | SARGAM_PITCH2 !DASH | DASH | <WHITE_SPACE>
 
 DASH =  (* ie a -, used as a rhythmical placeholder. IE S--R--G- *) 
    '-'
@@ -192,12 +199,12 @@ LINE_NUMBER (*    1)    2)     3) etc     *)
 
 <DIGITS> = (* One or more digits *)  #'\d+'
 
-BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES (* <S  - - R > *) = SARGAM_PITCH (WHITE_SPACE | DASH)+
+BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES (* <S  - - R > *) = SARGAM_PITCH2 (WHITE_SPACE | DASH)+
 
 REPEAT_SYMBOL = '%'
 
 PITCH_WITH_DASHES (* for example 'S--'  *)
-  = SARGAM_PITCH DASH+
+  = SARGAM_PITCH2 DASH+
 
 
 
@@ -208,7 +215,7 @@ BEAT_UNDELIMITED_ITEMS = BEAT_UNDELIMITED_ITEM+
 
 <BEAT_UNDELIMITED_ITEM> (* inside of a simple beat, ie S--R--G- Note that undelimited beats cannot contain spaces *)
   = PITCH_WITH_DASHES / 
-    SARGAM_PITCH / 
+    SARGAM_PITCH2 / 
     DASH 
 
 NON_BARLINE 
