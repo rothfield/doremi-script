@@ -44,10 +44,11 @@ SARGAM_SECTION
   =  (UPPER_OCTAVE_LINE <"\n">)*  SARGAM_LINE (<'\n'> LOWER_OCTAVE_LINE)* (<'\n'> LYRICS_LINE)*
 
 SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or
-more measures followed  *) = LINE_NUMBER?  SARGAM_LINE_ITEMS
+more measures followed  *) = SARGAM_LINE_ITEMS
+SARGAM_LINE_ITEMS = LINE_NUMBER?  SARGAM_LINE_ITEMS2
 
 
-SARGAM_LINE_ITEMS (* consists of optional line# at beginning of line, followed by 1 or more measures followed  *)
+<SARGAM_LINE_ITEMS2> (* consists of optional line# at beginning of line, followed by 1 or more measures followed  *)
   = <WHITE_SPACE?> BARLINE? MEASURE (BARLINE MEASURE)*  BARLINE? <WHITE_SPACE?>
 
 
@@ -99,10 +100,10 @@ DOUBLE_BARLINE (* ie ||, a solid barline *)
 SINGLE_BARLINE (* ie | *)
   = '|' ! ('|' | ']' | ':')
 LEFT_REPEAT (* ie |:  *)
-  = '|' ':'
+  = "|:"
 
 RIGHT_REPEAT (* ie :| *)
-  = ':' '|'
+  = ":|"
 
 (**** End barline section *)
 
