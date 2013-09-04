@@ -2,6 +2,7 @@
   "Semantic analysis is the activity of a compiler to determine what the types of various values are, how those types interact in expressions, and whether those interactions are semantically reasonable. "
   (:require	
     ;;  [doremi_script_clojure.test-helper :refer :all ]
+    [clojure.java.io :as io]
     [clojure.pprint :refer [pprint]] 
     [clojure.walk :refer [postwalk postwalk-replace keywordize-keys]]
     [clojure.string :refer [lower-case]]
@@ -9,11 +10,8 @@
     ))
 (defn p[] (println "************************"))
 
-(defn slurp-fixture [file-name]
-  (slurp (clojure.java.io/resource 
-           (str "resources/fixtures/" file-name))))
-
-(def yesterday (slurp-fixture "yesterday.txt"))
+(def yesterday 
+     (slurp (io/resource "fixtures/yesterday.txt")))
 
 (comment
   ;; to use in repl:
@@ -29,8 +27,7 @@
 
 (def doremi-script-parser  
   (insta/parser
-    (slurp (clojure.java.io/resource "resources/doremiscript.ebnf")))
-  )
+   (slurp (io/resource "doremiscript.ebnf"))))
 
 (defn start-index[z]
   "Looks up starting index of the node from the node's 
@@ -563,9 +560,10 @@ parse-tree)))
                 x)) parse-tree)) 
 
 (defn main5[txt]
-  (p)
+  (if false
+  (do (p)
   (println txt)
-  (p)
+  (p)))
   (-> txt
       run-through-parser
       (add-source txt)
@@ -674,7 +672,7 @@ parse-tree)))
 
 ;;(pprint (main5 "1) |: S | R |  G |]"))
 ;(pprint (main5 yesterday))
-(pprint (main5 "hi:john\n\n   Gm7\n1) S | r r r r |\n   hi"))
+;; (pprint (main5 "hi:john\n\n   Gm7\n1) S | r r r r |\n   hi"))
 ;(pprint (main5 "hi:john\n\n   Gm7\n   S | r r r r |\n   hi"))
 ;(pprint (main5 "Gm7\nS"))
 ;(pprint (main5 "1) S-"))

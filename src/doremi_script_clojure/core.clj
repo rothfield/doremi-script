@@ -1,16 +1,14 @@
 (ns doremi_script_clojure.core
+  (:gen-class)
   (:require	
-    ;;  [doremi_script_clojure.test-helper :refer :all ]
-    [clojure.java.io :as io]
-    [doremi_script_clojure.semantic_analyzer :refer [main5]]
+   [doremi_script_clojure.semantic_analyzer :refer [main5]]
+    [clojure.java.io]
     [clojure.pprint :refer [pprint]] 
-    )
-  (:gen-class :main true))
-
-(def get-parser22 
-  ;(insta/parser
-  ;  (slurp (clojure.java.io/resource "doremi_script_clojure/doremiscript.ebnf")))
-  )
+    ))
 
 (defn -main[& args]
-  (pprint (main5 "S")))
+   ;(pprint (slurp (clojure.java.io/resource "doremiscript.ebnf")))
+ (pprint (main5 (slurp *in*)))
+  ;;(pprint "hi")
+  )
+

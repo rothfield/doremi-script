@@ -8,4 +8,5 @@
                  [instaparse "1.2.2"] 
                  ]
   :main doremi_script_clojure.core
+  ;; lein uberjar creates jar file. Run it use java -jar
   )
