@@ -7,7 +7,7 @@
 tagline = ""  % removed 
 }
 %{
-S
+|: S--S--S- :|
   
 %}
 melody = {
@@ -15,7 +15,7 @@ melody = {
 \key c \major
 \time 4/4
 \autoBeamOn  
-\partial 4*1  c'4 \break
+\bar "|:"  c'8. c'8. c'8 \bar ":|"  \break
 
 }
 
