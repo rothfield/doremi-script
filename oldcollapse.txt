@@ -1,0 +1,102 @@
+(defn collapse-sargam-section[sargam-section]
+  ;;;(println "collapse-sargam-section")
+  "main logic is here"
+  "Deals with the white-space significant aspect of doremi-script"
+  "given a section like
+
+  .
+  S
+  Hi
+
+  "
+  "Returns the sargam-line with the associated objects in the same column attached
+  to the corresponding pitches/items on main line. The dot becomes an upper octave of S and 
+  Hi becomes a syllable for S"
+  "Assign attributes to the main line(sargam_line) from the lower and upper lines using 
+  column numbers. Returns a sargam-line"
+  ;; (pprint (rest sargam-section))
+  ;;(pprint "____")
+  (let [
+        sargam-section-content (rest sargam-section)
+        sargam-line (first (filter #(and (vector? %) (= :SARGAM_LINE (first %))) sargam-section-content))
+        lyrics-line (first (filter #(and (vector? %) (= :LYRICS_LINE (first %))) sargam-section-content))
+        syllables  (filter #(and (vector? %) (= :SYLLABLE (first %))) (tree-seq vector? rest lyrics-line))
+        line-number  (some #(if (and (vector? %) (= :LINE_NUMBER (first %)))
+                              %   ) 
+                           (tree-seq vector? rest sargam-line))
+        column-map (section-column-map sargam-section)
+        line-starts (map start-index sargam-section-content)
+        line-start-for  (fn[column] 
+                          (last (filter (fn[x] (>= column x)) line-starts)) )
+        column-for-node (fn[node]
+                          (- (start-index node) (line-start-for (start-index node))))
+        postwalk-fn (fn postwalker[node]
+                      (if
+                        (not (vector? node))
+                        node
+                        ;; else
+                        (let [
+                              column (column-for-node node)
+                              nodes (get column-map column) 
+                              k (first node)
+                              source (:_source (meta node))
+
+                              ]
+                          (cond
+                            (= :BEGIN_SLUR_SARGAM_PITCH k)
+                            ;; unwrap the sargam-pitch, setting begin-slur attribute !!
+                            (let [
+                                  sargam-pitch (get node 2) 
+                                  ]
+                              ;;(println "sargam-pitch**** --> " sargam-pitch)
+                              ;;   { _my_type: 'begin_slur', source: '(' }
+                              (assoc-in sargam-pitch [:attributes (count (:attributes sargam-pitch))] 
+                                        (sorted-map :_my_type "begin_slur" 
+                                                    :_source source
+                                                    )))
+                            (= :zPITCH_WITH_DASHES k)
+                            node
+                            (= :LINE_NUMBER k)
+                            (sorted-map :_my_type "line_number"
+                                        :_source source)
+                            ;;  { my_type: 'line_number', source: '1)', column: 0 }
+                            (= :BARLINE k)
+                            (do
+                              ;  (println "*****************BARLINE case**")
+                              ;  (pprint node)
+                              ;; [:BARLINE [:SINGLE_BARLINE "|"]]
+                              (sorted-map
+                                :_my_type (lower-case (name (get-in node [1 0])))
+                                :is_barline true
+                                :_source source))
+                            (= :SARGAM_PITCH k)
+                            (update-sargam-pitch-node node nodes)
+                            (= :SARGAM_ORNAMENT_PITCH k)
+                            (update-sargam-ornament-pitch-node node nodes)
+                            (= :BEAT k)
+                            (transform-beat node)
+                            true
+                            node))))
+        sargam-section-content2 (postwalk postwalk-fn sargam-section-content)
+        sargam-line2 (some #(if (and (vector? %) (= :SARGAM_LINE (first %))) %) sargam-section-content2)
+        items
+        ;;(flatten-things 
+        (some #(if (and (vector? %) (= :SARGAM_LINE_ITEMS (first %))) (subvec % 1)) sargam-line2)
+        ]
+    (assert (= :SARGAM_LINE (first sargam-line2)))
+    (assert (not (nil? items)))
+    (pprint sargam-line2) (p) (p) (p)
+    (println "items--->")
+    (pprint items) (p)(p)(p)(p)(p)
+    (println "items--->")
+    ;; (pprint (first sargam-line2))
+    (sorted-map :_my_type "sargam_line"
+                :items 
+                items
+                ;;  (some #(if (and (vector %) (= :SARGAM_LINE_ITEMS (first %))) (second %))  (tree-seq vector? rest (into [] sargam-section-content2)))
+                :line_number  (if line-number (second line-number) "")
+                :id 999  ;; TODO
+                :syllables syllables
+                :kind "latin_sargam"
+                :line_warnings []
+                :_source (:_source (meta sargam-section)))))

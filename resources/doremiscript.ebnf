@@ -159,7 +159,7 @@ SARGAM_MUSICAL_CHAR  =
 BEGIN_SLUR = '('
 END_SLUR = ')'
 
-BEGIN_SLUR_SARGAM_PITCH=  (*  (S   *)
+BEGIN_SLUR_SARGAM_PITCH =  (*  (S   *)
     BEGIN_SLUR SARGAM_PITCH
 
 SARGAM_PITCH = (* a sargam pitch ie SrR.. *)
