@@ -1009,5 +1009,5 @@ parse-tree)))
                     node2)))) 
             (run-through-parser txt)))
 (try-again "*\nS--")
-(pprint (try-again " *\n(S--"))
+(pprint (try-again " *\n(S--S)"))
 
