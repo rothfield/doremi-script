@@ -280,16 +280,31 @@
                         ))]
     (postwalk postwalk-fn beat3)))
 
+(defn my-seq[x]
+  "seq through the data structure, which is like"
+  " {:items [ {:items [1 2 3]} 2 3]}"
+  "Don't include items like {:items [1 2 3]} "
+  "just [1 2 3]"
+  (filter #(not (:items %))
+                (tree-seq
+    (fn branch?[x] (or (vector? x) (map? x))) 
+    (fn children[y] (cond 
+                      (and (map? y) (:items y)) 
+                      (:items y)
+                      (vector? y)
+                      (rest y))) 
+    x)))
+
 (defn line-column-map2 [my-map line]
   "my-map is a map from column number -> list of nodes
   Add nodes from line to the map"
-  (if true
+  (if false 
     (do
   (pprint "entering line-column-map2: line:")
   (pprint line)
   (pprint "****")
-  (pprint "*** my-seq line")
-  (pprint (my-seq line))
+ ;; (pprint "*** my-seq line")
+;(;  (pprint (my-seq line))
   (pprint "****")
       )
     )
@@ -339,20 +354,6 @@
   )
 
 
-(defn my-seq[x]
-  "seq through the data structure, which is like"
-  " {:items [ {:items [1 2 3]} 2 3]}"
-  "Don't include items like {:items [1 2 3]} "
-  "just [1 2 3]"
-  (filter #(not (:items %))
-                (tree-seq
-    (fn branch?[x] (or (vector? x) (map? x))) 
-    (fn children[y] (cond 
-                      (and (map? y) (:items y)) 
-                      (:items y)
-                      (vector? y)
-                      (rest y))) 
-    x)))
 (comment
 (pprint "***************")
 (pprint (my-seq sample3))
@@ -386,17 +387,21 @@
         postwalk-fn (fn postwalker[node]
               "TODO: in progress- rewrite for new version!!copied from old"
                       (if
-                        (not (vector? node))
+                        (not (map? node))
                         node
                         ;; else
                         (let [
                               column (column-for-node node)
                               nodes (get column-map column) 
-                              k (first node)
-                              source (:_source (meta node))
-
+                              my-type (:my_type node)
+                              source (:_source  node)
+                              k :unused
+                              ;;x (println "in postwalker")
+                              ;;z (pprint node)
                               ]
                           (cond
+                            true
+                            node
                             (= :BEGIN_SLUR_SARGAM_PITCH k)
                             ;; unwrap the sargam-pitch, setting begin-slur attribute !!
                             (let [
@@ -438,7 +443,8 @@
     (pprint line-starts)
     (pprint "column-map")
     (pprint column-map)))
-    sargam-section))
+    (postwalk postwalk-fn sargam-section)
+    ))
 
 (defn collapse-sargam-section[sargam-section]
   ;;;(println "collapse-sargam-section")
@@ -982,7 +988,7 @@ parse-tree)))
                                        :_my_type (keyword (keyword (lower-case (name (get-in node [1 0])))))
                                        :is_barline true
                                        ))
-                    (#{:UPPER_OCTAVE_DOT :LINE_NUMBER :DASH} my-key)
+                    (#{:UPPER_OCTAVE_DOT :LINE_NUMBER :DASH :BEGIN_SLUR :END_SLUR} my-key)
                     my-map
                     (= :SARGAM_PITCH my-key)
                     (let [
@@ -1003,5 +1009,5 @@ parse-tree)))
                     node2)))) 
             (run-through-parser txt)))
 (try-again "*\nS--")
-(pprint (try-again "*\nS--"))
+(pprint (try-again " *\n(S--"))
 
