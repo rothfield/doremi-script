@@ -4,7 +4,7 @@
     ;;  [doremi_script_clojure.test-helper :refer :all ]
     [clojure.java.io :as io]
     [clojure.pprint :refer [pprint]] 
-    [clojure.walk :refer [postwalk postwalk-replace keywordize-keys]]
+    [clojure.walk :refer [postwalk-demo postwalk postwalk-replace keywordize-keys]]
     [clojure.string :refer [lower-case]]
     [instaparse.core :as insta]
     [clojure.data.json :as json]
@@ -12,13 +12,13 @@
 (comment
   ;; to use in repl:
   ;; cpr runs current file in vim
-  (use 'clojure.stacktrace) (use 'doremi_script_clojure.semantic_analyzer :reload) (ns doremi_script_clojure.semantic_analyzer) 
+  (use 'doremi_script_clojure.semantic_analyzer :reload) (ns doremi_script_clojure.semantic_analyzer) 
+  (use 'clojure.stacktrace) 
   (print-stack-trace *e)
   (use 'doremi_script_clojure.test-helper :reload)  ;; to reload the grammar
   (print-stack-trace *e)
   (pst)
   )
-
 
 
 (defn p[] (println "************************"))
@@ -166,16 +166,18 @@
                           (:items sargam-section))
         column-map (reduce line-column-map {}  (:items sargam-section))
         line-starts (map :_start_index (:items sargam-section))
-        line-start-for  (fn[column] 
+        line-start-for  (fn line-start-for-fn[column] 
                           (last (filter (fn[x] (>= column x)) line-starts)) )
         column-for-node (fn[node]
                           (- (:_start_index node) (line-start-for (:_start_index node))))
         postwalk-fn (fn postwalker[node]
                       "TODO: in progress- rewrite for new version!!copied from old"
-                      (if
+                      (cond
                         (not (map? node))
                         node
-                        ;; else
+                        (not (:_my_type node))
+                        node
+                        true
                         (let [
                               column (column-for-node node)
                               nodes (get column-map column) 
@@ -197,12 +199,22 @@
                                         (sorted-map :_my_type "begin_slur" 
                                                     :_source source
                                                     )))
-                            (= :pitch_with_dashes my-type)
-                            ; return an array:  [sargampitch dash dash]. 
-                            ; Need to flatten it later
-                            (assoc-in (:items node) [0 :numerator] 
-                                      (count (filter (fn[x] (#{:sargam_pitch :dash} (:_my_type x)))
-                                                     (:items node))))
+                            (= :zpitch_with_dashes my-type)
+                            (do
+                              ;; (println "***************" my-type)
+                              ; return an array:  [sargampitch dash dash]. 
+                              ; Need to flatten it later
+                              (assoc-in (:items node) [0 :numerator] 
+                                        (count (filter (fn[x] (#{:sargam_pitch :dash} (:_my_type x)))
+                                                       (:items node))))
+                              )
+                            (= :zbeat my-type)
+                            ;; flatten takes care of the pitch_with_dashes returning an array
+                            (let [beat2
+                                  (assoc node :items (into [] (flatten (:items node))))
+                                  ]
+                              ;; (println "beat case")
+                              beat2)
                             true
                             node
                             (= :LINE_NUMBER k)
@@ -224,8 +236,10 @@
                             (= :SARGAM_ORNAMENT_PITCH k)
                             node
                             ;; (update-sargam-ornament-pitch-node node nodes)
-                            (= :BEAT k)
-                            node
+                            (= :zBEAT k)
+                            (do
+                              (println "BEAT case")
+                              (assoc node :items (apply concat (:items node))))
                             ;;;  (transform-beat node)
                             true
                             node))))
@@ -235,56 +249,152 @@
     (postwalk postwalk-fn sargam-section)
     ))
 
+(def unit-of-rhythm
+  #{:sargam_pitch :dash})
+
+(defn make-sorted-map[node]
+  (cond 
+    (and (map? node) (= (into (hash-set) (keys node)) #{:numerator :denominator}))
+    node
+    (map? node)
+    (into (sorted-map) node)
+    true
+    node))
+
+(defn make-maps-sorted[x]
+  (into (sorted-map) (postwalk make-sorted-map x)))
+
+(defn backwards-comparator[k1 k2]
+  (compare k2 k1))
+
 (defn doremi-script-parse[txt]
+  "parse the text"
   (println "processing")
   (println txt)
-  (postwalk (fn[node]
-              ;; (pprint node)
-              (cond
-                (not (vector? node))
-                node
-                true
-                (let [my-key (first node)
-                      my-map (array-map :_my_type (keyword (lower-case (name my-key)))
-                                        :_source (get-source node txt)
-                                        :_start_index (start-index node) 
-                                        )
-                      node2 (if (and (vector? (second node)) 
-                                     (.endsWith (name (first (second node))) "ITEMS"))
-                              (merge {:items (subvec  (second node) 1) } my-map)
-                              ;; else
-                              node)
-                      ]
-                  (cond
-                    (#{:UPPER_OCTAVE_LINE :BEGIN_SLUR_SARGAM_PITCH :PITCH_WITH_DASHES} my-key)
-                    (merge (sorted-map :items (subvec node 1)) my-map)
-                    (= :BARLINE my-key)
-                    (merge    my-map (sorted-map
+  (make-maps-sorted      
+    (postwalk (fn[node]
+                ;; (pprint node)
+                (cond
+                  (not (vector? node))
+                  node
+                  true
+                  (let [my-key (first node)
+                        my-map (array-map :_my_type (keyword (lower-case (name my-key)))
+                                          :_source (get-source node txt)
+                                          :_start_index (start-index node) 
+                                          )
+                        ;;zz (pprint "&&&&&&&&")
+                        ;;z (pprint node)
+                        node2 (if (and (vector? (second node)) 
+                                       (keyword? (first (second node)))
+                                       (.endsWith (name (first (second node))) "ITEMS"))
+                                (merge {:items (subvec  (second node) 1) } my-map)
+                                ;; else
+                                node)
+                        ]
+                    (cond
+                      (#{:UPPER_OCTAVE_LINE :BEGIN_SLUR_SARGAM_PITCH} my-key)
+                      (merge  my-map (array-map :items (subvec node 1)) )
+
+                      (= :PITCH_WITH_DASHES my-key)
+                      ;; returns [ pitch dash dash ]
+                      (let [my-items (subvec node2 1)
+                            ]
+                        (if false (do
+                                    (pprint "my-items -->")
+                                    (pprint my-items)
+                                    (pprint ":PITCH_WITH_DASHES case")))
+                        (assoc-in my-items [0 :numerator] 
+                                  (count 
+                                    (filter (fn[x] (#{:sargam_pitch :dash} (:_my_type x)))
+                                            my-items))))
+                      (= :BEAT my-key)
+                      (let [
+                            subdivisions 
+                            (count (filter (fn[x] (unit-of-rhythm (:_my_type x))) 
+                                           (apply concat (my-seq node2))))
+
+                            ;; apply concat to get rid of pitch with dashes' array
+                            my-beat (assoc node2 :_subdivisions subdivisions)
+                            ]
+                        (if false (do
+                                    (pprint "node2 -->")
+                                    (pprint node2)
+                                    (pprint "(my-seq node2) -->")
+                                    (pprint (my-seq node2))
+                                    (println "------------->>> subdivisions:" subdivisions)
+                                    (println "------------->>> subdivisions:" subdivisions)
+                                    ))
+                        ;;; (pprint (my-seq node2))
+                        ;;(pprint my-beat)
+                        (postwalk (fn postwalk-fn2[z] 
+                                    ;; (println "postwalk-fn2 -z ---------->")
+                                    ;; (pprint z)
+                                    (assert (not (nil? subdivisions)))
+                                    ;;(println "z is")
+                                    ;;(pprint z)
+                                    (cond 
+                                      (= :beat (:_my_type z))
+                                      (assoc z :items (into [] (apply concat (:items z))))
+
+                                      (not (#{:sargam_pitch :dash} (:_my_type z)))
+                                      z
+                                      true
+                                      (let [my-ratio (/ (:numerator z) subdivisions)
+                                            ;; zz (println "my-ratio is" my-ratio)
+                                            frac 
+                                            (if (= (class my-ratio) java.lang.Long)
+                                              (sorted-map-by backwards-comparator  :numerator 1 ;;  my-ratio ;;(:numerator my-ratio)
+                                                             :denominator 1) 
+                                              ;; else 
+                                              (sorted-map-by  backwards-comparator :numerator (numerator my-ratio)
+                                                             :denominator (denominator my-ratio)))
+                                            ]
+                                        ;; (pprint "z is")
+                                        ;; (pprint z)
+                                        ;; (pprint "frac is:")
+                                        ;; (pprint frac)
+                                        ;; (class (/ 1 2)) =>  ;; clojure.lang.Ratio
+                                        ;; (class (/ 1 1)) => ;; java.lang.Long
+                                        ;;  (println "sargam_pitch case!!!!")
+                                        (assoc z 
+                                               :denominator subdivisions
+                                               :fraction_array 
+                                               [ frac ]))))
+                                  my-beat))
+
+                      (= :BARLINE my-key)
+                      (merge  my-map (sorted-map
                                        :_my_type (keyword (keyword (lower-case (name (get-in node [1 0])))))
                                        :is_barline true
                                        ))
-                    (#{:UPPER_OCTAVE_DOT :LINE_NUMBER :DASH :BEGIN_SLUR :END_SLUR} my-key)
-                    my-map
-                    (= :SARGAM_PITCH my-key)
-                    (let [
-                          sarg  (some #(if (= (first %) :SARGAM_MUSICAL_CHAR) (first (second %))) (rest node))
-                          ]
-                      (merge 
-                        (sorted-map 
-                          :_my_type "pitch"
-                          :normalized_pitch (sarg to-normalized-pitch)
-                          :pitch_source (sarg sargam-pitch-to-source)
-                          ) my-map))
+                      (= :DASH my-key)
+                      (merge my-map (sorted-map :numerator 1))
+                      ;; (assoc my-map :numerator 1)
+                      (#{:UPPER_OCTAVE_DOT :LINE_NUMBER :BEGIN_SLUR :END_SLUR} my-key)
+                      my-map
+                      (= :SARGAM_PITCH my-key)
+                      (let [
+                            sarg  (some #(if (= (first %) :SARGAM_MUSICAL_CHAR) (first (second %))) (rest node))
+                            ]
+                        (merge 
+                          (sorted-map 
+                            :_my_type "pitch"
+                            :numerator 1  ;;; numerator and denominator may get updated later!
+                            :denominator 1
+                            :normalized_pitch (sarg to-normalized-pitch)
+                            :pitch_source (sarg sargam-pitch-to-source)
+                            ) my-map))
 
-                    (= :SARGAM_SECTION my-key)
-                    (collapse-sargam-section 
-                      (merge (sorted-map :items (subvec node 1)) my-map)
-                      txt)
-                    true
-                    node2)))) 
-            (run-through-parser txt)))
+                      (= :SARGAM_SECTION my-key)
+                      (collapse-sargam-section 
+                        (merge (sorted-map :items (subvec node 1)) my-map)
+                        txt)
+                      true
+                      node2)))) 
+(run-through-parser txt))))
 
-(pprint (doremi-script-parse "*\n(S--"))
+(pprint (doremi-script-parse "S---R-"))
 (defn doremi-script-to-json[txt]
   (my-to-json (doremi-script-parse txt)))
 

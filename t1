@@ -1,0 +1,18 @@
+                      (postwalk (fn walker[node]
+                              ;;    (println "in walker, node is")
+                               ;;  (pprint node) 
+                               ;;   (cond (not (unit-of-rhythm (:_my_type node2))
+                                ;;      (let [my-ratio (/ (:numerator node2) subdivisions)]
+                                ;;  (println ":numerator node")
+                                 ;; (println (:numerator node))
+                                  ;;      (println "my-ratio" my-ratio)
+                                       (assoc node2
+                                              :denominator 
+                                              999;;subdivisions
+                                             :fraction_array 
+                                              [ { :numerator (numerator my-ratio)
+                                                  :denominator (denominator my-ratio)} ])) 
+                                      true 
+                                       my-beat)
+                                  
+                                  ) 
