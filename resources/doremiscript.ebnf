@@ -320,8 +320,9 @@ FORWARD_SLASH_CHAR  (* note that putting forward slash in regex doesn't seem to 
 CHORD = #"[a-gA-GvViI][^\s]*"
 
 LOWER_OCTAVE_LINE (* can put lower octave dots or semicolons for lower-lower octave (. or :)   *)
-  = <WHITE_SPACE?> LOWER_OCTAVE_LINE_ITEM+ <WHITE_SPACE?> 
+  = <WHITE_SPACE?> LOWER_OCTAVE_LINE_ITEMS <WHITE_SPACE?> 
 
+LOWER_OCTAVE_LINE_ITEMS= LOWER_OCTAVE_LINE_ITEM+
 LOWER_OCTAVE_LINE_ITEM =  <WHITE_SPACE> | LOWER_OCTAVE_DOT |
           LOWER_LOWER_OCTAVE_SYMBOL | KOMMAL_INDICATOR  
 

@@ -7,7 +7,10 @@
 tagline = ""  % removed 
 }
 %{
-|S
+:
+~
+S
+Hi
   
 %}
 melody = {
@@ -15,12 +18,12 @@ melody = {
 \key c \major
 \time 4/4
 \autoBeamOn  
-| c'4 \break
+c'''4\mordent \break
 
 }
 
 text = \lyricmode {
-
+Hi
 }
 
 \score{

@@ -103,6 +103,9 @@
   "my-map is a map from column number -> list of nodes
   Add nodes from line to the map"
   (reduce (fn [accumulator node]
+            ;;(pprint "line-column-map")
+            ;;(pprint node)
+            ;;(pprint line)
             (let [column (- (:_start_index node) 
                             (:_start_index line))]
 
@@ -161,38 +164,30 @@
   ;; 
   (if false
     (let [
-          content (rest pitch)
           mordent (last (filter #(and (vector? %) (= (first %) :MORDENT)) nodes))
-          syls (filter #(and (vector? %) (= (first %) :SYLLABLE)) nodes)
-          upper-upper-dots (filter #(and (vector? %) (=(first %) :UPPER_UPPER_)) nodes)
-          upper-dots (filter #(and (vector? %) (=(first %) :UPPER_OCTAVE_DOT)) nodes)
-          upper-upper-dots (filter #(and (vector? %) (=(first %) :UPPER_UPPER_OCTAVE_SYMBOL)) nodes)
-          lower-dots (filter #(and (vector? %) (=(first %) :LOWER_OCTAVE_DOT)) nodes)
-          lower-lower-dots (filter #(and (vector? %) (=(first %) :LOWER_LOWER_OCTAVE_SYMBOL)) nodes)
-          chords (map second (filter #(= :CHORD (first %)) nodes))
-          tala (second (last (filter #(and (vector? %) (=(first %) :TALA)) nodes)))
           ornaments (filter #(and (vector? %) (=(first %) :SARGAM_ORNAMENT)) nodes)
-          octave  (+ (count upper-dots) 
-                     (- (count lower-dots))
-                     (* 2 (count upper-upper-dots))
-                     (* -2 (count lower-lower-dots))
-                     )
           ]
       ))
 
 
-  (let [octave 0 
+  (let [
         syllable nil 
         chord nil
         ornament nil
         mordent nil
-        syls []
-        chords []
+        syl (first (keep #(if (= (:_my_type %) :syllable)  (:_source %)) nodes))
+        tala (first (keep #(if (= (:_my_type %) :tala)  (:_source %)) nodes))
+        chord (first (keep #(if (= (:_my_type %) :chord)  (:_source %)) nodes))
         ornaments []
-        tala nil]
+        upper-dots (count (filter #(= (:_my_type %) :upper_octave_dot) nodes))
+        lower-dots (count (filter #(= (:_my_type %) :lower_octave_dot) nodes))
+        upper-upper-dots (count (filter #(= (:_my_type %) :upper_upper_octave_symbol) nodes))
+        lower-lower-dots (count (filter #(= (:_my_type %) :lower_lower_octave_symbol) nodes))
+        octave (+ upper-dots (- lower-dots) (* -2 lower-lower-dots) (* 2 upper-upper-dots))
+        ]
     (merge pitch 
            {
-            :attributes []
+            :attributes (filter #(#{:mordent} (:_my_type %)) nodes)
             ;; :pitch_source (sarg sargam-pitch-to-source)
             ;; :source (sarg sargam-pitch-to-source)
             :column_offset 0
@@ -200,7 +195,7 @@
             ;; :numerator 1
             ;; :denominator 1
             ;; :fraction_array  [ { :numerator , denominator: 1 } ]nil ;; TODO: review
-            :syllable syllable
+            :syllable syl
             :chord chord
             :ornament  ornament ;; just the pitches ornament
             :tala tala
@@ -322,7 +317,7 @@
                             :_start_index (start-index node) 
                             )
           ;;zz (pprint "&&&&&&&&")
-          ;;z (pprint node)
+          ;;z (pprint my-key)
           node2 (if (and (vector? (second node)) 
                          (keyword? (first (second node)))
                          (.endsWith (name (first (second node))) "ITEMS"))
@@ -333,7 +328,10 @@
       (cond
         (#{:UPPER_OCTAVE_LINE :BEGIN_SLUR_SARGAM_PITCH} my-key)
         (merge  my-map (array-map :items (subvec node 1)) )
-
+        (= :SYLLABLE my-key)
+     ;;  (do ;(println my-map)
+           ;(println "syllable case")
+          my-map 
         (= :COMPOSITION my-key)
         (let [ sections 
               (filter #(= :sargam_section (:_my_type %))  (:items node2))
@@ -411,7 +409,7 @@
                                  :fraction_array 
                                  [ frac ]))))
                     my-beat))
-        (#{:UPPER_OCTAVE_DOT :LINE_NUMBER :BEGIN_SLUR :END_SLUR} my-key)
+        (#{:MORDENT :UPPER_UPPER_OCTAVE_SYMBOL :LOWER_OCTAVE_DOT :LOWER_LOWER_OCTAVE_SYMBOL :UPPER_OCTAVE_DOT :LINE_NUMBER :BEGIN_SLUR :END_SLUR} my-key)
         my-map
         (= :DASH my-key)
         (merge my-map (sorted-map :numerator 1))
@@ -448,7 +446,8 @@ node2
               (run-through-parser txt))
     ))
 ;;(pprint (run-through-parser "S"))
-;;(pprint (doremi-script-parse "|S"))
+;;(pprint (doremi-script-parse ":\n*\n~\nS\n.\nHi"))
+;;(pprint (run-through-parser ":\n*\nS\n.\n:\nHi"))
 (defn doremi-script-to-json[txt]
   (my-to-json (doremi-script-parse txt)))
 
