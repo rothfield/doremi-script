@@ -1,7 +1,0 @@
-vim tips
---------
-
-command mode:
-  cpr runs source file - need to start a repl first with lein repl at command line
-insert mode:
-  ctrl-n  does autocomplete

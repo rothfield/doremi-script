@@ -1,1 +1,0 @@
-test/doremi_script_clojure/semantic_analyzer_test.clj

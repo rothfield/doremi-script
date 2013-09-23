@@ -283,7 +283,7 @@ ALTERNATE_ENDING_INDICATOR
   = <WHITE_SPACE> /
  UPPER_OCTAVE_DOT /
  TALA /
-     CHORD /
+     CHORD_SYMBOL /
 	    SARGAM_ORNAMENT /
  MORDENT /
  UPPER_UPPER_OCTAVE_SYMBOL /
@@ -296,7 +296,7 @@ ALTERNATE_ENDING_INDICATOR
      TALA /
      MORDENT /
      UPPER_UPPER_OCTAVE_SYMBOL /
-     CHORD /
+     CHORD_SYMBOL /
      SARGAM_ORNAMENT  
    *)
 UPPER_OCTAVE_DOT= DOT 
@@ -317,7 +317,7 @@ FORWARD_SLASH_CHAR  (* note that putting forward slash in regex doesn't seem to 
 *)
 
 
-CHORD = #"[a-gA-GvViI][^\s]*"
+CHORD_SYMBOL = #"[a-gA-GvViI][^\s]*"
 
 LOWER_OCTAVE_LINE (* can put lower octave dots or semicolons for lower-lower octave (. or :)   *)
   = <WHITE_SPACE?> LOWER_OCTAVE_LINE_ITEMS <WHITE_SPACE?> 

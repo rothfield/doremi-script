@@ -1,6 +1,0 @@
-                        node2 (if (and (vector? (second node)) 
-                                       (keyword? (first (second node)))
-                                       (.endsWith (name (first (second node))) "ITEMS"))
-                                (merge {:items (subvec  (second node) 1) } my-map)
-                                ;; else
-                                node)

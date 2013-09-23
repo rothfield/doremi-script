@@ -20,8 +20,8 @@
   (pst)
   )
 
-
 (defn p[] (println "************************"))
+(def yesterday (slurp (io/resource "fixtures/yesterday.txt")))
 
 (def doremi-script-parser  
   (insta/parser
@@ -34,11 +34,9 @@
   (first (instaparse.core/span z))    
   )
 
-
 (def unit-of-rhythm
   #{ :pitch  :dash}
   )
-
 
 (def sargam-pitch-to-source
   (array-map
@@ -47,7 +45,6 @@
     :Rsharp "R#" 
     :Gsharp "G#" 
     :Psharp "P#" 
-    :Pb "Pb" 
     :Dsharp "D#" 
     :Nsharp "N#" 
     :Pb "Pb" 
@@ -79,9 +76,15 @@
    :D "A"
    :n "Bb"
    :N "B"
+    :Sb "Cb" 
+    :Ssharp "C#"
+    :Rsharp "R#" 
+    :Gsharp "E#" 
+    :Psharp "G#" 
+    :Pb "Gb" 
+    :Dsharp "A#" 
+    :Nsharp "B#" 
    })
-
-
 
 
 (defn my-seq[x]
@@ -117,8 +120,6 @@
           )) 
 
 
-
-
 (defn rationalize-new-lines[txt]
   (clojure.string/replace txt #"\r\n" "\n")
   )
@@ -147,38 +148,11 @@
   (json/write-str x :key-fn json-key-fn))
 
 (defn- update-sargam-pitch-node [pitch nodes]
-  (if false
-    (do
+  (if false (do
       (println "update-sargam-pitch-node********")
-      (pprint pitch)
-      (println "nodes")
-      (pprint nodes)
-      (println "end nodes")
-      (println "********")
-      ))
-  ;; nodes should get transformed into attributes--
-  ;;attributes: 
-  ;;                    [ { _my_type: 'begin_slur', source: '(' },
-  ;;                     { _my_type: 'chord_symbol', source: 'F', column: 40 },
-  ;;                    { _my_type: 'ending', source: '1_____', num: 1, column: 40 } ],                       
-  ;; 
-  (if false
-    (let [
-          mordent (last (filter #(and (vector? %) (= (first %) :MORDENT)) nodes))
-          ornaments (filter #(and (vector? %) (=(first %) :SARGAM_ORNAMENT)) nodes)
-          ]
-      ))
-
-
+      (pprint pitch) (println "nodes") (pprint nodes) (println "end nodes")
+      (println "********")))
   (let [
-        syllable nil 
-        chord nil
-        ornament nil
-        mordent nil
-        syl (first (keep #(if (= (:_my_type %) :syllable)  (:_source %)) nodes))
-        tala (first (keep #(if (= (:_my_type %) :tala)  (:_source %)) nodes))
-        chord (first (keep #(if (= (:_my_type %) :chord)  (:_source %)) nodes))
-        ornaments []
         upper-dots (count (filter #(= (:_my_type %) :upper_octave_dot) nodes))
         lower-dots (count (filter #(= (:_my_type %) :lower_octave_dot) nodes))
         upper-upper-dots (count (filter #(= (:_my_type %) :upper_upper_octave_symbol) nodes))
@@ -187,25 +161,25 @@
         ]
     (merge pitch 
            {
-            :attributes (filter #(#{:mordent} (:_my_type %)) nodes)
-            ;; :pitch_source (sarg sargam-pitch-to-source)
-            ;; :source (sarg sargam-pitch-to-source)
-            :column_offset 0
+            ;; TODO: review which nodes gets added to attributes
+            :attributes 
+            (into [] (concat (:attributes pitch) 
+                    (filter #(#{:begin_slur 
+                                    :end_slur
+                                    :chord_symbol
+                                    :ending
+                                    :mordent} (:_my_type %)) nodes)))
             :octave octave
-            ;; :numerator 1
-            ;; :denominator 1
-            ;; :fraction_array  [ { :numerator , denominator: 1 } ]nil ;; TODO: review
-            :syllable syl
-            :chord chord
-            :ornament  ornament ;; just the pitches ornament
-            :tala tala
-            :mordent mordent
+            :syllable (first (keep #(if (= (:_my_type %) :syllable)  (:_source %)) nodes))
+            :chord (first (keep #(if (= (:_my_type %) :chord_symbol)  (:_source %)) nodes))
+            :ornament nil 
+            :tala (first (keep #(if (= (:_my_type %) :tala)  (:_source %)) nodes))
             }
-           ))
-  )
+           )))
 
 (defn collapse-sargam-section [sargam-section txt]
-  "main logic is here"
+;;  (pprint sargam-section) (println "************^^^^")
+  "main logic related to lining up columns is here"
   "Deals with the white-space significant aspect of doremi-script"
   "given a section like
 
@@ -248,7 +222,7 @@
                               ;z (pprint my-type)
                               ]
                           (cond
-                            (= :begin_slur_sargam_pitch my-type)
+                            (= :zbegin_slur_sargam_pitch my-type)
                             ;; unwrap the sargam-pitch, setting begin-slur attribute 
                             (let [
                                   sargam-pitch (second (:items node) )
@@ -284,14 +258,29 @@
     (assert (map? column-map))
     (postwalk postwalk-fn sargam-section)
     ))
-
-(def unit-of-rhythm
-  #{:pitch :dash})
-
+(def bad-beat
+  {:_subdivisions 0,
+    :_start_index 1307,
+    :_source "(S",
+    :_my_type :beat,
+    :items
+    [{:items
+         [{:_my_type :begin_slur, :_source "(", :_start_index 1307}
+              {:pitch_source "S",
+                    :numerator 1,
+                    :normalized_pitch "C",
+                    :denominator 1,
+                    :_my_type :pitch,
+                    :_source "S",
+                    :_start_index 1308}],
+         :_my_type :begin_slur_sargam_pitch,
+         :_source "(S",
+         :_start_index 1307}]}
+  )
 (defn make-sorted-map[node]
   (cond 
-    true
-    node
+;;    true
+ ;;   node
     (and (map? node) (= (into (hash-set) (keys node)) #{:numerator :denominator}))
     node
     (map? node)
@@ -326,7 +315,31 @@
                   node)
           ]
       (cond
-        (#{:UPPER_OCTAVE_LINE :BEGIN_SLUR_SARGAM_PITCH} my-key)
+       ;;[:BEGIN_SLUR_SARGAM_PITCH
+        ;;         [:BEGIN_SLUR "("]
+         ;;        [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:S]]]]
+        (= :CHORD_SYMBOL my-key)
+        my-map
+        (#{:BEGIN_SLUR_SARGAM_PITCH} my-key)
+            (let [
+                  [_ begin-slur my-pitch2] node
+                  my-pitch (merge my-pitch2
+                                  {:column_offset 1
+                                   :_source (:_source my-map)
+                                   })
+                 ]
+              (if false (do
+                  (pprint my-map)
+                  (pprint "******************")
+                  (println "aa")
+                  (pprint node)
+                          )
+                ;; add begin slur to attributes
+                (assoc my-pitch 
+                       :attributes
+                       (conj (into [] (:attributes my-pitch)) begin-slur))))
+        (#{:UPPER_OCTAVE_LINE} my-key)
+
         (merge  my-map (array-map :items (subvec node 1)) )
         (= :SYLLABLE my-key)
      ;;  (do ;(println my-map)
@@ -381,9 +394,14 @@
           ;;;
           ;;;(pprint my-beat)
           (postwalk (fn postwalk-in-beat[z] 
-                      ;; (println "postwalk-fn2 -z ---------->")
-                      ;; (pprint z)
-                      (assert (not (= 0 subdivisions)))
+                      ;;(println "postwalk-in-beat -z ---------->")
+                      ;;(println "subdivisions are " subdivisions)
+                      ;;(if (= 0 subdivisions)
+                       ;; (do
+                       ;; (println "0 subdivisions. my-beat is : ")
+                       ;; (pprint my-beat)))
+                      ;;(pprint z)
+                      ;;(assert (not (= 0 subdivisions)))
                       ;;(println "z is")
                       ;;(pprint z)
                       (cond 
@@ -430,6 +448,7 @@
               :_my_type :pitch
               :numerator 1  ;;; numerator and denominator may get updated later!
               :denominator 1
+              :column_offset 0  ;; may get updated
               :normalized_pitch (sarg to-normalized-pitch)
               :pitch_source (sarg sargam-pitch-to-source)
               )))
@@ -445,8 +464,12 @@ node2
     (postwalk (fn[node] (main-walk node txt)) 
               (run-through-parser txt))
     ))
-;;(pprint (run-through-parser "S"))
-;;(pprint (doremi-script-parse ":\n*\n~\nS\n.\nHi"))
+(def t1 "Dm7\nS")
+;;(pprint (run-through-parser t1))
+;;(pprint (doremi-script-parse t1))
+;;(pprint (run-through-parser yesterday))
+;;(doremi-script-parse yesterday)
+;;(pprint (doremi-script-parse yesterday))
 ;;(pprint (run-through-parser ":\n*\nS\n.\n:\nHi"))
 (defn doremi-script-to-json[txt]
   (my-to-json (doremi-script-parse txt)))

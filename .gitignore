@@ -1,3 +1,4 @@
+/tmp
 /target
 /lib
 /classes
@@ -12,3 +13,6 @@ pom.xml.asc
 .lein-plugins
 .lein-repl-history
 tmp.*
+doremi2ly
+to_lilypond
+doremiparse
