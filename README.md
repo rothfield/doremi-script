@@ -38,11 +38,11 @@ Sample Input in AACM Sargam Style
     
 DoremiScript HTML Output(screen snapshot)
 ------------------
-![Screenshot of DoremiScript rendered in html](https://github.com/rothfield/doremi-script/raw/master/docs/bansuri_in_html_screenshot.png "Sargam Screenshot")
+![Screenshot of DoremiScript rendered in html](https://github.com/rothfield/doremi-script-base/raw/master/docs/bansuri_in_html_screenshot.png "Sargam Screenshot")
 
 Generated Western Staff Notation
 --------------------------------
-![Converted to western notation](https://github.com/rothfield/doremi-script/raw/master/docs/bansuri_in_western_notation.png "")
+![Converted to western notation](https://github.com/rothfield/doremi-script-base/raw/master/docs/bansuri_in_western_notation.png "")
 
 
 
@@ -52,7 +52,7 @@ Generated Western Staff Notation
   - Numbered notation is written as follows 1234567 corresponding to the diatonic notes of the C scale, with sharps and flats notated as 2b(Db) and 2#(D#), for example.
   - AACM sargam notation is written as follows SrRgGmMPdDnN for the 12 notes. Sharp and flat notes are also supported as follows: S# R# etc and Pb. This allows proper notation using Sargam of Jazz/Pop/Classical music that uses these notes. For example, in notating the Beatles tune "Yesterday", use P# to indicate the sharpened fifth degree. P# corresponds to G# in the key of C.
   - Note that the AACM style of Sargam notation uses *lowercase* characters to indicate the flattened notes.
-  - Devanagri style sargam is written using the devanagri letters सरग़मपधऩस
+  - Devanagri style sargam is written using the devanagri letters सरग़मपधऩस
   for the seven notes SRGmPDN. Use an underline underneath the letter to indicate a kommal note (flat). For sharp Ma, write as म' (note the tick symbol) 
   - left and right parens are used to indicate slurs. Slurs can only be made between pitches. For example, use (SRg)- rather than  (Srg-)
   - Beats are delimited by spaces. You can also use angle brackets <> to delimit the beat
