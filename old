@@ -218,10 +218,40 @@
                               nodes (get column-map column) 
                               my-type (:_my_type node)
                               source (:_source  node)
+                              k :unused
+                              ;x (println "in sargam-section-postwalker. my-type =>")
+                              ;z (pprint my-type)
                               ]
                           (cond
+                            (= :zbegin_slur_sargam_pitch my-type)
+                            ;; unwrap the sargam-pitch, setting begin-slur attribute 
+                            (let [
+                                  sargam-pitch (second (:items node) )
+                                  ]
+                              ;;(println "sargam-pitch**** --> " sargam-pitch)
+                              ;;   { _my_type: 'begin_slur', source: '(' }
+                              (assoc-in sargam-pitch [:attributes (count (:attributes sargam-pitch))] 
+                                        (sorted-map :_my_type "begin_slur" 
+                                                    :_source source
+                                                    )))
+                            (= :zpitch_with_dashes my-type)
+                            (do
+                              ;; (println "***************" my-type)
+                              ; return an array:  [sargampitch dash dash]. 
+                              ; Need to flatten it later
+                              (assoc-in (:items node) [0 :numerator] 
+                                        (count (filter (fn[x] (#{:pitch :dash} (:_my_type x)))
+                                                       (:items node))))
+                              )
+                            (= :LINE_NUMBER k)
+                            (sorted-map :_my_type "line_number"
+                                        :_source source)
+                            ;;  { my_type: 'line_number', source: '1)', column: 0 }
                             (= my-type :pitch)
                             (update-sargam-pitch-node node nodes)
+                            (= :SARGAM_ORNAMENT_PITCH k)
+                            node
+                            ;; (update-sargam-ornament-pitch-node node nodes)
                             true
                             node))))
         ]
@@ -362,25 +392,11 @@
         ;; The first item is significant and will get counted rhythmically
         ;; returns [ pitch dash dash ] or [dash dash dash]
         (let [
-              dfadfadsf (println "my-key" my-key)
               all-items (subvec node2 1)
               main-item (first all-items)
-              zzzzzz (println "node2-->")
-              adfadf (pprint node2)
-              zz (println "main-item is:")
-              zzz (pprint main-item)
               rest-items (subvec all-items 1)
-              ;; following line bombs
               rest-items2 (into [] (map #(assoc % :ignore true) rest-items))
-             ddsadfafd  (println "rest-items-->\n\n")
-              fadfakkk (pprint rest-items)
-             ddsadfafd  (println "rest-items^^^\n\n")
-              counter2 (if (= my-key :DASHES)
-                         (do (swap! pitch-counter inc)
-                                  @pitch-counter)
-                         ;; else
-                         (:_pitch_counter main-item))
-              main-item2 (assoc main-item :_pitch_counter counter2 :numerator 
+              main-item2 (assoc main-item :numerator 
                     (count 
                       (filter (fn[x] (#{:pitch :dash} (:_my_type x)))
                               all-items)))]
@@ -519,8 +535,7 @@ node2
 (def t1 "Dm7\nS")
 ;; (def t2 "S--S --R-")
 (def t2 "Srgm")
-;(def t2 "---S r-")
-(def t2 "S-")
+(def t2 "---")
 (pprint (run-through-parser t2))
 
 (pprint (doremi-script-parse t2))
