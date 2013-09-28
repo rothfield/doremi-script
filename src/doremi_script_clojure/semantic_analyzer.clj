@@ -194,6 +194,10 @@
   Hi becomes a syllable for S"
   "Assign attributes to the main line(sargam_line) from the lower and upper lines using 
   column numbers. Returns a sargam-line"
+  (if false (do 
+  (println "entering collapse-sargam-section, sargam-section is")
+  (pprint sargam-section)))
+
   (assert (= (:_my_type sargam-section) :sargam_section))
   (assert (string? txt))
   (let [
@@ -245,8 +249,6 @@
 
 (defn backwards-comparator[k1 k2]
   (compare k2 k1))
-;;(def pitch-counter (atom -1))
-
 
 ;; Notes on dash, dashes handling
 ;;
@@ -292,6 +294,175 @@
 ;                      column: 2 },
 ;                    { my_type: 'dash', source: '-', column: 3 },
 ;;
+(defn handle-sargam-line-in-main-walk[line]
+  (let [
+        pitch-counter (atom -1)
+        significant? (fn significant2[x]
+                       "don't number dashes such as the last 2 of S---"
+                       (and (map? x) (#{:pitch :dash} (:_my_type x))
+                            (not (:ignore x))))
+        line2 (postwalk (fn add-pitch-counters[z] (cond
+                                                    (not (significant? z))
+                                                    z
+                                                    true
+                                                    (do
+                                                      (swap! pitch-counter inc)
+                                                      (assoc z :pitch-counter @pitch-counter))))
+                        line)
+        pitches (into []  (filter 
+                            significant? (my-seq line2) ))
+        line3 (postwalk (fn line3-postwalk[z]
+                          ;;  (println "**z ===> " z)
+                          (cond  
+                            (= :beat (:_my_type z))
+                            (let [ 
+                                 ;; z1  (println "**z ===> " z)
+                                  beat-counter (atom -1)
+                                  pitches-in-beat (into []  (filter 
+                                                              significant? (my-seq z) ))
+                                  ]
+                              (postwalk (fn[a]
+                                          (cond (significant? a)
+                                                (do
+                                                  (swap! beat-counter inc)
+                                                  (assoc a :beat-counter @beat-counter))
+                                                true
+                                                a 
+                                                ))  z)
+                              ;;(println "beat case")
+                              ;;(println "d is" pitches-in-beat)
+                              )
+                            true
+                            z)) line2)]
+         
+    (postwalk (fn walk-line-tieing-dashes-and-pitches[node-in-line] 
+                "if item is dash at beginning of line, set :dash_to_tie false and :rest true
+                if item is dash (not at beginning of line) and line starts with a pitch"
+               ;; (println "walk-line-tieing-dashes-and-pitches")
+               ;; (println "node-in-line -->") (pprint node-in-line)
+                ;;; (println "***node-in-line, significant?" node-in-line (significant? node-in-line))
+                (cond 
+                  (not (significant? node-in-line))
+                  node-in-line
+                  true
+                  (let
+                    [
+                     ;;xyz (pprint node-in-line)
+                     my-key (:_my_type node-in-line) 
+                     prev-item (last (filter #(and (significant? %)
+                                                   (< (:pitch-counter %) (:pitch-counter node-in-line))) pitches))
+                     next-item  (first (filter #(and (significant? %)
+                                                     (> (:pitch-counter node-in-line) (:pitch-counter %))) pitches))
+                     ]
+                    (cond (and (= 0 @pitch-counter)
+                               (= my-key :dash))  ;; dash is first item in line
+                          (do
+                          (assoc node-in-line              ;; it becomes a rest.
+                                 :dash_to_tie false
+                                 :rest true ))
+                          (and (= :pitch my-key)   ;; pitch and next item is a dash. 
+                               (not (nil? next-item))
+                               (= :dash (:_my_type next-item)))
+                          (assoc node-in-line :tied true)   ;; tie to next dash
+                          (and (= :dash my-key)    ;; dash at beginning of beat
+                               (= 0 (:beat-counter node-in-line)))
+                          (let [prev-pitch         ;; previous pitch in this line 
+                                (last (filter #(and (= :pitch (:_my_type %))
+                                                      (< 
+                                                        (:pitch-counter %)
+                                                        (:pitch-counter node-in-line)))
+                                              pitches))
+                                                  ]
+                            ;;  (assert prev-pitch)
+                              (assoc node-in-line 
+                                     :dash_to_tie true
+                                     :pitch_to_use_for_tie prev-pitch))
+                          (= :pitch my-key) 
+                          (let []
+                            ;;(println "pitch case")
+                            ;;(println "prev-pitch" prev-item)
+                            (assoc node-in-line :tied true)
+                            )
+                          true
+                          node-in-line
+                          )
+                    )
+                  ))
+              line3)
+    ))
+
+(defn handle-beat-in-main-walk[ node2]
+  (let [
+        ;; [ [pitch dash dash] pitch pitch ] => [pitch dash dash pitch pitch]
+        ;; apply concat to get rid of pitch with dashes' array
+        my-fun (fn[z]
+                 (apply concat (into [] (map (fn[x] (if (vector? x) x (vector x))) z))))
+        items2 (into [] (my-fun (:items node2)))  ;; TODO: ugly
+        subdivisions 
+        (count (filter (fn[x] (unit-of-rhythm (:_my_type x))) 
+                       items2))
+        my-beat (assoc node2 :items items2 :_subdivisions subdivisions)
+        ]
+    ;;;
+    ;;;(pprint my-beat)
+    (postwalk (fn postwalk-in-beat[z] 
+                ;;(println "postwalk-in-beat -z ---------->")
+                ;;(println "subdivisions are " subdivisions)
+                ;;(if (= 0 subdivisions)
+                ;; (do
+                ;; (println "0 subdivisions. my-beat is : ")
+                ;; (pprint my-beat)))
+                ;;(pprint z)
+                ;;(assert (not (= 0 subdivisions)))
+                ;;(println "z is")
+                ;;(pprint z)
+                ;; (pprint "z is")
+                ;; (println "postwalk-in-beat -z ---------->")
+                ;; (pprint z)
+                ;;(println "\n\n")
+                (cond 
+                  (= :beat (:_my_type z))
+                  z
+                  ;; (assoc z :items (into [] (apply concat (:items z))))
+                  (not (#{:pitch :dash} (:_my_type z)))
+                  z
+                  (:ignore z)
+                  z
+                  (not (:numerator z))
+                  z
+                  true 
+                  (do
+                    ;;(println "post-walk in beat, z is --->")
+                    ;;  (pprint z)
+                    (let [my-ratio (/ (:numerator z) subdivisions)
+                          ;; zz (println "my-ratio is" my-ratio)
+                          frac 
+                          (if (= (class my-ratio) java.lang.Long)
+                            (sorted-map-by backwards-comparator  :numerator 1 
+                                           :denominator 1) 
+                            ;; else 
+                            (sorted-map-by  backwards-comparator 
+                                           :numerator (numerator my-ratio)
+                                           :denominator (denominator my-ratio)))
+                          ]
+                      (assoc z 
+                             :denominator subdivisions
+                             :fraction_array 
+                             [ frac ])))))
+              my-beat)))
+(defn handle-pitch-with-dashes-in-main-walk[[my-key pitch & rest]]
+   "Handle  S--  and  ---"
+    ;; set :ignore true for all the dashes
+  ;;  and set numerator for pitch
+    (let [micro-beats (inc (count (filter #(= :dash (:_my_type %)) rest)))]
+    (assert (#{:PITCH_WITH_DASHES :DASHES} my-key))
+    (into [] (concat [ (assoc pitch
+                              :numerator micro-beats)] 
+                     (map (fn[x] (if (= :dash (:_my_type x))
+                                        (assoc x :ignore true)
+                                        ;; else
+                                        x)) rest)))))
+
 (defn main-walk[node txt]
   ;; (pprint node)
   (cond
@@ -315,9 +486,6 @@
                   node)
           ]
       (cond
-        ;;[:BEGIN_SLUR_SARGAM_PITCH
-        ;;         [:BEGIN_SLUR "("]
-        ;;        [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:S]]]]
         (= :CHORD_SYMBOL my-key)
         my-map
         (#{:BEGIN_SLUR_SARGAM_PITCH} my-key)
@@ -328,238 +496,79 @@
                                :_source (:_source my-map)
                                })
               ]
-          (if false (do
-                      (pprint my-map)
-                      (pprint "******************")
-                      (println "aa")
-                      (pprint node)
-                      )
-            ;; add begin slur to attributes
-            (assoc my-pitch 
-                   :attributes
-                   (conj (into [] (:attributes my-pitch)) begin-slur))))
-        (#{:UPPER_OCTAVE_LINE} my-key)
-
-        (merge  my-map (array-map :items (subvec node 1)) )
-        (= :SYLLABLE my-key)
-        ;;  (do ;(println my-map)
-        ;(println "syllable case")
-        my-map 
-        (= :COMPOSITION my-key)
-        (let [ sections 
-              (filter #(= :sargam_section (:_my_type %))  (:items node2))
-              lines
-              (into [] (map  (fn[x] (some #(if (= :sargam_line (:_my_type %))
-                                             %) 
-                                          (:items x))) sections))
-              ] 
-          (merge {:lines  lines 
-                  :warnings []
-                  :id 999
-                  :notes_used ""
-                  :force_sargam_chars_hash {}
-                  :time_signature "4/4"
-                  :mode "major"
-                  :key "C"
-                  :author ""
-                  :apply_hyphenated_lyrics false
-                  :title ""
-                  :filename "untitled"
-                  } 
-                 my-map))
-        (#{:PITCH_WITH_DASHES :DASHES} my-key)
-        ;; Handles things like S--  ---   
-        ;; --
-        ;; The first item is significant and will get counted rhythmically
-        ;; returns [ pitch dash dash ] or [dash dash dash]
-        (let [
-              ;; dfadfadsf (println "my-key" my-key)
-              all-items (subvec node2 1)
-              main-item (first all-items)
-              ;; zzzzzz (println "node2-->")
-              ;; adfadf (pprint node2)
-              ;; zz (println "main-item is:")
-              ;;; zzz (pprint main-item)
-              rest-items (subvec all-items 1)
-              ;; following line bombs
-              rest-items2 (into [] (map #(assoc % :ignore true) rest-items))
-              ;; ddsadfafd  (println "rest-items-->\n\n")
-              ;; fadfakkk (pprint rest-items)
-              ;; ddsadfafd  (println "rest-items^^^\n\n")
-              main-item2 (assoc main-item  :numerator 
-                                (count 
-                                  (filter (fn[x] (#{:pitch :dash} (:_my_type x)))
-                                          all-items)))]
-          (into [] (concat [main-item2] rest-items2)))
-        (= :BEAT my-key)
-        (let [
-              ;; [ [pitch dash dash] pitch pitch ] => [pitch dash dash pitch pitch]
-              ;; apply concat to get rid of pitch with dashes' array
-              my-fun (fn[z]
-                       (apply concat (into [] (map (fn[x] (if (vector? x) x (vector x))) z))))
-              items2 (into [] (my-fun (:items node2)))  ;; TODO: ugly
-              subdivisions 
-              (count (filter (fn[x] (unit-of-rhythm (:_my_type x))) 
-                             items2))
-              my-beat (assoc node2 :items items2 :_subdivisions subdivisions)
-              ]
-          ;;;
-          ;;;(pprint my-beat)
-          (postwalk (fn postwalk-in-beat[z] 
-                      ;;(println "postwalk-in-beat -z ---------->")
-                      ;;(println "subdivisions are " subdivisions)
-                      ;;(if (= 0 subdivisions)
-                      ;; (do
-                      ;; (println "0 subdivisions. my-beat is : ")
-                      ;; (pprint my-beat)))
-                      ;;(pprint z)
-                      ;;(assert (not (= 0 subdivisions)))
-                      ;;(println "z is")
-                      ;;(pprint z)
-                      ;; (pprint "z is")
-                      ;; (println "postwalk-in-beat -z ---------->")
-                      ;; (pprint z)
-                      ;;(println "\n\n")
-                      (cond 
-                        (= :beat (:_my_type z))
-                        z
-                        ;; (assoc z :items (into [] (apply concat (:items z))))
-                        (not (#{:pitch :dash} (:_my_type z)))
-                        z
-                        (:ignore z)
-                        z
-                        (not (:numerator z))
-                        z
-                        true 
-                        (do
-                          ;;(println "post-walk in beat, z is --->")
-                          ;;  (pprint z)
-                          (let [my-ratio (/ (:numerator z) subdivisions)
-                                ;; zz (println "my-ratio is" my-ratio)
-                                frac 
-                                (if (= (class my-ratio) java.lang.Long)
-                                  (sorted-map-by backwards-comparator  :numerator 1 
-                                                 :denominator 1) 
-                                  ;; else 
-                                  (sorted-map-by  backwards-comparator 
-                                                 :numerator (numerator my-ratio)
-                                                 :denominator (denominator my-ratio)))
-                                ]
-                            (assoc z 
-                                   :denominator subdivisions
-                                   :fraction_array 
-                                   [ frac ])))))
-                    my-beat))
-(#{:MORDENT :UPPER_UPPER_OCTAVE_SYMBOL :LOWER_OCTAVE_DOT :LOWER_LOWER_OCTAVE_SYMBOL :UPPER_OCTAVE_DOT :LINE_NUMBER :BEGIN_SLUR :END_SLUR} my-key)
-my-map
-(= :DASH my-key)
-;; TODO: I think not needed now
-my-map
-;; (merge my-map (sorted-map :numerator 1))
-(= :BARLINE my-key)
-(merge  my-map (sorted-map :_my_type (keyword (keyword (lower-case (name (get-in node [1 0])))))
-                           :is_barline true))
-(= :SARGAM_LINE my-key)
-;; Here is a good place to handle ties/dashes/rests
-;; Number the significant pitches and dashes in this line, starting with 0
-;; NEEDS WORK
-;; Given S- -R
-;; we want to tie the dash at beginning of beat 2 to S
-;; In general, a dash at the beginning of a beat will always be tied to the previous dash or
-;; pitch, except if the very first beat starts with a dash
-;;  S- -- --  
-;;  |  |  |    
-
-(let [
-
-      line node2
-      pitch-counter (atom -1)
-      significant? (fn significant2[x]
-                     "don't number dashes such as the last 2 of S---"
-                     (and (map? x) (#{:pitch :dash} (:_my_type x))
-                          (not (:ignore x))))
-      line2 (postwalk (fn add-pitch-counters[z] (cond
-                                                  (not (significant? z))
-                                                  z
-                                                  true
-                                                  (do
-                                                    (swap! pitch-counter inc)
-                                                    (assoc z :pitch-counter @pitch-counter))))
-                      line)
-      pitches (into []  (filter 
-                          significant? (my-seq line2) ))
-      line3 (postwalk (fn line3-postwalk[z]
-                      ;;  (println "**z ===> " z)
-                        (cond  
-                          (= :beat (:_my_type z))
-                          (let [ 
-                              beat-counter (atom -1)
-                              pitches-in-beat (into []  (filter 
-                              significant? (my-seq z) ))
-                                ]
-                            (postwalk (fn[a]
-                                        (cond (significant? a)
-                                              (do
-                                             (swap! beat-counter inc)
-                                             (assoc a :beat-counter @beat-counter))
-                                             true
-                                             a 
-                                        ))  z)
-                            ;;(println "beat case")
-                            ;;(println "d is" pitches-in-beat)
-                             )
-                          true
-                          z)) line2)
-      ] 
-  (postwalk (fn walk-line-tieing-dashes-and-pitches[zzz] 
-              "if item is dash at beginning of line, set dash_to_tie false and rest true
-              if item is dash (not at beginning of line) and line starts with a pitch"
-              ;;; (println "***zzz, significant?" zzz (significant? zzz))
-              (cond 
-                (not (significant? zzz))
-                zzz
-                true
-                (let
-                  [
-                   my-key (:_my_type zzz) 
-                   prev-item (last (filter #(and (significant? %)
-                                                  (< (:pitch-counter %) (:pitch-counter zzz))) pitches))
-                   next-item  (first (filter #(and (significant? %)
-                                                  (> (:pitch-counter zzz) (:pitch-counter %))) pitches))
-                   ]
-                  (cond (and (= 0 @pitch-counter)
-                             (= my-key :dash))  ;; dash is first item in line
-                        (assoc zzz 
-                               :dash_to_tie false
-                               :rest true )
-                        (and (= :dash my-key) (= 0 (:beat-counter zzz))
-                             prev-item)
-                        (do (println "dash case, prev-item is " prev-item "current is" zzz)
-                            (assoc zzz 
-                               :dash_to_tie true
-                               :pitch_to_use_for_tie prev-item))
-                        (= :pitch my-key) 
-                        (let []
-                          (println "pitch case")
-                          (println "prev-pitch" prev-item)
-                          (assoc zzz :tied true)
-                        )
-                        ))
-
-                ))
-            line3))
-(= :SARGAM_SECTION my-key)
-(let [collapsed
-      (collapse-sargam-section 
-        (merge (sorted-map :items (subvec node 1)) my-map)
-        txt)]
-  ;;(pprint collapsed)
-  collapsed
-  )
+          ;; add begin slur to attributes
+          (assoc my-pitch 
+                 :attributes
+                 (conj (into [] (:attributes my-pitch)) begin-slur)))
+      (#{:UPPER_OCTAVE_LINE} my-key)
+      (merge  my-map (array-map :items (subvec node 1)))
+      (= :SYLLABLE my-key)
+      my-map 
+      (= :COMPOSITION my-key)
+      (let [ sections 
+            (filter #(= :sargam_section (:_my_type %))  (:items node2))
+            lines
+            (into [] (map  (fn[x] (some #(if (= :sargam_line (:_my_type %)) %) 
+                                        (:items x))) sections))
+            ] 
+        (merge {:lines  lines 
+                :warnings []
+                :id 999
+                :notes_used ""
+                :force_sargam_chars_hash {}
+                :time_signature "4/4"
+                :mode "major"
+                :key "C"
+                :author ""
+                :apply_hyphenated_lyrics false
+                :title ""
+                :filename "untitled"
+                } 
+               my-map))
+      (#{:PITCH_WITH_DASHES :DASHES} my-key)
+      (handle-pitch-with-dashes-in-main-walk node)
+       
+      ;; Handles things like S--  ---   
+      ;; --
+      ;; The first item is significant and will get counted rhythmically
+      ;; returns [ pitch dash dash ] or [dash dash dash]
+      (= :BEAT my-key)
+      (handle-beat-in-main-walk node2)
+      (#{:MORDENT :UPPER_UPPER_OCTAVE_SYMBOL :LOWER_OCTAVE_DOT :LOWER_LOWER_OCTAVE_SYMBOL :UPPER_OCTAVE_DOT :LINE_NUMBER :BEGIN_SLUR :END_SLUR} my-key)
+      my-map
+      (= :DASH my-key)
+        (if false (do (println ":DASH case")
+            (pprint my-map))
+      ;; TODO: I think not needed now
+      my-map)
+      ;; (merge my-map (sorted-map :numerator 1))
+      (= :BARLINE my-key)
+      (merge  my-map (sorted-map :_my_type (keyword (keyword (lower-case (name (get-in node [1 0])))))
+                                 :is_barline true))
+      (= :SARGAM_LINE my-key)
+      (handle-sargam-line-in-main-walk node2)
+      ;; Here is a good place to handle ties/dashes/rests
+      ;; Number the significant pitches and dashes in this line, starting with 0
+      ;; NEEDS WORK
+      ;; Given S- -R
+      ;; we want to tie the dash at beginning of beat 2 to S
+      ;; In general, a dash at the beginning of a beat will always be tied to the previous dash or
+      ;; pitch, except if the very first beat starts with a dash
+      ;;  S- -- --  
+      ;;  |  |  |    
+      (= :SARGAM_SECTION my-key)
+      (let [collapsed
+            (collapse-sargam-section 
+              (merge (sorted-map :items (subvec node 1)) my-map)
+              txt)]
+        ;;(pprint collapsed)
+        collapsed
+        )
 (= :SARGAM_PITCH my-key)
 (let [
       sarg  (some #(if (= (first %) :SARGAM_MUSICAL_CHAR) (first (second %))) (rest node))
       ]
+  ;; (println ":SARGAM_PITCH case")
   ;; (swap! pitch-counter inc)
   (merge 
     my-map
@@ -574,7 +583,7 @@ my-map
       )))
 true
 node2
-)))) 
+)))) ;; end main-walk
 
 
 
@@ -608,10 +617,13 @@ node2
 ;(def t2 "---S r-")
 (def t2 "S--r-g-- -S")
 (def t2 "S--r-g-- -S")
-(def t2 "S-\n\n-R\n\nS- -R")
-(pprint (run-through-parser t2))
+(def t2 "---- S--R  --G-")
+(def t3 "---- S- -- ----")
+;;\n\n-R\n\nS- -R")
+;;(pprint (run-through-parser t2))
 
-(pprint (doremi-script-parse t2))
+;;(pprint (doremi-script-parse t3))
+;;(pprint (doremi-script-parse t2))
 
 ;;(def z1 (doremi-script-parse t2))
 ;;(pprint (run-through-parser yesterday))
