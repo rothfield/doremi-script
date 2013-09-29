@@ -22,7 +22,7 @@
   "Looks up starting index of the node from the node's 
   metadata. instaparse adds the metadata in the parsing process"
   "Returns the character position in the source code where the object starts"
-  (:instaparse.gll/start-index (meta z))
+   (:instaparse.gll/start-index (meta z))
   )
 
 (def unit-of-rhythm
@@ -110,9 +110,9 @@
 
 (defn get-source[node txt]
   (let [ s (:instaparse.gll/start-index (meta node))
-        e (:instaparse.gll/end-index (meta node))]
-    (if (and s e)
-      (subs txt s e))))
+         e (:instaparse.gll/end-index (meta node))]
+  (if (and s e)
+  (subs txt s e))))
 
 (defn- update-sargam-pitch-node [pitch nodes]
   (let [
@@ -122,7 +122,7 @@
         lower-lower-dots (count (filter #(= (:_my_type %) :lower_lower_octave_symbol) nodes))
         octave (+ upper-dots (- lower-dots) (* -2 lower-lower-dots) (* 2 upper-upper-dots))
         ]
-    ;;(pprint nodes)
+    (pprint nodes)
     (merge pitch 
            {
             ;; TODO: review which nodes gets added to attributes
@@ -426,39 +426,21 @@
                                    ;; else
                                    x)) rest)))))
 
-(defn handle-composition-in-main-walk[node2]
-        (let [ sections 
-              (filter #(= :sargam_section (:_my_type %))  (:items node2))
-              lines
-              (into [] (map  (fn[x] (some #(if (= :sargam_line (:_my_type %)) %) 
-                                          (:items x))) sections))
-              ] 
-          (merge (dissoc node2 :items) {:lines  lines 
-                  :warnings []
-                  :id 999
-                  :notes_used ""
-                  :force_sargam_chars_hash {}
-                  :time_signature "4/4"
-                  :mode "major"
-                  :key "C"
-                  :author ""
-                  :apply_hyphenated_lyrics false
-                  :title ""
-                  :filename "untitled"
-                  })))
-                  
-
 (defn main-walk[node txt]
+  ;; (pprint node)
   (cond
     (not (vector? node))
     node
     true
     (let [
           my-key (first node)
+          ;; zzz (println "main-walk, my-key =>" my-key)
           my-map (array-map :_my_type (keyword (lower-case (name my-key)))
                             :_source (get-source node txt)
                             :_start_index (start-index node) 
                             )
+          ;;zz (pprint "&&&&&&&&")
+          ;;z (pprint my-key)
           node2 (if (and (vector? (second node)) 
                          (keyword? (first (second node)))
                          (.endsWith (name (first (second node))) "ITEMS"))
@@ -488,7 +470,26 @@
         (= :SYLLABLE my-key)
         my-map 
         (= :COMPOSITION my-key)
-        (handle-composition-in-main-walk node2)
+        (let [ sections 
+              (filter #(= :sargam_section (:_my_type %))  (:items node2))
+              lines
+              (into [] (map  (fn[x] (some #(if (= :sargam_line (:_my_type %)) %) 
+                                          (:items x))) sections))
+              ] 
+          (merge {:lines  lines 
+                  :warnings []
+                  :id 999
+                  :notes_used ""
+                  :force_sargam_chars_hash {}
+                  :time_signature "4/4"
+                  :mode "major"
+                  :key "C"
+                  :author ""
+                  :apply_hyphenated_lyrics false
+                  :title ""
+                  :filename "untitled"
+                  } 
+                 my-map))
         (#{:PITCH_WITH_DASHES :DASHES} my-key)
         (handle-pitch-with-dashes-in-main-walk node)
 
