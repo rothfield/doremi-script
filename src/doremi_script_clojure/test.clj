@@ -1,6 +1,6 @@
 (ns doremi_script_clojure.test
   (:require	
-    [doremi_script_clojure.core :reload true :refer [run-through-parser]]
+    [doremi_script_clojure.core :reload true :refer [run-through-parser yesterday]]
     [doremi_script_clojure.semantic_analyzer :reload true :refer [transform-parse-tree]]
     [clojure.pprint :refer [pprint]] 
     [clojure.java.io]
@@ -16,9 +16,13 @@
   )
 
 (defn my-test[txt]
-  (transform-parse-tree (run-through-parser txt) txt))
+  (let [result (with-out-str (pprint (transform-parse-tree (run-through-parser txt) txt)))]
+    (println result)
+    (spit "tmp.txt" result)))
+
 
 (def x "   Fm7\n   +\n1) S\n   Hi")
-(pprint (my-test x))
+;;(spit "tmp.txt" (with-out-str (pprint (my-test yesterday))))
 ;;(pprint (run-through-parser x))
+(my-test "| --")
 

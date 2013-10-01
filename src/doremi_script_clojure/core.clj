@@ -13,6 +13,12 @@
       (subs y 1)
       y)))
 
+(defn slurp-fixture [file-name]
+  (slurp (clojure.java.io/resource 
+           (str "fixtures/" file-name))))
+
+(def yesterday (slurp-fixture "yesterday.txt"))
+
 (def doremi-script-parser  
   (insta/parser
     (slurp (io/resource "doremiscript.ebnf"))))
@@ -31,6 +37,5 @@
 
 (defn -main[& args]
   (let [txt (slurp *in*)]
-    (my-to-json (transform-parse-tree (run-through-parser txt) txt))))
-
+    (println (my-to-json (transform-parse-tree (run-through-parser txt) txt)))))
 

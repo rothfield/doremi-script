@@ -214,7 +214,7 @@
   (compare k2 k1))
 
 ;; Notes on dash, dashes handling
-;;
+;jjjjjjjjjjjjjjjj;
 ;; Rule 1: Dashes at beginning of beat should be tied to previous note in current line
 ;; the previous pitch should be marked :tied => true
 ;; The dash should be marked
@@ -317,7 +317,7 @@
                      next-item  (first (filter #(and (significant? %)
                                                      (> (:pitch-counter node-in-line) (:pitch-counter %))) pitches))
                      ]
-                    (cond (and (= 0 @pitch-counter)
+                    (cond (and (= 0 (:pitch-counter node-in-line))  ;; or better still, no prev-item
                                (= my-key :dash))  ;; dash is first item in line
                           (do
                             (assoc node-in-line              ;; it becomes a rest.
