@@ -22,7 +22,7 @@
 
 
 (def x "   Fm7\n   +\n1) S\n   Hi")
-;;(spit "tmp.txt" (with-out-str (pprint (my-test yesterday))))
-;;(pprint (run-through-parser x))
-(my-test "| --")
+(my-test yesterday)
+;;(my-test "| --")
+(my-test "| S R\nHe-llo")
 
