@@ -1,11 +1,16 @@
 (ns doremi_script_clojure.semantic_analyzer
   "Semantic analysis is the activity of a compiler to determine what the types of various values are, how those types interact in expressions, and whether those interactions are semantically reasonable. "
   (:require	
-    ;;  [doremi_script_clojure.test-helper :refer :all ]
     [clojure.pprint :refer [pprint]] 
     [clojure.walk :refer [postwalk-demo postwalk postwalk-replace keywordize-keys]]
     [clojure.string :refer [lower-case]]
     ))
+
+
+;; controlling scope:
+;; srruby: defn- is just defn + ^:private, which can be put on any def
+;;  vars are public ("exported") by default; putting ^:private on the var's name prevents this (but does not make it truly inaccessible.)
+
 
 (comment
   ;; to use in repl:
@@ -19,7 +24,7 @@
   )
 
 
-(defn start-index[z]
+(defn- start-index[z]
   "Looks up starting index of the node from the node's 
   metadata. instaparse adds the metadata in the parsing process"
   "Returns the character position in the source code where the object starts"
@@ -77,7 +82,7 @@
    })
 
 
-(defn my-seq[x]
+(defn- my-seq[x]
   "seq through the data structure, which is like"
   " {:items [ {:items [1 2 3]} 2 3]}"
   "Don't include items like {:items [1 2 3]} "
@@ -93,7 +98,7 @@
                 (rest y)))
             x)))
 
-(defn line-column-map [my-map line]
+(defn- line-column-map [my-map line]
   "my-map is a map from column number -> list of nodes
   Add nodes from line to the map"
   (reduce (fn [accumulator node]
@@ -107,7 +112,7 @@
           )) 
 
 
-(defn get-source[node txt]
+(defn- get-source[node txt]
   (let [ s (:instaparse.gll/start-index (meta node))
         e (:instaparse.gll/end-index (meta node))]
     (if (and s e)
@@ -121,10 +126,8 @@
         lower-lower-dots (count (filter #(= (:_my_type %) :lower_lower_octave_symbol) nodes))
         octave (+ upper-dots (- lower-dots) (* -2 lower-lower-dots) (* 2 upper-upper-dots))
         ]
-    ;;(pprint nodes)
     (merge pitch 
            {
-            ;; TODO: review which nodes gets added to attributes
             :attributes 
             (into [] (concat (:attributes pitch) 
                              (filter #(#{:begin_slur 
@@ -140,26 +143,15 @@
             }
            )))
 
-(defn collapse-sargam-section [sargam-section txt]
+(defn- collapse-sargam-section [sargam-section txt]
   ;;  (pprint sargam-section) (println "************^^^^")
   "main logic related to lining up columns is here"
   "Deals with the white-space significant aspect of doremi-script"
-  "given a section like
-
-  .
-  S
-  Hi
-
-  "
   "Returns the sargam-line with the associated objects in the same column attached
   to the corresponding pitches/items on main line. The dot becomes an upper octave of S and 
   Hi becomes a syllable for S"
   "Assign attributes to the main line(sargam_line) from the lower and upper lines using 
   column numbers. Returns a sargam-line"
-  (if false (do 
-              (println "entering collapse-sargam-section, sargam-section is")
-              (pprint sargam-section)))
-
   (assert (= (:_my_type sargam-section) :sargam_section))
   (assert (string? txt))
   (let [
@@ -188,7 +180,7 @@
     (postwalk postwalk-fn sargam-section)
     ))
 
-(defn make-sorted-map[node]
+(defn- make-sorted-map[node]
   (cond 
     (and (map? node) (= (into (hash-set) (keys node)) #{:numerator :denominator}))
     node
@@ -197,11 +189,24 @@
     true
     node))
 
-(defn make-maps-sorted[x]
+(defn- make-maps-sorted[x]
   (into (sorted-map) (postwalk make-sorted-map x)))
 
-(defn backwards-comparator[k1 k2]
+(defn- backwards-comparator[k1 k2]
   (compare k2 k1))
+
+
+
+
+;; Here is a good place to handle ties/dashes/rests
+;; Number the significant pitches and dashes in this line, starting with 0
+;; NEEDS WORK
+;; Given S- -R
+;; we want to tie the dash at beginning of beat 2 to S
+;; In general, a dash at the beginning of a beat will always be tied to the previous dash or
+;; pitch, except if the very first beat starts with a dash
+;;  S- -- --  
+;;  |  |  |    
 
 ;; Notes on dash, dashes handling
 ;jjjjjjjjjjjjjjjj;
@@ -247,7 +252,7 @@
 ;                      column: 2 },
 ;                    { my_type: 'dash', source: '-', column: 3 },
 ;;
-(defn handle-sargam-line-in-main-walk[line]
+(defn- handle-sargam-line-in-main-walk[line]
   (let [
         pitch-counter (atom -1)
         significant? (fn significant2[x]
@@ -339,7 +344,7 @@
               line3)
     ))
 
-(defn handle-beat-in-main-walk[ node2]
+(defn- handle-beat-in-main-walk[ node2]
   (let [
         ;; [ [pitch dash dash] pitch pitch ] => [pitch dash dash pitch pitch]
         ;; apply concat to get rid of pitch with dashes' array
@@ -376,7 +381,7 @@
                 )
               my-beat)))
 
-(defn handle-pitch-with-dashes-in-main-walk[[my-key pitch & rest]]
+(defn- handle-pitch-with-dashes-in-main-walk[[my-key pitch & rest]]
   "Handle  S--  and  ---"
   ;; set :ignore true for all the dashes
   ;;  and set numerator for pitch
@@ -389,7 +394,7 @@
                                    ;; else
                                    x)) rest)))))
 
-(defn handle-composition-in-main-walk[node2]
+(defn- handle-composition-in-main-walk[node2]
   (let [ sections 
         (filter #(= :sargam_section (:_my_type %))  (:items node2))
         lines
@@ -411,7 +416,7 @@
                                   })))
 
 
-(defn main-walk[node txt]
+(defn- main-walk[node txt]
   (if-not (vector? node) node
     ;; else
     (let [
@@ -454,12 +459,10 @@
         (handle-pitch-with-dashes-in-main-walk node)
         :DASHES
         (handle-pitch-with-dashes-in-main-walk node)
-
         :BEAT
         (handle-beat-in-main-walk node2)
         :MORDENT
         my-map
-
         :UPPER_UPPER_OCTAVE_SYMBOL
         my-map
         :LOWER_OCTAVE_DOT
@@ -477,37 +480,27 @@
         :DASH
         my-map
         :BARLINE
-        (merge  my-map (sorted-map :_my_type (keyword (keyword (lower-case (name (get-in node [1 0])))))
-                                   :is_barline true))
+        (merge  my-map 
+               (sorted-map 
+                 :_my_type 
+                 (keyword (keyword (lower-case (name (get-in node [1 0])))))
+                 :is_barline true))
         :SARGAM_LINE
         (handle-sargam-line-in-main-walk node2)
-        ;; Here is a good place to handle ties/dashes/rests
-        ;; Number the significant pitches and dashes in this line, starting with 0
-        ;; NEEDS WORK
-        ;; Given S- -R
-        ;; we want to tie the dash at beginning of beat 2 to S
-        ;; In general, a dash at the beginning of a beat will always be tied to the previous dash or
-        ;; pitch, except if the very first beat starts with a dash
-        ;;  S- -- --  
-        ;;  |  |  |    
         :SARGAM_SECTION
         (let [collapsed
               (collapse-sargam-section 
                 (merge (sorted-map :items (subvec node 1)) my-map)
                 txt)]
-          ;;(pprint collapsed)
           collapsed
           )
         :SARGAM_PITCH
         (let [
               sarg  (some #(if (= (first %) :SARGAM_MUSICAL_CHAR) (first (second %))) (rest node))
               ]
-          ;; (println ":SARGAM_PITCH case")
-          ;; (swap! pitch-counter inc)
           (merge 
             my-map
             (sorted-map  
-              ;; :_pitch_counter @pitch-counter
               :_my_type :pitch
               :numerator 1  ;;; numerator and denominator may get updated later!
               :denominator 1
@@ -518,11 +511,11 @@
         ;; default
         node2
         )
-))) ;; end main-walk
+      ))) ;; end main-walk
 
 
 
-(defn my-seq2[x]
+(defn- my-seq2[x]
   (tree-seq (fn branch?[node]
               true)
             (fn children[node]
@@ -542,20 +535,3 @@
                       parse-tree)))
 
 
-(def t1 "Dm7\nS")
-;; (def t2 "S--S --R-")
-;;(def t2 "Srgm")
-;(def t2 "---S r-")
-(def t2 "S--r-g-- -S")
-(def t2 "S--r-g-- -S")
-(def t2 "---- S--R  --G-")
-(def t3 "---- S- -- ----")
-(def t3 "S\nHi")
-;;\n\n-R\n\nS- -R")
-;;(pprint (run-through-parser t2))
-
-;;(pprint (doremi-script-parse t3))
-;;(pprint (doremi-script-parse t2))
-
-;;(def z1 (doremi-script-parse t2))
-;;(pprint (run-through-parser ":\n*\nS\n.\n:\nHi"))
