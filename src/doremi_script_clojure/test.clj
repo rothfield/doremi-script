@@ -24,6 +24,7 @@
 (def x "   Fm7\n   +\n1) S\n   Hi")
 ;;(my-test yesterday)
 ;;(my-test "S - -")
-(my-test (slurp-fixture "tie2.txt"))
+(my-test (slurp-fixture "ending.txt"))
+;; (pprint (run-through-parser  (slurp-fixture "ending.txt")))
 ;;(my-test "| S R\nHe-llo")
 

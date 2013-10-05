@@ -118,6 +118,11 @@
     (if (and s e)
       (subs txt s e))))
 
+(defn- update-node [node nodes]
+   (if-not (map? node)
+     node
+    (assoc node :attributes (into [] nodes))))
+
 (defn- update-sargam-pitch-node [pitch nodes]
   (let [
         upper-dots (count (filter #(= (:_my_type %) :upper_octave_dot) nodes))
@@ -126,6 +131,7 @@
         lower-lower-dots (count (filter #(= (:_my_type %) :lower_lower_octave_symbol) nodes))
         octave (+ upper-dots (- lower-dots) (* -2 lower-lower-dots) (* 2 upper-upper-dots))
         ]
+    (if false (do (println "update-sargam-pitch-node") (pprint nodes)))
     (merge pitch 
            {
             :attributes 
@@ -172,8 +178,8 @@
                         (case my-type
                           :pitch
                           (update-sargam-pitch-node node nodes)
-                          ;; default case
-                          node)))
+                          ;;node)))
+                          (update-node node nodes))))
         ]
     (assert (= :sargam_line (:_my_type sargam-line)))
     (assert (map? column-map))
@@ -458,6 +464,9 @@
         (merge  my-map (array-map :items (subvec node 1)))
         :SYLLABLE
         my-map 
+        :ALTERNATE_ENDING_INDICATOR
+        ; { my_type: 'ending', source: '1.____', n    um: 1, column: 2 }
+        (merge my-map {:_my_type :ending :num 99 })
         :COMPOSITION 
         (handle-composition-in-main-walk node2)
         :PITCH_WITH_DASHES
