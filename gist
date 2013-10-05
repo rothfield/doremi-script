@@ -1,3 +1,21 @@
+
+I'm using lein-localrepo. I added it to ~/.lein/profiles.clj
+
+------------ ~/.lein/profiles.clj --------------
+{:user {:plugins [[lein-localrepo "0.5.2"]]}}
+-------------------------------------------------------
+
+# I want to use texhyphj.jar in my clojure project
+
+lein localrepo install lib/texhyphj.jar net.davidashen/texhyphj 1.0 
+ 
+ lein localrepo list | grep texhyphj
+# ==>   net.davidashen/texhyphj (1.0)
+
+ Now how do I use Hyphenator in Clojure? 
+]$ jar tvf lib/texhyphj.jar 
+
+
      0 Sat Oct 05 11:29:26 PDT 2013 META-INF/
     40 Sat Oct 05 11:29:26 PDT 2013 META-INF/MANIFEST.MF
   8184 Sat Oct 05 11:29:26 PDT 2013 net/davidashen/text/Hyphenator.class

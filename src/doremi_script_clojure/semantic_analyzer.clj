@@ -178,7 +178,10 @@
                         (case my-type
                           :pitch
                           (update-sargam-pitch-node node nodes)
-                          ;;node)))
+                          ;; TODO: Actually only some nodes get this 
+                          ;; treatment. And  
+                          ;; update-sargam-pitch-node 
+                          ;; has common code re attributes
                           (update-node node nodes))))
         ]
     (assert (= :sargam_line (:_my_type sargam-line)))

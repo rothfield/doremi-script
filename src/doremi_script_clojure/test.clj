@@ -24,7 +24,10 @@
 (def x "   Fm7\n   +\n1) S\n   Hi")
 ;;(my-test yesterday)
 ;;(my-test "S - -")
-(my-test (slurp-fixture "ending.txt"))
+;;(my-test (slurp-fixture "ending.txt"))
 ;; (pprint (run-through-parser  (slurp-fixture "ending.txt")))
 ;;(my-test "| S R\nHe-llo")
-
+(def h (new net.davidashen.text.Hyphenator))
+(def hyphens  (clojure.java.io/input-stream (clojure.java.io/resource "hyphen.tex")))
+(.loadTable h hyphens)
+(pprint (.hyphenate h "hello"))
