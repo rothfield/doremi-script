@@ -22,7 +22,8 @@
 
 
 (def x "   Fm7\n   +\n1) S\n   Hi")
-(my-test yesterday)
-;;(my-test "| --")
-(my-test "| S R\nHe-llo")
+;;(my-test yesterday)
+;;(my-test "S - -")
+(my-test "-- PP")
+;;(my-test "| S R\nHe-llo")
 

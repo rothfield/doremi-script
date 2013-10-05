@@ -227,7 +227,7 @@
 ;; dashes will look like
 ;; { my_type: 'dash',numerator: 1, denominator: 2, dash_to_tie: false,rest: true }
 ;; example 3:
-;;  S --R
+;;  S --t
 ;                  [ { my_type: 'dash',
 ;                      source: '-',
 ;                      numerator: 2,
@@ -269,7 +269,6 @@
 
         pitches (into []  (filter 
                             significant? (my-seq line2) ))
-
         line3 (postwalk (fn line3-postwalk[node-in-line]
                           (case (:_my_type node-in-line)
                             :beat
@@ -294,10 +293,9 @@
     (postwalk (fn walk-line-tieing-dashes-and-pitches[node-in-line] 
                 "if item is dash at beginning of line, set :dash_to_tie false and :rest true
                 if item is dash (not at beginning of line) and line starts with a pitch"
-                (cond 
-                  (not (significant? node-in-line))
+                (if-not (significant? node-in-line)
                   node-in-line
-                  true
+                  ;; else
                   (let
                     [
                      ;;xyz (pprint node-in-line)
@@ -305,10 +303,13 @@
                      prev-item (last (filter #(and (significant? %)
                                                    (< (:pitch-counter %) (:pitch-counter node-in-line))) pitches))
                      next-item  (first (filter #(and (significant? %)
-                                                     (> (:pitch-counter node-in-line) (:pitch-counter %))) pitches))
+                                                     (> 
+                                                       (:pitch-counter %)
+                                                       (:pitch-counter node-in-line))) 
+                                               pitches))
                      ]
-                    (cond (and (= 0 (:pitch-counter node-in-line))  ;; or better still, no prev-item
-                               (= my-key :dash))  ;; dash is first item in line
+                    (cond (and (= my-key :dash)  ;; dash is first item in line
+                            (not prev-item))  ;; No previous item 
                           (do
                             (assoc node-in-line              ;; it becomes a rest.
                                    :dash_to_tie false
@@ -316,7 +317,8 @@
                           (and (= :pitch my-key)   ;; pitch and next item is a dash. 
                                (not (nil? next-item))
                                (= :dash (:_my_type next-item)))
-                          (assoc node-in-line :tied true)   ;; tie to next dash
+                          (do ;(println "next-item is" next-item)
+                          (assoc node-in-line :tied true))   ;; tie to next dash
                           (and (= :dash my-key)    ;; dash at beginning of beat
                                (= 0 (:beat-counter node-in-line)))
                           (let [prev-pitch         ;; previous pitch in this line 
@@ -329,6 +331,7 @@
                             ;;  (assert prev-pitch)
                             (assoc node-in-line 
                                    :dash_to_tie true
+                                   :tied (and next-item (= :dash (:_my_type next-item))) ;; #TODO
                                    :pitch_to_use_for_tie prev-pitch))
                           (= :pitch my-key) 
                           (let []
