@@ -1,6 +1,6 @@
 (ns doremi_script_clojure.test
   (:require	
-    [doremi_script_clojure.core :reload true :refer [run-through-parser yesterday]]
+    [doremi_script_clojure.core :reload true :refer [run-through-parser yesterday slurp-fixture]]
     [doremi_script_clojure.semantic_analyzer :reload true :refer [transform-parse-tree]]
     [clojure.pprint :refer [pprint]] 
     [clojure.java.io]
@@ -24,6 +24,6 @@
 (def x "   Fm7\n   +\n1) S\n   Hi")
 ;;(my-test yesterday)
 ;;(my-test "S - -")
-(my-test "-- PP")
+(my-test (slurp-fixture "tie2.txt"))
 ;;(my-test "| S R\nHe-llo")
 

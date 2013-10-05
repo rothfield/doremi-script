@@ -308,37 +308,39 @@
                                                        (:pitch-counter node-in-line))) 
                                                pitches))
                      ]
-                    (cond (and (= my-key :dash)  ;; dash is first item in line
+                    (cond 
+                          ;; Case 1: dash is first significant item in line
+                      (and (= my-key :dash)  ;; dash is first item in line
                             (not prev-item))  ;; No previous item 
-                          (do
                             (assoc node-in-line              ;; it becomes a rest.
                                    :dash_to_tie false
-                                   :rest true ))
-                          (and (= :pitch my-key)   ;; pitch and next item is a dash. 
-                               (not (nil? next-item))
+                                   :rest true )
+                          ;; Case 2: pitch and next item is a dash  
+                          (and (= :pitch my-key)   
                                (= :dash (:_my_type next-item)))
-                          (do ;(println "next-item is" next-item)
-                          (assoc node-in-line :tied true))   ;; tie to next dash
-                          (and (= :dash my-key)    ;; dash at beginning of beat
+                          (assoc node-in-line :tied true)   ;; tie to next dash
+                          ;; Case 3: dash at beginning of beat
+                          (and (= :dash my-key) 
                                (= 0 (:beat-counter node-in-line)))
+                          ;; doremi-v1 requires that the :tied attribute not
+                      ;; be set to anything if not tied
                           (let [prev-pitch         ;; previous pitch in this line 
                                 (last (filter #(and (= :pitch (:_my_type %))
                                                     (< 
                                                       (:pitch-counter %)
                                                       (:pitch-counter node-in-line)))
                                               pitches))
-                                ]
-                            ;;  (assert prev-pitch)
-                            (assoc node-in-line 
+                                   my-tied (and next-item (= :dash (:_my_type next-item))) 
+                                 my-result1 (assoc node-in-line 
+                                   :case3 true
                                    :dash_to_tie true
-                                   :tied (and next-item (= :dash (:_my_type next-item))) ;; #TODO
-                                   :pitch_to_use_for_tie prev-pitch))
-                          (= :pitch my-key) 
-                          (let []
-                            ;;(println "pitch case")
-                            ;;(println "prev-pitch" prev-item)
-                            (assoc node-in-line :tied true)
-                            )
+                                   :pitch_to_use_for_tie prev-pitch)
+                                ]
+                            ;; set dash_to_tie true ; tied true, and pitch_to_use_for_tie
+                            (if my-tied
+                                (assoc my-result1 :tied true)
+                                ;; else
+                              my-result1))
                           true
                           node-in-line
                           )
