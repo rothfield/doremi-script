@@ -2,8 +2,9 @@
   "Semantic analysis is the activity of a compiler to determine what the types of various values are, how those types interact in expressions, and whether those interactions are semantically reasonable. "
   (:require	
     [clojure.pprint :refer [pprint]] 
-    [clojure.walk :refer [postwalk-demo postwalk postwalk-replace keywordize-keys]]
-    [clojure.string :refer [lower-case]]
+    [clojure.walk :refer [postwalk-demo postwalk
+                          postwalk-replace keywordize-keys]]
+    [clojure.string :refer [split lower-case]]
     ))
 
 
@@ -38,14 +39,14 @@
 (def normalized-str "C Db D Eb E F F# G Ab A Bb B Cb Fb Gb C# D# E# G# A# B#")
 
 (def sargam-symbols
-   (into [] (map keyword (clojure.string/split sargams-str #" "))))
+   (into [] (map keyword (split sargams-str #" "))))
 
 (def to-normalized-pitch
-  (zipmap sargam-symbols (clojure.string/split normalized-str #" ")))
+  (zipmap sargam-symbols (split normalized-str #" ")))
 
 (def sargam-sources
   (into [] (map #(clojure.string/replace % "sharp" "#")
- (clojure.string/split sargams-str #" "))))
+ (split sargams-str #" "))))
 
 (def sargam-pitch-to-source
   (zipmap sargam-symbols sargam-sources))
@@ -171,9 +172,6 @@
 
 (defn- backwards-comparator[k1 k2]
   (compare k2 k1))
-
-
-
 
 ;; Here is a good place to handle ties/dashes/rests
 ;; Number the significant pitches and dashes in this line, starting with 0
