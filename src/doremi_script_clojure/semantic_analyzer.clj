@@ -33,54 +33,22 @@
 
 (def unit-of-rhythm #{:pitch :dash} )
 
-(def sargam-pitch-to-source
-  (array-map
-    :S "S" 
-    :r "r" 
-    :R "R" 
-    :g "g" 
-    :G "G" 
-    :m "m" 
-    :M "M" 
-    :P "P" 
-    :d "d" 
-    :D "D" 
-    :n "n" 
-    :N "N" 
-    :Sb "Sb" 
-    :Ssharp "S#"
-    :Rsharp "R#" 
-    :Gsharp "G#" 
-    :Psharp "P#" 
-    :Dsharp "D#" 
-    :Nsharp "N#" 
-    :Pb "Pb" 
-    ))
+(def sargams-str "S r R g G m M P d D n N Sb mb Pb Ssharp Rsharp Gsharp Psharp Dsharp Nsharp")
+
+(def normalized-str "C Db D Eb E F F# G Ab A Bb B Cb Fb Gb C# D# E# G# A# B#")
+
+(def sargam-symbols
+   (into [] (map keyword (clojure.string/split sargams-str #" "))))
 
 (def to-normalized-pitch
-  {
-   :S "C"
-   :r "Db"
-   :R "D"
-   :g "Eb"
-   :G "E"
-   :m "F"
-   :M "F#"
-   :P "G"
-   :d "Ab"
-   :D "A"
-   :n "Bb"
-   :N "B"
-   :Sb "Cb" 
-   :Ssharp "C#"
-   :Rsharp "R#" 
-   :Gsharp "E#" 
-   :Psharp "G#" 
-   :Pb "Gb" 
-   :Dsharp "A#" 
-   :Nsharp "B#" 
-   })
+  (zipmap sargam-symbols (clojure.string/split normalized-str #" ")))
 
+(def sargam-sources
+  (into [] (map #(clojure.string/replace % "sharp" "#")
+ (clojure.string/split sargams-str #" "))))
+
+(def sargam-pitch-to-source
+  (zipmap sargam-symbols sargam-sources))
 
 (defn- my-seq[x]
   "seq through the data structure, which is like"
