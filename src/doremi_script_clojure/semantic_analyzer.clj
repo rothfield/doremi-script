@@ -56,7 +56,8 @@
   " {:items [ {:items [1 2 3]} 2 3]}"
   "Don't include items like {:items [1 2 3]} "
   "just [1 2 3]"
-  (filter #(not (:items %))
+  ;; TODO: reno
+  ;;(filter #(not (:items %))
           (tree-seq
             (fn branch?[x] (or (vector? x) (map? x))) 
             (fn children[y] 
@@ -65,7 +66,8 @@
                 (:items y)
                 (vector? y)
                 (rest y)))
-            x)))
+            x))
+;)
 
 (defn- line-column-map [my-map line]
   "my-map is a map from column number -> list of nodes
@@ -108,6 +110,7 @@
                              (filter #(#{:begin_slur 
                                          :end_slur
                                          :chord_symbol
+                                         :ornament
                                          :ending
                                          :mordent} (:_my_type %)) nodes)))
             :octave octave
@@ -118,8 +121,30 @@
             }
            )))
 
+
+(comment
+;;                        { my_type: 'ornament',
+;;                           id: 2,
+;;                           column_offset: undefined,
+;;                           source: 'N',
+;;                           usable_source: 'N',
+;;                           ornament_items: 
+;;                            [ { my_type: 'pitch',
+;;                                normalized_pitch: 'B',
+;;                                attributes: [],
+;;                                pitch_source: 'N',
+;;                                source: 'N',
+;;                                column_offset: 0,
+;;                                octave: 0,
+;;                                group_line_no: 0 } ],
+;;                           column: 1,
+;;                           group_line_no: 0,
+;;                           placement: 'before' } 
+  )
+
+
 (defn- collapse-sargam-section [sargam-section txt]
-  ;;  (pprint sargam-section) (println "************^^^^")
+ ;; (pprint sargam-section) (println "************^^^^")
   "main logic related to lining up columns is here"
   "Deals with the white-space significant aspect of doremi-script"
   "Returns the sargam-line with the associated objects in the same column attached
@@ -133,6 +158,7 @@
         sargam-line (some #(if (= (:_my_type %) :sargam_line) %)
                           (:items sargam-section))
         column-map (reduce line-column-map {}  (:items sargam-section))
+        ;; _ (pprint column-map)
         line-starts (map :_start_index (:items sargam-section))
         line-start-for  (fn line-start-for-fn[column] 
                           (last (filter (fn[x] (>= column x)) line-starts)) )
@@ -140,7 +166,7 @@
                           (- (:_start_index node) (line-start-for (:_start_index node))))
 
         postwalk-fn (fn sargam-section-postwalker[node]
-                      (let [ my-type (:_my_type node)
+                     (let [ my-type (:_my_type node)
                             column (if my-type (column-for-node node))
                             nodes (if my-type (get column-map column)) 
                             ]
@@ -151,7 +177,8 @@
                           ;; treatment. And  
                           ;; update-sargam-pitch-node 
                           ;; has common code re attributes
-                          (update-node node nodes))))
+                          node)))
+                          ;; (update-node node nodes))))
         ]
     (assert (= :sargam_line (:_my_type sargam-line)))
     (assert (map? column-map))
@@ -413,6 +440,17 @@
                   node)
           ]
       (case my-key 
+        :SARGAM_ORNAMENT 
+        (do 
+          (merge 
+            my-map
+            (sorted-map  
+              :_my_type :ornament
+              :usable_source "N"
+              :ornament_items [
+               
+                               ]
+              )))
         :TALA 
         my-map
         :CHORD_SYMBOL
