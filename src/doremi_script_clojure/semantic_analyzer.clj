@@ -123,6 +123,7 @@
 
 
 (comment
+  "ornaments should look like this"
 ;;                        { my_type: 'ornament',
 ;;                           id: 2,
 ;;                           column_offset: undefined,
@@ -440,6 +441,12 @@
                   node)
           ]
       (case my-key 
+        :SARGAM_MUSICAL_CHAR
+        (let [ ;; _ (pprint node)
+               [_ [sarg]] node
+            ]
+         ;; (println "sarg_str is " sarg_str)
+          (assoc my-map :value sarg))
         :SARGAM_ORNAMENT 
         (do 
           (merge 
@@ -448,7 +455,6 @@
               :_my_type :ornament
               :usable_source "N"
               :ornament_items [
-               
                                ]
               )))
         :TALA 
@@ -517,8 +523,10 @@
           )
         :SARGAM_PITCH
         (let [
-              sarg  (some #(if (= (first %) :SARGAM_MUSICAL_CHAR) (first (second %))) (rest node))
+              sarg (:value (second node))
+              ;;:S ;;(some #(if (= (first %) :SARGAM_MUSICAL_CHAR) (first (second %))) (rest node))
               ]
+          (assert (= :sargam_musical_char (_my_type (second node))))
           (merge 
             my-map
             (sorted-map  
