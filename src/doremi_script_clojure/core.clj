@@ -30,9 +30,13 @@
   "For debugging, pretty print json output. Not useable"
   (json/pprint :key-fn json-key-fn)) 
 
+(defn my-pp-json[x]
+  "very primitive json pretty-printer. Changes dq,dq => dq,newline,dq "
+  (clojure.string/replace x "\",\"" "\",\n\""))
+
 (defn- my-to-json[x]
   "returns json/text version of parse tree. It is a string"
-  (json/write-str x :key-fn json-key-fn))
+  (my-pp-json (json/write-str x :key-fn json-key-fn)))
 
 
 (defn -main[& args]

@@ -39,14 +39,14 @@
 (def normalized-str "C Db D Eb E F F# G Ab A Bb B Cb Fb Gb C# D# E# G# A# B#")
 
 (def sargam-symbols
-   (into [] (map keyword (split sargams-str #" "))))
+  (into [] (map keyword (split sargams-str #" "))))
 
 (def to-normalized-pitch
   (zipmap sargam-symbols (split normalized-str #" ")))
 
 (def sargam-sources
   (into [] (map #(clojure.string/replace % "sharp" "#")
- (split sargams-str #" "))))
+                (split sargams-str #" "))))
 
 (def sargam-pitch-to-source
   (zipmap sargam-symbols sargam-sources))
@@ -58,15 +58,15 @@
   "just [1 2 3]"
   ;; TODO: reno
   ;;(filter #(not (:items %))
-          (tree-seq
-            (fn branch?[x] (or (vector? x) (map? x))) 
-            (fn children[y] 
-              (cond 
-                (and (map? y) (:items y)) 
-                (:items y)
-                (vector? y)
-                (rest y)))
-            x))
+  (tree-seq
+    (fn branch?[x] (or (vector? x) (map? x))) 
+    (fn children[y] 
+      (cond 
+        (and (map? y) (:items y)) 
+        (:items y)
+        (vector? y)
+        (rest y)))
+    x))
 ;)
 
 (defn- line-column-map [my-map line]
@@ -90,8 +90,8 @@
       (subs txt s e))))
 
 (defn- update-node [node nodes]
-   (if-not (map? node)
-     node
+  (if-not (map? node)
+    node
     (assoc node :attributes (into [] nodes))))
 
 (defn- update-sargam-pitch-node [pitch nodes]
@@ -122,30 +122,10 @@
            )))
 
 
-(comment
-  "ornaments should look like this"
-;;                        { my_type: 'ornament',
-;;                           id: 2,
-;;                           column_offset: undefined,
-;;                           source: 'N',
-;;                           usable_source: 'N',
-;;                           ornament_items: 
-;;                            [ { my_type: 'pitch',
-;;                                normalized_pitch: 'B',
-;;                                attributes: [],
-;;                                pitch_source: 'N',
-;;                                source: 'N',
-;;                                column_offset: 0,
-;;                                octave: 0,
-;;                                group_line_no: 0 } ],
-;;                           column: 1,
-;;                           group_line_no: 0,
-;;                           placement: 'before' } 
-  )
 
 
 (defn- collapse-sargam-section [sargam-section txt]
- ;; (pprint sargam-section) (println "************^^^^")
+  ;; (pprint sargam-section) (println "************^^^^")
   "main logic related to lining up columns is here"
   "Deals with the white-space significant aspect of doremi-script"
   "Returns the sargam-line with the associated objects in the same column attached
@@ -167,19 +147,37 @@
                           (- (:_start_index node) (line-start-for (:_start_index node))))
 
         postwalk-fn (fn sargam-section-postwalker[node]
-                     (let [ my-type (:_my_type node)
+                      (let [ my-type (:_my_type node)
                             column (if my-type (column-for-node node))
                             nodes (if my-type (get column-map column)) 
                             ]
                         (case my-type
                           :pitch
-                          (update-sargam-pitch-node node nodes)
+                          (let [z 
+                                (filter #(= (:_my_type %) :ornament) 
+                                        (get column-map (inc column))) 
+                                ;; _ (pprint z) 
+                                orns-after 
+                                (map #(assoc % :placement :after)
+                                     [(some 
+                                        #(if (= (:_my_type %) :ornament) %) 
+                                        (get column-map (inc column)))])
+                                ;; _ (pprint orns-before)
+                                ;; nodes-before-and-after)
+                                ;; nodes-before-and-after 
+                                ;; (concat (get column-map (inc column)) 
+                                ;;        (get column-map (dec column))) 
+                                ;; _ (println "nodes-before-and-after")
+                                ;; _ (pprint nodes-before-and-after)
+                                ]
+                            (update-sargam-pitch-node node (concat nodes orns-after))
+                            )
                           ;; TODO: Actually only some nodes get this 
                           ;; treatment. And  
                           ;; update-sargam-pitch-node 
                           ;; has common code re attributes
                           node)))
-                          ;; (update-node node nodes))))
+        ;; (update-node node nodes))))
         ]
     (assert (= :sargam_line (:_my_type sargam-line)))
     (assert (map? column-map))
@@ -312,41 +310,41 @@
                                                pitches))
                      ]
                     (cond 
-                          ;; Case 1: dash is first significant item in line
+                      ;; Case 1: dash is first significant item in line
                       (and (= my-key :dash)  ;; dash is first item in line
-                            (not prev-item))  ;; No previous item 
-                            (assoc node-in-line              ;; it becomes a rest.
-                                   :dash_to_tie false
-                                   :rest true )
-                          ;; Case 2: pitch and next item is a dash  
-                          (and (= :pitch my-key)   
-                               (= :dash (:_my_type next-item)))
-                          (assoc node-in-line :tied true)   ;; tie to next dash
-                          ;; Case 3: dash at beginning of beat
-                          (and (= :dash my-key) 
-                               (= 0 (:beat-counter node-in-line)))
-                          ;; doremi-v1 requires that the :tied attribute not
+                           (not prev-item))  ;; No previous item 
+                      (assoc node-in-line              ;; it becomes a rest.
+                             :dash_to_tie false
+                             :rest true )
+                      ;; Case 2: pitch and next item is a dash  
+                      (and (= :pitch my-key)   
+                           (= :dash (:_my_type next-item)))
+                      (assoc node-in-line :tied true)   ;; tie to next dash
+                      ;; Case 3: dash at beginning of beat
+                      (and (= :dash my-key) 
+                           (= 0 (:beat-counter node-in-line)))
+                      ;; doremi-v1 requires that the :tied attribute not
                       ;; be set to anything if not tied
-                          (let [prev-pitch         ;; previous pitch in this line 
-                                (last (filter #(and (= :pitch (:_my_type %))
-                                                    (< 
-                                                      (:pitch-counter %)
-                                                      (:pitch-counter node-in-line)))
-                                              pitches))
-                                   my-tied (and next-item (= :dash (:_my_type next-item))) 
-                                 my-result1 (assoc node-in-line 
-                                   :case3 true
-                                   :dash_to_tie true
-                                   :pitch_to_use_for_tie prev-pitch)
-                                ]
-                            ;; set dash_to_tie true ; tied true, and pitch_to_use_for_tie
-                            (if my-tied
-                                (assoc my-result1 :tied true)
-                                ;; else
-                              my-result1))
-                          true
-                          node-in-line
-                          )
+                      (let [prev-pitch         ;; previous pitch in this line 
+                            (last (filter #(and (= :pitch (:_my_type %))
+                                                (< 
+                                                  (:pitch-counter %)
+                                                  (:pitch-counter node-in-line)))
+                                          pitches))
+                            my-tied (and next-item (= :dash (:_my_type next-item))) 
+                            my-result1 (assoc node-in-line 
+                                              :case3 true
+                                              :dash_to_tie true
+                                              :pitch_to_use_for_tie prev-pitch)
+                            ]
+                        ;; set dash_to_tie true ; tied true, and pitch_to_use_for_tie
+                        (if my-tied
+                          (assoc my-result1 :tied true)
+                          ;; else
+                          my-result1))
+                      true
+                      node-in-line
+                      )
                     )
                   ))
               line3)
@@ -442,21 +440,53 @@
           ]
       (case my-key 
         :SARGAM_MUSICAL_CHAR
-        (let [ ;; _ (pprint node)
-               [_ [sarg]] node
-            ]
-         ;; (println "sarg_str is " sarg_str)
-          (assoc my-map :value sarg))
+        (let [
+              [_ [sarg-keyword]] node
+              ]
+          (assoc my-map :value sarg-keyword 
+                 :octave 0
+                 :normalized_pitch (sarg-keyword to-normalized-pitch)
+                 :pitch_source (sarg-keyword sargam-pitch-to-source)
+                 ))
         :SARGAM_ORNAMENT 
-        (do 
+        ;;  "ornaments should look like this"
+        ;;                        { my_type: 'ornament',
+        ;;                           id: 2,
+        ;;                           column_offset: undefined,
+        ;;                           source: 'N',
+        ;;                           usable_source: 'N',
+        ;;                           ornament_items: 
+        ;;                            [ { my_type: 'pitch',
+        ;;                                normalized_pitch: 'B',
+        ;;                                attributes: [],
+        ;;                                pitch_source: 'N',
+        ;;                                source: 'N',
+        ;;                                column_offset: 0,
+        ;;                                octave: 0,
+        ;;                                group_line_no: 0 } ],
+        ;;                           column: 1,
+        ;;                           group_line_no: 0,
+        ;;                           placement: 'before' } 
+        ;;   Ornaments can be before or after a pitch. Set :placement to  "before"
+        ;;   or "after"
+        ;;  (pprint node)
+        (do
+          ;; (println :SARGAM_ORNAMENT)
           (merge 
-            my-map
-            (sorted-map  
-              :_my_type :ornament
-              :usable_source "N"
-              :ornament_items [
-                               ]
-              )))
+            node2 
+            {
+             :TODO true
+             :_my_type :ornament
+             :items nil
+             :usable_source (:_source node2)
+             :ornament_items (into [] 
+                                   (map (fn[x] 
+                                          (merge x {:_my_type  :pitch} 
+                                                 )
+                                          )
+                                        (:items node2)))
+             }
+            ))
         :TALA 
         my-map
         :CHORD_SYMBOL
@@ -512,35 +542,36 @@
                  :_my_type 
                  (keyword (keyword (lower-case (name (get-in node [1 0])))))
                  :is_barline true))
-        :SARGAM_LINE
-        (handle-sargam-line-in-main-walk node2)
-        :SARGAM_SECTION
-        (let [collapsed
-              (collapse-sargam-section 
-                (merge (sorted-map :items (subvec node 1)) my-map)
-                txt)]
-          collapsed
-          )
-        :SARGAM_PITCH
-        (let [
-              sarg (:value (second node))
-              ;;:S ;;(some #(if (= (first %) :SARGAM_MUSICAL_CHAR) (first (second %))) (rest node))
-              ]
-          (assert (= :sargam_musical_char (_my_type (second node))))
-          (merge 
-            my-map
-            (sorted-map  
-              :_my_type :pitch
-              :numerator 1  ;;; numerator and denominator may get updated later!
-              :denominator 1
-              :column_offset 0  ;; may get updated
-              :normalized_pitch (sarg to-normalized-pitch)
-              :pitch_source (sarg sargam-pitch-to-source)
-              )))
-        ;; default
-        node2
-        )
-      ))) ;; end main-walk
+:SARGAM_LINE
+(handle-sargam-line-in-main-walk node2)
+:SARGAM_SECTION
+(let [collapsed
+      (collapse-sargam-section 
+        (merge (sorted-map :items (subvec node 1)) my-map)
+        txt)]
+  collapsed
+  )
+:SARGAM_PITCH
+(let [
+      [_ sarg & my-rest] node 
+      ]
+  _ (assert (= :sargam_musical_char (:_my_type sarg)))
+  ;; (pprint node)
+  (merge 
+    my-map
+    sarg
+    {
+     :_my_type :pitch
+     :numerator 1  ;;; numerator and denominator may get updated later!
+     :denominator 1
+     :column_offset 0  ;; may get updated
+     }
+    )
+  )
+;; default
+node2
+)
+))) ;; end main-walk
 
 
 
