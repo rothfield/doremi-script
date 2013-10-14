@@ -157,11 +157,12 @@
                                 (filter #(= (:_my_type %) :ornament) 
                                         (get column-map (inc column))) 
                                 ;; _ (pprint z) 
-                                orns-after 
-                                (map #(assoc % :placement :after)
-                                     [(some 
-                                        #(if (= (:_my_type %) :ornament) %) 
-                                        (get column-map (inc column)))])
+                                helper-fn (fn helper-fn[placement fct]
+                                (map #(assoc % :placement placement)
+                                     (filter #(= :ornament (:_my_type %))
+                                        (get column-map (fct column))))
+                                            )
+                                orns (mapcat helper-fn [:before :after] [dec inc])
                                 ;; _ (pprint orns-before)
                                 ;; nodes-before-and-after)
                                 ;; nodes-before-and-after 
@@ -170,7 +171,7 @@
                                 ;; _ (println "nodes-before-and-after")
                                 ;; _ (pprint nodes-before-and-after)
                                 ]
-                            (update-sargam-pitch-node node (concat nodes orns-after))
+                            (update-sargam-pitch-node node (concat nodes orns))
                             )
                           ;; TODO: Actually only some nodes get this 
                           ;; treatment. And  
@@ -470,23 +471,23 @@
         ;;   Ornaments can be before or after a pitch. Set :placement to  "before"
         ;;   or "after"
         ;;  (pprint node)
-        (do
+        (let [
+              my-items (:items node2)
+              node3 (dissoc node2 :items)
+              ]
           ;; (println :SARGAM_ORNAMENT)
           (merge 
-            node2 
+            node3 
             {
-             :TODO true
              :_my_type :ornament
-             :items nil
              :usable_source (:_source node2)
              :ornament_items (into [] 
                                    (map (fn[x] 
                                           (merge x {:_my_type  :pitch} 
                                                  )
                                           )
-                                        (:items node2)))
-             }
-            ))
+                                        my-items))
+             }))
         :TALA 
         my-map
         :CHORD_SYMBOL
