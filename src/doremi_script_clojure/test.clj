@@ -16,10 +16,15 @@
   )
 
 (defn my-test[txt]
-  (let [result (with-out-str (pprint (transform-parse-tree (run-through-parser txt) txt)))]
-    (pprint (run-through-parser txt))
-    (println result)
-    (spit "tmp.txt" result)))
+  (let [
+        
+        parse-tree (time (run-through-parser txt)) 
+        z (with-out-str (pprint parse-tree))
+        result (with-out-str (pprint (time (transform-parse-tree parse-tree txt))))
+        ]
+    (println "Source:\n" txt "\n\nParse tree:\n" z "\n\njson:\n" result)
+    (spit "tmp.txt" (str z
+                         result))))
 
 
 (def x "   Fm7\n   +\n1) S\n   Hi")
@@ -27,7 +32,8 @@
 ;;(my-test "S - -")
 ;;(my-test (slurp-fixture "ending.txt"))
 ;; (pprint (run-thrnough-parser  (slurp-fixture "ending.txt")))
-(pprint (my-test " RS\nG"))
+;;(pprint (my-test " RS\nG"))
+(pprint (my-test "hi:john\nauthor:me\n\n|S"))
 ;;(def h (new net.davidashen.text.Hyphenator))
 ;;(def hyphens  (clojure.java.io/input-stream (clojure.java.io/resource "hyphen.tex")))
 ;;(.loadTable h hyphens)

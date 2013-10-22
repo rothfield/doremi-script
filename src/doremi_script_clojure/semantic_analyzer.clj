@@ -402,13 +402,22 @@
                                    x)) rest)))))
 
 (defn- handle-composition-in-main-walk[node2]
-  (let [ sections 
+  (let [
+        attribute-sections 
+        (filter #(= :attributes (:_my_type %))  (:items node2))
+       
+        sections 
         (filter #(= :sargam_section (:_my_type %))  (:items node2))
         lines
         (into [] (map  (fn[x] (some #(if (= :sargam_line (:_my_type %)) %) 
                                     (:items x))) sections))
         ] 
     (merge (dissoc node2 :items) {:lines  lines 
+                                  :attributes 
+                                  (first attribute-sections) 
+                                 ;; (into []
+                                  ;;      (map (fn[x y] (str x y))
+                                   ;;          (apply array-map (:items (first attribute-sections)))))
                                   :warnings []
                                   :id 999
                                   :notes_used ""
@@ -422,7 +431,39 @@
                                   :filename "untitled"
                                   })))
 
-
+(defn- handle-attribute-section [node]
+  (let [
+        _ (println "in handle-attribute-section")
+        _ (pprint node) 
+        items-map (apply array-map (:items node))
+        x (into [] (map (fn[[k v]] 
+                          (str k " " v)
+                        {  :_my_type :attribute :key k :value v }  
+                          )
+                       
+                        items-map))
+        ]
+       (pprint x)
+       ;; (merge node2 { :_my_type :attributes })
+       ;; (let [ [:ATTRIBUTE_SECTION [:ATTRIBUTE_SECTION_ITEMS pairs]] node
+        ;;  [:ATTRIBUTE_SECTION
+        ;;     [:ATTRIBUTE_SECTION_ITEMS "hi" "john" "author" "me"]]
+  ;; output looks like:
+   ;; { my_type: 'attributes',
+   ;;  items: 
+   ;;   [ { my_type: 'attribute', key: 'foo', value: 'bar', source: 'todo' },
+    ;;    { my_type: 'attribute', key: 'hi', value: 'john', source: 'todo' } ],
+     ;; source: 'xx' },
+   ;;{:_start_index 0,
+   ;; :_source "hi:john\nauthor:me",
+   ;; :_my_type :attribute_section,
+   ;; :items ["hi" "john" "author" "me"]} 
+    (println "items-map" items-map)
+    (assert (= :attribute_section (:_my_type  node)))
+    (assert (:items node))
+    (assert (vector? (:items node)))
+   (merge node {:_my_type :attributes :items x})
+  ))
 (defn- main-walk[node txt]
   (if-not (vector? node) node
     ;; else
@@ -440,6 +481,8 @@
                   node)
           ]
       (case my-key 
+        :ATTRIBUTE_SECTION
+        (handle-attribute-section node2)
         :SARGAM_MUSICAL_CHAR
         (let [
               [_ [sarg-keyword]] node

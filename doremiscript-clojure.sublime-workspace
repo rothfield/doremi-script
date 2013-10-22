@@ -1,0 +1,386 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"UPPER",
+				"UPPER_OCTAVE_LINE"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "(ns doremi_script_clojure.core-test\n	(:require [clojure.test :refer :all ]\n		[clojure.pprint :refer :all ]\n		[doremi_script_clojure.core :refer :all ]\n		[clojure.walk :refer :all ]\n		[instaparse.core :as insta]\n		))\n(defn slurp-fixture [file-name]\n	(slurp (clojure.java.io/resource \n		(str \"doremi_script_clojure/fixtures/\" file-name))))\n\n(def my-get-parser \n	(insta/parser\n		(slurp (clojure.java.io/resource \"doremi_script_clojure/doremiscript.ebnf\")))\n	)\n\n(defn good-parse\n	\"Returns true if parse succeded and the list of expected values are in the \n	flattened parse tree\"\n	[txt start expected]\n	(println \"Testing \" txt \"with start \" start \" and expected \" expected)\n	(let [ result \n		(my-get-parser txt :total false\n			:start start)\n		flattened (flatten result)]\n		(letfn [(my-helper [x]\n			(let [found (some #(= x %) flattened)]\n				(if (nil? found) \n					(do\n						(println \"Parsing \" txt \" with start \" start \"; Didn't find \" x \" in flattened result \") \n						(pprint result)\n						)\n					found) \n				))]\n		(if (insta/failure? result)\n			(do (println \"Parsing \" txt \" with start \" start \"; Failed. Result is:\")\n				(pprint result)\n				false\n				)\n			(do\n				(pprint result)\n				(every? #(true? %) (map my-helper expected))\n				))\n		)))\n\n(deftest yesterday_no_chords\n	(let [txt2 (slurp \n		(clojure.java.io/resource \n			\"doremi_script_clojure/fixtures/yesterday_no_chords.doremiscript.txt\"))\n	txt (slurp-fixture \"yesterday_no_chords.doremiscript.txt\") \n	]\n\n	(pprint txt)\n	(is (good-parse txt :COMPOSITION [\"Yesterday\"]))\n	))\n\n(deftest composition-with-attributes-lyrics-and-sargam-section\n	(let [txt (slurp \n		(clojure.java.io/resource \n			\"doremi_script_clojure/fixtures/georgia.doremiscript.txt\"))]\n	(pprint txt)\n	(is (good-parse txt :COMPOSITION [\"Georgia\",:UPPER_OCTAVE_DOT,\".\",:TALA]))\n	))\n\n\n\n(deftest lower-octave-line\n	(is (good-parse \". : _\" :LOWER_OCTAVE_LINE [:LOWER_OCTAVE_DOT :KOMMAL_INDICATOR ])))\n\n\n(deftest dot\n	(is (good-parse \".\" :DOT [:DOT \".\"]))\n	(is (good-parse \"*\" :DOT [:DOT \"*\"]))\n	(is (good-parse \"*\" :LOWER_OCTAVE_DOT [:DOT \"*\"]))\n	(is (good-parse \".\" :LOWER_OCTAVE_DOT [:DOT \".\"]))\n	(is (good-parse \"*\" :UPPER_OCTAVE_DOT [:DOT \"*\"]))\n	(is (good-parse \".\" :UPPER_OCTAVE_DOT [:DOT \".\"]))\n	)\n\n\n(deftest sargam-pitch-can-include-left-slur\n	(is (good-parse \"(S\" :SARGAM_PITCH [:BEGIN_SLUR :S ]))\n		)\n(deftest lower-octave-dot\n	(is (good-parse \".\" :LOWER_OCTAVE_DOT [\".\"])))\n\n(deftest kommal_underscore\n	(is (good-parse \"_\" :KOMMAL_INDICATOR [\"_\"])))\n\n\n\n(deftest lower-lower-octave\n	(is (good-parse \":\" :LOWER_LOWER_OCTAVE_SYMBOL [\":\"])))\n\n\n(defn parse-fails? [text-to-parse starting-production]\n	(let [result (my-get-parser text-to-parse :start starting-production)]\n		(insta/failure? result)\n		)\n	)\n\n(deftest sargamNotes\n	(let [txt \"SrRgGmMPdDnNSbS#R#G#MP#D#N#\"\n		result (my-get-parser txt :start :BEAT )\n		flattened (flatten result)]\n    ; (println txt result)\n    ;(println \"flattend is \" flattened)\n    (is (some #(= :S %) flattened))\n    (is (some #(= :r %) flattened))\n    (is (= 1 (count (filter #(= :BEAT %) flattened))) \"beat count off\")\n    )\n	)\n; (is (some #(= :LINE_NUMBER %)  flattened))\n(deftest composition\n	(let [\n		txt \"foo:bar\\ncat:dog\\n\\n | S R G R |\\n\"\n		result (my-get-parser txt :total true :start :COMPOSITION )\n		flattened (flatten result)]\n		(println \"parsing \" txt)\n		(println result)\n    ;(println flattened)\n    (is (some #(= \"foo\" %) flattened))\n    (is (some #(= \"bar\" %) flattened))\n    (is (some #(= \"cat\" %) flattened))\n    (is (some #(= \"dog\" %) flattened))\n    )\n	)\n(deftest syllable\n	(let [txt \"foo\"\n		result (my-get-parser txt :total false :start :SYLLABLE )\n		flattened (flatten result)]\n    ;(pprint result)\n    (is (some #(= :SYLLABLE %) flattened))\n    (is (some #(= \"foo\" %) flattened))\n    ))\n(deftest lyrics-section\n	(let [txt \"  Georgia georgia\\nNo peace I find ba-by\"\n		result (my-get-parser txt :total true :start :LYRICS_SECTION )\n		flattened (flatten result)]\n    ;(pprint result)\n    (is (some #(= :SYLLABLE %) flattened))\n    (is (some #(= \"ba\" %) flattened))\n    ))\n\n\n(deftest upper-octave-line-item\n	(let [txt \".\"\n		result (my-get-parser txt :total true :start :UPPER_OCTAVE_LINE_ITEM )\n		flattened (flatten result)]\n		(pprint result)\n		(is (some #(= \".\" %) flattened))\n		))\n(deftest upper-octave-line\n	(let [txt \". + 0 2 3\"\n		result (my-get-parser txt :total true :start :UPPER_OCTAVE_LINE )\n		flattened (flatten result)]\n		(pprint result)\n		(is (some #(= \"+\" %) flattened))\n		(is (some #(= \"2\" %) flattened))\n		))\n(deftest lyrics-section\n	(let [txt \"  Georgia georgia\\nNo peace I find ba-by\"\n		result (my-get-parser txt :total true :start :LYRICS_SECTION )\n		flattened (flatten result)]\n    ;(pprint result)\n    (is (some #(= :SYLLABLE %) flattened))\n    (is (some #(= \"ba\" %) flattened))\n    ))\n\n\n\n\n\n\n(deftest lyrics-line\n	(let [txt \"  he-llo  dolly\"\n		result (my-get-parser txt :total true :start :LYRICS_LINE )\n		flattened (flatten result)]\n		(pprint result)\n		(is (some #(= :SYLLABLE %) flattened))\n		(is (some #(= \"he\" %) flattened))\n		(is (some #(= \"llo\" %) flattened))\n		(is (some #(= \"dolly\" %) flattened))\n		))\n\n(deftest sargam-ornament\n	(is (good-parse \"PMDP\" :SARGAM_ORNAMENT  [:P :D])))\n(deftest alternate_ending\n	(is (good-parse \"1._____\" :ALTERNATE_ENDING_INDICATOR  []))\n	(is (good-parse \"3_____\" :ALTERNATE_ENDING_INDICATOR  [])))\n\n\n\n(deftest syllable-with-hyphen\n	(is (good-parse \"foo-   bar baz-\" :LYRICS_LINE [\"foo\"])))\n\n(deftest syllable-with-hyphen-bad-case\n  ;;; TODO: change EBNF\n  (is (good-parse \"foo-   bar baz---\" :LYRICS_LINE [\"foo\"])))\n\n(deftest composition-attributes-and-sargam-sections\n	(let [txt \"foo:bar  \\ndog:cat    \\n\\n | S R G | \"\n		result (my-get-parser txt :total false :start :COMPOSITION )\n		flattened (flatten result)]\n		(pprint result)\n		(is (some #(= :G %) flattened))\n		))\n(deftest composition-two-attribute-sections\n	(let [txt \"foo:bar  \\ndog:cat    \\n\\nhat:bat\"\n		result (my-get-parser txt :total true :start :COMPOSITION )\n		flattened (flatten result)]\n		(pprint result)\n		(is (some #(= :ATTRIBUTE_LINE %) flattened))\n		))\n\n(deftest composition-one-attribute-no-eol\n	(let [result (my-get-parser \"foo:bar   \" :start :COMPOSITION )\n		flattened (flatten result)]\n		(pprint result)\n    ;(println flattened)\n    (is (some #(= :ATTRIBUTE_LINE %) flattened))\n    )\n	)\n(deftest section-two-attributes-no-eol\n	(let [result (my-get-parser \"foo:bar  \\ndog:cat    \" :total true :start :SECTION )\n		flattened (flatten result)]\n		(pprint result)\n    ;(println flattened)\n    (is (some #(= :ATTRIBUTE_SECTION %) flattened))\n    (is (some #(= :SECTION %) flattened))\n    )\n	)\n\n(deftest sargam-section\n	(let [result (my-get-parser \"  | S R G - | \" :start :SARGAM_SECTION )\n		flattened (flatten result)]\n    ;(println result)\n    ;(println flattened)\n    (is (some #(= :S %) flattened))\n    (is (some #(= :MEASURE %) flattened))\n    (is (some #(= :R %) flattened))\n    (is (some #(= :G %) flattened))\n    )\n	)\n(deftest attribute-line\n	(is (good-parse \"foo:bar\" :ATTRIBUTE_LINE [\"foo\" \"bar\" ]))\n	(is (good-parse \"foo : bar\" :ATTRIBUTE_LINE [\"foo\" \"bar\" ]))\n	(is (good-parse \"foo : bar    \" :ATTRIBUTE_LINE [\"foo\" \"bar\" ]))\n	)\n(deftest attribute-section\n	(let [result (my-get-parser \"foo:bar\\ncat:dog\" :start :ATTRIBUTE_SECTION )\n		flattened (flatten result)]\n    ;(println result)\n    ;(println flattened)\n    (is (some #(= \"foo\" %) flattened))\n    (is (some #(= \"bar\" %) flattened))\n    (is (some #(= \"cat\" %) flattened))\n    (is (some #(= \"dog\" %) flattened))\n    )\n	)\n\n(deftest attributes\n	(is (good-parse \"foo:bar\" :ATTRIBUTE_LINE [\"foo\" \"bar\"])))\n\n(deftest line-number\n	(let [result (my-get-parser \"1)\" :start :LINE_NUMBER )\n	flattened (flatten result)]\n    ;(println flattened)\n    (is (some #(= \"1\" %) flattened))\n    (is (some #(= :LINE_NUMBER %) flattened))\n    )\n	)\n(deftest sargam-line-2\n	(let [result (my-get-parser \"1) | S- Rgm |\" :start :SARGAM_LINE )\n	flattened (flatten result)]\n    ;(println result)\n    (is (some #(= :S %) flattened))\n    (is (some #(= :R %) flattened))\n    (is (= 2 (count (filter #(= :BEAT %) flattened))) \"beat count off\")\n    )\n	)\n(deftest sargam-line-simple\n	(is (good-parse \"| S R |\" :SARGAM_LINE [:S :R :BEAT ])))\n\n\n\n\n(deftest beat-can-be-delimited-with-angle-brackets\n	(is (good-parse \"<S>\" :BEAT_DELIMITED [:S :BEAT_DELIMITED ])))\n\n(deftest beat-can-be-delimited-with-angle-brackets-more-than-one-note-with-spaces\n	(is (good-parse \"<S r>\" :BEAT_DELIMITED [:S :r :BEAT_DELIMITED ])))\n\n(deftest sargam-pitch-can-include-right-slur\n	(is (good-parse \"S)\" :SARGAM_PITCH [:S :END_SLUR ])))\n\n(deftest parses-double-barline\n	(is (good-parse \"||\" :DOUBLE_BARLINE [:DOUBLE_BARLINE ])))\n\n(deftest doesnt-parse-single-barline-when-it-sees-double-barline\n	(is (parse-fails? \"||\" :SINGLE_BARLINE ))\n	\"\")\n\n(deftest test-left-repeat\n	(is (good-parse \"|:\" :LEFT_REPEAT [:LEFT_REPEAT ])))\n\n(deftest test-final-barline\n	(is (good-parse \"|]\" :FINAL_BARLINE [:FINAL_BARLINE ])))\n\n(deftest test-reverse-final-barline\n	(is (good-parse \"[|\" :REVERSE_FINAL_BARLINE [:REVERSE_FINAL_BARLINE ])))\n\n\n(deftest test-right-repeat\n	(is (good-parse \":|\" :RIGHT_REPEAT [:RIGHT_REPEAT ])))\n\n\n(deftest test-tala\n	(let [start :TALA\n		items \"+2034567\"]\n		(is (good-parse \"+\" :TALA [\"+\"]))\n		(is (good-parse \"0\" :TALA [\"0\"]))\n		(is (good-parse \"2\" :TALA [\"2\"]))\n		)\n	)\n\n\n(deftest dash\n	(is (good-parse \"-\" :DASH [:DASH ])))\n\n(deftest test-repeat-symbol\n	(is (good-parse \"%\" :REPEAT_SYMBOL [:REPEAT_SYMBOL ])) \"\")\n\n(defn test-some\n	[]\n	(sargam-pitch-can-include-left-slur)\n	(composition-with-attributes-lyrics-and-sargam-section)\n	(dash)\n	(attributes)\n	(parses-double-barline)\n	(test-final-barline)\n	(test-repeat-symbol)\n	(syllable-with-hyphen)\n	(beat-can-be-delimited-with-angle-brackets-more-than-one-note-with-spaces)\n	(sargam-pitch-can-include-right-slur)\n	(sargam-line-simple)\n	(beat-can-be-delimited-with-angle-brackets)\n	)\n\n;(run-tests)\n; (composition-with-attributes-lyrics-and-sargam-section)\n\n(println \"loaded core-test\")\n;  (test-some)\n;  (sargam-line-simple)\n;  (test-tala)\n;  	(composition-with-attributes-lyrics-and-sargam-section)\n;  (dot)\n;  (yesterday_no_chords)\n;  (attribute-line)\n;  \n;(composition-with-attributes-lyrics-and-sargam-section)\n;(yesterday_no_chords)\n(dash)\n",
+			"file": "core_test.clj",
+			"file_size": 10262,
+			"file_write_time": 1373733612000000,
+			"settings":
+			{
+				"buffer_size": 10204,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "doremiscript-clojure.sublime-project",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/john/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 13667,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "doremiscript.ebnf",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "grammar_unit_tests.clj",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/doremi_script_clojure/test_helper.clj",
+			"settings":
+			{
+				"buffer_size": 2324,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 52.0,
+		"selected_items":
+		[
+			[
+				":$",
+				":$ - EOF"
+			],
+			[
+				":w",
+				":w - Save"
+			],
+			[
+				":0",
+				":0 - BOF"
+			],
+			[
+				"",
+				"Indentation: Reindent Lines"
+			]
+		],
+		"width": 392.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/john/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/john/doremi-script-clojure",
+		"/home/john/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"ORNAMENT",
+			"CHORD",
+			"ORNAME",
+			"LYRICS_SEP",
+			"SARGAM_LINE_ITEM",
+			"LINE_END_CHAR",
+			"EOL",
+			"LINE_END",
+			"sharp",
+			"EMPTY_LINE2",
+			"empty_line",
+			"empty_line2",
+			"deftest",
+			"ignored"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"EMPTY_LINE"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "core_test.clj",
+					"settings":
+					{
+						"buffer_size": 10204,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1152,
+								1152
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Clojure/Clojure.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "doremiscript-clojure.sublime-project",
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/home/john/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+					"settings":
+					{
+						"buffer_size": 13667,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								13663,
+								13663
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4507.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "doremiscript.ebnf",
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lisp/Lisp.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 308.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "grammar_unit_tests.clj",
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Clojure/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3933.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "test/doremi_script_clojure/test_helper.clj",
+					"settings":
+					{
+						"buffer_size": 2324,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Clojure/Clojure.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": false,
+	"side_bar_visible": true,
+	"side_bar_width": 331.0,
+	"status_bar_visible": false
+}
