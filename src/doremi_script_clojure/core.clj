@@ -32,7 +32,9 @@
 
 (defn my-pp-json[x]
   "very primitive json pretty-printer. Changes dq,dq => dq,newline,dq "
-  (clojure.string/replace x "\",\"" "\",\n\""))
+  x
+  )
+  ;;(clojure.string/replace x "\",\"" "\",\n\""))
 
 (defn- my-to-json[x]
   "returns json/text version of parse tree. It is a string"
@@ -41,5 +43,5 @@
 
 (defn -main[& args]
   (let [txt (slurp *in*)]
-    (println (my-to-json (transform-parse-tree (run-through-parser txt) txt)))))
+    (print (my-to-json (transform-parse-tree (run-through-parser txt) txt)))))
 

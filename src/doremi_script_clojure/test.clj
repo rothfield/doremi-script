@@ -1,5 +1,5 @@
 (ns doremi_script_clojure.test
-  (:require	
+  (require	
     [doremi_script_clojure.core :reload true :refer [run-through-parser yesterday slurp-fixture]]
     [doremi_script_clojure.semantic_analyzer :reload true :refer [transform-parse-tree]]
     [clojure.pprint :refer [pprint]] 
@@ -33,7 +33,7 @@
 ;;(my-test (slurp-fixture "ending.txt"))
 ;; (pprint (run-thrnough-parser  (slurp-fixture "ending.txt")))
 ;;(pprint (my-test " RS\nG"))
-(pprint (my-test "hi:john\nauthor:me\n\n|S"))
+(pprint (my-test "lines: lineshere\nKey: D\nhi:john\nAuthor:me\n\n|S"))
 ;;(def h (new net.davidashen.text.Hyphenator))
 ;;(def hyphens  (clojure.java.io/input-stream (clojure.java.io/resource "hyphen.tex")))
 ;;(.loadTable h hyphens)
