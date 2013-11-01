@@ -14,7 +14,7 @@
     "MusicXML"
   ],
   "author": "John Rothfield",
-  "version": "0.1.0-pre",
+  "version": "0.2.0-pre",
   "engines": {
     "node": ">=0.4.9"
   },
@@ -28,7 +28,8 @@
     "doremi2ly": "./bin/doremi2ly",
     "doremi2musicxml": "./bin/doremi2musicxml",
     "doremiparse": "./bin/doremiparse",
-    "doremiparseline": "./bin/doremiparseline"
+    "doremiparseline": "./bin/doremiparseline",
+		"doremi_json_to_lilypond":"./bin/doremi_json_to_lilypond"
   },
   "homepage": "http://ragapedia.com",
   "repository": {

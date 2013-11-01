@@ -42,16 +42,22 @@ debug=true
 
 root = exports ? this
 if require?
+  root.Fraction=require('./third_party/fraction.js').Fraction
   shared=require('./shared.js')
   root._ = require("underscore")._
   root._.extend(root,shared)
 
+item_has_attribute = (item,attr_name) ->
+  return false if  !item.attributes?
+  _.detect item.attributes,  (attr) ->
+    return false if !attr.my_type?
+    attr.my_type is attr_name
 
 extract_lyrics= (composition_data) ->
   ary=[]
   for sargam_line in composition_data.lines
     for item in root.all_items(sargam_line,[])
-      @log "extract_lyrics-item is",item
+      #@log "extract_lyrics-item is",item
       ary.push item.syllable if item.syllable
   ary
 
@@ -92,9 +98,6 @@ fraction_to_lilypond=
   "4/1":"1"
   "5/1":"1.."
   "1/1":"4"
-  "1/1":"4"
-  "1/1":"4"
-  "1/1":"4"
   "1/2":"8"
   "1/3": "8"  # 1/3 1/5 1/7 all 8th notes so one beat will beam together
   "1/9":"8"
@@ -107,7 +110,6 @@ fraction_to_lilypond=
   "5/5":4
   "6/6":4
   "7/7":4
-  "8/8":4
   "9/9":4
   "10/10":4
   "11/11":4
@@ -138,11 +140,9 @@ fraction_to_lilypond=
   "1/4":"16"
   "2/4":"8"
   "3/4":"8."
-  "3/8":"16."
   "4/16":"16"
   "3/16":""
   "1/8":"32"
-  "3/8":"16."
   "6/16":"16"
 
 calculate_lilypond_duration= (numerator,denominator) ->
@@ -227,7 +227,7 @@ normalized_pitch_to_lilypond= (pitch,context={last_pitch: {},in_slur:false}) ->
   else
     first_fraction=new Fraction(pitch.numerator,pitch.denominator)
   duration=calculate_lilypond_duration first_fraction.numerator.toString(),first_fraction.denominator.toString()
-  @log("normalized_pitch_to_lilypond, pitch is",pitch)
+  #@log("normalized_pitch_to_lilypond, pitch is",pitch)
   if pitch.my_type is "dash"
     # unfortunately this is resulting in tied 1/4s.
     if pitch.dash_to_tie is true
@@ -385,10 +385,10 @@ emit_tied_array=(last_pitch,tied_array,ary) ->
   my_fun = (attr) ->
     attr.my_type is not "mordent"
   obj.attrs2= _.select(obj.attributes, my_fun)
-  @log "emit_tied_array-last is", last
+  #@log "emit_tied_array-last is", last
   last=tied_array[tied_array.length-1]
   obj.tied= last.tied
-  @log "leaving emit_tied_array"
+  #@log "leaving emit_tied_array"
   tied_array.length=0 # clear it
   console.log "****",has_after_ornament(last_pitch) if false
   if has_after_ornament(last_pitch)
@@ -404,7 +404,7 @@ is_sargam_line= (line) ->
   return true if line.kind.indexOf('number') > -1 # 3/10/2012
 
 notation_is_in_sargam= (composition_data) ->
-  @log "in notation_is_in_sargam"
+  #@log "in notation_is_in_sargam"
   root._.detect(composition_data.lines, (line) -> is_sargam_line(line))
 
 beat_is_all_dashes= (beat) ->
@@ -441,7 +441,7 @@ line_to_lilypond_array = (line,options={}) ->
   tied_array=[]
   at_beginning_of_first_measure_of_line=false
   in_times=false #hack
-  @log "processing #{line.source}"
+  #@log "processing #{line.source}"
   all=[]
   x=root.all_items(line,all)
   last_pitch=null
@@ -458,7 +458,7 @@ line_to_lilypond_array = (line,options={}) ->
       if item.my_type is "beat" or item.my_type is "barline"
         ary.push "}"
         in_times=false
-    @log "processing #{item.source}, my_type is #{item.my_type}"
+    #@log "processing #{item.source}, my_type is #{item.my_type}"
     if item.my_type=="pitch"
       last_pitch=item  #use this to help render ties better(hopefully)
       if dashes_at_beginning_of_line_array.length > 0
@@ -471,7 +471,7 @@ line_to_lilypond_array = (line,options={}) ->
     if item.my_type is "beat"
        beat=item
        if beat.subdivisions not in [0,1,2,4,8,16,32,64,128] and !beat_is_all_dashes(beat)
-           @log "odd beat.subdivisions=",beat.subdivisions
+           #@log "odd beat.subdivisions=",beat.subdivisions
            x=2
            if beat.subdivisions is 6
              x=4
@@ -482,7 +482,7 @@ line_to_lilypond_array = (line,options={}) ->
            in_times=true #hack
     if item.my_type is "dash"
       if !item.dash_to_tie and item.numerator? #THEN its at beginning of line!
-        @log "pushing item onto dashes_at_beginning_of_line_array"
+        #@log "pushing item onto dashes_at_beginning_of_line_array"
         dashes_at_beginning_of_line_array.push item
       if item.dash_to_tie
         #TODO:review

@@ -69,10 +69,8 @@ fraction_to_musicxml_type_and_dots =
   "3/6": "<type>quarter</type>" # not sure??
   "4/6":"<type>quarter</type>" # NOT SURE ????
   "5/6":"<type>eighth</type><dot/><dot/>" #  WRONGnot sure TODO??
-  "1/4":"<type>16th</type>"
   "2/4":"<type>eighth</type>"
   "3/4":"<type>eighth</type><dot/>"
-  "3/8":"<type>16th</type><dot/>"
 
 
 to_musicxml= (composition) ->
