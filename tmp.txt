@@ -1,0 +1,94 @@
+[:COMPOSITION
+ [:COMPOSITION_ITEMS
+  [:SARGAM_SECTION
+   [:UPPER_OCTAVE_LINE
+    [:UPPER_OCTAVE_LINE_ITEMS [:UPPER_OCTAVE_DOT [:DOT "."]]]]
+   [:SARGAM_LINE
+    [:SARGAM_LINE_ITEMS
+     [:MEASURE
+      [:MEASURE_ITEMS
+       [:BEAT
+        [:BEAT_UNDELIMITED_ITEMS
+         [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:S]]]]]
+       [:BEAT [:BEAT_UNDELIMITED_ITEMS [:DASHES [:DASH "-"]]]]]]]]]]]
+"Elapsed time: 16.279205 msecs"
+{:_my_type :composition,
+ :_source ".\nS -",
+ :_start_index 0,
+ :apply_hyphenated_lyrics false,
+ :attributes nil,
+ :author "",
+ :filename "untitled",
+ :force_sargam_chars_hash {},
+ :key "C",
+ :lines
+ [{:_my_type :sargam_line,
+   :_source "S -",
+   :_start_index 2,
+   :items
+   [{:_my_type :measure,
+     :_source "S -",
+     :_start_index 2,
+     :items
+     [{:_my_type :beat,
+       :_source "S",
+       :_start_index 2,
+       :_subdivisions 1,
+       :items
+       [{:_my_type :pitch,
+         :_source "S",
+         :_start_index 2,
+         :attributes [],
+         :beat-counter 0,
+         :chord nil,
+         :column_offset 0,
+         :denominator 1,
+         :fraction_array [{:numerator 1, :denominator 1}],
+         :normalized_pitch "C",
+         :numerator 1,
+         :octave 1,
+         :ornament nil,
+         :pitch-counter 0,
+         :pitch_source "S",
+         :syllable nil,
+         :tala nil,
+         :tied true,
+         :value :S}]}
+      {:_my_type :beat,
+       :_source "-",
+       :_start_index 4,
+       :_subdivisions 1,
+       :items
+       [{:_my_type :dash,
+         :_source "-",
+         :_start_index 4,
+         :beat-counter 0,
+         :case3 true,
+         :dash_to_tie true,
+         :denominator 1,
+         :fraction_array [{:numerator 1, :denominator 1}],
+         :numerator 1,
+         :pitch-counter 1,
+         :pitch_to_use_for_tie
+         {:_my_type :pitch,
+          :_source "S",
+          :_start_index 2,
+          :attributes [],
+          :chord nil,
+          :column_offset 0,
+          :denominator 1,
+          :fraction_array [{:numerator 1, :denominator 1}],
+          :normalized_pitch "C",
+          :numerator 1,
+          :octave 1,
+          :ornament nil,
+          :pitch-counter 0,
+          :pitch_source "S",
+          :pointer true,
+          :syllable nil,
+          :tala nil,
+          :value :S}}]}]}]}],
+ :mode "major",
+ :notes_used "",
+ :time_signature "4/4",
+ :warnings []}

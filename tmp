@@ -1,0 +1,128 @@
+diff --git a/src/doremi_script_clojure/semantic_analyzer.clj b/src/doremi_script_clojure/semantic_analyzer.clj
+index 09d2273..37bf865 100644
+--- a/src/doremi_script_clojure/semantic_analyzer.clj
++++ b/src/doremi_script_clojure/semantic_analyzer.clj
+@@ -186,6 +186,7 @@
+     ))
+ 
+ (defn- make-sorted-map[node]
++ ;; (println "make-sorted-map" "node is" node) 
+   (cond 
+     (and (map? node) (= (into (hash-set) (keys node)) #{:numerator :denominator}))
+     node
+@@ -401,49 +402,76 @@
+                                    ;; else
+                                    x)) rest)))))
+ 
++(def reserved-attributes [:lines 
++                          :attributes
++                          :warnings
++                          :_my_type
++                          :_source
++                          :_start_index
++                          :attributes
++                          ]
++                          )
++(def default-attributes
++  {:key "C"
++   :mode "major"
++   :author ""
++   :force_sargam_chars_hash {}
++   :notes_used ""
++   :warnings []
++   :time_signature "4/4"
++  :apply_hyphenated_lyrics false
++  :filename "untitled"
++   })
++
++  (def default-attribute-keys
++    (into #{} (keys default-attributes)))
++
+ (defn- handle-composition-in-main-walk[node2]
+   (let [
+         attribute-sections 
+         (filter #(= :attributes (:_my_type %))  (:items node2))
+-       
++        attribute-section (first attribute-sections)
++        ;; _ (println "attribute-sections" attribute-sections) 
+         sections 
+         (filter #(= :sargam_section (:_my_type %))  (:items node2))
+         lines
+         (into [] (map  (fn[x] (some #(if (= :sargam_line (:_my_type %)) %) 
+                                     (:items x))) sections))
++        items-map2 
++          (into {} (map (fn[[k v]] [(keyword (lower-case (name k))) v]) (:items_map attribute-section)))
++       ;; _ (println "items-map2")
++       ;;  _ (pprint items-map2)
+         ] 
++    (assert (map? items-map2))
+     (merge (dissoc node2 :items) {:lines  lines 
+                                   :attributes 
+-                                  (first attribute-sections) 
+-                                 ;; (into []
+-                                  ;;      (map (fn[x y] (str x y))
+-                                   ;;          (apply array-map (:items (first attribute-sections)))))
+-                                  :warnings []
+-                                  :id 999
+-                                  :notes_used ""
+-                                  :force_sargam_chars_hash {}
+-                                  :time_signature "4/4"
+-                                  :mode "major"
+-                                  :key "C"
+-                                  :author ""
+-                                  :apply_hyphenated_lyrics false
+-                                  :title ""
+-                                  :filename "untitled"
+-                                  })))
++                                  attribute-section
++                                  }
++                                  default-attributes
++      (filter (fn[[k v]] (default-attribute-keys k)) 
++              items-map2)
++      )))
+ 
+ (defn- handle-attribute-section [node]
+   (let [
+-        _ (println "in handle-attribute-section")
+-        _ (pprint node) 
+-        items-map (apply array-map (:items node))
++       ;; _ (println "in handle-attribute-section")
++       ;;  _ (pprint node) 
++        ;; make keys keywords.
++        items-map (apply array-map 
++                         (map-indexed (fn [i v] 
++                                        (if (even? i) 
++                                          (keyword v)
++                                        ;;  (keyword (lower-case v)) 
++                                          ;; else
++                                           v))  (:items node)))
+         x (into [] (map (fn[[k v]] 
+                           (str k " " v)
+-                        {  :_my_type :attribute :key k :value v }  
++                        {  :_my_type :attribute :key (name k) :value v }  
+                           )
+                        
+                         items-map))
+         ]
+-       (pprint x)
++       ;;(pprint x)
+        ;; (merge node2 { :_my_type :attributes })
+        ;; (let [ [:ATTRIBUTE_SECTION [:ATTRIBUTE_SECTION_ITEMS pairs]] node
+         ;;  [:ATTRIBUTE_SECTION
+@@ -458,12 +486,14 @@
+    ;; :_source "hi:john\nauthor:me",
+    ;; :_my_type :attribute_section,
+    ;; :items ["hi" "john" "author" "me"]} 
+-    (println "items-map" items-map)
++    ;; (println "items-map" items-map)
+     (assert (= :attribute_section (:_my_type  node)))
+     (assert (:items node))
+     (assert (vector? (:items node)))
+-   (merge node {:_my_type :attributes :items x})
++    ;;(println "items-map:") (pprint items-map)
++   (merge node {:_source "TODO" :_my_type :attributes :items x :items_map items-map})
+   ))
++
+ (defn- main-walk[node txt]
+   (if-not (vector? node) node
+     ;; else
