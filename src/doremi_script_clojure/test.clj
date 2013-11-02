@@ -28,12 +28,13 @@
 
 
 (def x "   Fm7\n   +\n1) S\n   Hi")
-;;(my-test yesterdaty)
-;;(my-test "S - -")
+;; (my-test yesterday)
+;;(my-test "(SRG-\n.\nhe-llo john")
+(my-test "S -      R\n.\nGood job")
 ;;(my-test (slurp-fixture "ending.txt"))
 ;; (pprint (run-thrnough-parser  (slurp-fixture "ending.txt")))
 ;;(pprint (my-test " RS\nG"))
-(pprint (my-test "lines: lineshere\nKey: D\nhi:john\nAuthor:me\n\n|S"))
+;;tt(pprint (my-test "lines: lineshere\nKey: D\nhi:john\nAuthor:me\n\n|S"))
 ;;(def h (new net.davidashen.text.Hyphenator))
 ;;(def hyphens  (clojure.java.io/input-stream (clojure.java.io/resource "hyphen.tex")))
 ;;(.loadTable h hyphens)

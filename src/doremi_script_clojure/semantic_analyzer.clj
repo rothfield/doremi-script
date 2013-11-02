@@ -94,7 +94,7 @@
     node
     (assoc node :attributes (into [] nodes))))
 
-(defn- update-sargam-pitch-node [pitch nodes]
+(defn- update-sargam-pitch-node [pitch nodes syl]
   (let [
         upper-dots (count (filter #(= (:_my_type %) :upper_octave_dot) nodes))
         lower-dots (count (filter #(= (:_my_type %) :lower_octave_dot) nodes))
@@ -114,7 +114,8 @@
                                          :ending
                                          :mordent} (:_my_type %)) nodes)))
             :octave octave
-            :syllable (some #(if (= (:_my_type %) :syllable)  (:_source %)) nodes)
+            :syllable syl
+           ;;;  :syllable (some #(if (= (:_my_type %) :syllable)  (:_source %)) nodes)
             :chord (some #(if (= (:_my_type %) :chord_symbol)  (:_source %)) nodes)
             :ornament nil 
             :tala (some #(if (= (:_my_type %) :tala)  (:_source %)) nodes)
@@ -146,6 +147,17 @@
         column-for-node (fn[node]
                           (- (:_start_index node) (line-start-for (:_start_index node))))
 
+        lower-lines (filter #(= (:_my_type %) :lyrics_line) (:items sargam-section))
+        ;_ (println "sargam-section is")
+        ;_ (pprint sargam-section)
+        ;_ (println "--------end sargam-section is")
+        ;; _ (println "--------lower-lines is")
+        ;; _ (pprint lower-lines)
+        syls-to-apply (atom
+                        (map :_source (filter #(= :syllable (:_my_type %))
+                                       (mapcat #(:items %) lower-lines))))
+        ;; _ (println "syls-to-apply" syls-to-apply)
+        in-slur (atom false)
         postwalk-fn (fn sargam-section-postwalker[node]
                       (let [ my-type (:_my_type node)
                             column (if my-type (column-for-node node))
@@ -153,26 +165,32 @@
                             ]
                         (case my-type
                           :pitch
-                          (let [z 
-                                (filter #(= (:_my_type %) :ornament) 
-                                        (get column-map (inc column))) 
-                                ;; _ (pprint z) 
+                          (if (:pointer node)  ;; pitch_to_use case. Messy code!! TODO: rewrite? how
+                            node
+                          (let [
+                                ;; _ (println "pitch is "  "\n--------")
+                                ;; _ (pprint node)
+                                ;; _ (println "pitch is "  "\n--------")
+                                ;; _ (println "in-slur is " @in-slur)
+                                has-begin-slur (some (fn[x] (= :begin_slur (:_my_type x))) (:attributes node))
+                                has-end-slur (some (fn[x] (= :end_slur (:_my_type x))) (:attributes node))
                                 helper-fn (fn helper-fn[placement fct]
                                 (map #(assoc % :placement placement)
                                      (filter #(= :ornament (:_my_type %))
                                         (get column-map (fct column))))
                                             )
                                 orns (mapcat helper-fn [:before :after] [dec inc])
-                                ;; _ (pprint orns-before)
-                                ;; nodes-before-and-after)
-                                ;; nodes-before-and-after 
-                                ;; (concat (get column-map (inc column)) 
-                                ;;        (get column-map (dec column))) 
-                                ;; _ (println "nodes-before-and-after")
-                                ;; _ (pprint nodes-before-and-after)
+                                next-syl (first @syls-to-apply)
+                                my-syl (if (and next-syl
+                                                (not @in-slur))
+                                           (do (swap! syls-to-apply rest)
+                                               next-syl))
+                                ;; _ (println "my-syl is:" my-syl)
                                 ]
-                            (update-sargam-pitch-node node (concat nodes orns))
-                            )
+                            (if has-begin-slur (reset! in-slur true)) 
+                            (if has-end-slur (reset! in-slur false)) 
+                            (update-sargam-pitch-node node (concat nodes orns) my-syl)
+                            ))
                           ;; TODO: Actually only some nodes get this 
                           ;; treatment. And  
                           ;; update-sargam-pitch-node 
@@ -269,7 +287,9 @@
                               (swap! pitch-counter inc)
                               (assoc z :pitch-counter @pitch-counter))))
                         line)
-
+        all-syls []
+        ;; _ (println "line2:")
+        ;; _ (pprint line2)
         pitches (into []  (filter 
                             significant? (my-seq line2) ))
         line3 (postwalk (fn line3-postwalk[node-in-line]
@@ -337,7 +357,7 @@
                             my-result1 (assoc node-in-line 
                                               :case3 true
                                               :dash_to_tie true
-                                              :pitch_to_use_for_tie prev-pitch)
+                                              :pitch_to_use_for_tie (assoc prev-pitch :pointer true))
                             ]
                         ;; set dash_to_tie true ; tied true, and pitch_to_use_for_tie
                         (if my-tied
