@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all ]
             [clojure.pprint :refer :all ]
             [doremi_script_clojure.test-helper :refer :all ]
-            [clojure.walk :refer :all ]
+            [doremi_script_clojure.core :refer [doremi-script-parser ]]
             [instaparse.core :as insta]
             ))
 
@@ -62,7 +62,7 @@
 
 
 (defn parse-fails? [text-to-parse starting-production]
-  (let [result ((my-get-parser) text-to-parse :start starting-production)]
+  (let [result (doremi-script-parser text-to-parse :start starting-production)]
     (insta/failure? result)
     )
   )

@@ -4,6 +4,7 @@
 	(:require [clojure.test :refer :all ]
 						[clojure.pprint :refer :all ]
 						[doremi_script_clojure.test-helper :refer :all ]
+						[doremi_script_clojure.core :refer [slurp-fixture doremi-script-parser] ]
 						[instaparse.core :as insta]))
 
 (deftest composition_with_only_sargam_and_no_eol

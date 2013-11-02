@@ -1,29 +1,11 @@
 (ns doremi_script_clojure.test-helper
 	(:require [clojure.test :refer :all ]
+           [doremi_script_clojure.core :refer [doremi-script-parser]]
 		[clojure.pprint :refer :all ]
 		[instaparse.core :as insta]
 		))
   (use 'clojure.stacktrace)
 
-;;;(insta/set-default-output-format! :enlive)
-(defn slurp-fixture [file-name]
-	(slurp (clojure.java.io/resource 
-		(str "resources/fixtures/" file-name))))
-
-(def get-parser2  
-	(insta/parser
-		(slurp (clojure.java.io/resource "resources/doremiscript.ebnf")))
-	)
-
-(defn zzzpst[]
-   (print-stack-trace *e)
-)
-(defn my-get-parser [] 
-	(insta/parser
-		(slurp (clojure.java.io/resource "resources/doremiscript.ebnf")))
-	)
-
-(def yesterday (get-parser2 (slurp-fixture "yesterday.txt")))
 
 
 (defn trunc_aux [txt,len]
@@ -50,7 +32,7 @@
 	[txt start expected]
 	(println "Testing " (trunc txt)  "  with start " start " and expected " expected)
 	(let [ result 
-		((my-get-parser) txt :total false
+		(doremi-script-parser txt :total false
 			:start start)
 		flattened (flatten result)]
 		(letfn [(my-helper [x]
@@ -73,8 +55,7 @@
 					))
 		)))
 
-;(def my-tree ((my-get-parser) (slurp-fixture "yesterday.txt")))
-(def my-tree ((my-get-parser)  "S- --"))
+(def my-tree (doremi-script-parser  "S- --"))
 
 
 (defn transform-line [& args]
@@ -97,4 +78,4 @@
 )
 
 ;;(pprint my-transform)
-(pprint (get-parser2 "    \nauthor:john\ntitle:untitled\n\n    RG 1.___\n1) <SS#S> SS :|\nhe-llo"))
+(pprint (doremi-script-parser "    \nauthor:john\ntitle:untitled\n\n    RG 1.___\n1) <SS#S> SS :|\nhe-llo"))
