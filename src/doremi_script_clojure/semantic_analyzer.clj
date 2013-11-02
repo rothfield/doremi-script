@@ -115,7 +115,7 @@
                                          :mordent} (:_my_type %)) nodes)))
             :octave octave
             :syllable syl
-           ;;;  :syllable (some #(if (= (:_my_type %) :syllable)  (:_source %)) nodes)
+            ;;;  :syllable (some #(if (= (:_my_type %) :syllable)  (:_source %)) nodes)
             :chord (some #(if (= (:_my_type %) :chord_symbol)  (:_source %)) nodes)
             :ornament nil 
             :tala (some #(if (= (:_my_type %) :tala)  (:_source %)) nodes)
@@ -155,7 +155,7 @@
         ;; _ (pprint lower-lines)
         syls-to-apply (atom
                         (map :_source (filter #(= :syllable (:_my_type %))
-                                       (mapcat #(:items %) lower-lines))))
+                                              (mapcat #(:items %) lower-lines))))
         ;; _ (println "syls-to-apply" syls-to-apply)
         in-slur (atom false)
         postwalk-fn (fn sargam-section-postwalker[node]
@@ -167,30 +167,30 @@
                           :pitch
                           (if (:pointer node)  ;; pitch_to_use case. Messy code!! TODO: rewrite? how
                             node
-                          (let [
-                                ;; _ (println "pitch is "  "\n--------")
-                                ;; _ (pprint node)
-                                ;; _ (println "pitch is "  "\n--------")
-                                ;; _ (println "in-slur is " @in-slur)
-                                has-begin-slur (some (fn[x] (= :begin_slur (:_my_type x))) (:attributes node))
-                                has-end-slur (some (fn[x] (= :end_slur (:_my_type x))) (:attributes node))
-                                helper-fn (fn helper-fn[placement fct]
-                                (map #(assoc % :placement placement)
-                                     (filter #(= :ornament (:_my_type %))
-                                        (get column-map (fct column))))
-                                            )
-                                orns (mapcat helper-fn [:before :after] [dec inc])
-                                next-syl (first @syls-to-apply)
-                                my-syl (if (and next-syl
-                                                (not @in-slur))
+                            (let [
+                                  ;; _ (println "pitch is "  "\n--------")
+                                  ;; _ (pprint node)
+                                  ;; _ (println "pitch is "  "\n--------")
+                                  ;; _ (println "in-slur is " @in-slur)
+                                  has-begin-slur (some (fn[x] (= :begin_slur (:_my_type x))) (:attributes node))
+                                  has-end-slur (some (fn[x] (= :end_slur (:_my_type x))) (:attributes node))
+                                  helper-fn (fn helper-fn[placement fct]
+                                              (map #(assoc % :placement placement)
+                                                   (filter #(= :ornament (:_my_type %))
+                                                           (get column-map (fct column))))
+                                              )
+                                  orns (mapcat helper-fn [:before :after] [dec inc])
+                                  next-syl (first @syls-to-apply)
+                                  my-syl (if (and next-syl
+                                                  (not @in-slur))
                                            (do (swap! syls-to-apply rest)
                                                next-syl))
-                                ;; _ (println "my-syl is:" my-syl)
-                                ]
-                            (if has-begin-slur (reset! in-slur true)) 
-                            (if has-end-slur (reset! in-slur false)) 
-                            (update-sargam-pitch-node node (concat nodes orns) my-syl)
-                            ))
+                                  ;; _ (println "my-syl is:" my-syl)
+                                  ]
+                              (if has-begin-slur (reset! in-slur true)) 
+                              (if has-end-slur (reset! in-slur false)) 
+                              (update-sargam-pitch-node node (concat nodes orns) my-syl)
+                              ))
                           ;; TODO: Actually only some nodes get this 
                           ;; treatment. And  
                           ;; update-sargam-pitch-node 
@@ -204,7 +204,7 @@
     ))
 
 (defn- make-sorted-map[node]
- ;; (println "make-sorted-map" "node is" node) 
+  ;; (println "make-sorted-map" "node is" node) 
   (cond 
     (and (map? node) (= (into (hash-set) (keys node)) #{:numerator :denominator}))
     node
@@ -273,7 +273,8 @@
 ;                      column: 2 },
 ;                    { my_type: 'dash', source: '-', column: 3 },
 ;;
-(defn- handle-sargam-line-in-main-walk[line]
+(defn- tie-and-measure-pitches[line]
+  ;; Needs to be called from within collapse-sargam-section
   (let [
         pitch-counter (atom -1)
         significant? (fn significant2[x]
@@ -287,9 +288,6 @@
                               (swap! pitch-counter inc)
                               (assoc z :pitch-counter @pitch-counter))))
                         line)
-        all-syls []
-        ;; _ (println "line2:")
-        ;; _ (pprint line2)
         pitches (into []  (filter 
                             significant? (my-seq line2) ))
         line3 (postwalk (fn line3-postwalk[node-in-line]
@@ -354,6 +352,8 @@
                                                   (:pitch-counter node-in-line)))
                                           pitches))
                             my-tied (and next-item (= :dash (:_my_type next-item))) 
+                            ;;  _ (println "prev-pitch")
+                            ;;  _ (pprint prev-pitch)
                             my-result1 (assoc node-in-line 
                                               :case3 true
                                               :dash_to_tie true
@@ -430,7 +430,7 @@
                           :_start_index
                           :attributes
                           ]
-                          )
+  )
 (def default-attributes
   {:key "C"
    :mode "major"
@@ -439,12 +439,12 @@
    :notes_used ""
    :warnings []
    :time_signature "4/4"
-  :apply_hyphenated_lyrics false
-  :filename "untitled"
+   :apply_hyphenated_lyrics false
+   :filename "untitled"
    })
 
-  (def default-attribute-keys
-    (into #{} (keys default-attributes)))
+(def default-attribute-keys
+  (into #{} (keys default-attributes)))
 
 (defn- handle-composition-in-main-walk[node2]
   (let [
@@ -458,61 +458,61 @@
         (into [] (map  (fn[x] (some #(if (= :sargam_line (:_my_type %)) %) 
                                     (:items x))) sections))
         items-map2 
-          (into {} (map (fn[[k v]] [(keyword (lower-case (name k))) v]) (:items_map attribute-section)))
-       ;; _ (println "items-map2")
-       ;;  _ (pprint items-map2)
+        (into {} (map (fn[[k v]] [(keyword (lower-case (name k))) v]) (:items_map attribute-section)))
+        ;; _ (println "items-map2")
+        ;;  _ (pprint items-map2)
         ] 
     (assert (map? items-map2))
     (merge (dissoc node2 :items) {:lines  lines 
                                   :attributes 
                                   attribute-section
                                   }
-                                  default-attributes
-      (filter (fn[[k v]] (default-attribute-keys k)) 
-              items-map2)
-      )))
+           default-attributes
+           (filter (fn[[k v]] (default-attribute-keys k)) 
+                   items-map2)
+           )))
 
 (defn- handle-attribute-section [node]
   (let [
-       ;; _ (println "in handle-attribute-section")
-       ;;  _ (pprint node) 
+        ;; _ (println "in handle-attribute-section")
+        ;;  _ (pprint node) 
         ;; make keys keywords.
         items-map (apply array-map 
                          (map-indexed (fn [i v] 
                                         (if (even? i) 
                                           (keyword v)
-                                        ;;  (keyword (lower-case v)) 
+                                          ;;  (keyword (lower-case v)) 
                                           ;; else
-                                           v))  (:items node)))
+                                          v))  (:items node)))
         x (into [] (map (fn[[k v]] 
                           (str k " " v)
-                        {  :_my_type :attribute :key (name k) :value v }  
+                          {  :_my_type :attribute :key (name k) :value v }  
                           )
-                       
+
                         items-map))
         ]
-       ;;(pprint x)
-       ;; (merge node2 { :_my_type :attributes })
-       ;; (let [ [:ATTRIBUTE_SECTION [:ATTRIBUTE_SECTION_ITEMS pairs]] node
-        ;;  [:ATTRIBUTE_SECTION
-        ;;     [:ATTRIBUTE_SECTION_ITEMS "hi" "john" "author" "me"]]
-  ;; output looks like:
-   ;; { my_type: 'attributes',
-   ;;  items: 
-   ;;   [ { my_type: 'attribute', key: 'foo', value: 'bar', source: 'todo' },
+    ;;(pprint x)
+    ;; (merge node2 { :_my_type :attributes })
+    ;; (let [ [:ATTRIBUTE_SECTION [:ATTRIBUTE_SECTION_ITEMS pairs]] node
+    ;;  [:ATTRIBUTE_SECTION
+    ;;     [:ATTRIBUTE_SECTION_ITEMS "hi" "john" "author" "me"]]
+    ;; output looks like:
+    ;; { my_type: 'attributes',
+    ;;  items: 
+    ;;   [ { my_type: 'attribute', key: 'foo', value: 'bar', source: 'todo' },
     ;;    { my_type: 'attribute', key: 'hi', value: 'john', source: 'todo' } ],
-     ;; source: 'xx' },
-   ;;{:_start_index 0,
-   ;; :_source "hi:john\nauthor:me",
-   ;; :_my_type :attribute_section,
-   ;; :items ["hi" "john" "author" "me"]} 
+    ;; source: 'xx' },
+    ;;{:_start_index 0,
+    ;; :_source "hi:john\nauthor:me",
+    ;; :_my_type :attribute_section,
+    ;; :items ["hi" "john" "author" "me"]} 
     ;; (println "items-map" items-map)
     (assert (= :attribute_section (:_my_type  node)))
     (assert (:items node))
     (assert (vector? (:items node)))
     ;;(println "items-map:") (pprint items-map)
-   (merge node {:_source "TODO" :_my_type :attributes :items x :items_map items-map})
-  ))
+    (merge node {:_source "TODO" :_my_type :attributes :items x :items_map items-map})
+    ))
 
 (defn- main-walk[node txt]
   (if-not (vector? node) node
@@ -585,6 +585,19 @@
         my-map
         :CHORD_SYMBOL
         my-map
+        :END_SLUR_SARGAM_PITCH
+        ;; TODO: DRY with BEGIN_SLUR_SARGAM_PITCH
+        (let [
+              [_ my-pitch2 end-slur ] node
+              my-pitch (merge my-pitch2
+                              {
+                               :_source (:_source my-map)
+                               })
+              ]
+          ;; add end slur to attributes
+          (assoc my-pitch 
+                 :attributes
+                 (conj (into [] (:attributes my-pitch)) end-slur)))
         :BEGIN_SLUR_SARGAM_PITCH
         (let [
               [_ begin-slur my-pitch2] node
@@ -618,32 +631,35 @@
         my-map
         :LOWER_OCTAVE_DOT
         my-map
-        :LOWER_LOWER_OCTAVE_SYMBOL
-        my-map
-        :UPPER_OCTAVE_DOT
-        my-map 
-        :LINE_NUMBER  
-        my-map
-        :BEGIN_SLUR 
-        my-map
-        :END_SLUR 
-        my-map
-        :DASH
-        my-map
-        :BARLINE
-        (merge  my-map 
-               (sorted-map 
-                 :_my_type 
-                 (keyword (keyword (lower-case (name (get-in node [1 0])))))
-                 :is_barline true))
-:SARGAM_LINE
-(handle-sargam-line-in-main-walk node2)
+:LOWER_LOWER_OCTAVE_SYMBOL
+my-map
+:UPPER_OCTAVE_DOT
+my-map 
+:LINE_NUMBER  
+my-map
+:BEGIN_SLUR 
+my-map
+:END_SLUR 
+my-map
+:DASH
+my-map
+:BARLINE
+(merge  my-map 
+       (sorted-map 
+         :_my_type 
+         (keyword (keyword (lower-case (name (get-in node [1 0])))))
+         :is_barline true))
 :SARGAM_SECTION
 (let [collapsed
       (collapse-sargam-section 
         (merge (sorted-map :items (subvec node 1)) my-map)
-        txt)]
-  collapsed
+        txt)
+      ;; TODO: should this be moved into collapse-sargam-section ??
+      tied2 (tie-and-measure-pitches (some #(if (= (:_my_type %) :sargam_line) %) (:items collapsed)))
+      ]
+  (if false (println "collapsed"))
+  (if false (pprint collapsed)) 
+  (assoc collapsed :items [tied2])
   )
 :SARGAM_PITCH
 (let [
