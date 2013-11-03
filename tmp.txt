@@ -1,43 +1,231 @@
 [:COMPOSITION
  [:COMPOSITION_ITEMS
+  [:ATTRIBUTE_SECTION
+   [:ATTRIBUTE_SECTION_ITEMS
+    "Rag"
+    "Bhairavi"
+    "Tal"
+    "Tintal"
+    "Title"
+    "Bansuri"
+    "Author"
+    "Traditional"
+    "Source"
+    "AAK"
+    "Mode"
+    "phrygian"
+    "Filename"
+    "bansuriv3"
+    "Time"
+    "4/4"
+    "Key"
+    "D"]]
   [:SARGAM_SECTION
    [:UPPER_OCTAVE_LINE
     [:UPPER_OCTAVE_LINE_ITEMS [:UPPER_OCTAVE_DOT [:DOT "."]]]]
+   [:UPPER_OCTAVE_LINE
+    [:UPPER_OCTAVE_LINE_ITEMS
+     [:SARGAM_ORNAMENT
+      [:SARGAM_ORNAMENT_ITEMS [:SARGAM_MUSICAL_CHAR [:g]]]]]]
+   [:UPPER_OCTAVE_LINE
+    [:UPPER_OCTAVE_LINE_ITEMS
+     [:UPPER_OCTAVE_DOT [:DOT "."]]
+     [:UPPER_OCTAVE_DOT [:DOT "."]]
+     [:UPPER_OCTAVE_DOT [:DOT "."]]]]
    [:SARGAM_LINE
     [:SARGAM_LINE_ITEMS
+     [:BARLINE [:SINGLE_BARLINE "|"]]
+     [:MEASURE
+      [:MEASURE_ITEMS
+       [:BEAT
+        [:BEAT_UNDELIMITED_ITEMS
+         [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:g]]]]]
+       [:BEAT
+        [:BEAT_UNDELIMITED_ITEMS
+         [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:m]]]]]
+       [:BEAT
+        [:BEAT_UNDELIMITED_ITEMS
+         [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:d]]]]]
+       [:BEAT
+        [:BEAT_UNDELIMITED_ITEMS
+         [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:n]]]]]]]
+     [:BARLINE [:SINGLE_BARLINE "|"]]
      [:MEASURE
       [:MEASURE_ITEMS
        [:BEAT
         [:BEAT_UNDELIMITED_ITEMS
          [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:S]]]]]
-       [:BEAT [:BEAT_UNDELIMITED_ITEMS [:DASHES [:DASH "-"]]]]]]]]]]]
-"Elapsed time: 16.279205 msecs"
+       [:BEAT [:BEAT_UNDELIMITED_ITEMS [:DASHES [:DASH "-"]]]]
+       [:BEAT
+        [:BEAT_UNDELIMITED_ITEMS
+         [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:r]]]]]
+       [:BEAT
+        [:BEAT_UNDELIMITED_ITEMS
+         [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:S]]]]]]]
+     [:BARLINE [:SINGLE_BARLINE "|"]]]]
+   [:LYRICS_LINE
+    [:LYRICS_LINE_ITEMS
+     [:SYLLABLE "ji-"]
+     [:SYLLABLE "na"]
+     [:SYLLABLE "ja-"]
+     [:SYLLABLE "u"]
+     [:SYLLABLE "san-"]
+     [:SYLLABLE "ga"]]]]]]
+"Elapsed time: 35.566543 msecs"
 {:_my_type :composition,
- :_source ".\nS -",
+ :_source
+ "Rag:Bhairavi\nTal:Tintal\nTitle:Bansuri\nAuthor:Traditional\nSource:AAK\nMode: phrygian\nFilename: bansuriv3\nTime: 4/4\nKey: D\n\n               .\n              <g>\n            .   . .\n| g m d n | S - r S |\nji-na ja-u san-ga\n",
  :_start_index 0,
  :apply_hyphenated_lyrics false,
- :attributes nil,
- :author "",
- :filename "untitled",
+ :attributes
+ {:_my_type :attributes,
+  :_source "TODO",
+  :_start_index 0,
+  :items
+  [{:_my_type :attribute, :key "Rag", :value "Bhairavi"}
+   {:_my_type :attribute, :key "Tal", :value "Tintal"}
+   {:_my_type :attribute, :key "Title", :value "Bansuri"}
+   {:_my_type :attribute, :key "Author", :value "Traditional"}
+   {:_my_type :attribute, :key "Source", :value "AAK"}
+   {:_my_type :attribute, :key "Mode", :value "phrygian"}
+   {:_my_type :attribute, :key "Filename", :value "bansuriv3"}
+   {:_my_type :attribute, :key "Time", :value "4/4"}
+   {:_my_type :attribute, :key "Key", :value "D"}],
+  :items_map
+  {:Author "Traditional",
+   :Filename "bansuriv3",
+   :Key "D",
+   :Mode "phrygian",
+   :Rag "Bhairavi",
+   :Source "AAK",
+   :Tal "Tintal",
+   :Time "4/4",
+   :Title "Bansuri"}},
+ :author "Traditional",
+ :filename "bansuriv3",
  :force_sargam_chars_hash {},
- :key "C",
+ :key "D",
  :lines
  [{:_my_type :sargam_line,
-   :_source "S -",
-   :_start_index 2,
+   :_source "| g m d n | S - r S |",
+   :_start_index 176,
    :items
-   [{:_my_type :measure,
-     :_source "S -",
-     :_start_index 2,
+   [{:_my_type :single_barline,
+     :_source "|",
+     :_start_index 176,
+     :is_barline true}
+    {:_my_type :measure,
+     :_source " g m d n ",
+     :_start_index 177,
+     :items
+     [{:_my_type :beat,
+       :_source "g",
+       :_start_index 178,
+       :_subdivisions 1,
+       :items
+       [{:_my_type :pitch,
+         :_source "g",
+         :_start_index 178,
+         :attributes [],
+         :beat-counter 0,
+         :chord nil,
+         :column_offset 0,
+         :denominator 1,
+         :fraction_array [{:numerator 1, :denominator 1}],
+         :normalized_pitch "Eb",
+         :numerator 1,
+         :octave 0,
+         :ornament nil,
+         :pitch-counter 0,
+         :pitch_source "g",
+         :syllable "ji-",
+         :tala nil,
+         :value :g}]}
+      {:_my_type :beat,
+       :_source "m",
+       :_start_index 180,
+       :_subdivisions 1,
+       :items
+       [{:_my_type :pitch,
+         :_source "m",
+         :_start_index 180,
+         :attributes [],
+         :beat-counter 0,
+         :chord nil,
+         :column_offset 0,
+         :denominator 1,
+         :fraction_array [{:numerator 1, :denominator 1}],
+         :normalized_pitch "F",
+         :numerator 1,
+         :octave 0,
+         :ornament nil,
+         :pitch-counter 1,
+         :pitch_source "m",
+         :syllable "na",
+         :tala nil,
+         :value :m}]}
+      {:_my_type :beat,
+       :_source "d",
+       :_start_index 182,
+       :_subdivisions 1,
+       :items
+       [{:_my_type :pitch,
+         :_source "d",
+         :_start_index 182,
+         :attributes [],
+         :beat-counter 0,
+         :chord nil,
+         :column_offset 0,
+         :denominator 1,
+         :fraction_array [{:numerator 1, :denominator 1}],
+         :normalized_pitch "Ab",
+         :numerator 1,
+         :octave 0,
+         :ornament nil,
+         :pitch-counter 2,
+         :pitch_source "d",
+         :syllable "ja-",
+         :tala nil,
+         :value :d}]}
+      {:_my_type :beat,
+       :_source "n",
+       :_start_index 184,
+       :_subdivisions 1,
+       :items
+       [{:_my_type :pitch,
+         :_source "n",
+         :_start_index 184,
+         :attributes [],
+         :beat-counter 0,
+         :chord nil,
+         :column_offset 0,
+         :denominator 1,
+         :fraction_array [{:numerator 1, :denominator 1}],
+         :normalized_pitch "Bb",
+         :numerator 1,
+         :octave 0,
+         :ornament nil,
+         :pitch-counter 3,
+         :pitch_source "n",
+         :syllable "u",
+         :tala nil,
+         :value :n}]}]}
+    {:_my_type :single_barline,
+     :_source "|",
+     :_start_index 186,
+     :is_barline true}
+    {:_my_type :measure,
+     :_source " S - r S ",
+     :_start_index 187,
      :items
      [{:_my_type :beat,
        :_source "S",
-       :_start_index 2,
+       :_start_index 188,
        :_subdivisions 1,
        :items
        [{:_my_type :pitch,
          :_source "S",
-         :_start_index 2,
+         :_start_index 188,
          :attributes [],
          :beat-counter 0,
          :chord nil,
@@ -48,31 +236,31 @@
          :numerator 1,
          :octave 1,
          :ornament nil,
-         :pitch-counter 0,
+         :pitch-counter 4,
          :pitch_source "S",
-         :syllable nil,
+         :syllable "san-",
          :tala nil,
          :tied true,
          :value :S}]}
       {:_my_type :beat,
        :_source "-",
-       :_start_index 4,
+       :_start_index 190,
        :_subdivisions 1,
        :items
        [{:_my_type :dash,
          :_source "-",
-         :_start_index 4,
+         :_start_index 190,
          :beat-counter 0,
          :case3 true,
          :dash_to_tie true,
          :denominator 1,
          :fraction_array [{:numerator 1, :denominator 1}],
          :numerator 1,
-         :pitch-counter 1,
+         :pitch-counter 5,
          :pitch_to_use_for_tie
          {:_my_type :pitch,
           :_source "S",
-          :_start_index 2,
+          :_start_index 188,
           :attributes [],
           :chord nil,
           :column_offset 0,
@@ -82,13 +270,63 @@
           :numerator 1,
           :octave 1,
           :ornament nil,
-          :pitch-counter 0,
+          :pitch-counter 4,
           :pitch_source "S",
           :pointer true,
-          :syllable nil,
+          :syllable "san-",
           :tala nil,
-          :value :S}}]}]}]}],
- :mode "major",
+          :value :S}}]}
+      {:_my_type :beat,
+       :_source "r",
+       :_start_index 192,
+       :_subdivisions 1,
+       :items
+       [{:_my_type :pitch,
+         :_source "r",
+         :_start_index 192,
+         :attributes [],
+         :beat-counter 0,
+         :chord nil,
+         :column_offset 0,
+         :denominator 1,
+         :fraction_array [{:numerator 1, :denominator 1}],
+         :normalized_pitch "Db",
+         :numerator 1,
+         :octave 1,
+         :ornament nil,
+         :pitch-counter 6,
+         :pitch_source "r",
+         :syllable "ga",
+         :tala nil,
+         :value :r}]}
+      {:_my_type :beat,
+       :_source "S",
+       :_start_index 194,
+       :_subdivisions 1,
+       :items
+       [{:_my_type :pitch,
+         :_source "S",
+         :_start_index 194,
+         :attributes [],
+         :beat-counter 0,
+         :chord nil,
+         :column_offset 0,
+         :denominator 1,
+         :fraction_array [{:numerator 1, :denominator 1}],
+         :normalized_pitch "C",
+         :numerator 1,
+         :octave 1,
+         :ornament nil,
+         :pitch-counter 7,
+         :pitch_source "S",
+         :syllable nil,
+         :tala nil,
+         :value :S}]}]}
+    {:_my_type :single_barline,
+     :_source "|",
+     :_start_index 196,
+     :is_barline true}]}],
+ :mode "phrygian",
  :notes_used "",
  :time_signature "4/4",
  :warnings []}

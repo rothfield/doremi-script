@@ -563,7 +563,6 @@
         ;;                           placement: 'before' } 
         ;;   Ornaments can be before or after a pitch. Set :placement to  "before"
         ;;   or "after"
-        ;;  (pprint node)
         (let [
               my-items (:items node2)
               node3 (dissoc node2 :items)
@@ -576,7 +575,9 @@
              :usable_source (:_source node2)
              :ornament_items (into [] 
                                    (map (fn[x] 
-                                          (merge x {:_my_type  :pitch} 
+                                          ;; TODO
+                                          (merge x {:pointer true 
+                                                    :_my_type  :pitch} 
                                                  )
                                           )
                                         my-items))
