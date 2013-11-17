@@ -13,4 +13,8 @@ var parser=DoremiScriptParser
 var source= fs.readFileSync('/dev/stdin').toString()
 var composition=parser.parse(source)
 composition.source=source
-process.stdout.write(JSON.stringify(composition,false,null)+"\n")
+// Doesn't pretty print:
+// process.stdout.write(JSON.stringify(composition,false,null)+"\n")
+//
+// pretty print the output
+process.stdout.write(JSON.stringify(composition,null,4)+"\n")
