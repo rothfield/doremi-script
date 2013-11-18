@@ -2,6 +2,7 @@
 /target
 /lib
 /classes
+/resources/fixtures/tmp
 /checkouts
 pom.xml
 pom.xml.asc
