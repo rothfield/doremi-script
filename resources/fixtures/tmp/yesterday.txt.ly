@@ -54,17 +54,17 @@ melody = {
 \key f \major
 \time 4/4
 \autoBeamOn  
-| d'8^"F" c'8 c'4~ c'4~ c'4~ | c'4 e'8 fs'8 gs'8^"A7" a'8 b'8 c''8 | b'4^"Dmi" a'8 a'8~ a'4~ a'4 | \break
- | r4 a'8 a'8 g'8^"C7" f'8 e'8 d'8 | f'4^"F" e'8 e'8~ e'4 d'4^"C/E" | c'4^"Dmi" e'4 d'4^"G" a4 | c'4^"Bb" e'8 e'8~ e'4~ e'4 | \break
- | d'8^"F" c'8 c'4~ c'4~ c'4~ | c'4 e'8 fs'8 gs'8^"A7" a'8 b'8 c''8 | b'4^"Dmi" a'8 a'8~ a'4~ a'4 | \break
- | r4 a'8 a'8 g'8^"C7" f'8 e'8 d'8 | f'4^"F" e'8 e'8~ e'4 d'4^"C/E" | c'4^"Dmi" e'4 d'4^"G" a4 | c'4^"Bb" e'8 e'8~ e'4~ e'4 \bar ":|"  \break
- \bar "||"  e'4~^"A11" e'4 e'4~^"A7" e'4 | a'4^"Dmi" b'4^"C" c''4^"Bb" b'8^"Dmi/A" a'8 | b'4~^"G" b'8 a'8 g'4^"C" a'8 e'8~ | e'4~ e'4~ e'4~ e'4 | \break
- | e'4~^"A11" e'4 e'4~^"A7" e'4 | a'4^"Dmi" b'4^"C" c''4^"Bb" b'8^"Dmi/A" a'8 | b'4~^"Gm" b'8 a'8 g'4^"C" b'4 | c''4(^"1_____"^"F" g'4 f'4 e'4 \bar ":|"  c''4~^"2______"^"F" c'4~ c'4~ c'4 \bar "||"  \break
+\bar "|"  d'8^"F" c'8 c'4~ c'4~ c'4~ \bar "|"  c'4 e'8 fs'8 gs'8^"A7" a'8 b'8 c''8 \bar "|"  b'4^"Dmi" a'8 a'8~ a'4~ a'4 \bar "|"  \break
+ \bar "|"  r4 a'8 a'8 g'8^"C7" f'8 e'8 d'8 \bar "|"  f'4^"F" e'8 e'8~ e'4 d'4^"C/E" \bar "|"  c'4^"Dmi" e'4 d'4^"G" a4 \bar "|"  c'4^"Bb" e'8 e'8~ e'4~ e'4 \bar "|"  \break
+ \bar "|"  d'8^"F" c'8 c'4~ c'4~ c'4~ \bar "|"  c'4 e'8 fs'8 gs'8^"A7" a'8 b'8 c''8 \bar "|"  b'4^"Dmi" a'8 a'8~ a'4~ a'4 \bar "|"  \break
+ \bar "|"  r4 a'8 a'8 g'8^"C7" f'8 e'8 d'8 \bar "|"  f'4^"F" e'8 e'8~ e'4 d'4^"C/E" \bar "|"  c'4^"Dmi" e'4 d'4^"G" a4 \bar "|"  c'4^"Bb" e'8 e'8~ e'4~ e'4 \bar ":|"  \break
+ \bar "||"  e'4~^"A11" e'4 e'4~^"A7" e'4 \bar "|"  a'4^"Dmi" b'4^"C" c''4^"Bb" b'8^"Dmi/A" a'8 \bar "|"  b'4~^"G" b'8 a'8 g'4^"C" a'8 e'8~ \bar "|"  e'4~ e'4~ e'4~ e'4 \bar "|"  \break
+ \bar "|"  e'4~^"A11" e'4 e'4~^"A7" e'4 \bar "|"  a'4^"Dmi" b'4^"C" c''4^"Bb" b'8^"Dmi/A" a'8 \bar "|"  b'4~^"Gm" b'8 a'8 g'4^"C" b'4 \bar "|"  c''4(^"1_____"^"F" g'4 f'4 e'4) \bar ":|"  c''4~^"2______"^"F" c''4~ c''4~ c''4 \bar "||"  \break
 
 }
 
 text = \lyricmode {
- yes- ter day all my trou- bles seemed so far a- way now it looks as though they're here to stay oh I be- lieve in Yes- ter- day sudd- en- ly I'm not half the man I used to be theres a sha- dow hang- ing o- ver me Oh I be- lieve in Yes- ter- day why she had to go I don't know she would- n't say I said some- thing wrong now I long for yes- ter- day
+ yes- ter day all my trou- bles seemed so far a- way now it looks as though they're here to stay oh I be- lieve in Yes- ter- day sudd- en- ly I'm not half the man I used to be theres a sha- dow hang- ing o- ver me Oh I be- lieve in Yes- ter- day why she had to go I don't know she would- n't say I said some- thing wrong now I long for yes- ter- day day
 }
 
 \score{

@@ -459,11 +459,11 @@
                                     (:items x))) sections))
         items-map2 
         (into {} (map (fn[[k v]] [(keyword (lower-case (name k))) v]) (:items_map attribute-section)))
-        ;; _ (println "items-map2")
-        ;;  _ (pprint items-map2)
+        lines2 (map #(assoc % :kind "latin_sargam") lines)
         ] 
     (assert (map? items-map2))
-    (merge (dissoc node2 :items) {:lines  lines 
+    (merge (dissoc node2 :items) {
+                                  :lines  lines2 
                                   :attributes 
                                   attribute-section
                                   }
@@ -474,8 +474,6 @@
 
 (defn- handle-attribute-section [node]
   (let [
-        ;; _ (println "in handle-attribute-section")
-        ;;  _ (pprint node) 
         ;; make keys keywords.
         items-map (apply array-map 
                          (map-indexed (fn [i v] 
@@ -582,6 +580,29 @@
                                           )
                                         my-items))
              }))
+        :MEASURE
+    ;; [:MEASURE
+    ;;  [:BARLINE [:LEFT_REPEAT "|:"]]
+    ;;  [:MEASURE_ITEMS
+    ;;          [:BEAT
+    ;;             [:BEAT_UNDELIMITED_ITEMS
+    ;;                             [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:S]]]]]]
+    ;;  [:BARLINE [:SINGLE_BARLINE "|"]]]
+      (let [ might-be-barline (second node) 
+              my-items2  
+        (if (:is_barline (second node))
+          (into [(second node)] (rest (nth node 2)))
+          ;; else
+          (:items node2) 
+          )
+           my-items3
+        (if (:is_barline (last node))
+          (conj my-items2 (last node))
+          my-items2
+          )
+            beat-count (count (filter #(= (:_my_type %) :beat) my-items3))
+            ]
+        (assoc my-map :beat_count beat-count :is_partial true :items my-items3))
         :TALA 
         my-map
         :CHORD_SYMBOL
@@ -660,7 +681,7 @@ my-map
       ]
   (if false (println "collapsed"))
   (if false (pprint collapsed)) 
-  (assoc collapsed :items [tied2])
+  (assoc collapsed :kind "latin_sargam" :items [tied2])
   )
 :SARGAM_PITCH
 (let [
