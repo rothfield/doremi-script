@@ -29,13 +29,13 @@
                          result))))
 
 
-(def x "   Fm7\n   +\n1) S\n   Hi")
 ;; (my-test yesterday)
 ;;(my-test "(SRG-\n.\nhe-llo john")
 ;; (my-test "(PG) | S G P | S\nOh say can you see")
-;; (my-test ".\nS -")
+;;(my-test ".\nS -")
 ;; (my-test "R\n    .\n| S")
-(my-test (slurp-fixture "ornament_before.txt"))
+(my-test "| S R\nHello")
+;;(my-test (slurp-fixture "ornament_before.txt"))
 ;; (my-test (slurp-fixture "ornament_after_with_octave.txt"))
 ;;(my-test (slurp-fixture "problem.txt"))
 ;;(my-test (slurp-fixture "yesterday.txt"))

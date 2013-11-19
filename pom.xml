@@ -16,7 +16,7 @@
   <scm>
     <connection>scm:git:git://github.com/rothfield/doremi-script-clojure.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/rothfield/doremi-script-clojure.git</developerConnection>
-    <tag>4bf442bc175558102897ec4b11842fffeace6216
+    <tag>bbc0587ef955dd8e90060fbdade9cb331abf49ad
 </tag>
     <url>https://github.com/rothfield/doremi-script-clojure</url>
   </scm>
@@ -78,9 +78,9 @@
       <version>1.2.2</version>
     </dependency>
     <dependency>
-      <groupId>net.davidashen</groupId>
-      <artifactId>texhypj</artifactId>
-      <version>1.0</version>
+      <groupId>com.googlecode.texhyphj</groupId>
+      <artifactId>texhyphj</artifactId>
+      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>

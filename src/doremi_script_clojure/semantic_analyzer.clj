@@ -1,12 +1,34 @@
 (ns doremi_script_clojure.semantic_analyzer
   "Semantic analysis is the activity of a compiler to determine what the types of various values are, how those types interact in expressions, and whether those interactions are semantically reasonable. "
+  (:import (net.davidashen.text Hyphenator))
   (:require	
+   ;; [doremi_script_clojure.core :refer [hyphenate]]
+
     [clojure.pprint :refer [pprint]] 
+    [clojure.java.io :refer [input-stream resource]]
+    [clojure.set :refer [union]] 
     [clojure.walk :refer [postwalk-demo postwalk
                           postwalk-replace keywordize-keys]]
     [clojure.string :refer [split lower-case]]
     ))
 
+(def hyphenator 
+  (memoize 
+    (fn []
+      (let [h (new Hyphenator)]
+        (.loadTable 
+          h (input-stream (resource "hyphen.tex")))
+        h))))
+
+(def hyphenator-splitting-char (char 173))
+
+(defn hyphenate[txt]
+  " (hyphenate \"happy birthday\") => 
+  (hap- py birth- day)
+  "
+  (let [hyphenated (.hyphenate (hyphenator) txt)
+   hyphenated2 (clojure.string/replace hyphenated (char 173) \-)]
+    (re-seq  #"\w+-?" hyphenated2)))
 
 ;; controlling scope:
 ;; srruby: defn- is just defn + ^:private, which can be put on any def
@@ -139,16 +161,17 @@
   (assert (= (:_my_type sargam-section) :sargam_section))
   (assert (string? txt))
   (let [
+        assigned (atom #{})
         sargam-line (some #(if (= (:_my_type %) :sargam_line) %)
                           (:items sargam-section))
         ;; TODO: make atom of column-map
         column-map (reduce line-column-map {}  (:items sargam-section))
         _ (if false (do
-                     (println "**** sargam-section")
-                     (pprint sargam-section)
-                     (println "**** column-map")
-                     (pprint column-map)
-                     ))
+                      (println "**** sargam-section")
+                      (pprint sargam-section)
+                      (println "**** column-map")
+                      (pprint column-map)
+                      ))
         line-starts (map :_start_index (:items sargam-section))
         line-start-for  (fn line-start-for-fn[column] 
                           (last (filter (fn[x] (>= column x)) line-starts)) )
@@ -163,9 +186,15 @@
                       ;; _ (println "--------lower-lines is")
                       ;; _ (pprint lower-lines)
                       ))
-        syls-to-apply (atom
-                        (map :_source (filter #(= :syllable (:_my_type %))
-                                              (mapcat #(:items %) lower-lines))))
+        syls-to-apply1 (map :_source (filter #(= :syllable (:_my_type %))
+                                             (mapcat #(:items %) lower-lines)))
+        syls-str2 (apply str (interpose " " syls-to-apply1))
+        syls-to-apply (atom (hyphenate syls-str2))
+        _ (if false (do
+                      (println "****syls-str2")
+                      (pprint syls-str2)
+                      (println "****syls-to-apply2")
+                      (pprint @syls-to-apply)))
         ;; _ (println "syls-to-apply" syls-to-apply)
         in-slur (atom false)
         postwalk-fn (fn sargam-section-postwalker[node]
@@ -185,20 +214,23 @@
                                   ;; _ (println "in-slur is " @in-slur)
                                   has-begin-slur (some (fn[x] (= :begin_slur (:_my_type x))) (:attributes node))
                                   has-end-slur (some (fn[x] (= :end_slur (:_my_type x))) (:attributes node))
-                                  all-orns (filter #(= :ornament (:_my_type %)) (my-seq sargam-section))
+                                  all-orns1 (filter #(= :ornament (:_my_type %)) (my-seq sargam-section))
+                                  all-orns (filter #(not (@assigned %)) all-orns1)
+
                                   _ (if false (do (println "all-orns *****")
-                                  (pprint all-orns) 
-                                  (println "all-orns *****")))
+                                                  (pprint all-orns) 
+                                                  (println "all-orns *****")))
                                   ;; To find the orns before, look at each ornament and
                                   ;; find the ones where column + length of source is one less
                                   ;; than the pitch's column
                                   orns-before (map #(assoc % :placement :before)
-                                                  (filter #(= column (+ (count (:_source %)) (column-for-node %)))
-                                                          all-orns))
+                                                   (filter #(= column (+ (count (:_source %)) (column-for-node %)))
+                                                           all-orns))
                                   orns-after (map #(assoc % :placement :after)
-                                                   (filter #(= :ornament (:_my_type %))
-                                                           (get column-map (inc column))))
+                                                  (filter #(= column (inc (column-for-node %)))
+                                                          all-orns))
                                   orns (concat orns-before orns-after)
+                                  _ (swap! assigned clojure.set/union @assigned (set orns))
 
                                   ;; _ (println "orns****" orns)
                                   next-syl (first @syls-to-apply)
@@ -210,6 +242,7 @@
                                   ]
                               (if has-begin-slur (reset! in-slur true)) 
                               (if has-end-slur (reset! in-slur false)) 
+
                               (update-sargam-pitch-node node (concat nodes orns) my-syl)
                               ))
                           ;; TODO: Actually only some nodes get this 

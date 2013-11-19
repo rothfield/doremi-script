@@ -1,6 +1,5 @@
 (ns doremi_script_clojure.core
   (:gen-class)
-  (:import (net.davidashen.text Hyphenator))
   (:require	
     [instaparse.core :as insta]
     [doremi_script_clojure.semantic_analyzer :refer [transform-parse-tree]]
@@ -8,24 +7,6 @@
     [clojure.data.json :as json]
     ))
 
-(def hyphenator 
-  (memoize 
-    (fn []
-      (println "Loading hyphen.tex")
-      (let [h (new Hyphenator)]
-        (.loadTable 
-          h (input-stream (resource "hyphen.tex")))
-        h))))
-
-(def hyphenator-splitting-char (char 173))
-
-(defn hyphenate[txt]
-  " (hyphenate \"happy birthday\") => 
-  (hap- py birth- day)
-  "
-  (let [hyphenated (.hyphenate (hyphenator) txt)
-   hyphenated2 (clojure.string/replace hyphenated (char 173) \-)]
-    (re-seq  #"\w+-?" hyphenated2)))
 
 (defn- json-key-fn[x]
   (let [y (name x)]
