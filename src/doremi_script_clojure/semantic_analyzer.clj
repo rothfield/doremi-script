@@ -126,6 +126,8 @@
 
 
 (defn- collapse-sargam-section [sargam-section txt]
+  ;; TODO: use atom to manage items removed from column map. And an atom to track unassigned
+  ;; items. column-map needs to be mutable.
   ;; (pprint sargam-section) (println "************^^^^")
   "main logic related to lining up columns is here"
   "Deals with the white-space significant aspect of doremi-script"
@@ -139,8 +141,14 @@
   (let [
         sargam-line (some #(if (= (:_my_type %) :sargam_line) %)
                           (:items sargam-section))
+        ;; TODO: make atom of column-map
         column-map (reduce line-column-map {}  (:items sargam-section))
-        ;; _ (pprint column-map)
+        _ (if false (do
+                     (println "**** sargam-section")
+                     (pprint sargam-section)
+                     (println "**** column-map")
+                     (pprint column-map)
+                     ))
         line-starts (map :_start_index (:items sargam-section))
         line-start-for  (fn line-start-for-fn[column] 
                           (last (filter (fn[x] (>= column x)) line-starts)) )
@@ -148,11 +156,13 @@
                           (- (:_start_index node) (line-start-for (:_start_index node))))
 
         lower-lines (filter #(= (:_my_type %) :lyrics_line) (:items sargam-section))
-        ;_ (println "sargam-section is")
-        ;_ (pprint sargam-section)
-        ;_ (println "--------end sargam-section is")
-        ;; _ (println "--------lower-lines is")
-        ;; _ (pprint lower-lines)
+        _ (if false (do
+                      (println "sargam-section is")
+                      (pprint sargam-section)
+                      ;_ (println "--------end sargam-section is")
+                      ;; _ (println "--------lower-lines is")
+                      ;; _ (pprint lower-lines)
+                      ))
         syls-to-apply (atom
                         (map :_source (filter #(= :syllable (:_my_type %))
                                               (mapcat #(:items %) lower-lines))))
@@ -166,7 +176,8 @@
                         (case my-type
                           :pitch
                           (if (:pointer node)  ;; pitch_to_use case. Messy code!! TODO: rewrite? how
-                            node
+                            node ;;
+                            ;; else
                             (let [
                                   ;; _ (println "pitch is "  "\n--------")
                                   ;; _ (pprint node)
@@ -174,12 +185,22 @@
                                   ;; _ (println "in-slur is " @in-slur)
                                   has-begin-slur (some (fn[x] (= :begin_slur (:_my_type x))) (:attributes node))
                                   has-end-slur (some (fn[x] (= :end_slur (:_my_type x))) (:attributes node))
-                                  helper-fn (fn helper-fn[placement fct]
-                                              (map #(assoc % :placement placement)
+                                  all-orns (filter #(= :ornament (:_my_type %)) (my-seq sargam-section))
+                                  _ (if false (do (println "all-orns *****")
+                                  (pprint all-orns) 
+                                  (println "all-orns *****")))
+                                  ;; To find the orns before, look at each ornament and
+                                  ;; find the ones where column + length of source is one less
+                                  ;; than the pitch's column
+                                  orns-before (map #(assoc % :placement :before)
+                                                  (filter #(= column (+ (count (:_source %)) (column-for-node %)))
+                                                          all-orns))
+                                  orns-after (map #(assoc % :placement :after)
                                                    (filter #(= :ornament (:_my_type %))
-                                                           (get column-map (fct column))))
-                                              )
-                                  orns (mapcat helper-fn [:before :after] [dec inc])
+                                                           (get column-map (inc column))))
+                                  orns (concat orns-before orns-after)
+
+                                  ;; _ (println "orns****" orns)
                                   next-syl (first @syls-to-apply)
                                   my-syl (if (and next-syl
                                                   (not @in-slur))
@@ -581,28 +602,28 @@
                                         my-items))
              }))
         :MEASURE
-    ;; [:MEASURE
-    ;;  [:BARLINE [:LEFT_REPEAT "|:"]]
-    ;;  [:MEASURE_ITEMS
-    ;;          [:BEAT
-    ;;             [:BEAT_UNDELIMITED_ITEMS
-    ;;                             [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:S]]]]]]
-    ;;  [:BARLINE [:SINGLE_BARLINE "|"]]]
-      (let [ might-be-barline (second node) 
+        ;; [:MEASURE
+        ;;  [:BARLINE [:LEFT_REPEAT "|:"]]
+        ;;  [:MEASURE_ITEMS
+        ;;          [:BEAT
+        ;;             [:BEAT_UNDELIMITED_ITEMS
+        ;;                             [:SARGAM_PITCH [:SARGAM_MUSICAL_CHAR [:S]]]]]]
+        ;;  [:BARLINE [:SINGLE_BARLINE "|"]]]
+        (let [ might-be-barline (second node) 
               my-items2  
-        (if (:is_barline (second node))
-          (into [(second node)] (rest (nth node 2)))
-          ;; else
-          (:items node2) 
-          )
-           my-items3
-        (if (:is_barline (last node))
-          (conj my-items2 (last node))
-          my-items2
-          )
-            beat-count (count (filter #(= (:_my_type %) :beat) my-items3))
-            ]
-        (assoc my-map :beat_count beat-count :is_partial true :items my-items3))
+              (if (:is_barline (second node))
+                (into [(second node)] (rest (nth node 2)))
+                ;; else
+                (:items node2) 
+                )
+              my-items3
+              (if (:is_barline (last node))
+                (conj my-items2 (last node))
+                my-items2
+                )
+              beat-count (count (filter #(= (:_my_type %) :beat) my-items3))
+              ]
+          (assoc my-map :beat_count beat-count :is_partial true :items my-items3))
         :TALA 
         my-map
         :CHORD_SYMBOL
@@ -632,27 +653,27 @@
           (assoc my-pitch 
                  :attributes
                  (conj (into [] (:attributes my-pitch)) begin-slur)))
-        :UPPER_OCTAVE_LINE
-        (merge  my-map (array-map :items (subvec node 1)))
-        :SYLLABLE
-        my-map 
-        :ALTERNATE_ENDING_INDICATOR
-        ; { my_type: 'ending', source: '1.____', n    um: 1, column: 2 }
-        (merge my-map {:_my_type :ending :num 99 })
-        :COMPOSITION 
-        (handle-composition-in-main-walk node2)
-        :PITCH_WITH_DASHES
-        (handle-pitch-with-dashes-in-main-walk node)
-        :DASHES
-        (handle-pitch-with-dashes-in-main-walk node)
-        :BEAT
-        (handle-beat-in-main-walk node2)
-        :MORDENT
-        my-map
-        :UPPER_UPPER_OCTAVE_SYMBOL
-        my-map
-        :LOWER_OCTAVE_DOT
-        my-map
+:UPPER_OCTAVE_LINE
+(merge  my-map (array-map :items (subvec node 1)))
+:SYLLABLE
+my-map 
+:ALTERNATE_ENDING_INDICATOR
+; { my_type: 'ending', source: '1.____', n    um: 1, column: 2 }
+(merge my-map {:_my_type :ending :num 99 })
+:COMPOSITION 
+(handle-composition-in-main-walk node2)
+:PITCH_WITH_DASHES
+(handle-pitch-with-dashes-in-main-walk node)
+:DASHES
+(handle-pitch-with-dashes-in-main-walk node)
+:BEAT
+(handle-beat-in-main-walk node2)
+:MORDENT
+my-map
+:UPPER_UPPER_OCTAVE_SYMBOL
+my-map
+:LOWER_OCTAVE_DOT
+my-map
 :LOWER_LOWER_OCTAVE_SYMBOL
 my-map
 :UPPER_OCTAVE_DOT

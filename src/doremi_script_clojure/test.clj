@@ -16,6 +16,8 @@
   )
 
 (defn my-test[txt]
+  (println "txt is")
+  (pprint txt)
   (let [
         
         parse-tree (time (run-through-parser txt)) 
@@ -32,14 +34,10 @@
 ;;(my-test "(SRG-\n.\nhe-llo john")
 ;; (my-test "(PG) | S G P | S\nOh say can you see")
 ;; (my-test ".\nS -")
-(my-test "S")
+;; (my-test "R\n    .\n| S")
+(my-test (slurp-fixture "ornament_before.txt"))
+;; (my-test (slurp-fixture "ornament_after_with_octave.txt"))
 ;;(my-test (slurp-fixture "problem.txt"))
 ;;(my-test (slurp-fixture "yesterday.txt"))
 ;; (pprint (run-thrnough-parser  (slurp-fixture "ending.txt")))
 ;;(pprint (my-test " RS\nG"))
-;;tt(pprint (my-test( "lines: lineshere\nKey: D\nhi:john\nAuthor:me\n\n|S"))
-;;(def h (new net.davidashen.text.Hyphenator))
-;;(def hyphens  (c((lojure.java.io/input-stream (clojure.java.io/resource "hyphen.tex")))
-;;(.loadTable h hyphens)
-;;          (assert (= :sargam_musical_char (:_my_type (second node))))
-;;(pprint (.hyphenate h "hello"))

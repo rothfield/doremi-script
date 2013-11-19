@@ -1,11 +1,31 @@
 (ns doremi_script_clojure.core
   (:gen-class)
+  (:import (net.davidashen.text Hyphenator))
   (:require	
     [instaparse.core :as insta]
     [doremi_script_clojure.semantic_analyzer :refer [transform-parse-tree]]
-    [clojure.java.io :as io]
+    [clojure.java.io :refer [input-stream resource]]
     [clojure.data.json :as json]
     ))
+
+(def hyphenator 
+  (memoize 
+    (fn []
+      (println "Loading hyphen.tex")
+      (let [h (new Hyphenator)]
+        (.loadTable 
+          h (input-stream (resource "hyphen.tex")))
+        h))))
+
+(def hyphenator-splitting-char (char 173))
+
+(defn hyphenate[txt]
+  " (hyphenate \"happy birthday\") => 
+  (hap- py birth- day)
+  "
+  (let [hyphenated (.hyphenate (hyphenator) txt)
+   hyphenated2 (clojure.string/replace hyphenated (char 173) \-)]
+    (re-seq  #"\w+-?" hyphenated2)))
 
 (defn- json-key-fn[x]
   (let [y (name x)]
@@ -14,14 +34,14 @@
       y)))
 
 (defn slurp-fixture [file-name]
-  (slurp (clojure.java.io/resource 
+  (slurp (resource 
            (str "fixtures/" file-name))))
 
 (def yesterday (slurp-fixture "yesterday.txt"))
 
 (def doremi-script-parser  
   (insta/parser
-    (slurp (io/resource "doremiscript.ebnf"))))
+    (slurp (resource "doremiscript.ebnf"))))
 
 (defn run-through-parser[txt]
   (doremi-script-parser txt))
@@ -34,7 +54,7 @@
   "very primitive json pretty-printer. Changes dq,dq => dq,newline,dq "
   x
   )
-  ;;(clojure.string/replace x "\",\"" "\",\n\""))
+;;(clojure.string/replace x "\",\"" "\",\n\""))
 
 (defn- my-to-json[x]
   "returns json/text version of parse tree. It is a string"

@@ -1,0 +1,16 @@
+<srruby> I understand that I use maven like RubyGems to install and manage Java components.  There seems to be a Maven repository at  mvnrepository.com  where I can pull in jar files. How does this all fit in with leiningen ?
+<joegallo> srruby: what dependency do you want to pull in?
+<joegallo> that is, give me one example, please
+<gtrak> srruby: lein uses maven repos (remote and local) for its artifacts.  The particular repos used are specific to a project, but a few are included by default.
+<srruby> joegallo: Texhyphj 
+<srruby> joegallo: It is on http://mvnrepository.com
+<joegallo> srruby: i searched mavenrepository for it, and found this http://search.maven.org/#artifactdetails|com.googlecode.texhyphj|texhyphj|1.2|bundle
+<srruby> joegallo: Right. Now how do I integrate it with Clojure/Leiningen
+<joegallo> so you would put [com.googlecode.texhyphj/texhyphj "1.2"] in your project.clj file under :dependencies
+<joegallo> and then run lein deps
+<srruby> cool
+<joegallo> and it'll download it
+<srruby> joegallo: Thanks very much!
+<joegallo> you're welcome
+<zerokarmaleft> srruby: https://github.com/technomancy/leiningen/blob/master/sample.project.clj#L39
+<zerokarmaleft> the sample project is well-commented, and it's worth scanning the whole thing just to see what options are available
