@@ -1,9 +1,6 @@
 (ns doremi_script_clojure.semantic_analyzer
   "Semantic analysis is the activity of a compiler to determine what the types of various values are, how those types interact in expressions, and whether those interactions are semantically reasonable. "
-  (:import (net.davidashen.text Hyphenator))
   (:require	
-   ;; [doremi_script_clojure.core :refer [hyphenate]]
-
     [clojure.pprint :refer [pprint]] 
     [clojure.java.io :refer [input-stream resource]]
     [clojure.set :refer [union]] 
@@ -11,24 +8,6 @@
                           postwalk-replace keywordize-keys]]
     [clojure.string :refer [split lower-case]]
     ))
-
-(def hyphenator 
-  (memoize 
-    (fn []
-      (let [h (new Hyphenator)]
-        (.loadTable 
-          h (input-stream (resource "hyphen.tex")))
-        h))))
-
-(def hyphenator-splitting-char (char 173))
-
-(defn hyphenate[txt]
-  " (hyphenate \"happy birthday\") => 
-  (hap- py birth- day)
-  "
-  (let [hyphenated (.hyphenate (hyphenator) txt)
-   hyphenated2 (clojure.string/replace hyphenated (char 173) \-)]
-    (re-seq  #"\w+-?" hyphenated2)))
 
 ;; controlling scope:
 ;; srruby: defn- is just defn + ^:private, which can be put on any def
@@ -186,16 +165,8 @@
                       ;; _ (println "--------lower-lines is")
                       ;; _ (pprint lower-lines)
                       ))
-        syls-to-apply1 (map :_source (filter #(= :syllable (:_my_type %))
-                                             (mapcat #(:items %) lower-lines)))
-        syls-str2 (apply str (interpose " " syls-to-apply1))
-        syls-to-apply (atom (hyphenate syls-str2))
-        _ (if false (do
-                      (println "****syls-str2")
-                      (pprint syls-str2)
-                      (println "****syls-to-apply2")
-                      (pprint @syls-to-apply)))
-        ;; _ (println "syls-to-apply" syls-to-apply)
+        syls-to-apply (atom (map :_source (filter #(= :syllable (:_my_type %))
+                                             (mapcat #(:items %) lower-lines))))
         in-slur (atom false)
         postwalk-fn (fn sargam-section-postwalker[node]
                       (let [ my-type (:_my_type node)

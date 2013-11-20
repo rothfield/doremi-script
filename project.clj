@@ -13,5 +13,6 @@
                ;;  [net.davidashen.text.Hyphenator "1.0"]
                  ]
   :main doremi_script_clojure.core
+  :profiles {:uberjar {:aot :all}}
   ;; lein uberjar creates jar file. Run it use java -jar
   )
