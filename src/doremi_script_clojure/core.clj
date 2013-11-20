@@ -28,7 +28,7 @@
   (doremi-script-parser txt))
 
 (defn -main[& args]
-  (let [txt (slurp *in*)
+  (let [txt (str (slurp *in*) "\n")
        x (transform-parse-tree (run-through-parser txt) txt)
         ]
   (json/pprint x :key-fn json-key-fn)))
