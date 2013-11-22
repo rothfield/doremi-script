@@ -1,0 +1,48 @@
+(ns doremi_script_clojure.core
+  (:gen-class)
+  (:require	
+    [instaparse.core :as insta]
+    [doremi_script_clojure.semantic_analyzer :refer [transform-parse-tree]]
+    [clojure.java.io :refer [reader input-stream resource]]
+    [clojure.data.json :as json]
+    [clojure.string :refer [join]]
+    ))
+
+
+(defn- json-key-fn[x]
+  (let [y (name x)]
+    (if (= \_ (first y))
+      (subs y 1)
+      y)))
+
+(defn slurp-fixture [file-name]
+  (slurp (resource 
+           (str "fixtures/" file-name))))
+
+(def yesterday (slurp-fixture "yesterday.txt"))
+
+(def doremi-script-parser  
+  (insta/parser
+    (slurp (resource "doremiscript.ebnf"))))
+
+(defn run-through-parser[txt]
+  (doremi-script-parser txt))
+
+(alter-var-root (var *flush-on-newline*)  (fn[x] (constantly false)))
+
+(defn -main[& args]
+  (println *command-line-args*)
+  (with-open [rdr (reader *in*)]
+    (let [lines (doall (line-seq rdr))
+          txt (apply str (interpose "\n"  lines))
+          x (transform-parse-tree (run-through-parser txt) txt)
+          z (with-out-str (println (json/pprint x :key-fn json-key-fn)))
+          ]
+      (println (if (.endsWith z "nil\n")
+                 (do  ;; (println "ends with nil!")
+       (subs z 0 (- (count z) 4))) 
+        ;; else
+        z))
+    ))
+  )
+
