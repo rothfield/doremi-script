@@ -31,6 +31,14 @@
   ;;   So that the parser has marked off 1 1/2 beats as rests
   ;;   Note that Sargam only has rests at the beginning of a line by
   ;;   my interpretation!!
+debug=true
+
+root = exports ? this
+if require?
+  root.Fraction=require('./third_party/fraction.js').Fraction
+  shared=require('./shared.js')
+  root._ = require("underscore")._
+  root._.extend(root,shared)
 
 item_has_attribute = (item,attr_name) ->
   return false if  !item.attributes?
@@ -592,3 +600,5 @@ text = \\lyricmode {
   lilypond_template
 
 
+root.to_lilypond=to_lilypond
+root.line_to_lilypond=line_to_lilypond

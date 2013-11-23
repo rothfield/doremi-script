@@ -747,8 +747,13 @@ node2
 
 (defn transform-parse-tree[parse-tree txt]
   "Transform parse-tree into doremi-script json style format"
+  ;;(println "parse tree:")
+  ;;(pprint parse-tree)
+  (if (map? parse-tree)
+    parse-tree
+    ;; else
   (make-maps-sorted (postwalk 
                       (fn[node] (main-walk node txt)) 
-                      parse-tree)))
+                      parse-tree))))
 
 

@@ -11,4 +11,6 @@
   :main doremi_script_clojure.core
   :profiles {:uberjar {:aot :all}}
   ;; lein uberjar creates jar file. Run it use java -jar
+  :jar-name "doremi-script.jar"
+  :uberjar-name "doremi-script-standalone.jar"
   )

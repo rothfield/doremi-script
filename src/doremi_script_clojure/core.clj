@@ -1,5 +1,7 @@
 (ns doremi_script_clojure.core
-  (:gen-class)
+  (:gen-class
+    :methods [#^{:static true} [myparse [String] String]]) 
+
   (:require	
     [instaparse.core :as insta]
 
@@ -24,7 +26,7 @@
 
 (def doremi-script-parser  
   (insta/parser
-    (slurp (resource "doremiscript.ebnf"))))
+    (slurp (resource "doremiscript.ebnf")) :total true))
 
 (defn run-through-parser[txt]
   (doremi-script-parser txt))
@@ -32,26 +34,43 @@
 
 (defn get-stdin[]
   (with-open [rdr (java.io.BufferedReader. *in* )]
-      (let [seq  (line-seq rdr)
-            zz (count seq)]
-            (apply str (clojure.string/join "\n" seq)))))
-  
+    (let [seq  (line-seq rdr)
+          zz (count seq)]
+      (apply str (clojure.string/join "\n" seq)))))
+
 (defn -mzzain
   [& args]
   (get-stdin))
 ;;  (println (get-stdin)))
+(defn myparse[txt]
+  "in myparse")
 
+(defn -myparse[txt1]
+  (try
+    (let [
+          txt (clojure.string/replace txt1 "\r\n" "\n")
+          x (transform-parse-tree (run-through-parser  txt)
+                                  txt)
+          ]
+      (println "x is\n" x)
+      (println "class of x is:" (class x))
+      (if (:_my_type x)
+        (with-out-str (json/pprint x :key-fn json-key-fn))
+        (with-out-str (pprint x))
+        ;;(json/write-str x :key-fn json-key-fn)
+        ))
+    (catch Exception e (str "Error:" (.getMessage e)))
+    )) 
 
 (defn -main[& args]
   (let [
-       ;; txt1 (slurp (first args))
-        txt (get-stdin)
-
-       ;;  _ (println "txt is" txt)
-       x (transform-parse-tree (run-through-parser  txt)
+        ;; txt1 (slurp (first args))
+        txt1 (get-stdin)
+        txt (clojure.string/replace txt1 "\r\n" "\n")
+        x (transform-parse-tree (run-through-parser  txt)
                                 txt)
         ]
-  (json/pprint x :key-fn json-key-fn)
+    (json/pprint x :key-fn json-key-fn)
     (println "")
-   ""))
+    ""))
 

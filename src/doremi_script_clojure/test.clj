@@ -28,8 +28,6 @@
     (spit "tmp.txt" (str z
                          result))))
 
-
-;; (my-test yesterday)
 ;;(my-test "(SRG-\n.\nhe-llo john")
 ;; (my-test "(PG) | S G P | S\nOh say can you see")
 ;;(my-test ".\nS -")
@@ -42,3 +40,5 @@
 ;;(my-test (slurp-fixture "yesterday.txt"))
 ;; (pprint (run-thrnough-parser  (slurp-fixture "ending.txt")))
 ;;(pprint (my-test " RS\nG"))
+
+(println "HI")

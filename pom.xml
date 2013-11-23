@@ -16,7 +16,7 @@
   <scm>
     <connection>scm:git:git://github.com/rothfield/doremi-script-clojure.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/rothfield/doremi-script-clojure.git</developerConnection>
-    <tag>bbc0587ef955dd8e90060fbdade9cb331abf49ad
+    <tag>9dd9a3f27781866356418e398d35bc3e8b0f384e
 </tag>
     <url>https://github.com/rothfield/doremi-script-clojure</url>
   </scm>
