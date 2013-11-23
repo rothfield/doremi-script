@@ -1,0 +1,44 @@
+  #(ly:set-option 'midi-extension "mid")
+  \\version "2.12.3"
+  \\include "english.ly"
+  \\header{ 
+  #{title_snippet}
+  #{composer_snippet}
+  tagline = ""  % removed 
+  }
+%{
+#{src}  
+%}
+melody = {
+\\clef treble
+#{key_snippet}
+\\time #{time}
+\\autoBeamOn  
+#{notes}
+}
+
+text = \\lyricmode {
+  #{extract_lyrics(composition_data).join(' ')}
+}
+
+\\score{
+#{transpose_snip}
+<<
+  \\new Voice = "one" {
+    \\melody
+  }
+  \\new Lyrics \\lyricsto "one" \\text
+>>
+\\layout {
+  \\context {
+       \\Score
+    \\remove "Bar_number_engraver"
+  } 
+  }
+\\midi { 
+  \\context {
+    \\Score
+    tempoWholesPerMinute = #(ly:make-moment #{beats_per_minute} 4)
+   }
+ }
+}

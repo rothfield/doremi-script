@@ -18,6 +18,13 @@
       (subs y 1)
       y)))
 
+
+(defn pprint-results[x]
+  (if (:_my_type x)
+    (with-out-str (json/pprint x :key-fn json-key-fn))
+    (with-out-str (pprint x))))
+
+
 (defn slurp-fixture [file-name]
   (slurp (resource 
            (str "fixtures/" file-name))))
@@ -38,12 +45,6 @@
           zz (count seq)]
       (apply str (clojure.string/join "\n" seq)))))
 
-(defn -mzzain
-  [& args]
-  (get-stdin))
-;;  (println (get-stdin)))
-(defn myparse[txt]
-  "in myparse")
 
 (defn -myparse[txt1]
   (try
@@ -52,25 +53,22 @@
           x (transform-parse-tree (run-through-parser  txt)
                                   txt)
           ]
-      (println "x is\n" x)
-      (println "class of x is:" (class x))
-      (if (:_my_type x)
-        (with-out-str (json/pprint x :key-fn json-key-fn))
-        (with-out-str (pprint x))
-        ;;(json/write-str x :key-fn json-key-fn)
-        ))
+      ;;(println "x is\n" x)
+      ;;(println "class of x is:" (class x))
+      (pprint-results x))
     (catch Exception e (str "Error:" (.getMessage e)))
     )) 
 
 (defn -main[& args]
-  (let [
-        ;; txt1 (slurp (first args))
-        txt1 (get-stdin)
-        txt (clojure.string/replace txt1 "\r\n" "\n")
-        x (transform-parse-tree (run-through-parser  txt)
-                                txt)
-        ]
-    (json/pprint x :key-fn json-key-fn)
-    (println "")
-    ""))
+  "Read from stdin. Writes results to stdout"
+  (try
+    (let [
+          txt1 (get-stdin)
+          txt (clojure.string/replace txt1 "\r\n" "\n")
+          x (transform-parse-tree (run-through-parser  txt)
+                                  txt)
+          ]
+      (println (pprint-results x)))
+    (catch Exception e (str "Error:" (.getMessage e)))
+    ))
 
