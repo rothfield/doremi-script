@@ -4,6 +4,7 @@
 /classes
 /resources/fixtures/tmp
 /checkouts
+/attic
 pom.xml
 pom.xml.asc
 *.swp
