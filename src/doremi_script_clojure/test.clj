@@ -1,8 +1,9 @@
 (ns doremi_script_clojure.test
   (require	
-    [doremi_script_clojure.core :reload true :refer [run-through-parser yesterday slurp-fixture]]
+    [doremi_script_clojure.core :reload true :refer [doremi-script-text->parsed-doremi-script run-through-parser yesterday slurp-fixture]]
     [doremi_script_clojure.semantic_analyzer :reload true :refer [transform-parse-tree]]
     [clojure.pprint :refer [pprint]] 
+    [clojure.data.json :as json]
     [clojure.java.io]
     [instaparse.core :as insta]
     ))
@@ -12,14 +13,28 @@
   (use 'doremi_script_clojure.test :reload) (ns doremi_script_clojure.test) 
   (use 'clojure.stacktrace) 
   (print-stack-trace *e)
-;  (pst)
+  ;  (pst)
   )
+
+
+(defn- my-seq2[x]
+  (tree-seq (fn[x](constantly true))
+            (fn children[node]
+              (cond 
+                (and (map? node) (:items node))
+                (:items node)
+                (and (map? node) (:lines node))
+                (:lines node)
+                (vector? node)
+                identity))
+            x))
+
 
 (defn my-test[txt]
   (println "txt is")
   (pprint txt)
   (let [
-        
+
         parse-tree (time (run-through-parser txt)) 
         z (with-out-str (pprint parse-tree))
         result (with-out-str (pprint (time (transform-parse-tree parse-tree txt))))
@@ -34,11 +49,10 @@
 ;; (my-test "R\n    .\n| S")
 ;;(my-test (slurp-fixture "auto_assign_syllables_in_line.txt"))
 ;;(my-test "| S R\nHello")
-;;(my-test (slurp-fixture "ornament_before.txt"))
+(my-test (slurp-fixture "ornament_after.txt"))
 ;; (my-test (slurp-fixture "ornament_after_with_octave.txt"))
 ;;(my-test (slurp-fixture "problem.txt"))
 ;;(my-test (slurp-fixture "yesterday.txt"))
 ;; (pprint (run-thrnough-parser  (slurp-fixture "ending.txt")))
 ;;(pprint (my-test " RS\nG"))
 
-(println "HI")

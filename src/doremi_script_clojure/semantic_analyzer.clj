@@ -4,7 +4,7 @@
     [clojure.pprint :refer [pprint]] 
     [clojure.java.io :refer [input-stream resource]]
     [clojure.set :refer [union]] 
-    [clojure.walk :refer [postwalk-demo postwalk
+    [clojure.walk :refer [postwalk
                           postwalk-replace keywordize-keys]]
     [clojure.string :refer [split lower-case]]
     ))
@@ -74,13 +74,13 @@
   "my-map is a map from column number -> list of nodes
   Add nodes from line to the map"
   (reduce (fn [accumulator node]
-            (let [column (- (:_start_index node) 
-                            (:_start_index line))]
+            (let [column (- (:start_index node) 
+                            (:start_index line))]
               (assoc accumulator
                      column 
                      (conj (get accumulator column) node)
                      )))
-          my-map (filter #(:_start_index %) (my-seq line))
+          my-map (filter #(:start_index %) (my-seq line))
           )) 
 
 
@@ -96,14 +96,16 @@
     (assoc node :attributes (into [] nodes))))
 
 (defn- update-sargam-pitch-node [pitch nodes syl]
+  (if false (do
+  (println "entering update-sargam-pitch-node")
+  (pprint nodes)))
   (let [
-        upper-dots (count (filter #(= (:_my_type %) :upper_octave_dot) nodes))
-        lower-dots (count (filter #(= (:_my_type %) :lower_octave_dot) nodes))
-        upper-upper-dots (count (filter #(= (:_my_type %) :upper_upper_octave_symbol) nodes))
-        lower-lower-dots (count (filter #(= (:_my_type %) :lower_lower_octave_symbol) nodes))
+        upper-dots (count (filter #(= (:my_type %) :upper_octave_dot) nodes))
+        lower-dots (count (filter #(= (:my_type %) :lower_octave_dot) nodes))
+        upper-upper-dots (count (filter #(= (:my_type %) :upper_upper_octave_symbol) nodes))
+        lower-lower-dots (count (filter #(= (:my_type %) :lower_lower_octave_symbol) nodes))
         octave (+ upper-dots (- lower-dots) (* -2 lower-lower-dots) (* 2 upper-upper-dots))
         ]
-    (if false (do (println "update-sargam-pitch-node") (pprint nodes)))
     (merge pitch 
            {
             :attributes 
@@ -113,13 +115,12 @@
                                          :chord_symbol
                                          :ornament
                                          :ending
-                                         :mordent} (:_my_type %)) nodes)))
+                                         :mordent} (:my_type %)) nodes)))
             :octave octave
             :syllable syl
-            ;;;  :syllable (some #(if (= (:_my_type %) :syllable)  (:_source %)) nodes)
-            :chord (some #(if (= (:_my_type %) :chord_symbol)  (:_source %)) nodes)
-            :ornament nil 
-            :tala (some #(if (= (:_my_type %) :tala)  (:_source %)) nodes)
+            ;;;  :syllable (some #(if (= (:my_type %) :syllable)  (:source %)) nodes)
+            :chord (some #(if (= (:my_type %) :chord_symbol)  (:source %)) nodes)
+            :tala (some #(if (= (:my_type %) :tala)  (:source %)) nodes)
             }
            )))
 
@@ -137,11 +138,11 @@
   Hi becomes a syllable for S"
   "Assign attributes to the main line(sargam_line) from the lower and upper lines using 
   column numbers. Returns a sargam-line"
-  (assert (= (:_my_type sargam-section) :sargam_section))
+  (assert (= (:my_type sargam-section) :sargam_section))
   (assert (string? txt))
   (let [
         assigned (atom #{})
-        sargam-line (some #(if (= (:_my_type %) :sargam_line) %)
+        sargam-line (some #(if (= (:my_type %) :sargam_line) %)
                           (:items sargam-section))
         ;; TODO: make atom of column-map
         column-map (reduce line-column-map {}  (:items sargam-section))
@@ -151,13 +152,13 @@
                       (println "**** column-map")
                       (pprint column-map)
                       ))
-        line-starts (map :_start_index (:items sargam-section))
+        line-starts (map :start_index (:items sargam-section))
         line-start-for  (fn line-start-for-fn[column] 
                           (last (filter (fn[x] (>= column x)) line-starts)) )
         column-for-node (fn[node]
-                          (- (:_start_index node) (line-start-for (:_start_index node))))
+                          (- (:start_index node) (line-start-for (:start_index node))))
 
-        lower-lines (filter #(= (:_my_type %) :lyrics_line) (:items sargam-section))
+        lower-lines (filter #(= (:my_type %) :lyrics_line) (:items sargam-section))
         _ (if false (do
                       (println "sargam-section is")
                       (pprint sargam-section)
@@ -165,11 +166,11 @@
                       ;; _ (println "--------lower-lines is")
                       ;; _ (pprint lower-lines)
                       ))
-        syls-to-apply (atom (map :_source (filter #(= :syllable (:_my_type %))
+        syls-to-apply (atom (map :source (filter #(= :syllable (:my_type %))
                                              (mapcat #(:items %) lower-lines))))
         in-slur (atom false)
         postwalk-fn (fn sargam-section-postwalker[node]
-                      (let [ my-type (:_my_type node)
+                      (let [ my-type (:my_type node)
                             column (if my-type (column-for-node node))
                             nodes (if my-type (get column-map column)) 
                             ]
@@ -183,9 +184,9 @@
                                   ;; _ (pprint node)
                                   ;; _ (println "pitch is "  "\n--------")
                                   ;; _ (println "in-slur is " @in-slur)
-                                  has-begin-slur (some (fn[x] (= :begin_slur (:_my_type x))) (:attributes node))
-                                  has-end-slur (some (fn[x] (= :end_slur (:_my_type x))) (:attributes node))
-                                  all-orns1 (filter #(= :ornament (:_my_type %)) (my-seq sargam-section))
+                                  has-begin-slur (some (fn[x] (= :begin_slur (:my_type x))) (:attributes node))
+                                  has-end-slur (some (fn[x] (= :end_slur (:my_type x))) (:attributes node))
+                                  all-orns1 (filter #(= :ornament (:my_type %)) (my-seq sargam-section))
                                   all-orns (filter #(not (@assigned %)) all-orns1)
 
                                   _ (if false (do (println "all-orns *****")
@@ -195,10 +196,10 @@
                                   ;; find the ones where column + length of source is one less
                                   ;; than the pitch's column
                                   orns-before (map #(assoc % :placement :before)
-                                                   (filter #(= column (+ (count (:_source %)) (column-for-node %)))
+                                                   (filter #(= column (+ (count (:source %)) (column-for-node %)))
                                                            all-orns))
                                   orns-after (map #(assoc % :placement :after)
-                                                  (filter #(= column (inc (column-for-node %)))
+                                                  (filter #(= column (dec (column-for-node %)))
                                                           all-orns))
                                   orns (concat orns-before orns-after)
                                   _ (swap! assigned clojure.set/union @assigned (set orns))
@@ -223,26 +224,10 @@
                           node)))
         ;; (update-node node nodes))))
         ]
-    (assert (= :sargam_line (:_my_type sargam-line)))
+    (assert (= :sargam_line (:my_type sargam-line)))
     (assert (map? column-map))
     (postwalk postwalk-fn sargam-section)
     ))
-
-(defn- make-sorted-map[node]
-  ;; (println "make-sorted-map" "node is" node) 
-  (cond 
-    (and (map? node) (= (into (hash-set) (keys node)) #{:numerator :denominator}))
-    node
-    (map? node)
-    (into (sorted-map) node)
-    true
-    node))
-
-(defn- make-maps-sorted[x]
-  (into (sorted-map) (postwalk make-sorted-map x)))
-
-(defn- backwards-comparator[k1 k2]
-  (compare k2 k1))
 
 ;; Here is a good place to handle ties/dashes/rests
 ;; Number the significant pitches and dashes in this line, starting with 0
@@ -304,7 +289,7 @@
         pitch-counter (atom -1)
         significant? (fn significant2[x]
                        "don't number dashes such as the last 2 of S---"
-                       (and (map? x) (#{:pitch :dash} (:_my_type x))
+                       (and (map? x) (#{:pitch :dash} (:my_type x))
                             (not (:ignore x))))
         line2 (postwalk (fn add-pitch-counters[z] 
                           (if-not (significant? z)
@@ -316,7 +301,7 @@
         pitches (into []  (filter 
                             significant? (my-seq line2) ))
         line3 (postwalk (fn line3-postwalk[node-in-line]
-                          (case (:_my_type node-in-line)
+                          (case (:my_type node-in-line)
                             :beat
                             (let [ 
                                   ;; z1  (println "**z ===> " z)
@@ -345,7 +330,7 @@
                   (let
                     [
                      ;;xyz (pprint node-in-line)
-                     my-key (:_my_type node-in-line) 
+                     my-key (:my_type node-in-line) 
                      prev-item (last (filter #(and (significant? %)
                                                    (< (:pitch-counter %) (:pitch-counter node-in-line))) pitches))
                      next-item  (first (filter #(and (significant? %)
@@ -363,7 +348,7 @@
                              :rest true )
                       ;; Case 2: pitch and next item is a dash  
                       (and (= :pitch my-key)   
-                           (= :dash (:_my_type next-item)))
+                           (= :dash (:my_type next-item)))
                       (assoc node-in-line :tied true)   ;; tie to next dash
                       ;; Case 3: dash at beginning of beat
                       (and (= :dash my-key) 
@@ -371,12 +356,12 @@
                       ;; doremi-v1 requires that the :tied attribute not
                       ;; be set to anything if not tied
                       (let [prev-pitch         ;; previous pitch in this line 
-                            (last (filter #(and (= :pitch (:_my_type %))
+                            (last (filter #(and (= :pitch (:my_type %))
                                                 (< 
                                                   (:pitch-counter %)
                                                   (:pitch-counter node-in-line)))
                                           pitches))
-                            my-tied (and next-item (= :dash (:_my_type next-item))) 
+                            my-tied (and next-item (= :dash (:my_type next-item))) 
                             ;;  _ (println "prev-pitch")
                             ;;  _ (pprint prev-pitch)
                             my-result1 (assoc node-in-line 
@@ -405,24 +390,23 @@
                  (apply concat (into [] (map (fn[x] (if (vector? x) x (vector x))) z))))
         items2 (into [] (my-fun (:items node2)))  ;; TODO: ugly
         subdivisions 
-        (count (filter (fn[x] (unit-of-rhythm (:_my_type x))) 
+        (count (filter (fn[x] (unit-of-rhythm (:my_type x))) 
                        items2))
-        my-beat (assoc node2 :items items2 :_subdivisions subdivisions)
+        my-beat (assoc node2 :items items2 :subdivisions subdivisions)
         ]
     (postwalk (fn postwalk-in-beat[node-in-beat] 
-                (if (and (#{:pitch :dash} (:_my_type node-in-beat))
+                (if (and (#{:pitch :dash} (:my_type node-in-beat))
                          (not (:ignore node-in-beat))
                          (:numerator node-in-beat)  ;; probably don't need this
                          )
                   (let [my-ratio (/ (:numerator node-in-beat) subdivisions)
                         frac 
                         (if (= (class my-ratio) java.lang.Long)
-                          (sorted-map-by backwards-comparator  :numerator 1 
+                          (array-map  :numerator 1 
                                          :denominator 1) 
                           ;; else 
-                          (sorted-map-by  backwards-comparator 
-                                         :numerator (numerator my-ratio)
-                                         :denominator (denominator my-ratio)))
+                          (array-map :numerator (numerator my-ratio)
+                                     :denominator (denominator my-ratio)))
                         ]
                     (assoc node-in-beat 
                            :denominator subdivisions
@@ -438,11 +422,11 @@
   "Handle  S--  and  ---"
   ;; set :ignore true for all the dashes
   ;;  and set numerator for pitch
-  (let [micro-beats (inc (count (filter #(= :dash (:_my_type %)) rest)))]
+  (let [micro-beats (inc (count (filter #(= :dash (:my_type %)) rest)))]
     (assert (#{:PITCH_WITH_DASHES :DASHES} my-key))
     (into [] (concat [ (assoc pitch
                               :numerator micro-beats)] 
-                     (map (fn[x] (if (= :dash (:_my_type x))
+                     (map (fn[x] (if (= :dash (:my_type x))
                                    (assoc x :ignore true)
                                    ;; else
                                    x)) rest)))))
@@ -450,9 +434,9 @@
 (def reserved-attributes [:lines 
                           :attributes
                           :warnings
-                          :_my_type
-                          :_source
-                          :_start_index
+                          :my_type
+                          :source
+                          :start_index
                           :attributes
                           ]
   )
@@ -474,17 +458,17 @@
 (defn- handle-composition-in-main-walk[node2]
   (let [
         attribute-sections 
-        (filter #(= :attributes (:_my_type %))  (:items node2))
+        (filter #(= :attributes (:my_type %))  (:items node2))
         attribute-section (first attribute-sections)
         ;; _ (println "attribute-sections" attribute-sections) 
         sections 
-        (filter #(= :sargam_section (:_my_type %))  (:items node2))
+        (filter #(= :sargam_section (:my_type %))  (:items node2))
         lines
-        (into [] (map  (fn[x] (some #(if (= :sargam_line (:_my_type %)) %) 
+        (into [] (map  (fn[x] (some #(if (= :sargam_line (:my_type %)) %) 
                                     (:items x))) sections))
         items-map2 
         (into {} (map (fn[[k v]] [(keyword (lower-case (name k))) v]) (:items_map attribute-section)))
-        lines2 (map #(assoc % :kind "latin_sargam") lines)
+        lines2 (into [] (map #(assoc % :kind "latin_sargam") lines))
         ] 
     (assert (map? items-map2))
     (merge (dissoc node2 :items) {
@@ -509,13 +493,13 @@
                                           v))  (:items node)))
         x (into [] (map (fn[[k v]] 
                           (str k " " v)
-                          {  :_my_type :attribute :key (name k) :value v }  
+                          {  :my_type :attribute :key (name k) :value v }  
                           )
 
                         items-map))
         ]
     ;;(pprint x)
-    ;; (merge node2 { :_my_type :attributes })
+    ;; (merge node2 { :my_type :attributes })
     ;; (let [ [:ATTRIBUTE_SECTION [:ATTRIBUTE_SECTION_ITEMS pairs]] node
     ;;  [:ATTRIBUTE_SECTION
     ;;     [:ATTRIBUTE_SECTION_ITEMS "hi" "john" "author" "me"]]
@@ -525,16 +509,16 @@
     ;;   [ { my_type: 'attribute', key: 'foo', value: 'bar', source: 'todo' },
     ;;    { my_type: 'attribute', key: 'hi', value: 'john', source: 'todo' } ],
     ;; source: 'xx' },
-    ;;{:_start_index 0,
-    ;; :_source "hi:john\nauthor:me",
-    ;; :_my_type :attribute_section,
+    ;;{:start_index 0,
+    ;; :source "hi:john\nauthor:me",
+    ;; :my_type :attribute_section,
     ;; :items ["hi" "john" "author" "me"]} 
     ;; (println "items-map" items-map)
-    (assert (= :attribute_section (:_my_type  node)))
+    (assert (= :attribute_section (:my_type  node)))
     (assert (:items node))
     (assert (vector? (:items node)))
     ;;(println "items-map:") (pprint items-map)
-    (merge node {:_source "TODO" :_my_type :attributes :items x :items_map items-map})
+    (merge node {:source "TODO" :my_type :attributes :items x :items_map items-map})
     ))
 
 (defn- main-walk[node txt]
@@ -542,9 +526,9 @@
     ;; else
     (let [
           my-key (first node)
-          my-map (array-map :_my_type (keyword (lower-case (name my-key)))
-                            :_source (get-source node txt)
-                            :_start_index (start-index node) 
+          my-map (array-map :my_type (keyword (lower-case (name my-key)))
+                            :source (get-source node txt)
+                            :start_index (start-index node) 
                             )
           node2 (if (and (vector? (second node)) 
                          (keyword? (first (second node)))
@@ -590,17 +574,17 @@
               my-items (:items node2)
               node3 (dissoc node2 :items)
               ]
-          ;; (println :SARGAM_ORNAMENT)
+          ;;(println :SARGAM_ORNAMENT)
           (merge 
             node3 
             {
-             :_my_type :ornament
-             :usable_source (:_source node2)
+             :my_type :ornament
+             :usable_source (:source node2)
              :ornament_items (into [] 
                                    (map (fn[x] 
                                           ;; TODO
                                           (merge x {:pointer true 
-                                                    :_my_type  :pitch} 
+                                                    :my_type  :pitch} 
                                                  )
                                           )
                                         my-items))
@@ -625,7 +609,7 @@
                 (conj my-items2 (last node))
                 my-items2
                 )
-              beat-count (count (filter #(= (:_my_type %) :beat) my-items3))
+              beat-count (count (filter #(= (:my_type %) :beat) my-items3))
               ]
           (assoc my-map :beat_count beat-count :is_partial true :items my-items3))
         :TALA 
@@ -638,7 +622,7 @@
               [_ my-pitch2 end-slur ] node
               my-pitch (merge my-pitch2
                               {
-                               :_source (:_source my-map)
+                               :source (:source my-map)
                                })
               ]
           ;; add end slur to attributes
@@ -650,7 +634,7 @@
               [_ begin-slur my-pitch2] node
               my-pitch (merge my-pitch2
                               {:column_offset 1
-                               :_source (:_source my-map)
+                               :source (:source my-map)
                                })
               ]
           ;; add begin slur to attributes
@@ -663,7 +647,7 @@
 my-map 
 :ALTERNATE_ENDING_INDICATOR
 ; { my_type: 'ending', source: '1.____', n    um: 1, column: 2 }
-(merge my-map {:_my_type :ending :num 99 })
+(merge my-map {:my_type :ending :num 99 })
 :COMPOSITION 
 (handle-composition-in-main-walk node2)
 :PITCH_WITH_DASHES
@@ -693,7 +677,7 @@ my-map
 :BARLINE
 (merge  my-map 
        (sorted-map 
-         :_my_type 
+         :my_type 
          (keyword (keyword (lower-case (name (get-in node [1 0])))))
          :is_barline true))
 :SARGAM_SECTION
@@ -702,7 +686,7 @@ my-map
         (merge (sorted-map :items (subvec node 1)) my-map)
         txt)
       ;; TODO: should this be moved into collapse-sargam-section ??
-      tied2 (tie-and-measure-pitches (some #(if (= (:_my_type %) :sargam_line) %) (:items collapsed)))
+      tied2 (tie-and-measure-pitches (some #(if (= (:my_type %) :sargam_line) %) (:items collapsed)))
       ]
   (if false (println "collapsed"))
   (if false (pprint collapsed)) 
@@ -712,13 +696,13 @@ my-map
 (let [
       [_ sarg & my-rest] node 
       ]
-  _ (assert (= :sargam_musical_char (:_my_type sarg)))
+  _ (assert (= :sargam_musical_char (:my_type sarg)))
   ;; (pprint node)
   (merge 
     my-map
     sarg
     {
-     :_my_type :pitch
+     :my_type :pitch
      :numerator 1  ;;; numerator and denominator may get updated later!
      :denominator 1
      :column_offset 0  ;; may get updated
@@ -752,8 +736,8 @@ node2
   (if (map? parse-tree)
     parse-tree
     ;; else
-  (make-maps-sorted (postwalk 
+  (postwalk 
                       (fn[node] (main-walk node txt)) 
-                      parse-tree))))
+                      parse-tree)))
 
 

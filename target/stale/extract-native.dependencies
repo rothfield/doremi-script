@@ -1,1 +1,1 @@
-([:dependencies ([org.clojure/clojure "1.5.1"] [org.clojure/data.json "0.2.3"] [instaparse/instaparse "1.2.2"] [com.googlecode.texhyphj/texhyphj "1.2"])])
+([:dependencies ([org.clojure/clojure "1.5.1"] [org.clojure/data.json "0.2.3"] [instaparse/instaparse "1.2.2"] [com.googlecode.texhyphj/texhyphj "1.2"] [clabango/clabango "0.5"])])

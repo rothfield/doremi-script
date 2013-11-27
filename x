@@ -1,4 +1,48 @@
-(defn pprint-results[x]
-  (if (:_my_type x)
-    (with-out-str (json/pprint x :key-fn json-key-fn))
-    (with-out-str (pprint x))))
+{:lines
+ ({:kind "latin_sargam",
+   :_start_index 0,
+   :_source "S",
+   :_my_type :sargam_line,
+   :items
+   [{:items
+     [{:_subdivisions 1,
+       :_start_index 0,
+       :_source "S",
+       :_my_type :beat,
+       :items
+       [{:syllable nil,
+         :_my_type :pitch,
+         :chord nil,
+         :fraction_array [{:numerator 1, :denominator 1}],
+         :pitch_source "S",
+         :normalized_pitch "C",
+         :numerator 1,
+         :ornament nil,
+         :denominator 1,
+         :octave 0,
+         :beat-counter 0,
+         :attributes [],
+         :pitch-counter 0,
+         :column_offset 0,
+         :_source "S",
+         :_start_index 0,
+         :tala nil,
+         :value :S}]}],
+     :is_partial true,
+     :beat_count 1,
+     :_my_type :measure,
+     :_source "S",
+     :_start_index 0}]}),
+ :force_sargam_chars_hash {},
+ :_my_type :composition,
+ :notes_used "",
+ :time_signature "4/4",
+ :key "C",
+ :author "",
+ :apply_hyphenated_lyrics false,
+ :attributes nil,
+ :warnings [],
+ :_source "S",
+ :filename "untitled",
+ :_start_index 0,
+ :mode "major"}

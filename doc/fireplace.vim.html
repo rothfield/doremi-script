@@ -1,0 +1,873 @@
+
+
+
+<!DOCTYPE html>
+<html>
+  <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# githubog: http://ogp.me/ns/fb/githubog#">
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>guides/articles/tutorials/vim_fireplace.md at master · clojuredocs/guides · GitHub</title>
+    <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="GitHub" />
+    <link rel="fluid-icon" href="https://github.com/fluidicon.png" title="GitHub" />
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-114.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-144.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144.png" />
+    <link rel="logo" type="image/svg" href="https://github-media-downloads.s3.amazonaws.com/github-logo.svg" />
+    <meta property="og:image" content="https://github.global.ssl.fastly.net/images/modules/logos_page/Octocat.png">
+    <meta name="hostname" content="github-fe119-cp1-prd.iad.github.net">
+    <meta name="ruby" content="ruby 1.9.3p194-tcs-github-tcmalloc (e1c0c3f392) [x86_64-linux]">
+    <link rel="assets" href="https://github.global.ssl.fastly.net/">
+    <link rel="conduit-xhr" href="https://ghconduit.com:25035/">
+    <link rel="xhr-socket" href="/_sockets" />
+    
+
+
+    <meta name="msapplication-TileImage" content="/windows-tile.png" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="selected-link" value="repo_source" data-pjax-transient />
+    <meta content="collector.githubapp.com" name="octolytics-host" /><meta content="collector-cdn.github.com" name="octolytics-script-host" /><meta content="github" name="octolytics-app-id" /><meta content="1718D9AA:5400:1272A7:52950890" name="octolytics-dimension-request_id" />
+    
+
+    
+    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <meta content="authenticity_token" name="csrf-param" />
+<meta content="KeMg8CoxFtFrQprnkIKwh90tqC8LY4Rs4KVdHbYh6Bo=" name="csrf-token" />
+
+    <link href="https://github.global.ssl.fastly.net/assets/github-f630a4b1bda1011cbb4274c3ad4a69ed08d30d50.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="https://github.global.ssl.fastly.net/assets/github2-472a6c32cb9e80c66ee8f985f4cfa6666114340a.css" media="all" rel="stylesheet" type="text/css" />
+    
+
+    
+
+      <script src="https://github.global.ssl.fastly.net/assets/frameworks-f78f9db32da9343ba16e477c7b54aa5b971fecbd.js" type="text/javascript"></script>
+      <script src="https://github.global.ssl.fastly.net/assets/github-245354e64bb245e74b8cc031535f22562832442d.js" type="text/javascript"></script>
+      
+      <meta http-equiv="x-pjax-version" content="c6e57b39aecdf8929c0e55db737cad39">
+
+        <link data-pjax-transient rel='permalink' href='/clojuredocs/guides/blob/5ac144cfa6a2bfcab837bde5374bf7689b558089/articles/tutorials/vim_fireplace.md'>
+  <meta property="og:title" content="guides"/>
+  <meta property="og:type" content="githubog:gitrepository"/>
+  <meta property="og:url" content="https://github.com/clojuredocs/guides"/>
+  <meta property="og:image" content="https://github.global.ssl.fastly.net/images/gravatars/gravatar-user-420.png"/>
+  <meta property="og:site_name" content="GitHub"/>
+  <meta property="og:description" content="Documentation guides and tutorials for Clojure. Various authors."/>
+
+  <meta name="description" content="Documentation guides and tutorials for Clojure. Various authors." />
+
+  <meta content="2488708" name="octolytics-dimension-user_id" /><meta content="clojuredocs" name="octolytics-dimension-user_login" /><meta content="6080673" name="octolytics-dimension-repository_id" /><meta content="clojuredocs/guides" name="octolytics-dimension-repository_nwo" /><meta content="true" name="octolytics-dimension-repository_public" /><meta content="false" name="octolytics-dimension-repository_is_fork" /><meta content="6080673" name="octolytics-dimension-repository_network_root_id" /><meta content="clojuredocs/guides" name="octolytics-dimension-repository_network_root_nwo" />
+  <link href="https://github.com/clojuredocs/guides/commits/master.atom" rel="alternate" title="Recent Commits to guides:master" type="application/atom+xml" />
+
+  </head>
+
+
+  <body class="logged_out  env-production linux vis-public page-blob">
+    <div class="wrapper">
+      
+      
+      
+      
+
+
+      
+      <div class="header header-logged-out">
+  <div class="container clearfix">
+
+    <a class="header-logo-wordmark" href="https://github.com/">
+      <span class="mega-octicon octicon-logo-github"></span>
+    </a>
+
+    <div class="header-actions">
+        <a class="button primary" href="/join">Sign up</a>
+      <a class="button signin" href="/login?return_to=%2Fclojuredocs%2Fguides%2Fblob%2Fmaster%2Farticles%2Ftutorials%2Fvim_fireplace.md">Sign in</a>
+    </div>
+
+    <div class="command-bar js-command-bar  in-repository">
+
+      <ul class="top-nav">
+          <li class="explore"><a href="/explore">Explore</a></li>
+        <li class="features"><a href="/features">Features</a></li>
+          <li class="enterprise"><a href="https://enterprise.github.com/">Enterprise</a></li>
+          <li class="blog"><a href="/blog">Blog</a></li>
+      </ul>
+        <form accept-charset="UTF-8" action="/search" class="command-bar-form" id="top_search_form" method="get">
+
+<input type="text" data-hotkey="/ s" name="q" id="js-command-bar-field" placeholder="Search or type a command" tabindex="1" autocapitalize="off"
+    
+    
+      data-repo="clojuredocs/guides"
+      data-branch="master"
+      data-sha="c27eab503aa710df423595a17fada4e237e81613"
+  >
+
+    <input type="hidden" name="nwo" value="clojuredocs/guides" />
+
+    <div class="select-menu js-menu-container js-select-menu search-context-select-menu">
+      <span class="minibutton select-menu-button js-menu-target">
+        <span class="js-select-button">This repository</span>
+      </span>
+
+      <div class="select-menu-modal-holder js-menu-content js-navigation-container">
+        <div class="select-menu-modal">
+
+          <div class="select-menu-item js-navigation-item js-this-repository-navigation-item selected">
+            <span class="select-menu-item-icon octicon octicon-check"></span>
+            <input type="radio" class="js-search-this-repository" name="search_target" value="repository" checked="checked" />
+            <div class="select-menu-item-text js-select-button-text">This repository</div>
+          </div> <!-- /.select-menu-item -->
+
+          <div class="select-menu-item js-navigation-item js-all-repositories-navigation-item">
+            <span class="select-menu-item-icon octicon octicon-check"></span>
+            <input type="radio" name="search_target" value="global" />
+            <div class="select-menu-item-text js-select-button-text">All repositories</div>
+          </div> <!-- /.select-menu-item -->
+
+        </div>
+      </div>
+    </div>
+
+  <span class="octicon help tooltipped downwards" title="Show command bar help">
+    <span class="octicon octicon-question"></span>
+  </span>
+
+
+  <input type="hidden" name="ref" value="cmdform">
+
+</form>
+    </div>
+
+  </div>
+</div>
+
+
+      
+
+
+          <div class="site" itemscope itemtype="http://schema.org/WebPage">
+    
+    <div class="pagehead repohead instapaper_ignore readability-menu">
+      <div class="container">
+        
+
+<ul class="pagehead-actions">
+
+
+  <li>
+    <a href="/login?return_to=%2Fclojuredocs%2Fguides"
+    class="minibutton with-count js-toggler-target star-button tooltipped upwards"
+    title="You must be signed in to use this feature" rel="nofollow">
+    <span class="octicon octicon-star"></span>Star
+  </a>
+
+    <a class="social-count js-social-count" href="/clojuredocs/guides/stargazers">
+      135
+    </a>
+
+  </li>
+
+    <li>
+      <a href="/login?return_to=%2Fclojuredocs%2Fguides"
+        class="minibutton with-count js-toggler-target fork-button tooltipped upwards"
+        title="You must be signed in to fork a repository" rel="nofollow">
+        <span class="octicon octicon-git-branch"></span>Fork
+      </a>
+      <a href="/clojuredocs/guides/network" class="social-count">
+        83
+      </a>
+    </li>
+</ul>
+
+        <h1 itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="entry-title public">
+          <span class="repo-label"><span>public</span></span>
+          <span class="mega-octicon octicon-repo"></span>
+          <span class="author">
+            <a href="/clojuredocs" class="url fn" itemprop="url" rel="author"><span itemprop="title">clojuredocs</span></a>
+          </span>
+          <span class="repohead-name-divider">/</span>
+          <strong><a href="/clojuredocs/guides" class="js-current-repository js-repo-home-link">guides</a></strong>
+
+          <span class="page-context-loader">
+            <img alt="Octocat-spinner-32" height="16" src="https://github.global.ssl.fastly.net/images/spinners/octocat-spinner-32.gif" width="16" />
+          </span>
+
+        </h1>
+      </div><!-- /.container -->
+    </div><!-- /.repohead -->
+
+    
+
+    <div class="container">
+
+      <div class="repository-with-sidebar repo-container  ">
+
+        <div class="repository-sidebar">
+            
+
+<div class="sunken-menu vertical-right repo-nav js-repo-nav js-repository-container-pjax js-octicon-loaders">
+  <div class="sunken-menu-contents">
+    <ul class="sunken-menu-group">
+      <li class="tooltipped leftwards" title="Code">
+        <a href="/clojuredocs/guides" aria-label="Code" class="selected js-selected-navigation-item sunken-menu-item" data-gotokey="c" data-pjax="true" data-selected-links="repo_source repo_downloads repo_commits repo_tags repo_branches /clojuredocs/guides">
+          <span class="octicon octicon-code"></span> <span class="full-word">Code</span>
+          <img alt="Octocat-spinner-32" class="mini-loader" height="16" src="https://github.global.ssl.fastly.net/images/spinners/octocat-spinner-32.gif" width="16" />
+</a>      </li>
+
+        <li class="tooltipped leftwards" title="Issues">
+          <a href="/clojuredocs/guides/issues" aria-label="Issues" class="js-selected-navigation-item sunken-menu-item js-disable-pjax" data-gotokey="i" data-selected-links="repo_issues /clojuredocs/guides/issues">
+            <span class="octicon octicon-issue-opened"></span> <span class="full-word">Issues</span>
+            <span class='counter'>12</span>
+            <img alt="Octocat-spinner-32" class="mini-loader" height="16" src="https://github.global.ssl.fastly.net/images/spinners/octocat-spinner-32.gif" width="16" />
+</a>        </li>
+
+      <li class="tooltipped leftwards" title="Pull Requests"><a href="/clojuredocs/guides/pulls" aria-label="Pull Requests" class="js-selected-navigation-item sunken-menu-item js-disable-pjax" data-gotokey="p" data-selected-links="repo_pulls /clojuredocs/guides/pulls">
+            <span class="octicon octicon-git-pull-request"></span> <span class="full-word">Pull Requests</span>
+            <span class='counter'>1</span>
+            <img alt="Octocat-spinner-32" class="mini-loader" height="16" src="https://github.global.ssl.fastly.net/images/spinners/octocat-spinner-32.gif" width="16" />
+</a>      </li>
+
+
+    </ul>
+    <div class="sunken-menu-separator"></div>
+    <ul class="sunken-menu-group">
+
+      <li class="tooltipped leftwards" title="Pulse">
+        <a href="/clojuredocs/guides/pulse" aria-label="Pulse" class="js-selected-navigation-item sunken-menu-item" data-pjax="true" data-selected-links="pulse /clojuredocs/guides/pulse">
+          <span class="octicon octicon-pulse"></span> <span class="full-word">Pulse</span>
+          <img alt="Octocat-spinner-32" class="mini-loader" height="16" src="https://github.global.ssl.fastly.net/images/spinners/octocat-spinner-32.gif" width="16" />
+</a>      </li>
+
+      <li class="tooltipped leftwards" title="Graphs">
+        <a href="/clojuredocs/guides/graphs" aria-label="Graphs" class="js-selected-navigation-item sunken-menu-item" data-pjax="true" data-selected-links="repo_graphs repo_contributors /clojuredocs/guides/graphs">
+          <span class="octicon octicon-graph"></span> <span class="full-word">Graphs</span>
+          <img alt="Octocat-spinner-32" class="mini-loader" height="16" src="https://github.global.ssl.fastly.net/images/spinners/octocat-spinner-32.gif" width="16" />
+</a>      </li>
+
+      <li class="tooltipped leftwards" title="Network">
+        <a href="/clojuredocs/guides/network" aria-label="Network" class="js-selected-navigation-item sunken-menu-item js-disable-pjax" data-selected-links="repo_network /clojuredocs/guides/network">
+          <span class="octicon octicon-git-branch"></span> <span class="full-word">Network</span>
+          <img alt="Octocat-spinner-32" class="mini-loader" height="16" src="https://github.global.ssl.fastly.net/images/spinners/octocat-spinner-32.gif" width="16" />
+</a>      </li>
+    </ul>
+
+
+  </div>
+</div>
+
+            <div class="only-with-full-nav">
+              
+
+  
+
+<div class="clone-url open"
+  data-protocol-type="http"
+  data-url="/users/set_protocol?protocol_selector=http&amp;protocol_type=clone">
+  <h3><strong>HTTPS</strong> clone URL</h3>
+  <div class="clone-url-box">
+    <input type="text" class="clone js-url-field"
+           value="https://github.com/clojuredocs/guides.git" readonly="readonly">
+
+    <span class="js-zeroclipboard url-box-clippy minibutton zeroclipboard-button" data-clipboard-text="https://github.com/clojuredocs/guides.git" data-copied-hint="copied!" title="copy to clipboard"><span class="octicon octicon-clippy"></span></span>
+  </div>
+</div>
+
+  
+
+<div class="clone-url "
+  data-protocol-type="subversion"
+  data-url="/users/set_protocol?protocol_selector=subversion&amp;protocol_type=clone">
+  <h3><strong>Subversion</strong> checkout URL</h3>
+  <div class="clone-url-box">
+    <input type="text" class="clone js-url-field"
+           value="https://github.com/clojuredocs/guides" readonly="readonly">
+
+    <span class="js-zeroclipboard url-box-clippy minibutton zeroclipboard-button" data-clipboard-text="https://github.com/clojuredocs/guides" data-copied-hint="copied!" title="copy to clipboard"><span class="octicon octicon-clippy"></span></span>
+  </div>
+</div>
+
+
+<p class="clone-options">You can clone with
+      <a href="#" class="js-clone-selector" data-protocol="http">HTTPS</a>,
+      or <a href="#" class="js-clone-selector" data-protocol="subversion">Subversion</a>.
+  <span class="octicon help tooltipped upwards" title="Get help on which URL is right for you.">
+    <a href="https://help.github.com/articles/which-remote-url-should-i-use">
+    <span class="octicon octicon-question"></span>
+    </a>
+  </span>
+</p>
+
+
+
+              <a href="/clojuredocs/guides/archive/master.zip"
+                 class="minibutton sidebar-button"
+                 title="Download this repository as a zip file"
+                 rel="nofollow">
+                <span class="octicon octicon-cloud-download"></span>
+                Download ZIP
+              </a>
+            </div>
+        </div><!-- /.repository-sidebar -->
+
+        <div id="js-repo-pjax-container" class="repository-content context-loader-container" data-pjax-container>
+          
+
+
+<!-- blob contrib key: blob_contributors:v21:738a021ba7cc6eb79c624ab395eced04 -->
+
+<p title="This is a placeholder element" class="js-history-link-replace hidden"></p>
+
+<a href="/clojuredocs/guides/find/master" data-pjax data-hotkey="t" class="js-show-file-finder" style="display:none">Show File Finder</a>
+
+<div class="file-navigation">
+  
+
+<div class="select-menu js-menu-container js-select-menu" >
+  <span class="minibutton select-menu-button js-menu-target" data-hotkey="w"
+    data-master-branch="master"
+    data-ref="master"
+    role="button" aria-label="Switch branches or tags" tabindex="0">
+    <span class="octicon octicon-git-branch"></span>
+    <i>branch:</i>
+    <span class="js-select-button">master</span>
+  </span>
+
+  <div class="select-menu-modal-holder js-menu-content js-navigation-container" data-pjax>
+
+    <div class="select-menu-modal">
+      <div class="select-menu-header">
+        <span class="select-menu-title">Switch branches/tags</span>
+        <span class="octicon octicon-remove-close js-menu-close"></span>
+      </div> <!-- /.select-menu-header -->
+
+      <div class="select-menu-filters">
+        <div class="select-menu-text-filter">
+          <input type="text" aria-label="Filter branches/tags" id="context-commitish-filter-field" class="js-filterable-field js-navigation-enable" placeholder="Filter branches/tags">
+        </div>
+        <div class="select-menu-tabs">
+          <ul>
+            <li class="select-menu-tab">
+              <a href="#" data-tab-filter="branches" class="js-select-menu-tab">Branches</a>
+            </li>
+            <li class="select-menu-tab">
+              <a href="#" data-tab-filter="tags" class="js-select-menu-tab">Tags</a>
+            </li>
+          </ul>
+        </div><!-- /.select-menu-tabs -->
+      </div><!-- /.select-menu-filters -->
+
+      <div class="select-menu-list select-menu-tab-bucket js-select-menu-tab-bucket" data-tab-filter="branches">
+
+        <div data-filterable-for="context-commitish-filter-field" data-filterable-type="substring">
+
+
+            <div class="select-menu-item js-navigation-item ">
+              <span class="select-menu-item-icon octicon octicon-check"></span>
+              <a href="/clojuredocs/guides/blob/emacs-trim/articles/tutorials/vim_fireplace.md"
+                 data-name="emacs-trim"
+                 data-skip-pjax="true"
+                 rel="nofollow"
+                 class="js-navigation-open select-menu-item-text js-select-button-text css-truncate-target"
+                 title="emacs-trim">emacs-trim</a>
+            </div> <!-- /.select-menu-item -->
+            <div class="select-menu-item js-navigation-item selected">
+              <span class="select-menu-item-icon octicon octicon-check"></span>
+              <a href="/clojuredocs/guides/blob/master/articles/tutorials/vim_fireplace.md"
+                 data-name="master"
+                 data-skip-pjax="true"
+                 rel="nofollow"
+                 class="js-navigation-open select-menu-item-text js-select-button-text css-truncate-target"
+                 title="master">master</a>
+            </div> <!-- /.select-menu-item -->
+        </div>
+
+          <div class="select-menu-no-results">Nothing to show</div>
+      </div> <!-- /.select-menu-list -->
+
+      <div class="select-menu-list select-menu-tab-bucket js-select-menu-tab-bucket" data-tab-filter="tags">
+        <div data-filterable-for="context-commitish-filter-field" data-filterable-type="substring">
+
+
+        </div>
+
+        <div class="select-menu-no-results">Nothing to show</div>
+      </div> <!-- /.select-menu-list -->
+
+    </div> <!-- /.select-menu-modal -->
+  </div> <!-- /.select-menu-modal-holder -->
+</div> <!-- /.select-menu -->
+
+  <div class="breadcrumb">
+    <span class='repo-root js-repo-root'><span itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="/clojuredocs/guides" data-branch="master" data-direction="back" data-pjax="true" itemscope="url"><span itemprop="title">guides</span></a></span></span><span class="separator"> / </span><span itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="/clojuredocs/guides/tree/master/articles" data-branch="master" data-direction="back" data-pjax="true" itemscope="url"><span itemprop="title">articles</span></a></span><span class="separator"> / </span><span itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="/clojuredocs/guides/tree/master/articles/tutorials" data-branch="master" data-direction="back" data-pjax="true" itemscope="url"><span itemprop="title">tutorials</span></a></span><span class="separator"> / </span><strong class="final-path">vim_fireplace.md</strong> <span class="js-zeroclipboard minibutton zeroclipboard-button" data-clipboard-text="articles/tutorials/vim_fireplace.md" data-copied-hint="copied!" title="copy to clipboard"><span class="octicon octicon-clippy"></span></span>
+  </div>
+</div>
+
+
+
+  <div class="commit file-history-tease">
+    <img class="main-avatar" height="24" src="https://1.gravatar.com/avatar/388dee5b4fb00316282b5f40b8409438?d=https%3A%2F%2Fidenticons.github.com%2F8b4066554730ddfaa0266346bdc1b202.png&amp;r=x&amp;s=140" width="24" />
+    <span class="author"><a href="/michaelklishin" rel="author">michaelklishin</a></span>
+    <time class="js-relative-date" datetime="2013-07-22T20:07:42-07:00" title="2013-07-22 20:07:42">July 22, 2013</time>
+    <div class="commit-title">
+        <a href="/clojuredocs/guides/commit/efea61803b0c052274ee2c981e201583e0b963ad" class="message" data-pjax="true" title="Link to clojuredocs/guides">Link to clojuredocs/guides</a>
+    </div>
+
+    <div class="participation">
+      <p class="quickstat"><a href="#blob_contributors_box" rel="facebox"><strong>2</strong> contributors</a></p>
+          <a class="avatar tooltipped downwards" title="michaelklishin" href="/clojuredocs/guides/commits/master/articles/tutorials/vim_fireplace.md?author=michaelklishin"><img height="20" src="https://1.gravatar.com/avatar/388dee5b4fb00316282b5f40b8409438?d=https%3A%2F%2Fidenticons.github.com%2F8b4066554730ddfaa0266346bdc1b202.png&amp;r=x&amp;s=140" width="20" /></a>
+    <a class="avatar tooltipped downwards" title="daveray" href="/clojuredocs/guides/commits/master/articles/tutorials/vim_fireplace.md?author=daveray"><img height="20" src="https://1.gravatar.com/avatar/8afe5283fb2d5f0a817c9c9ea4fa925e?d=https%3A%2F%2Fidenticons.github.com%2F3f2a4bdeffa1894ef93c3dd8ffdaf769.png&amp;r=x&amp;s=140" width="20" /></a>
+
+
+    </div>
+    <div id="blob_contributors_box" style="display:none">
+      <h2 class="facebox-header">Users who have contributed to this file</h2>
+      <ul class="facebox-user-list">
+          <li class="facebox-user-list-item">
+            <img height="24" src="https://1.gravatar.com/avatar/388dee5b4fb00316282b5f40b8409438?d=https%3A%2F%2Fidenticons.github.com%2F8b4066554730ddfaa0266346bdc1b202.png&amp;r=x&amp;s=140" width="24" />
+            <a href="/michaelklishin">michaelklishin</a>
+          </li>
+          <li class="facebox-user-list-item">
+            <img height="24" src="https://1.gravatar.com/avatar/8afe5283fb2d5f0a817c9c9ea4fa925e?d=https%3A%2F%2Fidenticons.github.com%2F3f2a4bdeffa1894ef93c3dd8ffdaf769.png&amp;r=x&amp;s=140" width="24" />
+            <a href="/daveray">daveray</a>
+          </li>
+      </ul>
+    </div>
+  </div>
+
+<div id="files" class="bubble">
+  <div class="file">
+    <div class="meta">
+      <div class="info">
+        <span class="icon"><b class="octicon octicon-file-text"></b></span>
+        <span class="mode" title="File Mode">file</span>
+          <span>290 lines (195 sloc)</span>
+        <span>16.512 kb</span>
+      </div>
+      <div class="actions">
+        <div class="button-group">
+              <a class="minibutton disabled tooltipped leftwards" href="#"
+                 title="You must be signed in to make or propose changes">Edit</a>
+          <a href="/clojuredocs/guides/raw/master/articles/tutorials/vim_fireplace.md" class="button minibutton " id="raw-url">Raw</a>
+            <a href="/clojuredocs/guides/blame/master/articles/tutorials/vim_fireplace.md" class="button minibutton ">Blame</a>
+          <a href="/clojuredocs/guides/commits/master/articles/tutorials/vim_fireplace.md" class="button minibutton " rel="nofollow">History</a>
+        </div><!-- /.button-group -->
+          <a class="minibutton danger disabled empty-icon tooltipped leftwards" href="#"
+             title="You must be signed in and on a branch to make or propose changes">
+          Delete
+        </a>
+      </div><!-- /.actions -->
+
+    </div>
+      
+  <div id="readme" class="blob instapaper_body">
+    <article class="markdown-body entry-content" itemprop="mainContentOfPage"><table data-table-type="yaml-metadata">
+<thead><tr>
+<th>title</th>
+
+  <th>layout</th>
+  </tr></thead>
+<tbody><tr>
+<td><div>Clojure with Vim and fireplace.vim</div></td>
+
+  <td><div>article</div></td>
+  </tr></tbody>
+</table><p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons
+Attribution 3.0 Unported License</a> (including images &amp;
+stylesheets). The source is available <a href="https://github.com/clojuredocs/guides">on
+Github</a>.</p>
+
+<h2>
+<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h2>
+
+<p><a href="https://github.com/tpope/vim-fireplace">fireplace.vim</a> is a Vim plugin developed by <a href="http://tpo.pe/">Tim Pope</a> which provides support for the "dynamic" aspects of Clojure development. Namely, connection to an <a href="https://github.com/clojure/tools.nrepl">nREPL</a> server, code evaluation, code completion, and basically everything beyond syntax highlighting and indentation.</p>
+
+<p>This guide will cover installation and some basic usage within a typical Clojure project.</p>
+
+<h2>
+<a name="about-the-name" class="anchor" href="#about-the-name"><span class="octicon octicon-link"></span></a>About the Name</h2>
+
+<p><em>fireplace was once called foreplay, but people weren't ready for that, so now it's fireplace</em></p>
+
+<h2>
+<a name="what-about-vimclojure" class="anchor" href="#what-about-vimclojure"><span class="octicon octicon-link"></span></a>What About VimClojure?</h2>
+
+<p>Until recently (late 2012), VimClojure was the preeminent plugin for Clojure development in Vim. Since then, its developer, Meikel Brandmeyer, has <a href="https://groups.google.com/forum/?fromgroups=#!topic/vimclojure/B-UU8qctd5A">acknowledged</a> that VimClojure development has slowed to a trickle and that fireplace is the future. That said, VimClojure is still a viable and excellent development evironment.</p>
+
+<h2>
+<a name="what-versions-of-clojure-and-fireplace-does-this-guide-cover" class="anchor" href="#what-versions-of-clojure-and-fireplace-does-this-guide-cover"><span class="octicon octicon-link"></span></a>What Versions of Clojure and fireplace Does This Guide Cover?</h2>
+
+<p>This guide covers Clojure 1.4 and the latest version of fireplace as of January 2013. It should work on most versions of both.</p>
+
+<h2>
+<a name="essential-references" class="anchor" href="#essential-references"><span class="octicon octicon-link"></span></a>Essential References</h2>
+
+<p>fireplace.vim lives on <a href="https://github.com/tpope/vim-fireplace">github</a>. That's the source of truth for development and where issues should be reported.</p>
+
+<p>The <a href="https://groups.google.com/forum/?fromgroups#!forum/vimclojure">vimclojure mailing list</a> remains the primary place to get help and ask questions related to Clojuring in Vim.</p>
+
+<p>Finally, don't forget the documentation that comes with the plugin itself. All features are documented there in standard Vim help format. Just <code>:help fireplace</code>, or <a href="https://github.com/tpope/vim-fireplace/blob/master/doc/fireplace.txt">view it online</a>. <em>I'm dead serious. READ THIS FILE.</em></p>
+
+<h2>
+<a name="how-fireplacevim-works" class="anchor" href="#how-fireplacevim-works"><span class="octicon octicon-link"></span></a>How fireplace.vim Works</h2>
+
+<p>Before using fireplace, it's useful to have a basic understanding of how it works, especially when it comes to evaluating Clojure code. This will help avoid confusion and tears. fireplace itself is a collection of VimScript code running withing Vim. When it needs to evaluate some Clojure code (for example, you just required a namespace, or gave it a command to run the tests in a namespace) it sends commands to an nREPL server embedded in a Java Virtual Machine (JVM).</p>
+
+<p><em>Note that because fireplace evaluates code synchronously, so if you evaluate a long-running command, <strong>your entire Vim process will be blocked/frozen</strong> until the operation completes. More on this below.</em></p>
+
+<p>Usually the task of running an nREPL server falls to Leiningen, but fireplace can connect to any nREPL server. See the <a href="https://github.com/clojure/tools.nrepl">nREPL docs</a> for details.</p>
+
+<h2>
+<a name="installing-vim" class="anchor" href="#installing-vim"><span class="octicon octicon-link"></span></a>Installing Vim</h2>
+
+<p>TODO: Someone should write Vim installation instructions and basic usage here.</p>
+
+<h3>
+<a name="osx" class="anchor" href="#osx"><span class="octicon octicon-link"></span></a>OSX</h3>
+
+<ul>
+<li>Install <a href="http://mxcl.github.com/homebrew/">Homebrew</a>
+</li>
+<li>The dance: <code>brew update</code>
+</li>
+<li>If you're like me, you tend to inspect a homebrew formula's options before installing: <code>brew options macvim</code>
+</li>
+<li>And if you're like me: <code>brew install --override-system-vim macvim</code>
+</li>
+<li>Optionally you can: <code>brew linkapps</code> which will, by default, create a symlink to <code>MacVim.app</code> in <code>~/Applications</code>.</li>
+<li>Assuming your <code>PATH</code> is set correctly, you can run vim from the command line by typing <code>mvim</code>
+</li>
+<li>If you'd rather launch it from the dock, you can navigate to <code>~/Applications</code> and double-click <code>MacVim.app</code> assuming you've run <code>brew linkapps</code>
+</li>
+</ul><h3>
+<a name="debianubuntu" class="anchor" href="#debianubuntu"><span class="octicon octicon-link"></span></a>Debian/Ubuntu</h3>
+
+<p>TODO: Ubuntu vim install instructions</p>
+
+<h3>
+<a name="windows" class="anchor" href="#windows"><span class="octicon octicon-link"></span></a>Windows</h3>
+
+<p>TODO: Windows vim install instructions</p>
+
+<h2>
+<a name="installing-fireplacevim" class="anchor" href="#installing-fireplacevim"><span class="octicon octicon-link"></span></a>Installing fireplace.vim</h2>
+
+<p>Because fireplace.vim handles only the dynamic aspects of Clojure development, a separate plugin, <a href="https://github.com/guns/vim-clojure-static">vim-clojure-static</a> (extracted from VimClojure and maintained by <a href="https://github.com/guns">Sung Pae</a>) includes support for syntax highlighting, indentation, etc. You'll want to install both for a pleasant experience.</p>
+
+<p>Installation is covered thoroughly in the <a href="https://github.com/tpope/vim-fireplace/blob/master/README.markdown">fireplace README</a>. Since it's likely to be most up-to-date, we'll defer to it for purposes of installation.</p>
+
+<p>Once installed, there's really nothing to configure. Yay!</p>
+
+<h2>
+<a name="basics" class="anchor" href="#basics"><span class="octicon octicon-link"></span></a>Basics</h2>
+
+<p>Let's go through the process of creating a simple project to demonstrate some of fireplace.vim's capabilities.
+Because this author is a little lazy, we'll use the same example as the <a href="/clojuredocs/guides/blob/master/articles/tutorials/emacs.html">emacs tutorial</a>. That is, a simple
+command-line argument parser.</p>
+
+<p>First, we'll need a new project:</p>
+
+<pre><code>$ lein new command-line-args
+$ cd command-line-args
+</code></pre>
+
+<p>Now we need to start up Vim as well as the nREPL server. Luckily, just running the Leiningen 2 REPL will start up a server for us. If you're using console Vim, I suggest running
+each in its own console.</p>
+
+<p>In console 1:</p>
+
+<pre><code>$ lein repl
+nREPL server started on port 58197
+... REPL help message elided ...
+user=&gt;
+</code></pre>
+
+<p>Nice. And in console 2:</p>
+
+<pre><code>$ vim
+</code></pre>
+
+<p>If you're using gvim, just start gvim and then run the REPL:</p>
+
+<pre><code>$ gvim
+$ lein repl
+nREPL server started on port 58197
+... REPL help message elided ...
+user=&gt;
+</code></pre>
+
+<p><em>fireplace.vim will automatically figure out the nREPL port from the <code>target/repl-port</code> file written by Leiningen.</em></p>
+
+<p>Now we can start editing code (see <a href="#editing">Editing</a> below for tips on effectively editing Clojure code in Vim).</p>
+
+<p>Let's add a simple test. Execute <code>:e test/command_line_args/core_test.clj</code>, enter insert mode and add the following to the file:</p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="nf">deftest</span> <span class="nv">pairs-of-values</span>
+   <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">args</span> <span class="p">[</span><span class="s">"--server"</span> <span class="s">"localhost"</span>
+               <span class="s">"--port"</span> <span class="s">"8080"</span>
+               <span class="s">"--environment"</span> <span class="s">"production"</span><span class="p">]]</span>
+      <span class="p">(</span><span class="nf">is</span> <span class="p">(</span><span class="nb">= </span><span class="p">{</span><span class="ss">:server</span> <span class="s">"localhost"</span>
+              <span class="ss">:port</span> <span class="s">"8080"</span>
+              <span class="ss">:environment</span> <span class="s">"production"</span><span class="p">}</span>
+              <span class="p">(</span><span class="nf">parse-args</span> <span class="nv">args</span><span class="p">)))))</span>
+</pre></div>
+
+<p>To run the test, save the file, <code>:w</code>, and now we'll invoke our first fireplace.vim command, <code>cpr</code>. <em>All commands are run in normal mode, so bang on escape a few times first</em>. This performs a <code>(require ... :reload)</code> on the current buffer/namespace. Here we don't even get a chance to run the test. The code doesn't even compile because <code>command-line-args.core/parse-args</code> hasn't been defined yet. Let's fix that.</p>
+
+<p><em>Note: Anytime fireplace reports an exception in a namespace, you can get the full stack trace by opening Vim's "location list" with <code>:lopen</code>. Hit enter on a Clojure stack frame to jump to the relevant source.</em></p>
+
+<p>The easiest way to get to the <code>command-line-args.core</code> namespace is to put your cursor on <code>command-line-args.core</code> in the <code>ns</code> declaration at the top of the file and hit <code>gf</code>. This key combination will open the file for the namespace under the cursor. <em>It even works for namespaces in jar files!</em></p>
+
+<p>Next add the following definition in the <code>command-line-args.core</code> namespace:</p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="kd">defn </span><span class="nv">parse-args</span> <span class="p">[</span><span class="nv">args</span><span class="p">]</span>
+  <span class="p">{})</span>
+</pre></div>
+
+<p><em>Tip: Use <code>ctrl-w f</code> (ctrl-w followed by the f key) to split the view into two windows opening the file under the cursor in a new split.</em></p>
+
+<p>Save the file, <code>:w</code>, and then switch back to <code>test/command_line_args/core_test.clj</code>. Now we can try requiring the test namespace again. This time we'll use <code>cpR</code> (that's with a big 'R'), which performs a <code>(require ... :reload-all)</code> on the current namespace. That should succeed, so we can run the tests with the command <code>:Eval (clojure.test/run-tests)</code> which will print out a test failure with something like this:</p>
+
+<pre><code>Testing command-line-args.core-test
+
+FAIL in (pairs-of-values) (core_test.clj:9)
+expected: (= {:server "localhost", :port "8080", :environment "production"} (parse-args args))
+  actual: (not (= {:server "localhost", :environment "production", :port "8080"} {}))
+
+Ran 1 tests containing 1 assertions.
+1 failures, 0 errors.
+{:type :summary, :pass 0, :test 1, :error 0, :fail 1}
+</code></pre>
+
+<p>Note that we know a few fireplace commands now:</p>
+
+<ul>
+<li>
+<code>gf</code> - Jumps to the namespace under the cursor</li>
+<li>
+<code>cpr</code> and <code>cpR</code> - <code>(require :reload)</code> or <code>(require :reload-all)</code> the current namespace.</li>
+<li>
+<code>:Eval (clojure code)</code> - Evaluate arbitrary Clojure code in the current namespace.</li>
+<li>
+<code>:lopen</code> - Not really a fireplace command, but it opens the stacktrace for the last exception in the buffer.</li>
+</ul><p>Now we can fix some errors. Return to <code>command-line-args.core</code> and edit:</p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="kd">defn </span><span class="nv">parse-args</span> <span class="p">[</span><span class="nv">args</span><span class="p">]</span>
+  <span class="p">(</span><span class="nb">apply hash-map </span><span class="nv">args</span><span class="p">))</span>
+</pre></div>
+
+<p>Running our tests again we get another error:</p>
+
+<pre><code>Testing command-line-args.core-test
+
+FAIL in (pairs-of-values) (core_test.clj:9)
+expected: (= {:server "localhost", :port "8080", :environment "production"} (parse-args args))
+  actual: (not (= {:server "localhost", :environment "production", :port "8080"} {"--port"
+ "8080", "--server" "localhost", "--environment" "production"}))
+
+Ran 1 tests containing 1 assertions.
+1 failures, 0 errors.
+{:type :summary, :pass 0, :test 1, :error 0, :fail 1}
+</code></pre>
+
+<p>We need to strip off those dashes and turn them into keywords. Back to <code>core.clj</code> again. Let's take a different route this time. Put your cursor on <code>parse-args</code> in the test file and hit <code>] ctrl-D</code> (two keystrokes). That jumps right to <code>parse-args</code>. Now we can fix it up:</p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="kd">defn </span><span class="nv">parse-args</span> <span class="p">[</span><span class="nv">args</span><span class="p">]</span>
+  <span class="p">(</span><span class="nb">into </span><span class="p">{}</span> <span class="p">(</span><span class="nb">map </span><span class="p">(</span><span class="k">fn </span><span class="p">[[</span><span class="nv">k</span> <span class="nv">v</span><span class="p">]]</span> <span class="p">[(</span><span class="nb">keyword </span><span class="p">(</span><span class="nf">.replace</span> <span class="nv">k</span> <span class="s">"--"</span> <span class="s">""</span><span class="p">))</span> <span class="nv">v</span><span class="p">])</span>
+                <span class="p">(</span><span class="nf">partition</span> <span class="mi">2</span> <span class="nv">args</span><span class="p">))))</span>
+</pre></div>
+
+<p>and the test passes.</p>
+
+<p><em>Tip</em>: During testing you may get into the situation where you've deleted an old, possibly failing, test, yet it still runs because it's still in memory. Supposing the name of the test is <code>a-test</code>, you have a few options:</p>
+
+<ul>
+<li>Hit <code>cqp</code> (or use <code>:Eval</code>) and run <code>(ns-unmap *ns* 'a-test)</code> to remove the test from the namespace.</li>
+<li>Restart the Leiningen REPL. fireplace will re-initialize the connection the next time you run a command.</li>
+</ul><p>Wondering what <code>clojure.core/ns-unmap</code> does? In fireplace, use the command <code>:Doc ns-unmap</code> to see the docstring. If a symbol's under your cursor you can just hit <code>shift-K</code> to do the same thing.</p>
+
+<h2>
+<a name="the-quasi-repl-and-evaluating-code" class="anchor" href="#the-quasi-repl-and-evaluating-code"><span class="octicon octicon-link"></span></a>The Quasi-REPL and Evaluating Code</h2>
+
+<p>Note we've learned another handy command, <code>cqp</code>, which opens fireplace's "quasi-repl" where you can execute Clojure code in the current namespace. Tab-completion and command history are supported there as you'd expect. If you need to do a little more editing or you'd like to edit and re-run a previous command, hit <code>cqc</code> to bring up a command-line window similar to what you'd get with <code>q:</code> in normal Vim.</p>
+
+<p>Many times you'd like to just evaluate some snippet of code. fireplace.vim really shines here because it brings idiomatic Vim to bear on the problem. For example, it's common to have a snippet of test code you're playing with in a namespace, often in a <code>(comment )</code> at the end of the file. Let's say we have something like this:</p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="nf">comment</span>
+  <span class="p">(</span><span class="nf">my-service-call</span> <span class="p">(</span><span class="nf">choose-server</span> <span class="nv">load-balancer</span><span class="p">)</span>
+                   <span class="p">(</span><span class="nf">normalize-request</span> <span class="p">{</span> <span class="nv">...</span> <span class="nv">request</span> <span class="nb">map </span><span class="nv">...</span><span class="p">})))</span>
+</pre></div>
+
+<p>Say we wanted to evaluate the entire <code>(my-service-call ...)</code> expression. There are a few ways to do this:</p>
+
+<ul>
+<li>Put the cursor on <code>my-service-call</code> and hit <code>cpp</code>. This evaluates the inner-most expression containing the cursor</li>
+<li>Put the cursor on the opening paren and hit <code>cp%</code>. <code>cp</code> followed by a Vim text motion (see below) executes the text described by that motion. We could also do, for example <code>cpiw</code> (inner word) to look at the value of the symbol under the cursor.</li>
+<li>Put the cursor on the opening paren and hit <code>cq%</code>. This will grab the text (the <code>%</code> text motion again) and pre-populate the command-line window (<code>cqc</code> above) with the expression.</li>
+</ul><p>With all that it's easy to see we can evaluate the whole <code>my-service-call</code> expression, or any of the sub-expressions in the comment. Furthermore, if you're code's all referentially transparent and everything, the <code>cpX</code> family of commands have cousins of the form <code>c!X</code> which replace the expression with its result.</p>
+
+<h2>
+<a name="the-non-quasi-repl" class="anchor" href="#the-non-quasi-repl"><span class="octicon octicon-link"></span></a>The (non-quasi) REPL</h2>
+
+<p>Unlike VimClojure, fireplace.vim doesn't have an integrated REPL. I (DR) miss it a little, but <a href="https://github.com/trptcolin/reply">REPL-y</a>, the REPL that ships with Leiningen is very nice and since it's separated from Vim there's much less chance of locking up Vim with a long-running or infinite operation.</p>
+
+<p>Keep in mind that the nREPL server (the lein REPL) and fireplace are both playing in the same JVM. fireplace can see changes you make in nREPL and vice versa. So you can make some changes, save and hit <code>cpr</code> to reload the namespace and switch over to the REPL and the changes will be there.</p>
+
+<h2>
+<a name="editing" class="anchor" href="#editing"><span class="octicon octicon-link"></span></a>Editing</h2>
+
+<p>This section includes some tips on basic Clojure code editing in Vim.</p>
+
+<p>TODO: Move this to a separate, more general doc?</p>
+
+<h3>
+<a name="words" class="anchor" href="#words"><span class="octicon octicon-link"></span></a>"Words"</h3>
+
+<p>The <code>vim-clojure-static</code> plugin makes some minor adjustments to Vim's settings to improve the editing experience. In particular, it extends the notion of a "word" (<code>:help word</code>) to include additional characters like <code>-</code> (hyphen), <code>.</code> (dot), etc. This changes has a number of effects:</p>
+
+<ul>
+<li>Insert mode code completion (<code>ctrl-n</code> and <code>ctrl-p</code>) will complete words with hyphens which is very common in Clojure code</li>
+<li>The insanely useful, magical "star" (<code>*</code>) operator in normal mode will search for the full Clojure symbol under the cursor, including dots, hyphens, etc.</li>
+<li>Word motions (<code>:help w</code>), include dots, hyphens, etc. So <code>dw</code> in normal mode will delete an entire Clojure symbol.</li>
+</ul><h3>
+<a name="wrangling-parentheses" class="anchor" href="#wrangling-parentheses"><span class="octicon octicon-link"></span></a>Wrangling Parentheses</h3>
+
+<p>The most effective way to edit Clojure code is <em>structurally</em> with <a href="https://bitbucket.org/kovisoft/paredit/overview">paredit.vim</a>, but if you don't have time to learn that, Vim still brings a lot to the table for dealing with all the parentheses in Clojure code.</p>
+
+<p>First, obviously, the <code>%</code> motion (<code>:help %</code>) is very useful. In normal mode, put the cursor on an opening or closing paren and you can:</p>
+
+<ul>
+<li>Hit <code>%</code> to jump to the matching paren.</li>
+<li>Hit <code>d%</code> to delete the parens and everything they contain.</li>
+<li>Hit <code>y%</code> to "yank"/copy the parens and everything in them.</li>
+<li>Hit <code>c%</code> to delete the parens and the text they contain and start editing.</li>
+<li>Hit <code>v%</code> to select the parens and the text they contain visually.</li>
+</ul><p>The <code>%</code> motion is useful, but it's often more convenient to work with Vim's "block" text object (<code>:help text-objects</code>). This manifests in two forms. First, <code>ab</code> ("all block") which is an entire form, including the parentheses. Second, <code>ib</code> ("inner block") which is all the text within the enclosing parentheses. So, put your cursor anywhere within some parentheses in normal mode and you can:</p>
+
+<ul>
+<li>Hit <code>dab</code> ("delete all block") to delete the entire form.</li>
+<li>Hit <code>dib</code> ("delete inner block") to delete everything inside the parens.</li>
+<li>Hit <code>cab</code> ("change all block") to delete the entire form and enter insert mode.</li>
+<li>Hit <code>cib</code> ("change inner block") to delete the contents of the form, preserving parens, and enter insert mode.</li>
+<li>Hit <code>yab</code> ("yank all block") to copy the entire form including parens.</li>
+<li>Hit <code>yib</code> ("yank inner block") to copy the everything inside the parens.</li>
+</ul><p>And so on. Getting these commands in muscle memory can really speed up working with Clojure forms.</p>
+
+<p><em>Tip: Vim has text objects for blocks enclosed in square brackets (vectors), quotes (strings), curly braces (maps, sets) etc. They're all invaluable. <code>:help text-objects</code> !!!</em></p>
+
+<h2>
+<a name="code-completion" class="anchor" href="#code-completion"><span class="octicon octicon-link"></span></a>Code Completion</h2>
+
+<p>Some code completion is available with fireplace. It is built using Vim's <code>omni-complete</code>
+system. When typing a symbol, hit <code>ctrl-x ctrl-o</code> to start omni-complete. A popup with a
+list of suggestions will appear. Use <code>ctrl-n</code> and <code>ctrl-p</code> to change the selection and hit
+enter to expand a selection into the buffer.</p>
+
+<p>Note that Vim's built-in code completion, <code>ctrl-n</code> and <code>ctrl-p</code> in insert mode, also work fine while editing Clojure code.</p>
+
+<h2>
+<a name="getting-documentation" class="anchor" href="#getting-documentation"><span class="octicon octicon-link"></span></a>Getting Documentation</h2>
+
+<p>fireplace has handy shortcuts for getting documentation for Clojure functions:</p>
+
+<ul>
+<li>
+<code>shift-K</code>: Lookup the doc string for the symbol under the cursor. Works for Java classes as well.</li>
+<li>
+<code>:Doc</code>: Lookup the doc string for a symbol entered in a prompt. Works for Java classes as well.</li>
+</ul><p>And since source code is often the best/only documentation in Clojure:</p>
+
+<ul>
+<li>
+<code>[d</code>: display the source for the symbol under the cursor</li>
+<li>
+<code>:Source</code>: display the source code for a symbol entered in a prompt</li>
+</ul><h2>
+<a name="other-resources" class="anchor" href="#other-resources"><span class="octicon octicon-link"></span></a>Other Resources</h2>
+
+<h2>
+<a name="contributors" class="anchor" href="#contributors"><span class="octicon octicon-link"></span></a>Contributors</h2>
+
+<p><a href="http://darevay.com">Dave Ray</a>, 2013 (original author)</p></article>
+  </div>
+
+  </div>
+</div>
+
+<a href="#jump-to-line" rel="facebox[.linejump]" data-hotkey="l" class="js-jump-to-line" style="display:none">Jump to Line</a>
+<div id="jump-to-line" style="display:none">
+  <form accept-charset="UTF-8" class="js-jump-to-line-form">
+    <input class="linejump-input js-jump-to-line-field" type="text" placeholder="Jump to line&hellip;" autofocus>
+    <button type="submit" class="button">Go</button>
+  </form>
+</div>
+
+        </div>
+
+      </div><!-- /.repo-container -->
+      <div class="modal-backdrop"></div>
+    </div><!-- /.container -->
+  </div><!-- /.site -->
+
+
+    </div><!-- /.wrapper -->
+
+      <div class="container">
+  <div class="site-footer">
+    <ul class="site-footer-links right">
+      <li><a href="https://status.github.com/">Status</a></li>
+      <li><a href="http://developer.github.com">API</a></li>
+      <li><a href="http://training.github.com">Training</a></li>
+      <li><a href="http://shop.github.com">Shop</a></li>
+      <li><a href="/blog">Blog</a></li>
+      <li><a href="/about">About</a></li>
+
+    </ul>
+
+    <a href="/">
+      <span class="mega-octicon octicon-mark-github"></span>
+    </a>
+
+    <ul class="site-footer-links">
+      <li>&copy; 2013 <span title="0.02069s from github-fe119-cp1-prd.iad.github.net">GitHub</span>, Inc.</li>
+        <li><a href="/site/terms">Terms</a></li>
+        <li><a href="/site/privacy">Privacy</a></li>
+        <li><a href="/security">Security</a></li>
+        <li><a href="/contact">Contact</a></li>
+    </ul>
+  </div><!-- /.site-footer -->
+</div><!-- /.container -->
+
+
+    <div class="fullscreen-overlay js-fullscreen-overlay" id="fullscreen_overlay">
+  <div class="fullscreen-container js-fullscreen-container">
+    <div class="textarea-wrap">
+      <textarea name="fullscreen-contents" id="fullscreen-contents" class="js-fullscreen-contents" placeholder="" data-suggester="fullscreen_suggester"></textarea>
+          <div class="suggester-container">
+              <div class="suggester fullscreen-suggester js-navigation-container" id="fullscreen_suggester"
+                 data-url="/clojuredocs/guides/suggestions/commit">
+              </div>
+          </div>
+    </div>
+  </div>
+  <div class="fullscreen-sidebar">
+    <a href="#" class="exit-fullscreen js-exit-fullscreen tooltipped leftwards" title="Exit Zen Mode">
+      <span class="mega-octicon octicon-screen-normal"></span>
+    </a>
+    <a href="#" class="theme-switcher js-theme-switcher tooltipped leftwards"
+      title="Switch themes">
+      <span class="octicon octicon-color-mode"></span>
+    </a>
+  </div>
+</div>
+
+
+
+    <div id="ajax-error-message" class="flash flash-error">
+      <span class="octicon octicon-alert"></span>
+      <a href="#" class="octicon octicon-remove-close close ajax-error-dismiss"></a>
+      Something went wrong with that request. Please try again.
+    </div>
+
+  </body>
+</html>
+

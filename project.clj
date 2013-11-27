@@ -7,6 +7,7 @@
                  [org.clojure/data.json "0.2.3"]
                  [instaparse "1.2.2"] 
                  [com.googlecode.texhyphj/texhyphj "1.2"]
+                 [clabango "0.5"]
                  ]
   :main doremi_script_clojure.core
   :profiles {:uberjar {:aot :all}}
