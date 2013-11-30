@@ -1,28 +1,26 @@
-  #(ly:set-option 'midi-extension "mid")
-  \version "2.12.3"
-  \include "english.ly"
-  \header{ 
-  {{title_snippet}}
-  {{composer_snippet}}
+#(ly:set-option 'midi-extension "mid")
+\version "2.12.3"
+\include "english.ly"
+\header{ 
+  {{title-snippet}}
+  {{composer-snippet}}
   tagline = ""  % removed 
-  }
-%{
-{{src}}  
-%}
+}
+{{src-snippet}}  
 melody = {
 \clef treble
-{{key_snippet}}
+{{key-snippet}}
 \time {{time}}
 \autoBeamOn  
 {{notes}}
 }
 
 text = \lyricmode {
-  {{extracted_lyrics}}
+  {{extracted-lyrics}}
 }
 
 \score{
-{{transpose_snip}}
+{{transpose-snip}}
 <<
   \new Voice = "one" {
     \melody
@@ -38,7 +36,7 @@ text = \lyricmode {
 \midi { 
   \context {
     \Score
-    tempoWholesPerMinute = #(ly:make-moment {{beats_per_minute}} 4)
+    tempoWholesPerMinute = #(ly:make-moment {{beats-per-minute}} 4)
    }
  }
 }

@@ -12,9 +12,9 @@
     [clojure.pprint :refer [pprint]] 
     ))
 
-
 (defn sample-data[]
   (read-string (slurp (resource "fixtures/sample-data.clj"))))
+
 
 (def doremi-script-parser  
   (insta/parser
@@ -26,7 +26,7 @@
 (defn doremi-script-text->parsed-doremi-script[txt]
   (transform-parse-tree (run-through-parser txt) txt))
 
-;;(spit "resources/fixtures/sample-data.clj" (with-out-str (pprint (doremi-script-text->parsed-doremi-script "S R\nHi there"))))
+;;(spit "resources/fixtures/sample-data.clj" (with-out-str (pprint (doremi-script-text->parsed-doremi-script "~RG\nS|"))))
 
 
 (defn sample-data2[]
@@ -64,6 +64,11 @@
   (to-lilypond (-> "lilypond_templates/lilypond.txt" resource slurp)
                (json/read-str txt)))
 
+(defn doremi-json-to-lilypond[x]
+  ""
+  (to-lilypond (-> "lilypond_templates/lilypond.txt" resource slurp)
+               x))
+
 (comment
   (-json_text_to_lilypond "{}"))
 
@@ -82,8 +87,18 @@
     (catch Exception e (str "Error:" (.getMessage e)))
     )) 
 
+(defn main-json[txt]
+  (pprint-results 
+    (transform-parse-tree (run-through-parser  txt)
+                          txt)))
+
+(defn usage[]
+   (println "Usage: pipe std in as follows: \"SRG\" |  java -jar doremi-script-standalone.jar > my.ly to produce lilypond output. Or --json to produce doremi-script json format. Or --ly to produce lilypond output.") 
+  )
 (defn -main[& args]
   "Read from stdin. Writes results to stdout"
+  "Command line params: --json returns doremi json data"
+  "--ly returns lilypond data"
   (try
     (let [
           txt1 (get-stdin)
@@ -91,7 +106,15 @@
           x (transform-parse-tree (run-through-parser  txt)
                                   txt)
           ]
-      (println (pprint-results x)))
+  (cond 
+    (= (first args) "--json")
+      (println (pprint-results x))
+    (or (= (first args) "--ly") (empty? args)) 
+     (println (doremi-json-to-lilypond x))
+    true
+     (println (usage))
+      )
+      )
     (catch Exception e (str "Error:" (.getMessage e)))
     ))
 
