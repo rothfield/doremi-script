@@ -1,6 +1,6 @@
 (ns doremi_script_clojure.test
   (require	
-    [doremi_script_clojure.core :reload true :refer [sample-data doremi-script-text->parsed-doremi-script run-through-parser yesterday slurp-fixture]]
+    [doremi_script_clojure.core :reload true :refer [doremi-script-text->parsed-doremi-script run-through-parser yesterday slurp-fixture]]
     [doremi_script_clojure.semantic_analyzer :reload true :refer [transform-parse-tree]]
     [clojure.pprint :refer [pprint]] 
     [clojure.data.json :as json]
@@ -23,14 +23,7 @@
               (or (:items node) (:lines node) (:attributes node)
                 (:attributes node) node))
             x))
-;;(pprint (filter :syllable (my-seq2 (sample-data))))
 
-;;(println (last (map (fn[x] (println) (pprint x) (println))  (my-seq2 (sample-data)))))
-;;(pprint (my-seq2 [1 2 [3 4]]))
-
-;;(pprint (my-seq2 (sample-data)))
-;;(println "-------------")
-;;(println "syllables")
 (defn my-test[txt]
   (println "txt is")
   (pprint txt)

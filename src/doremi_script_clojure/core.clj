@@ -10,47 +10,79 @@
     [clojure.java.io :refer [input-stream resource]]
     [clojure.data.json :as json]
     [clojure.pprint :refer [pprint]] 
+    [clojure.walk :refer [postwalk]]
     ))
 
-(defn sample-data[]
-  (read-string (slurp (resource "fixtures/sample-data.clj"))))
 
 
 (def doremi-script-parser  
   (insta/parser
     (slurp (resource "doremiscript.ebnf")) :total true))
 
-(defn run-through-parser[txt]
+(defn doremi-text->parse-tree[txt]
   (doremi-script-parser txt))
 
 (defn doremi-script-text->parsed-doremi-script[txt]
-  (transform-parse-tree (run-through-parser txt) txt))
+  (transform-parse-tree (doremi-text->parse-tree txt) txt))
 
-;;(spit "resources/fixtures/sample-data.clj" (with-out-str (pprint (doremi-script-text->parsed-doremi-script "~RG\nS|"))))
-
-
-(defn sample-data2[]
-  (doremi-script-text->parsed-doremi-script "S\nHi John")
-  )
-
-;;(pprint (doremi-script-text->parsed-doremi-script "S"))
-;;(pprint (transform-parse-tree (run-through-parser "S") "S"))
-;; (pprint (sample-data))
-;;
-(defn pprint-results[x]
-  (if (:my_type x)
-    (with-out-str (json/pprint x))
-    (with-out-str (pprint x))))
-
-
-(defn slurp-fixture [file-name]
+(defn slurp-fixture[file-name]
   (slurp (resource 
            (str "fixtures/" file-name))))
 
 (def yesterday (slurp-fixture "yesterday.txt"))
 
+(defn to-string[doremi-data]
+  (let [
+                            default-formatter (fn default-formatter[x]
+                                            (array-map       :type (:my_type x)
+                                                   :source (:source x)
+                                                ))
+        postwalk-fn (fn to-string-postwalker[node]
+                      (let [ my-type (if (:is_barline node)
+                                       :barline
+                                       ;; else
+                                       (:my_type node))
+                            default-val (default-formatter node)
+                            ]
+                        ;; (println my-type)
+                        (case my-type
+                          :beat
+                          (array-map :type :beat :subdivisions (:subdivisions node) :items (:items node))
+                          :measure
+                          (array-map :type my-type 
+                                      :beat_count (:beat_count node) 
+                                      :items (:items node))
+                          :composition
+                          (array-map :type my-type 
+                                      :source (:source node)
+                                      :lines (:lines node))
+                          :sargam_line
+                          (array-map :type my-type 
+                                      :source (:source node)
+                                      :items (:items node))
+                          :pitch
+                          (array-map :type my-type 
+                                      :value (:value node)
+                                      :octave (:octave node)
+                                     :syllable (:syllable node)
+                                     )
+                          :dash
+                          :dash
+                          ;; (default-formatter node)
+                          :barline
+                          (array-map :type my-type 
+                                      :source (:source node)
+                                     )
+                          node
+                          )))
+        ]
+    (postwalk postwalk-fn doremi-data)
+    ))
 
-
+(defn pprint-results[x]
+  (if (:my_type x)
+    (with-out-str (json/pprint x))
+    (with-out-str (pprint x))))
 
 (defn get-stdin[]
   (with-open [rdr (java.io.BufferedReader. *in* )]
@@ -61,13 +93,11 @@
 (defn -json_text_to_lilypond[txt]
   "Takes parsed doremi-script json data as text"
   "Returns lilypond text"
-  (to-lilypond (-> "lilypond_templates/lilypond.txt" resource slurp)
-               (json/read-str txt)))
+  (to-lilypond (json/read-str txt)))
 
 (defn doremi-json-to-lilypond[x]
   ""
-  (to-lilypond (-> "lilypond_templates/lilypond.txt" resource slurp)
-               x))
+  (to-lilypond x))
 
 (comment
   (-json_text_to_lilypond "{}"))
@@ -78,7 +108,7 @@
   (try
     (let [
           txt (clojure.string/replace txt1 "\r\n" "\n")
-          x (transform-parse-tree (run-through-parser  txt)
+          x (transform-parse-tree (doremi-text->parse-tree  txt)
                                   txt)
           ]
       ;;(println "x is\n" x)
@@ -89,13 +119,31 @@
 
 (defn main-json[txt]
   (pprint-results 
-    (transform-parse-tree (run-through-parser  txt)
+    (transform-parse-tree (doremi-text->parse-tree  txt)
                           txt)))
+
+(defn doremi-text->json-data[txt]
+   (let [txt1 (clojure.string/replace txt "\r\n" "\n")
+         parse-tree (doremi-text->parse-tree txt1)
+         ]
+     (transform-parse-tree parse-tree txt1)
+  ))
+
+(defn doremi-text->lilypond[txt]
+   (let [txt1 (clojure.string/replace txt "\r\n" "\n")
+         parse-tree (doremi-text->parse-tree txt1)
+         json-data (transform-parse-tree parse-tree txt1)
+         ]
+     (to-lilypond json-data)
+  ))
+
+;;(pprint (doremi-text->lilypond "S"))
 
 (defn usage[]
    (println "Usage: pipe std in as follows: \"SRG\" |  java -jar doremi-script-standalone.jar > my.ly to produce lilypond output. Or --json to produce doremi-script json format. Or --ly to produce lilypond output.") 
   )
 (defn -main[& args]
+
   "Read from stdin. Writes results to stdout"
   "Command line params: --json returns doremi json data"
   "--ly returns lilypond data"
@@ -103,14 +151,14 @@
     (let [
           txt1 (get-stdin)
           txt (clojure.string/replace txt1 "\r\n" "\n")
-          x (transform-parse-tree (run-through-parser  txt)
+          x (transform-parse-tree (doremi-text->parse-tree  txt)
                                   txt)
           ]
   (cond 
     (= (first args) "--json")
       (println (pprint-results x))
     (or (= (first args) "--ly") (empty? args)) 
-     (println (doremi-json-to-lilypond x))
+     (println (to-lilypond x))
     true
      (println (usage))
       )

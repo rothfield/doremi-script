@@ -527,7 +527,6 @@
     (let [
           my-key (first node)
           my-map (array-map :my_type (keyword (lower-case (name my-key)))
-                            :source (get-source node txt)
                             :start_index (start-index node) 
                             )
           node2 (if (and (vector? (second node)) 
@@ -613,9 +612,10 @@
               ]
           (assoc my-map :beat_count beat-count :is_partial true :items my-items3))
         :TALA 
-        my-map
+        (assoc my-map :source (get-source node txt))
         :CHORD_SYMBOL
-        my-map
+        (assoc my-map 
+               :source (get-source node txt))
         :END_SLUR_SARGAM_PITCH
         ;; TODO: DRY with BEGIN_SLUR_SARGAM_PITCH
         (let [
@@ -634,7 +634,7 @@
               [_ begin-slur my-pitch2] node
               my-pitch (merge my-pitch2
                               {:column_offset 1
-                               :source (:source my-map)
+                               :source (get-source node txt)
                                })
               ]
           ;; add begin slur to attributes
@@ -644,7 +644,7 @@
 :UPPER_OCTAVE_LINE
 (merge  my-map (array-map :items (subvec node 1)))
 :SYLLABLE
-my-map 
+        (assoc my-map :source (get-source node txt))
 :ALTERNATE_ENDING_INDICATOR
 ; { my_type: 'ending', source: '1.____', n    um: 1, column: 2 }
 (merge my-map {:my_type :ending :num 99 })

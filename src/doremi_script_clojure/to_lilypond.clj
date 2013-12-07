@@ -1,50 +1,16 @@
 (ns doremi_script_clojure.to_lilypond
   (:require	
     [clabango.parser :refer [render]]
+    [clojure.java.io :refer [resource]]
     [clojure.string :refer [join]] 
     [clojure.pprint :refer [pprint]] 
     ))
-(defn sample-data[]
-  (read-string (slurp (clojure.java.io/resource "fixtures/sample-data.clj"))))
 
+(defn item-has-attribute[item attribute]
+  (some #(if (= attribute (:my_type %)) %) (:attributes item)))
 
+(def lilypond-symbol-for-tie "~")
 
-
-;; barline looks like this
-(comment
-    {:is_barline true,
-     :my_type :single_barline,
-     :source "|",
-     :start_index 5}
-)
-
-(defn lookup-lilypond-barline[barline-type]
-  " maps barline-type field for barlines"
-  (let [my-map
-        {
-         :reverse-final-barline "\\bar \"|.\""
-         :final-barline "\\bar \"||\" "
-         :double-barline "\\bar \"||\" " 
-         :single-barline "\\bar \"|\"" 
-         :left-repeat "\\bar \"|:\"" 
-         :right-repeat "\\bar \":|\"" 
-         }
-        ]
-    (or (barline-type my-map) (:single-barline my-map))
-    ))
-
-(def lilypond-octave-map
-  {
-   "-2 "","
-   "-1 """
-   "0 ""'"
-   "1 " "''"
-   "2" "'''"
-   })
-
-(defn line-to-lilypond-array[line & options]
-  [""]  ;; TODO
-  )
 (def fraction-to-lilypond
   ;;       # Todo: use fractions.js
   ;;       # TODO: have to tie notes for things like 5/8
@@ -105,6 +71,26 @@
    "1/8" "32"
    })
 
+(defn get-ornament[pitch]
+  (some #(if (= :ornament (:my_type %)) %) (:attributes pitch)))
+
+
+(def mordent-snippet
+"\\mordent") 
+
+(defn get-chord[pitch]
+  (some #(if (= :chord_symbol (:my_type %)) %) (:attributes pitch)))
+
+(defn chord-snippet[chord]
+  (:pre (= :chord_symbol (:my_type chord)))
+  (if (nil? chord)
+      ""
+      ;; else
+     (str "^\"" (:source chord) "\"")))
+
+(defn has-mordent?[pitch]
+  (some #(if (= :mordent (:my_type %)) %) (:attributes pitch)))
+
 
 (defn calculate-lilypond-duration[numerator denominator]
   "TODO: rewrite"
@@ -122,6 +108,358 @@
         "16"
         ))))
 
+(defn lilypond-escape[x]
+  (println "x is " x)
+  ;;      # Anything that is enclosed in %{ and %} is ignored  by lilypond
+  ;;      composition-data.source="" if !composition-data.source?
+  ;;      src1= composition-data.source.replace /%\{/gi, "% {"
+  ;;      src= src1.replace /\{%/gi, "% }"
+  (clojure.string/replace x #"\{%" "% {")
+  ) 
+
+;; barline looks like this
+(comment
+  {:is_barline true,
+   :my_type :single_barline,
+   :source "|",
+   :start_index 5}
+  )
+
+(defn- my-seq2[x]
+  (tree-seq (fn branch[node](or (map? node) (vector? node)))
+            (fn children[node]
+              (or (:items node) (:lines node) (:attributes node)
+                  (:attributes node) node))
+            x))
+
+(def lilypond-pitch-map
+  {
+   "-" "r"
+   "C" "c"
+   "C#" "cs"
+   "Cb" "cf"
+   "Db" "df"
+   "D" "d"
+   "D#" "ds"
+   "Eb" "ef"
+   "E" "e"
+   "E#" "es"
+   "F" "f"
+   "Fb" "ff"
+   "F#" "fs"
+   "Gb" "gf"
+   "G" "g"
+   "G#" "gs"
+   "Ab" "af"
+   "A" "a"
+   "A#" "as"
+   "Bb" "bf"
+   "B" "b"
+   "B#" "bs"
+   }
+  )
+
+(defn lookup-lilypond-barline[barline-type]
+  " maps barline-type field for barlines"
+  (let [my-map
+        {
+         :reverse-final-barline "\\bar \"|.\""
+         :final-barline "\\bar \"||\" "
+         :double-barline "\\bar \"||\" " 
+         :single-barline "\\bar \"|\"" 
+         :left-repeat "\\bar \"|:\"" 
+         :right-repeat "\\bar \":|\"" 
+         }
+        ]
+    (or (barline-type my-map) (:single-barline my-map))
+    ))
+
+(def lilypond-octave-map
+  {
+   -2 ","
+   -1 ""
+   0 "'"
+   1   "''"
+   2 "'''"
+   })
+
+
+(defn normalized-pitch-to-lilypond[pitch & options]
+  "Also handles dashes"
+  (let
+    [ 
+     ;; _ (println "normalized-pitch-to-lilypond, pitch=") 
+     ;; _ (pprint pitch)
+     my-template "{{grace1}}{{lilypond-pitch}}{{lilypond-octave}}{{duration}}{{lilypond-symbol-for-tie}}{{mordent}}{{begin-slur}}{{extra-end-slur}}{{end-slur}}{{ending}}{{chord}}{{grace2}}"
+     rest-template "r{{duration}}{{chord}}{{ending}}"
+     lilypond-octave  (lilypond-octave-map (:octave pitch))
+             duration (calculate-lilypond-duration 
+                         (:numerator pitch) 
+                         (:denominator pitch))
+     chord (chord-snippet (get-chord pitch))
+             ending (item-has-attribute pitch :ending)
+
+     ]
+    ;;(pprint pitch)
+    (cond (:ignore pitch)
+          ""
+          (and (= :dash (:my_type pitch)) 
+               (not (:dash_to_tie pitch)))
+    (render rest-template {
+           :duration duration
+           :chord chord
+          :ending ending                  
+                           })
+    true
+    (render my-template 
+            {:lilypond-pitch 
+             (lilypond-pitch-map (:normalized_pitch pitch))
+             :lilypond-octave  (lilypond-octave-map (:octave pitch))
+             :duration duration
+             :lilypond-symbol-for-tie (if (:tied pitch)
+                                       lilypond-symbol-for-tie "")
+             :chord chord
+             :mordent (if (not (has-mordent? pitch))
+                          ""
+                          ;; else
+                          mordent-snippet)
+             :begin-slur (if (item-has-attribute pitch :begin_slur) "(" )
+             :end-slur (if (item-has-attribute pitch :end_slur) ")" )
+          :ending ending                  
+    }
+            ))))
+
+
+;;    normalized-pitch-to-lilypond= (pitch,context={last-pitch: {},in-slur:false}) ->
+;;      special-case=false
+;;      if pitch.dash-to-tie and has-after-ornament(context.last-pitch)
+;;        console.log "***SPECIAL CASE" if false
+;;        special-case=true
+;;      console.log "context.in-slur is ", context.in-slur if false
+;;      # Render a pitch/dash as lilypond
+;;      # needs work
+;;      chord=get-chord(pitch)
+;;      ending=get-ending(pitch)
+;;      if pitch.fraction-array?
+;;        first-fraction=pitch.fraction-array[0]
+;;      else
+;;        first-fraction=new Fraction(pitch.numerator,pitch.denominator)
+;;      duration=calculate-lilypond-duration first-fraction.numerator.toString(),first-fraction.denominator.toString()
+;;      #@log("normalized-pitch-to-lilypond, pitch is",pitch)
+;;      if pitch.my-type is "dash"
+;;        # unfortunately this is resulting in tied 1/4s.
+;;        if pitch.dash-to-tie is true
+;;          pitch.normalized-pitch=pitch.pitch-to-use-for-tie.normalized-pitch
+;;          pitch.octave=pitch.pitch-to-use-for-tie.octave
+;;        else
+;;          return "r#{duration}#{chord}#{ending}"
+;;      lilypond-pitch=lilypond-pitch-map[pitch.normalized-pitch]
+;;      return "???#{pitch.source}" if  !lilypond-pitch?
+;;      lilypond-octave=lilypond-octave-map["#{pitch.octave}"]
+;;      return "???#{pitch.octave}" if !lilypond-octave?
+;;      # Lower markings would be added as follows:
+;;      # "-\"#{pp}\""
+;;      mordent = if has-mordent(pitch) then "\\mordent" else ""
+;;      begin-slur = if item-has-attribute(pitch,"begin-slur") then "("  else ""
+;;      end-slur  =  if item-has-attribute(pitch,"end-slur") then ")" else ""
+;;      in-slur=false
+;;      if item-has-attribute(pitch,"begin-slur")
+;;        in-slur=true
+;;      if item-has-attribute(pitch,"end-slur")
+;;        in-slur=true
+;;      console.log "in-slur is",in-slur if false
+;;      suppress-slurs=in-slur
+;;      if context.in-slur
+;;        suppress-slurs=true
+;;      lilypond-symbol-for-tie=  if pitch.tied? then '~' else ''
+;;      # From lilypond docs:
+;;      # If you want to end a note with a grace, 
+;;      # use the \afterGrace command. It takes two 
+;;      # arguments: the main note, and the 
+;;      # grace notes following the main note.
+;;      #
+;;      #  c1 \afterGrace d1( { c32[ d]) } c1
+;;      #
+;;      #  Use
+;;      #  \acciaccatura { e16 d16 } c4
+;;      #  for ornaments with ornament.placement is "before"
+;;    
+;;    
+;;      # The afterGrace in lilypond require parens to get lilypond
+;;      # to render a slur.
+;;      # The acciatura in lilypond don't require parens to get lilypond
+;;      # to render a slur.
+;;      #
+;;    
+;;      EXAMPLES = '''
+;;    \partial 4*2  | \afterGrace c'4( { b32[ d'32 c'32 b32 c'32] } c'8) d'8 \break
+;;    \partial 4*2  | \afterGrace c'4~ { b32[ d'32 c'32 b32 c'32] } c'8 d'8 \break
+;;     \partial 4*2  | c'4~ c'8 d'8 \break
+;;     '''
+;;      #
+;;      ornament=get-ornament(pitch)
+;;      grace1=grace2=grace-notes=""
+;;      if ornament?.placement is "after"
+;;        if pitch.tied?
+;;          suppress-slurs=true
+;;        if context.in-slur
+;;          suppress-slurs=true
+;;        if !context.in-slur #TODO: unfunkify
+;;          begin-slur="("
+;;        grace1 = "\\afterGrace "
+;;        #grace2="( { #{lilypond-grace-notes(ornament)}) }"
+;;        grace2=" { #{lilypond-grace-notes(ornament,suppress-slurs)} }"
+;;      if ornament?.placement is "before"
+;;      #  \acciaccatura { e16 d16 } c4
+;;        suppress-slurs=true # FOR NOW
+;;        grace1= "\\acciaccatura {#{lilypond-grace-notes(ornament,suppress-slurs)}}"
+;;      extra-end-slur=""
+;;      if special-case
+;;        extra-end-slur=")"
+;;      # Don't use tie if ornament is after!
+;;      if (ornament?.placement is "after") and pitch.tied?
+;;        console.log "OMG" if false
+;;        lilypond-symbol-for-tie=""
+;;      "#{grace1}#{lilypond-pitch}#{lilypond-octave}#{duration}#{lilypond-symbol-for-tie}#{mordent}#{begin-slur}#{extra-end-slur}#{end-slur}#{ending}#{chord}#{grace2}"
+
+
+;;" ~\n Dm7\n .\n(S-- R)-m | G - - - | m - - P |"))))
+
+(defn line-to-lilypond-array[line & options]
+  ;;(println "entering line-to-lilypond-array")
+  ;;(pprint line)
+  ;;    # Line is a line from the parsed doremi-script
+  ;;    # Returns an array of items - join them with a string
+  (let [in-slur (atom false)
+        in-times (atom false)
+        at-beginning-of-first-measure-of-line (atom false)
+        process-measure (fn process-measure[measure] 
+                          "" ;; TODO
+                          )
+        process-beat (fn process-beat[beat] 
+                       ;; TODO
+                       "")
+        process-barline (fn process-barline[x] 
+                          (lookup-lilypond-barline (:my_type x)))
+        process-pitch (fn process-pitch[x] 
+                        (str     (normalized-pitch-to-lilypond x {})
+                             (lilypond-octave-map (:octave x)) 
+                             ))
+        process-beat (fn process-beat[x] 
+                       ""
+                             )
+        process-item (fn process-item[item]
+                       (let [ my-type (:my_type item) ]
+                         ;;(println "in process-item, my-type is " my-type)
+                         (cond 
+                           (= :zdash my-type)
+                           (println "skipping dash")
+                           (or (= :pitch my-type) 
+                           (= :dash my-type))
+
+                               ;;        last-pitch=item  #use this to help render ties better(hopefully)
+                               ;;        if dashes-at-beginning-of-line-array.length > 0
+                               ;;          for dash in dashes-at-beginning-of-line-array
+                               ;;            ary.push normalized-pitch-to-lilypond(dash,{last-pitch:last-pitch})
+                               ;;          dashes-at-beginning-of-line-array=[]
+                               ;;        ary.push normalized-pitch-to-lilypond(item,{in-slur:  in-slur,last-pitch:last-pitch})
+                               (process-pitch item)
+                               (= :measure my-type)
+                               (process-measure item)
+                               (= :beat my-type)
+                               (process-beat item)
+                               (:is_barline item)
+                               (process-barline item)
+                               true
+                               ""
+                               )))
+        ]
+
+    ;;    in-slur=false
+    ;;    ary=[]
+    ;;    in-times=false #hack
+    ;;    at-beginning-of-first-measure-of-line=false
+    ;;    dashes-at-beginning-of-line-array=[]
+    ;;    tied-array=[]
+    ;;    at-beginning-of-first-measure-of-line=false
+    ;;    in-times=false #hack
+    ;;    #@log "processing #{line.source}"
+    ;;    all=[]
+    ;;    x=root.all-items(line,all)
+    ;;    last-pitch=null
+    ;;    for item in all
+    ;;      if item-has-attribute(item,"begin-slur") 
+    ;;        in-slur=true
+    ;;  
+    ;;      if item.my-type in ["pitch","barline","measure"] or item.is-barline
+    ;;        emit-tied-array(last-pitch,tied-array,ary) if tied-array.length >0 
+    ;;  
+    ;;      # TODO refactor
+    ;;      # TODO: barlines should get attributes like endings too and talas too!
+    ;;      if in-times
+    ;;        if item.my-type is "beat" or item.my-type is "barline"
+    ;;          ary.push "}"
+    ;;          in-times=false
+    ;;      #@log "processing #{item.source}, my-type is #{item.my-type}"
+    ;;      if item.my-type=="pitch"
+    ;;        last-pitch=item  #use this to help render ties better(hopefully)
+    ;;        if dashes-at-beginning-of-line-array.length > 0
+    ;;          for dash in dashes-at-beginning-of-line-array
+    ;;            ary.push normalized-pitch-to-lilypond(dash,{last-pitch:last-pitch})
+    ;;          dashes-at-beginning-of-line-array=[]
+    ;;        ary.push normalized-pitch-to-lilypond(item,{in-slur:  in-slur,last-pitch:last-pitch})
+    ;;      if item.is-barline
+    ;;        ary.push(lookup-lilypond-barline(item.my-type))
+    ;;      if item.my-type is "beat"
+    ;;         beat=item
+    ;;         if beat.subdivisions not in [0,1,2,4,8,16,32,64,128] and !beat-is-all-dashes(beat)
+    ;;             #@log "odd beat.subdivisions=",beat.subdivisions
+    ;;             x=2
+    ;;             if beat.subdivisions is 6
+    ;;               x=4
+    ;;             if  beat.subdivisions is 5
+    ;;               x=4
+    ;;             disable-tuplet-numbers="\\override TupletNumber #'stencil = ##f"
+    ;;             ary.push "#{disable-tuplet-numbers} \\times #{x}/#{beat.subdivisions} { "
+    ;;             in-times=true #hack
+    ;;      if item.my-type is "dash"
+    ;;        if !item.dash-to-tie and item.numerator? #THEN its at beginning of line!
+    ;;          #@log "pushing item onto dashes-at-beginning-of-line-array"
+    ;;          dashes-at-beginning-of-line-array.push item
+    ;;        if item.dash-to-tie
+    ;;          #TODO:review
+    ;;          console.log "dash-to-tie case!!***" if false
+    ;;          console.log "dash-to-tie case!!***last-pitch is",last-pitch if false
+    ;;          ary.push normalized-pitch-to-lilypond(item,{last-pitch: last-pitch})
+    ;;          item=null
+    ;;      if item? and item.my-type is "measure"
+    ;;         measure=item
+    ;;         if measure.is-partial
+    ;;           # Lilypond partial measures:
+    ;;           # \partial duration
+    ;;           # where duration is the rhythmic length of the interval 
+    ;;           # before the start of the first complete measure:
+;;           ary.push "\\partial 4*#{measure.beat-count} "
+;;      if item? and item.dash-to-tie
+;;        tied-array.push item if item?
+;;      # TODO: why/how can item be null???
+;;      if item? and item-has-attribute(item,"end-slur") 
+;;        in-slur=false
+;;    if in-times
+;;      ary.push "}"
+;;      in-times=false
+;;    console.log "tied-array",tied-array.length if false
+;;    emit-tied-array(last-pitch,tied-array,ary) if tied-array.length >0 
+;;    ary.push "\\break\n"
+;;    ary
+(conj (map process-item (filter :my_type (my-seq2(:items line)))) "\\break\n")
+))
+
+
+
+
+
+
 ;;      frac=";;{numerator}/#{denominator}"
 ;;      looked-up-duration=fraction-to-lilypond[frac]
 ;;      if !looked-up-duration?
@@ -130,12 +468,6 @@
 ;;      looked-up-duration
 
 ;;(pprint (calculate-lilypond-duration 4 6))
-
-(defn get-ornament[pitch]
-  (some #(if (= :ornament (:my_type %)) %) (:attributes pitch)))
-
-(defn has-mordent[pitch]
-  (some #(if (= :mordent (:my_type %)) %) (:attributes pitch)))
 
 
 (def pitch-with-after-ornament
@@ -246,33 +578,6 @@
 (defn notation-is-in-abc[composition-data]
   (some is-abc-line (:lines composition-data)))
 
-;;; (pprint (notation-is-in-abc (sample-data)))
-(def lilypond-pitch-map
-  {
-   "-" "r"
-   "C" "c"
-   "C#" "cs"
-   "Cb" "cf"
-   "Db" "df"
-   "D" "d"
-   "D#" "ds"
-   "Eb" "ef"
-   "E" "e"
-   "E#" "es"
-   "F" "f"
-   "Fb" "ff"
-   "F#" "fs"
-   "Gb" "gf"
-   "G" "g"
-   "G#" "gs"
-   "Ab" "af"
-   "A" "a"
-   "A#" "as"
-   "Bb" "bf"
-   "B" "b"
-   "B#" "bs"
-   }
-  )
 
 (defn lilypond-transpose[composition-data]
   "return transpose snippet for lilypond"
@@ -284,17 +589,11 @@
         true
         (str "\\transpose c' " (lilypond-pitch-map (:key composition-data)))))
 
-(defn- my-seq2[x]
-  (tree-seq (fn branch[node](or (map? node) (vector? node)))
-            (fn children[node]
-              (or (:items node) (:lines node) (:attributes node)
-                  (:attributes node) node))
-            x))
 
 (defn extract-lyrics[x]
   (map :syllable (filter :syllable (my-seq2 x))))
 
-(defn line-to-lilypond-array[line]
+(defn zline-to-lilypond-array[line]
   ;; TODO
   ;;    # Line is a line from the parsed doremi_script
   (let [ in-slur (atom false)
@@ -303,139 +602,47 @@
     ))
 
 (defn line-to-lilypond[line & options]
+  ;;(println "my-seq2 line is")
+  ;;(pprint (map :my_type (filter :my_type (my-seq2 line))))
   (join " " (line-to-lilypond-array line)))
+;;(to-lilypond "" {})
 
 
-(defn to-lilypond[template x]
-  :pre (map? x)
+
+(defn to-lilypond[doremi-data]
+  :pre (map? doremi-data)
+  :pre (= :composition (:my_type doremi-data))
   "Takes parsed doremi-script and returns lilypond text"
   ""
   (let [ src "source here"
+        template (-> "lilypond/composition.tpl" resource slurp)
         ]
-  ;;(println "lyrics")
-  ;;(println (extract-lyrics x))
-  ;;(println "lines line-to-lilypond-array")
-  ;;(pprint (mapcat line-to-lilypond-array (:lines x)))
-  (render template 
-          {:transpose-snip (lilypond-transpose x) 
-           :extracted-lyrics (apply str (join " " (extract-lyrics x)))
-           :beats-per-minute 200
-           :title-snippet ""
-           :src-snippet (str  "%{\n" src "\n%}\n")
-           :notes "a'8"
-           :time "4/4"
-           })))
-
-;;(pprint (filter :syllable (my-seq2 (sample-data))))
-
-;;  (if false
-;;  (pprint (to-lilypond 
-;;            (-> "lilypond_templates/lilypond.txt" 
-;;                clojure.java.io/resource 
-;;                slurp)
-;;            (doremi_script_clojure.core/sample-data)))
-;;  )
-
-
+    ;;(println "lyrics")
+    ;;(println (extract-lyrics x))
+    ;;(println "lines line-to-lilypond-array")
+    ;;(pprint (mapcat line-to-lilypond-array (:lines x)))
+    ;;(println "doremi-data")
+    ;;(pprint doremi-data)
+    (render template 
+            {:transpose-snip (lilypond-transpose doremi-data) 
+             :extracted-lyrics (apply str (join " " (extract-lyrics doremi-data)))
+             :beats-per-minute 200
+             :title-snippet ""
+             :src-snippet (str  "%{\n " (lilypond-escape (:source doremi-data)) " \n %}\n")
+             :notes (join "\n" (map line-to-lilypond (:lines doremi-data))) 
+             :time "4/4"
+             })))
+;;(comment
 (comment
-  (to-lilypond "notmuch" (doremi_script_clojure.core/sample-data))
-  )
+  (println
+    (to-lilypond 
+(doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+  "-- S - R"
+  ))))
 
 
 
 
-
-;; Messy code from coffeescript version to
-;;
-;; process a line.
-;;
-;;  line-to-lilypond-array = (line,options={}) ->
-;;    # Line is a line from the parsed doremi-script
-;;    # Returns an array of items - join them with a string
-;;    in-slur=false
-;;    ary=[]
-;;    in-times=false #hack
-;;    at-beginning-of-first-measure-of-line=false
-;;    dashes-at-beginning-of-line-array=[]
-;;    tied-array=[]
-;;    at-beginning-of-first-measure-of-line=false
-;;    in-times=false #hack
-;;    #@log "processing #{line.source}"
-;;    all=[]
-;;    x=root.all-items(line,all)
-;;    last-pitch=null
-;;    for item in all
-;;      if item-has-attribute(item,"begin-slur") 
-;;        in-slur=true
-;;  
-;;      if item.my-type in ["pitch","barline","measure"] or item.is-barline
-;;        emit-tied-array(last-pitch,tied-array,ary) if tied-array.length >0 
-;;  
-;;      # TODO refactor
-;;      # TODO: barlines should get attributes like endings too and talas too!
-;;      if in-times
-;;        if item.my-type is "beat" or item.my-type is "barline"
-;;          ary.push "}"
-;;          in-times=false
-;;      #@log "processing #{item.source}, my-type is #{item.my-type}"
-;;      if item.my-type=="pitch"
-;;        last-pitch=item  #use this to help render ties better(hopefully)
-;;        if dashes-at-beginning-of-line-array.length > 0
-;;          for dash in dashes-at-beginning-of-line-array
-;;            ary.push normalized-pitch-to-lilypond(dash,{last-pitch:last-pitch})
-;;          dashes-at-beginning-of-line-array=[]
-;;        ary.push normalized-pitch-to-lilypond(item,{in-slur:  in-slur,last-pitch:last-pitch})
-;;      if item.is-barline
-;;        ary.push(lookup-lilypond-barline(item.my-type))
-;;      if item.my-type is "beat"
-;;         beat=item
-;;         if beat.subdivisions not in [0,1,2,4,8,16,32,64,128] and !beat-is-all-dashes(beat)
-;;             #@log "odd beat.subdivisions=",beat.subdivisions
-;;             x=2
-;;             if beat.subdivisions is 6
-;;               x=4
-;;             if  beat.subdivisions is 5
-;;               x=4
-;;             disable-tuplet-numbers="\\override TupletNumber #'stencil = ##f"
-;;             ary.push "#{disable-tuplet-numbers} \\times #{x}/#{beat.subdivisions} { "
-;;             in-times=true #hack
-;;      if item.my-type is "dash"
-;;        if !item.dash-to-tie and item.numerator? #THEN its at beginning of line!
-;;          #@log "pushing item onto dashes-at-beginning-of-line-array"
-;;          dashes-at-beginning-of-line-array.push item
-;;        if item.dash-to-tie
-;;          #TODO:review
-;;          console.log "dash-to-tie case!!***" if false
-;;          console.log "dash-to-tie case!!***last-pitch is",last-pitch if false
-;;          ary.push normalized-pitch-to-lilypond(item,{last-pitch: last-pitch})
-;;          item=null
-;;      if item? and item.my-type is "measure"
-;;         measure=item
-;;         if measure.is-partial
-;;           # Lilypond partial measures:
-;;           # \partial duration
-;;           # where duration is the rhythmic length of the interval 
-;;           # before the start of the first complete measure:
-;;           ary.push "\\partial 4*#{measure.beat-count} "
-;;      if item? and item.dash-to-tie
-;;        tied-array.push item if item?
-;;      # TODO: why/how can item be null???
-;;      if item? and item-has-attribute(item,"end-slur") 
-;;        in-slur=false
-;;    if in-times
-;;      ary.push "}"
-;;      in-times=false
-;;    console.log "tied-array",tied-array.length if false
-;;    emit-tied-array(last-pitch,tied-array,ary) if tied-array.length >0 
-;;    ary.push "\\break\n"
-;;    ary
-;;  
-;;  
-;;  
-;;  
-;;  
-;;  
-;;  
 ;; Note that the parser produces something like this for
 ;; -- --S- 
 ;;
