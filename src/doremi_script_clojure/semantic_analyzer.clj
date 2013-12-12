@@ -649,7 +649,7 @@
 ; { my_type: 'ending', source: '1.____', n    um: 1, column: 2 }
 (merge my-map {:my_type :ending :num 99 })
 :COMPOSITION 
-(handle-composition-in-main-walk node2)
+(handle-composition-in-main-walk (assoc node2 :source (get-source node txt)))
 :PITCH_WITH_DASHES
 (handle-pitch-with-dashes-in-main-walk node)
 :DASHES

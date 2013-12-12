@@ -76,7 +76,7 @@
 
 
 (def mordent-snippet
-"\\mordent") 
+  "\\mordent") 
 
 (defn get-chord[pitch]
   (some #(if (= :chord_symbol (:my_type %)) %) (:attributes pitch)))
@@ -84,21 +84,25 @@
 (defn chord-snippet[chord]
   (:pre (= :chord_symbol (:my_type chord)))
   (if (nil? chord)
-      ""
-      ;; else
-     (str "^\"" (:source chord) "\"")))
+    ""
+    ;; else
+    (str "^\"" (:source chord) "\"")))
 
 (defn has-mordent?[pitch]
   (some #(if (= :mordent (:my_type %)) %) (:attributes pitch)))
 
 
-(defn calculate-lilypond-duration[numerator denominator]
+(defn calculate-lilypond-duration[my-numerator my-denominator]
+;;  (:pre (not (nil? my-numerator)))
+ ;; (:pre (not (nil? my-denominator)))
+  ;;(println "entering calculate-lilypond-duration, my-numerator my-denominator " my-numerator my-denominator )
   "TODO: rewrite"
-  (if (= numerator denominator)
+  (if (= my-numerator my-denominator)
     "4"
     ;; else
-    (let [frac (str numerator "/" denominator)
-          ;;_ (println frac)
+    (let [frac (str my-numerator "/" my-denominator)
+          ;; _ (println "frac is ")
+          ;; _ (println frac)
           looked-up-duration (fraction-to-lilypond frac)
           ;;_ (println looked-up-duration)
           ]
@@ -109,7 +113,7 @@
         ))))
 
 (defn lilypond-escape[x]
-  (println "x is " x)
+  ;;(println "x is " x)
   ;;      # Anything that is enclosed in %{ and %} is ignored  by lilypond
   ;;      composition-data.source="" if !composition-data.source?
   ;;      src1= composition-data.source.replace /%\{/gi, "% {"
@@ -174,6 +178,9 @@
     (or (barline-type my-map) (:single-barline my-map))
     ))
 
+(def partial-template
+   (-> "lilypond/partial.tpl" resource slurp))
+
 (def lilypond-octave-map
   {
    -2 ","
@@ -185,49 +192,76 @@
 
 
 (defn normalized-pitch-to-lilypond[pitch & options]
+  ;;(println "normalized-pitch-to-lilypond")
+  ;;(println "pitch is:")
+  ;;(pprint pitch)
   "Also handles dashes"
+  "Render a pitch/dash as lilypond"
   (let
     [ 
      ;; _ (println "normalized-pitch-to-lilypond, pitch=") 
      ;; _ (pprint pitch)
-     my-template "{{grace1}}{{lilypond-pitch}}{{lilypond-octave}}{{duration}}{{lilypond-symbol-for-tie}}{{mordent}}{{begin-slur}}{{extra-end-slur}}{{end-slur}}{{ending}}{{chord}}{{grace2}}"
-     rest-template "r{{duration}}{{chord}}{{ending}}"
+     pitch-template (-> "lilypond/pitch.tpl" resource slurp)
+     rest-template (-> "lilypond/rest.tpl" resource slurp)
      lilypond-octave  (lilypond-octave-map (:octave pitch))
-             duration (calculate-lilypond-duration 
-                         (:numerator pitch) 
-                         (:denominator pitch))
+     duration (calculate-lilypond-duration 
+                (:numerator pitch) 
+                (:denominator pitch))
+     ;; _ (println "duration is: " duration)
      chord (chord-snippet (get-chord pitch))
-             ending (item-has-attribute pitch :ending)
-
+     ending (item-has-attribute pitch :ending)
+    ; _ (println "pitch is")
+    ; _ (pprint pitch)
+     pitch2 (if (and (= :dash (:my_type pitch)) 
+                     (:dash_to_tie pitch))
+              (do
+               ; (println "special")
+               ; (pprint (:pitch_to_use_for_tie pitch))
+               ; (println "***")
+               ; (pprint (get-in pitch [:pitch_to_use_for_tie :normalized_pitch]))
+               ; (pprint "***")
+               ; (pprint 
+               ;   (get-in [:pitch_to_use_for_tie :normalized_pitch] pitch)
+               ;   )
+                   (assoc pitch :normalized_pitch (get-in pitch [:pitch_to_use_for_tie :normalized_pitch] ) :octave (get-in pitch [:pitch_to_use_for_tie :octave] ))
+                )
+                  ;; else
+                pitch)
+;;          pitch.normalized-pitch=pitch.pitch-to-use-for-tie.normalized-pitch
+;;          pitch.octave=pitch.pitch-to-use-for-tie.octave
      ]
-    ;;(pprint pitch)
-    (cond (:ignore pitch)
+    ;;(println "pitch2 is")
+    ;;(pprint pitch2)
+    (cond (:ignore pitch2)
           ""
-          (and (= :dash (:my_type pitch)) 
-               (not (:dash_to_tie pitch)))
-    (render rest-template {
-           :duration duration
-           :chord chord
-          :ending ending                  
-                           })
-    true
-    (render my-template 
-            {:lilypond-pitch 
-             (lilypond-pitch-map (:normalized_pitch pitch))
-             :lilypond-octave  (lilypond-octave-map (:octave pitch))
-             :duration duration
-             :lilypond-symbol-for-tie (if (:tied pitch)
-                                       lilypond-symbol-for-tie "")
-             :chord chord
-             :mordent (if (not (has-mordent? pitch))
-                          ""
-                          ;; else
-                          mordent-snippet)
-             :begin-slur (if (item-has-attribute pitch :begin_slur) "(" )
-             :end-slur (if (item-has-attribute pitch :end_slur) ")" )
-          :ending ending                  
-    }
-            ))))
+          (:pointer pitch)
+          ""
+          (and (= :dash (:my_type pitch2)) 
+              (not (:dash_to_tie pitch2)))
+          (render rest-template {
+                                 :duration duration
+                                 :chord chord
+                                 :ending ending                  
+                                 })
+          (or (= :pitch (:my_type pitch2))
+              (= :dash (:my_type pitch2)))
+          (render pitch-template 
+                  {:lilypond-pitch 
+                   (lilypond-pitch-map (:normalized_pitch pitch2))
+                   :lilypond-octave  (lilypond-octave-map (:octave pitch2))
+                   :duration duration
+                   :lilypond-symbol-for-tie (if (:tied pitch2)
+                                              lilypond-symbol-for-tie "")
+                   :chord chord
+                   :mordent (if (not (has-mordent? pitch2))
+                              ""
+                              ;; else
+                              mordent-snippet)
+                   :begin-slur (if (item-has-attribute pitch2 :begin_slur) "(" )
+                   :end-slur (if (item-has-attribute pitch2 :end_slur) ")" )
+                   :ending ending                  
+                   }
+                  ))))
 
 
 ;;    normalized-pitch-to-lilypond= (pitch,context={last-pitch: {},in-slur:false}) ->
@@ -326,6 +360,8 @@
 ;;" ~\n Dm7\n .\n(S-- R)-m | G - - - | m - - P |"))))
 
 (defn line-to-lilypond-array[line & options]
+  ;; You could also think of doing the processing recursively
+  ;; 
   ;;(println "entering line-to-lilypond-array")
   ;;(pprint line)
   ;;    # Line is a line from the parsed doremi-script
@@ -334,46 +370,43 @@
         in-times (atom false)
         at-beginning-of-first-measure-of-line (atom false)
         process-measure (fn process-measure[measure] 
-                          "" ;; TODO
+;;           ;; "\partial 4*#{measure.beat-count} "
+                (render partial-template {:beat-count (:beat_count measure)})
                           )
         process-beat (fn process-beat[beat] 
                        ;; TODO
                        "")
         process-barline (fn process-barline[x] 
                           (lookup-lilypond-barline (:my_type x)))
-        process-pitch (fn process-pitch[x] 
-                        (str     (normalized-pitch-to-lilypond x {})
-                             (lilypond-octave-map (:octave x)) 
-                             ))
         process-beat (fn process-beat[x] 
                        ""
-                             )
+                       )
         process-item (fn process-item[item]
                        (let [ my-type (:my_type item) ]
                          ;;(println "in process-item, my-type is " my-type)
                          (cond 
-                           (= :zdash my-type)
-                           (println "skipping dash")
                            (or (= :pitch my-type) 
-                           (= :dash my-type))
+                               (= :dash my-type))
 
-                               ;;        last-pitch=item  #use this to help render ties better(hopefully)
-                               ;;        if dashes-at-beginning-of-line-array.length > 0
-                               ;;          for dash in dashes-at-beginning-of-line-array
-                               ;;            ary.push normalized-pitch-to-lilypond(dash,{last-pitch:last-pitch})
-                               ;;          dashes-at-beginning-of-line-array=[]
-                               ;;        ary.push normalized-pitch-to-lilypond(item,{in-slur:  in-slur,last-pitch:last-pitch})
-                               (process-pitch item)
-                               (= :measure my-type)
-                               (process-measure item)
-                               (= :beat my-type)
-                               (process-beat item)
-                               (:is_barline item)
-                               (process-barline item)
-                               true
-                               ""
-                               )))
+                           ;;        last-pitch=item  #use this to help render ties better(hopefully)
+                           ;;        if dashes-at-beginning-of-line-array.length > 0
+                           ;;          for dash in dashes-at-beginning-of-line-array
+                           ;;            ary.push normalized-pitch-to-lilypond(dash,{last-pitch:last-pitch})
+                           ;;          dashes-at-beginning-of-line-array=[]
+                           ;;        ary.push normalized-pitch-to-lilypond(item,{in-slur:  in-slur,last-pitch:last-pitch})
+                           (normalized-pitch-to-lilypond item)
+                           (= :measure my-type)
+                           (process-measure item)
+                           (= :beat my-type)
+                           (process-beat item)
+                           (:is_barline item)
+                           (process-barline item)
+                           true
+                           ""
+                           )))
         ]
+(conj (map process-item (filter :my_type (my-seq2(:items line)))) "\\break\n")
+))
 
     ;;    in-slur=false
     ;;    ary=[]
@@ -431,14 +464,14 @@
     ;;          console.log "dash-to-tie case!!***" if false
     ;;          console.log "dash-to-tie case!!***last-pitch is",last-pitch if false
     ;;          ary.push normalized-pitch-to-lilypond(item,{last-pitch: last-pitch})
-    ;;          item=null
-    ;;      if item? and item.my-type is "measure"
-    ;;         measure=item
-    ;;         if measure.is-partial
-    ;;           # Lilypond partial measures:
-    ;;           # \partial duration
-    ;;           # where duration is the rhythmic length of the interval 
-    ;;           # before the start of the first complete measure:
+;;          item=null
+;;      if item? and item.my-type is "measure"
+;;         measure=item
+;;         if measure.is-partial
+;;           # Lilypond partial measures:
+;;           # \partial duration
+;;           # where duration is the rhythmic length of the interval 
+;;           # before the start of the first complete measure:
 ;;           ary.push "\\partial 4*#{measure.beat-count} "
 ;;      if item? and item.dash-to-tie
 ;;        tied-array.push item if item?
@@ -452,8 +485,6 @@
 ;;    emit-tied-array(last-pitch,tied-array,ary) if tied-array.length >0 
 ;;    ary.push "\\break\n"
 ;;    ary
-(conj (map process-item (filter :my_type (my-seq2(:items line)))) "\\break\n")
-))
 
 
 
@@ -632,13 +663,17 @@
              :notes (join "\n" (map line-to-lilypond (:lines doremi-data))) 
              :time "4/4"
              })))
-;;(comment
+
 (comment
+  (use 'clojure.stacktrace) 
+  (print-stack-trace *e)
   (println
     (to-lilypond 
-(doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-  "-- S - R"
-  ))))
+      (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+        "-- S - R"
+        ))
+      
+      ))
 
 
 
@@ -1100,4 +1135,13 @@
 ;;      lilypond-template
 ;;    
 ;;    
-;;    ;;
+;;    ;
+;;    ;
+
+(comment
+(println (to-lilypond 
+      (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+        ;"S--g - R | S R G m |"
+        "S--g -"
+        )))
+)
