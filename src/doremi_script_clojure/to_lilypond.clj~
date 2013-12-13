@@ -51,7 +51,7 @@
 
 (defn lilypond-grace-note-pitch[pitch]
   "generate a single pitch for use as a grace note"
-  (render grace-note-pitch-template 
+  (render "{{lilypond-pitch}}{{lilypond-octave}}{{duration}}" 
           {:lilypond-pitch (lilypond-pitch-map (:normalized_pitch pitch))
      :lilypond-octave  (lilypond-octave-map (:octave pitch))
            :duration "32"})

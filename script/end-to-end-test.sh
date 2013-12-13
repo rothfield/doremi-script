@@ -8,7 +8,10 @@ echo "Deleting $fname.json $fname.ly $fname.png $fname.mid $fname.ps if they exi
 rm -f $fname.json $fname.ly $fname.png $fname.mid $fname.ps
 echo "Reading $1"
 echo "Temporary files created are $fname.json and $fname.ly"
-cat $1 | java -jar $dirname/../target/doremi-script-standalone.jar --ly | tee $fname.ly |  lilypond -o $fname -f png - ; feh $fname.png
+# cat $1 | java -jar $dirname/../target/doremi-script-standalone.jar --ly | tee $fname.ly |  lilypond -o $fname -f png - ; feh $fname.png
+
+echo "using lein run --ly"
+cat $1 | lein run --ly | tee $fname.ly |  lilypond -o $fname -f png - ; feh $fname.png
 
 #cat $1 | lein run > $fname.json ;
 # I've been unable to get clojure to pretty-print the json, so use node.
