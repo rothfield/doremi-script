@@ -2,7 +2,7 @@
   (:require	
     [clabango.parser :refer [render]]
     [clojure.java.io :refer [resource]]
-    [clojure.string :refer [join]] 
+    [clojure.string :refer [join lower-case]] 
     [clojure.pprint :refer [pprint]] 
     ))
 
@@ -180,6 +180,8 @@
 
 (def partial-template
    (-> "lilypond/partial.tpl" resource slurp))
+(def ending-template
+   (-> "lilypond/ending.tpl" resource slurp))
 
 (def lilypond-octave-map
   {
@@ -209,7 +211,9 @@
                 (:denominator pitch))
      ;; _ (println "duration is: " duration)
      chord (chord-snippet (get-chord pitch))
-     ending (item-has-attribute pitch :ending)
+     ending (render ending-template { :ending 
+                            (:source (item-has-attribute pitch :ending))
+                            })
     ; _ (println "pitch is")
     ; _ (pprint pitch)
      pitch2 (if (and (= :dash (:my_type pitch)) 
@@ -241,7 +245,7 @@
           (render rest-template {
                                  :duration duration
                                  :chord chord
-                                 :ending ending                  
+                                 :ending ending                
                                  })
           (or (= :pitch (:my_type pitch2))
               (= :dash (:my_type pitch2)))
@@ -609,6 +613,8 @@
 (defn notation-is-in-abc[composition-data]
   (some is-abc-line (:lines composition-data)))
 
+(def transpose-template
+        (-> "lilypond/transpose.tpl" resource slurp))
 
 (defn lilypond-transpose[composition-data]
   "return transpose snippet for lilypond"
@@ -618,11 +624,16 @@
         (notation-is-in-abc composition-data)
         ""
         true
-        (str "\\transpose c' " (lilypond-pitch-map (:key composition-data)))))
-
+        (render transpose-template 
+                {:key (lilypond-pitch-map (:key composition-data))})))
 
 (defn extract-lyrics[x]
-  (map :syllable (filter :syllable (my-seq2 x))))
+  (map :syllable (filter 
+  #(and (not (:pointer %)) (#{:pitch :dash} (:my_type %))
+       (:syllable %))
+                   (my-seq2 x))))
+
+
 
 (defn zline-to-lilypond-array[line]
   ;; TODO
@@ -647,6 +658,7 @@
   ""
   (let [ src "source here"
         template (-> "lilypond/composition.tpl" resource slurp)
+        key-template (-> "lilypond/key.tpl" resource slurp)
         ]
     ;;(println "lyrics")
     ;;(println (extract-lyrics x))
@@ -657,9 +669,14 @@
     (render template 
             {:transpose-snip (lilypond-transpose doremi-data) 
              :extracted-lyrics (apply str (join " " (extract-lyrics doremi-data)))
+             ;; :zzz (pprint (extract-lyrics doremi-data))
              :beats-per-minute 200
              :title-snippet ""
              :src-snippet (str  "%{\n " (lilypond-escape (:source doremi-data)) " \n %}\n")
+             
+             :key-snippet (render key-template { :key "c"  ;; Always set to c as we are transposing. TODO: review.
+                                                :mode (lower-case (:mode doremi-data "major"))
+                                               }) 
              :notes (join "\n" (map line-to-lilypond (:lines doremi-data))) 
              :time "4/4"
              })))
@@ -1142,6 +1159,6 @@
 (println (to-lilypond 
       (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
         ;"S--g - R | S R G m |"
-        "S--g -"
-        )))
-)
+;;        "S--g -"
+   (-> "fixtures/yesterday.txt" resource slurp)
+        ))))

@@ -25,8 +25,8 @@ Key: D
 | (d-Pm  g) P  m | r - S :|
    ga-      wa-ta  ho- ri
 
-               .
-              <g>
-            .   . .
-| g m d n | S - r S |
-ji-na ja-u san-ga
+                 .
+                <g>
+              .   . .
+| g m (d n) | S - r S |
+  ji-na ja-   u   san-ga

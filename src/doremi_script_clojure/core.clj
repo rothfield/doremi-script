@@ -142,11 +142,14 @@
 (defn usage[]
    (println "Usage: pipe std in as follows: \"SRG\" |  java -jar doremi-script-standalone.jar > my.ly to produce lilypond output. Or --json to produce doremi-script json format. Or --ly to produce lilypond output.") 
   )
+
+
 (defn -main[& args]
 
   "Read from stdin. Writes results to stdout"
   "Command line params: --json returns doremi json data"
   "--ly returns lilypond data"
+  "defaults to lilypond"
   (try
     (let [
           txt1 (get-stdin)

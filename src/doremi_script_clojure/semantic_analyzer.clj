@@ -646,8 +646,8 @@
 :SYLLABLE
         (assoc my-map :source (get-source node txt))
 :ALTERNATE_ENDING_INDICATOR
-; { my_type: 'ending', source: '1.____', n    um: 1, column: 2 }
-(merge my-map {:my_type :ending :num 99 })
+;; TODO: finish
+(merge my-map {:my_type :ending :num 99 :source (get-source node txt) })
 :COMPOSITION 
 (handle-composition-in-main-walk (assoc node2 :source (get-source node txt)))
 :PITCH_WITH_DASHES
