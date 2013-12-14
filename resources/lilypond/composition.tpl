@@ -10,7 +10,7 @@
 melody = {
 \clef treble
 {{key-snippet}}
-{{time-snippet}}
+{{time-signature-snippet}}
 \autoBeamOn  
 {{notes}}
 }

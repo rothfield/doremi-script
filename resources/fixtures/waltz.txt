@@ -1,4 +1,4 @@
-Time: 3/4
+TimeSignature: 3/4
 
 | S - - | R - S | N - - | - - - |
                   .

@@ -447,7 +447,7 @@
    :force_sargam_chars_hash {}
    :notes_used ""
    :warnings []
-   :time_signature "4/4"
+ ;;  :time_signature "4/4"
    :apply_hyphenated_lyrics false
    :filename "untitled"
    })
@@ -468,19 +468,32 @@
                                     (:items x))) sections))
         items-map2 
         (into {} (map (fn[[k v]] [(keyword (lower-case (name k))) v]) (:items_map attribute-section)))
+        
         lines2 (into [] (map #(assoc % :kind "latin_sargam") lines))
         ] 
     (assert (map? items-map2))
+   ;; (println "items-map2--->")
+    ;;(pprint items-map2)
     (merge (dissoc node2 :items) {
+                                  :time_signature
+                                  (:timesignature items-map2 "4/4") 
+                                  :apply_hyphenated_lyrics
+                                  (:apply_hyphenated_lyrics items-map2 false)
+                                  :mode (:mode items-map2 "major") 
+                                  :filename (:filename items-map2 "untitled") 
+                                  :author (:author items-map2 "")
+                                  :notes_used (:notes_used items-map2 "")
+                                  :force_sargam_chars_hash (:force_sargam_chars_hash items-map2 {})
+                                  :warnings []
                                   :lines  lines2 
                                   :attributes 
                                   attribute-section
                                   }
-           default-attributes
-           (filter (fn[[k v]] (default-attribute-keys k)) 
-                   items-map2)
            )))
-
+(if false
+             (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+               (-> "fixtures/waltz.txt" resource slurp)))
+)
 (defn- handle-attribute-section [node]
   (let [
         ;; make keys keywords.
