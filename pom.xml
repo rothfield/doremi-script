@@ -14,11 +14,11 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:git://github.com/rothfield/doremi-script-clojure.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/rothfield/doremi-script-clojure.git</developerConnection>
-    <tag>9dd9a3f27781866356418e398d35bc3e8b0f384e
+    <connection>scm:git:git://github.com//.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com//.git</developerConnection>
+    <tag>f6a66781457493ef0ccf9c96f5f20d3f71fe6949
 </tag>
-    <url>https://github.com/rothfield/doremi-script-clojure</url>
+    <url>https://github.com//</url>
   </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -81,6 +81,11 @@
       <groupId>com.googlecode.texhyphj</groupId>
       <artifactId>texhyphj</artifactId>
       <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>clabango</groupId>
+      <artifactId>clabango</artifactId>
+      <version>0.5</version>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>

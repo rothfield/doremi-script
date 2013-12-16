@@ -490,7 +490,7 @@
                                   attribute-section
                                   }
            )))
-(if false
+(comment
              (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
                (-> "fixtures/waltz.txt" resource slurp)))
 )

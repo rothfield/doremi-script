@@ -2,7 +2,7 @@
   (:require	
     [clabango.parser :refer [render]]
     [clojure.java.io :refer [resource]]
-    [clojure.string :refer [join lower-case]] 
+    [clojure.string :refer [join upper-case lower-case]] 
     [clojure.pprint :refer [pprint]] 
     ))
 
@@ -510,13 +510,17 @@
 (defn lilypond-transpose[composition-data]
   "return transpose snippet for lilypond"
   "Don't transpose non-sargam."
-  (cond (= "C" (:key composition-data))
+  (let [my-key (:key composition-data)]
+  (cond 
+    (nil? my-key) 
+    ""
+    (= "c" (lower-case (:key composition-data)))
         ""
         (notation-is-in-abc composition-data)
         ""
         true
         (render transpose-template 
-                {:key (normalized-pitch->lilypond-pitch (:key composition-data))})))
+                {:key (normalized-pitch->lilypond-pitch (upper-case (:key composition-data)))}))))
 
 (defn extract-lyrics[x]
   (map :syllable (filter 
