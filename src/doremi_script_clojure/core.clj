@@ -20,16 +20,21 @@
     (slurp (resource "doremiscript.ebnf")) :total true))
 
 (defn doremi-text->parse-tree[txt]
+  ;; Parser doesn't handle input that doesn't end with a newline.
+  ;; So fix it here. 
   (doremi-script-parser txt))
 
+(comment
+  (doremi-script-text->parsed-doremi-script 
+    (slurp (resource "fixtures/georgia.doremiscript.txt")))
+  )
+    
 (defn doremi-script-text->parsed-doremi-script[txt]
   (transform-parse-tree (doremi-text->parse-tree txt) txt))
 
 (defn slurp-fixture[file-name]
   (slurp (resource 
            (str "fixtures/" file-name))))
-
-(def yesterday (slurp-fixture "yesterday.txt"))
 
 (defn to-string[doremi-data]
   (let [
@@ -104,15 +109,11 @@
 
 
 
-(defn -myparse[txt1]
+(defn -myparse[txt]
   (try
-    (let [
-          txt (clojure.string/replace txt1 "\r\n" "\n")
-          x (transform-parse-tree (doremi-text->parse-tree  txt)
-                                  txt)
+    (let [ x (transform-parse-tree 
+               (doremi-text->parse-tree  txt) txt)
           ]
-      ;;(println "x is\n" x)
-      ;;(println "class of x is:" (class x))
       (pprint-results x))
     (catch Exception e (str "Error:" (.getMessage e)))
     )) 
@@ -123,16 +124,16 @@
                           txt)))
 
 (defn doremi-text->json-data[txt]
-   (let [txt1 (clojure.string/replace txt "\r\n" "\n")
-         parse-tree (doremi-text->parse-tree txt1)
+   (let [
+         parse-tree (doremi-text->parse-tree txt)
          ]
-     (transform-parse-tree parse-tree txt1)
+     (transform-parse-tree parse-tree txt)
   ))
 
 (defn doremi-text->lilypond[txt]
-   (let [txt1 (clojure.string/replace txt "\r\n" "\n")
-         parse-tree (doremi-text->parse-tree txt1)
-         json-data (transform-parse-tree parse-tree txt1)
+   (let [
+         parse-tree (doremi-text->parse-tree txt)
+         json-data (transform-parse-tree parse-tree txt)
          ]
      (to-lilypond json-data)
   ))
@@ -152,8 +153,7 @@
   "defaults to lilypond"
   (try
     (let [
-          txt1 (get-stdin)
-          txt (clojure.string/replace txt1 "\r\n" "\n")
+          txt (get-stdin)
           x (transform-parse-tree (doremi-text->parse-tree  txt)
                                   txt)
           ]

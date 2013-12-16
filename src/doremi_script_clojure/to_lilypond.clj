@@ -514,6 +514,7 @@
 (defn lilypond-transpose[composition-data]
   "return transpose snippet for lilypond"
   "Don't transpose non-sargam."
+
   (let [my-key (:key composition-data)]
   (cond 
     (nil? my-key) 

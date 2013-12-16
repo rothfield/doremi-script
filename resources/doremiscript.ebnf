@@ -8,10 +8,12 @@ COMPOSITION (* a musical piece *)
      (* Each section is separated by one or more 'empty' lines.
       The empty line can have spaces. Section doesn't include the eol.
       That allows things like "S" to parse as a COMPOSITION *)
-  = <EMPTY_LINE*> COMPOSITION_ITEMS <EMPTY_LINE*>
+  = <EMPTY_LINE*> COMPOSITION_ITEMS <EMPTY_LINE*> <WHITE_SPACE*> 
+
+
 
 COMPOSITION_ITEMS=
- SECTION (<'\n'> <EMPTY_LINE+>  SECTION)* 
+ SECTION (<NEWLINE> <EMPTY_LINE+>  SECTION)* 
 
 <SECTION> = (* 3 kinds of sections: attributes, lyrics and sargam.
    Typically a composition will have attributes followed by lyrics, followed
@@ -41,7 +43,8 @@ SARGAM_SECTION
 
 *)
 
-  =  (UPPER_OCTAVE_LINE <"\n">)*  SARGAM_LINE (<'\n'> LOWER_OCTAVE_LINE)* (<'\n'> LYRICS_LINE)*
+  =  (UPPER_OCTAVE_LINE <NEWLINE>)*  SARGAM_LINE (<NEWLINE> LOWER_OCTAVE_LINE)*
+  (<NEWLINE> LYRICS_LINE)*
 
 SARGAM_LINE (* consists of optional line# at beginning of line, followed by 1 or
 more measures followed  *) = SARGAM_LINE_ITEMS
@@ -70,12 +73,12 @@ SARGAM_LINE_ITEM  "an item in the main line"
  *)
 ATTRIBUTE_SECTION (* Key value pairs *)
  = ATTRIBUTE_SECTION_ITEMS
-ATTRIBUTE_SECTION_ITEMS = ATTRIBUTE_LINE (<'\n'> ATTRIBUTE_LINE)* 
+ATTRIBUTE_SECTION_ITEMS = ATTRIBUTE_LINE (<NEWLINE> ATTRIBUTE_LINE)* 
 
 LYRICS_SECTION (* Lines of lyrics *)
-  = LYRICS_LINE (<'\n'> LYRICS_LINE)*
+  = LYRICS_LINE (<NEWLINE> LYRICS_LINE)*
 
-<EMPTY_LINE>= WHITE_SPACE? '\n'  
+<EMPTY_LINE>= WHITE_SPACE? NEWLINE  
 
 
 (************** Barlines **********************)
@@ -170,7 +173,7 @@ SARGAM_PITCH = (* a sargam pitch ie SrR.. *)
 <SARGAM_PITCH2> = (* a sargam pitch ie SrR.. *)
        BEGIN_SLUR_SARGAM_PITCH / END_SLUR_SARGAM_PITCH / SARGAM_PITCH
 
-
+<NEWLINE>= "\r\n" | "\n"
 <SARGAM_ORNAMENT_PITCH> = SARGAM_MUSICAL_CHAR 
 (***  End pitches *********************)
 		 
