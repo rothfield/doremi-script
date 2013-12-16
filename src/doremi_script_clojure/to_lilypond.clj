@@ -20,12 +20,16 @@
 (def tick "'")
 (def comma ",")
 (def octave-number->lilypond-octave
+  ;; Could also do: (apply str (take 2 (repeat tick))))
+  ;;
   {
+   -3 (str comma comma)
    -2 comma
    -1 ""
    0 tick
-   1  (str comma comma) 
-   2  (str comma comma comma)
+   1  (str tick tick) 
+   2  (str tick tick)
+   3  (str tick tick tick)
    })
 
 (def normalized-pitch->lilypond-pitch

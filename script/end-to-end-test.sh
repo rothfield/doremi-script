@@ -10,6 +10,8 @@ echo "Reading $1"
 echo "Temporary files created are $fname.json and $fname.ly"
 # cat $1 | java -jar $dirname/../target/doremi-script-standalone.jar --ly | tee $fname.ly |  lilypond -o $fname -f png - ; feh $fname.png
 
+echo "creating $fname.json"
+cat $1 | lein run --json > $fname.json
 echo "using lein run --ly"
 cat $1 | lein run --ly | tee $fname.ly |  lilypond -o $fname -f png - ; feh $fname.png
 

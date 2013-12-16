@@ -475,6 +475,8 @@
    ;; (println "items-map2--->")
     ;;(pprint items-map2)
     (merge (dissoc node2 :items) {
+                                  :key 
+                                  (:key items-map2 "c")
                                   :time_signature
                                   (:timesignature items-map2 "4/4") 
                                   :apply_hyphenated_lyrics
