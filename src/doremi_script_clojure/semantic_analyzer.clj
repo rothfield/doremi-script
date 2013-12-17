@@ -458,8 +458,6 @@
         lines2 (into [] (map #(assoc % :kind "latin_sargam") lines))
         ] 
     (assert (map? items-map2))
-   ;; (println "items-map2--->")
-   ;; (pprint items-map2)
     (merge (dissoc node2 :items) {
                                   :key 
                                   (:key items-map2 "c")

@@ -109,83 +109,118 @@
                        "(")
           ]
       {:begin-slur begin-slur})))
+;;      ornament=get-ornament(pitch)
+;;      grace1=grace2=grace-notes=""
+;;      if ornament?.placement is "after"
+;;        if pitch.tied?
+;;          suppress-slurs=true
+;;        if context.in-slur
+;;          suppress-slurs=true
+;;        if !context.in-slur #TODO: unfunkify
+;;          begin-slur="("
+;;        grace1 = "\\afterGrace "
+;;        #grace2="( { #{lilypond-grace-notes(ornament)}) }"
+;;        grace2=" { #{lilypond-grace-notes(ornament,suppress-slurs)} }"
+;;      if ornament?.placement is "before"
+;;      #  \acciaccatura { e16 d16 } c4
+;;        suppress-slurs=true # FOR NOW
+;;        grace1= "\\acciaccatura {#{lilypond-grace-notes(ornament,suppress-slurs)}}"
+;;      extra-end-slur=""
+;;      if special-case
+;;        extra-end-slur=")"
+;;      # Don't use tie if ornament is after!
+;;      if (ornament?.placement is "after") and pitch.tied?
+;;        console.log "OMG" if false
+;;        lilypond-symbol-for-tie=""
+;;      "#{grace1}#{lilypond-pitch}#{lilypond-octave}#{duration}#{lilypond-symbol-for-tie}#{mordent}#{begin-slur}#{extra-end-slur}#{end-slur}#{ending}#{chord}#{grace2}"
+;;    
 
-(defn ratio-to-lilypond[my-numerator subdivisions-in-beat]
-  (let [my-ratio (/ my-numerator subdivisions-in-beat)]
-    ;; In the case of beats whose subdivisions aren't powers of 2, we will
-    ;; use a tuplet, which displays, for example, ---3---  above the beat
-    ;; if the beat has 3 microbeats.
-    ;; Take the case of  S---R. beat is subdivided into 5.  Use sixteenth notes. 4 for S and 1 for R. 5/16 total.  
-    ;; For subdivision of 3, use 3 1/8 notes.
-    ;; For subdivision of 5 use 5 1/16th notes.
-    ;; For 6 use   16th notes
-    ;; etc
-    ;; For over 32 use 32nd notes, I guess.
-    ;; confusing, but works
-    ;; Things like S---r should map to quarter note plus sixteenth note in a 5-tuple
-    ;; Take the case of S----R--   
-    ;; S is 5 microbeats amounting to 5/32nds. To get 5 we have to tie either
-    ;; 4/8th of a beat plus 1/32nd  or there are other approaches.
-    (if (not (ratio? my-ratio))
-      
-      ({ 1 "4"
-        2 "2"
-        3 "2."
-        4 "1"  ;; review
-        } my-ratio)
-      ;; else
-      (let [ 
-            my-table
-            { 1 ["4"] ;; a whole beat is a quarter note
-             (/ 1 2) ["8"] ;; 1/4 of a beat is 16th
-             (/ 1 4) ["16"] ;; 1/4 of a beat is 16th
-             (/ 1 8) ["32"] ;; 1/8th of a beat is a 32nd. 
-             (/ 1 16) ["64"] ;; 1/16th of a beat is 64th. 16/64ths=beat
-             (/ 1 32) ["128"] ;; 32nd of a beat is 128th note
-             (/ 3 4) ["8."] ;; 3/4 of a beat is  dotted eighth
-             (/ 3 8) ["16."] ;; 
-             (/ 3 16) ["32."] ;;  1/32 + 1/64 = 3/64 =3/16th of beat = 3/64 dotted 32nd
-             (/ 3 32) ["64."]
-             (/ 3 64) ["128."]
-             (/ 5 4) ["4" "16"] ;; 1 1/4 beats= quarter tied to 16th
-             (/ 5 8) ["8" "32"]
-             (/ 5 16) ["16" "64"];;
-             (/ 5 32) ["32" "128"];;
-             (/ 5 64) ["64" "256"];;
-             (/ 5 128) ["128" "512"];;
-             (/ 7 4) ["4" "8."] ;;
-             (/ 7 8) ["8.."] ;; 1/2 + 1/4 + 1/8  
-             (/ 7 16) ["16" "32."] ;; 1/4+ 3/16   
-             (/ 7 32) ["64" "128."] ;;   
-             (/ 11 16) ["8" "64."] ;; 1/2 + 
-             
-             } 
-            ;;  
-            new-denominator 
-            (cond (#{1 2 4 8 16 32 64 128 256 512} subdivisions-in-beat)
-                  subdivisions-in-beat
-                  (= 3 subdivisions-in-beat) 
-                  2 
-                  (<  subdivisions-in-beat 8)
-                  4 
-                  (< subdivisions-in-beat 16)
-                  8 
-                  (< subdivisions-in-beat 32)
-                  16 
-                  (< subdivisions-in-beat 64)
-                  32 
-                  true
-                  32 
-                  )
-            new-ratio (/ my-numerator new-denominator)
-            ]
-        ;; (println "subdivisions in beat" subdivisions-in-beat)
-        ;; (println "new-denominator is " new-denominator)
-        (get my-table new-ratio 
-             [
-              (str "unsupported: " my-numerator "/" new-denominator)
-              ]) 
-        ))))
+;;      # From lilypond docs:
+;;      # If you want to end a note with a grace, 
+;;      # use the \afterGrace command. It takes two 
+;;      # arguments: the main note, and the 
+;;      # grace notes following the main note.
+;;      #
+;;      #  c1 \afterGrace d1( { c32[ d]) } c1
+;;      #
+;;      #  Use
+;;      #  \acciaccatura { e16 d16 } c4
+;;      #  for ornaments with ornament.placement is "before"
+;;    
+;;    
+;;      # The afterGrace in lilypond require parens to get lilypond
+;;      # to render a slur.
+;;      # The acciatura in lilypond don't require parens to get lilypond
+;;      # to render a slur.
+;;      #
+;;    
+;;      EXAMPLES = '''
+;;    \partial 4*2  | \afterGrace c'4( { b32[ d'32 c'32 b32 c'32] } c'8) d'8 \break
+;;    \partial 4*2  | \afterGrace c'4~ { b32[ d'32 c'32 b32 c'32] } c'8 d'8 \break
+;;     \partial 4*2  | c'4~ c'8 d'8 \break
+;;     '''
+;;      #
+;;      ornament=get-ornament(pitch)
+;;      grace1=grace2=grace-notes=""
+;;      if ornament?.placement is "after"
+;;        if pitch.tied?
+;;          suppress-slurs=true
+;;        if context.in-slur
+;;          suppress-slurs=true
+;;        if !context.in-slur #TODO: unfunkify
+;;          begin-slur="("
+;;        grace1 = "\\afterGrace "
+;;        #grace2="( { #{lilypond-grace-notes(ornament)}) }"
+;;        grace2=" { #{lilypond-grace-notes(ornament,suppress-slurs)} }"
+;;      if ornament?.placement is "before"
+;;      #  \acciaccatura { e16 d16 } c4
+;;        suppress-slurs=true # FOR NOW
+;;        grace1= "\\acciaccatura {#{lilypond-grace-notes(ornament,suppress-slurs)}}"
+;;      extra-end-slur=""
+;;      if special-case
+;;        extra-end-slur=")"
+;;      # Don't use tie if ornament is after!
+;;      if (ornament?.placement is "after") and pitch.tied?
+;;        console.log "OMG" if false
+;;        lilypond-symbol-for-tie=""
+;;      "#{grace1}#{lilypond-pitch}#{lilypond-octave}#{duration}#{lilypond-symbol-for-tie}#{mordent}#{begin-slur}#{extra-end-slur}#{end-slur}#{ending}#{chord}#{grace2}"
+;;    
+;;    
+
+(defn non-power-of-2-ratio-to-lilypond[x]
+   "Handle rhythm for tuplets"
+   ; Example S--R-    
+   ; The sa is 3 microbeats.
+  ; Since beat is subdivided into 5, notate the S as 3 16ths
+  ; 
+  ; 3/16 = 2/16 + 1/16= dotted eighth 
+  ; then the R would be 2/16th or eighth
+   (let []
+     )
+  )
+(defn ratio-to-lilypond[x]
+  ;; confusing, but works
+  ;; Things like S---r should map to quarter note plus sixteenth note in a 5-tuple
+  (if (not (ratio? x))
+    "4"  ;; TODO:review 
+    ;; else
+    ;; m
+    (let [ my-table
+          { 1 "4"
+           (/ 1 8) "8"
+           (/ 1 16) "16"
+           (/ 1 4) "4"
+           (/ 3 4) "2."
+           (/ 3 16) "8."
+           (/ 5 16) "8.." ;; wrong TODO have to tie.
+           (/ 3 8) "4."
+           (/ 5 8) "2."
+           (/ 7 8) "2.." ;; wrong have to tie
+           } 
+          new-denominator (if (= 3 (denominator x)) 8 16) 
+          new-ratio (/ (numerator x) new-denominator)
+          ]
+      (get my-table new-ratio))))
 
 
 (def mordent-snippet
@@ -246,123 +281,97 @@
   (-> "lilypond/partial.tpl" resource slurp trim))
 (def ending-template
   (-> "lilypond/ending.tpl" resource slurp trim))
-(def tied-pitch-template
-  (-> "lilypond/tied_pitch.tpl" resource slurp trim))
 
 (defn draw-pitch[pitch in-slur beat-subdivisions]
-
   "Also handles dashes"
   "Render a pitch/dash as lilypond"
-  ;; (println "entering draw-pitch" beat-subdivisions)
-  (if (:ignore pitch)
-    ""
-    (let
-      [ 
-       ;;if pitch.dash_to_tie and has_after_ornament(context.last_pitch)
-       ;; _ (println "normalized-pitch-to-lilypond, pitch=") 
-       ;; _ (pprint pitch)
-       ornament (get-ornament pitch)
-       placement (:placement ornament)
-       has-after-ornament (= :after placement)
-       has-before-ornament (= :before placement)    
-       suppress-slurs (and has-after-ornament
-                           (or in-slur (:tied pitch)))
-       after-ornament-start (if has-after-ornament
-                              "\\afterGrace ")
-       before-ornament-snippet (if has-before-ornament
-                                 (str "\\acciaccatura {" (lilypond-grace-notes ornament suppress-slurs) "}"))
+  (let
+    [ 
+     ;;if pitch.dash_to_tie and has_after_ornament(context.last_pitch)
+     ;; _ (println "normalized-pitch-to-lilypond, pitch=") 
+     ;; _ (pprint pitch)
+     ornament (get-ornament pitch)
+     placement (:placement ornament)
+     has-after-ornament (= :after placement)
+     has-before-ornament (= :before placement)    
+     suppress-slurs (and has-after-ornament
+                         (or in-slur (:tied pitch)))
+     after-ornament-start (if has-after-ornament
+                            "\\afterGrace ")
+     before-ornament-snippet (if has-before-ornament
+                               (str "\\acciaccatura {" (lilypond-grace-notes ornament suppress-slurs) "}"))
 
-       after-ornament-end (if has-after-ornament
-                            (str " { " (lilypond-grace-notes ornament suppress-slurs) " }")) 
+     after-ornament-end (if has-after-ornament
+                          (str " { " (lilypond-grace-notes ornament suppress-slurs) " }")) 
 
-       begin-slur (if (or (get-attribute pitch :begin_slur)
-                          (and (not in-slur) has-after-ornament))
-                    "(" )
-       extra_end_slur  (if (and (:dash_to_tie pitch) 
-                                has-after-ornament)
-                         ")")
-       ;;begin-slur (if (and (= :after placement)
-       pitch-template (-> "lilypond/pitch.tpl" resource slurp trim)
-       rest-template (-> "lilypond/rest.tpl" resource slurp trim)
-       lilypond-octave  (octave-number->lilypond-octave (:octave pitch))
-       ;;_ (pprint pitch)
-       duration-ary (ratio-to-lilypond 
-                      (:numerator pitch) 
-                      beat-subdivisions)
-       duration (first duration-ary)
-       ;; example grouping of 5 produces
-       ;;      (/ 5 8) ["8" "32"]
-       ;; _ (println "duration is: " duration)
-       chord (chord-snippet (get-chord pitch))
-       ending (:source (get-attribute pitch :ending))
-       ending-snippet (if ending
-                        (render ending-template { :ending 
-                                                 (:source (get-attribute pitch :ending))
-                                                 }))
-       ; _ (println "pitch is")
-       ; _ (pprint pitch)
-       pitch2 (if (and (= :dash (:my_type pitch)) 
-                       (:dash_to_tie pitch))
-                (assoc pitch :normalized_pitch 
-                       (get-in pitch [:pitch_to_use_for_tie :normalized_pitch] ) 
-                       :octave (get-in pitch [:pitch_to_use_for_tie :octave] ))
-                ;; else
-                pitch)
-       lilypond-octave  (octave-number->lilypond-octave (:octave pitch2))
-       lilypond-pitch 
-       (normalized-pitch->lilypond-pitch (:normalized_pitch pitch2))
-       extra-tied-durations (if (> (count duration-ary) 1)
-                              (str lilypond-symbol-for-tie
-                                   (join lilypond-symbol-for-tie
-                                         (map (fn[duration] 
-                                                (render tied-pitch-template
-                                                        {
-                                                         :duration duration
-                                                         :lilypond-pitch lilypond-pitch
-                                                         :lilypond-octave lilypond-octave
-                                                         }
-                                                        ))
-                                          (rest duration-ary)    
-                                              ))))
-       ;;_ (println "extra-tied-durations" extra-tied-durations)
-       ]
-      ;; this function returns the value of the following cond:
-      (cond (:ignore pitch2)
-            ""
-            (:pointer pitch)
-            ""
-            (and (= :dash (:my_type pitch2)) 
-                 (not (:dash_to_tie pitch2)))
-            (render rest-template {
-                                   :duration duration
-                                   :chord chord
-                                   :ending ending-snippet                
-                                   })
-            (or (= :pitch (:my_type pitch2))
-                (= :dash (:my_type pitch2)))
-            ;;
-            ;;{{before-ornament-snippet}}{{after-ornament-start}}{{lilypond-pitch}}{{lilypond-octave}}{{duration}}{{lilypond-symbol-for-tie}}{{mordent}}{{begin-slur}}{{extra-end-slur}}{{end-slur}}{{ending}}{{chord}}{{after-ornament-end}}
-            (render pitch-template 
-                    {
-                     :before-ornament-snippet before-ornament-snippet
-                     :after-ornament-start after-ornament-start
-                     :lilypond-pitch lilypond-pitch
-                     :lilypond-octave lilypond-octave
-                     :duration duration
-                     :lilypond-symbol-for-tie 
-                     (if (and (:tied pitch)
-                              (not has-after-ornament)) 
-                       lilypond-symbol-for-tie )
-                     :mordent (if (get-attribute pitch2 :mordent) mordent-snippet)
-                     :begin-slur begin-slur
-                     :extra-end-slur "" ;;; TODO 
-                     :end-slur (if (get-attribute pitch2 :end_slur) ")" )
-                     :ending ending-snippet                  
-                     :chord chord
-                     :after-ornament-end after-ornament-end
-                     :extra-tied-durations extra-tied-durations
-                     }
-                    )))))
+     begin-slur (if (or (get-attribute pitch :begin_slur)
+                        (and (not in-slur) has-after-ornament))
+                  "(" )
+     extra_end_slur  (if (and (:dash_to_tie pitch) 
+                              has-after-ornament)
+                       ")")
+     ;;begin-slur (if (and (= :after placement)
+     pitch-template (-> "lilypond/pitch.tpl" resource slurp trim)
+     rest-template (-> "lilypond/rest.tpl" resource slurp trim)
+     lilypond-octave  (octave-number->lilypond-octave (:octave pitch))
+    ;;  _ (pprint pitch)
+     duration (ratio-to-lilypond (/
+                (:numerator pitch) 
+                beat-subdivisions))
+     ;; _ (println "duration is: " duration)
+     chord (chord-snippet (get-chord pitch))
+     ending (:source (get-attribute pitch :ending))
+     ending-snippet (if ending
+                      (render ending-template { :ending 
+                                               (:source (get-attribute pitch :ending))
+                                               }))
+     ; _ (println "pitch is")
+     ; _ (pprint pitch)
+     pitch2 (if (and (= :dash (:my_type pitch)) 
+                     (:dash_to_tie pitch))
+              (assoc pitch :normalized_pitch 
+                     (get-in pitch [:pitch_to_use_for_tie :normalized_pitch] ) 
+                     :octave (get-in pitch [:pitch_to_use_for_tie :octave] ))
+              ;; else
+              pitch)
+     ]
+    ;; this function returns the value of the following cond:
+    (cond (:ignore pitch2)
+          ""
+          (:pointer pitch)
+          ""
+          (and (= :dash (:my_type pitch2)) 
+               (not (:dash_to_tie pitch2)))
+          (render rest-template {
+                                 :duration duration
+                                 :chord chord
+                                 :ending ending-snippet                
+                                 })
+          (or (= :pitch (:my_type pitch2))
+              (= :dash (:my_type pitch2)))
+          ;;
+          ;;{{before-ornament-snippet}}{{after-ornament-start}}{{lilypond-pitch}}{{lilypond-octave}}{{duration}}{{lilypond-symbol-for-tie}}{{mordent}}{{begin-slur}}{{extra-end-slur}}{{end-slur}}{{ending}}{{chord}}{{after-ornament-end}}
+          (render pitch-template 
+                  {
+                   :before-ornament-snippet before-ornament-snippet
+                   :after-ornament-start after-ornament-start
+                   :lilypond-pitch 
+                   (normalized-pitch->lilypond-pitch (:normalized_pitch pitch2))
+                   :lilypond-octave  (octave-number->lilypond-octave (:octave pitch2))
+                   :duration duration
+                   :lilypond-symbol-for-tie 
+                   (if (and (:tied pitch)
+                            (not has-after-ornament)) 
+                     lilypond-symbol-for-tie )
+                   :mordent (if (get-attribute pitch2 :mordent) mordent-snippet)
+                   :begin-slur begin-slur
+                   :extra-end-slur "" ;;; TODO 
+                   :end-slur (if (get-attribute pitch2 :end_slur) ")" )
+                   :ending ending-snippet                  
+                   :chord chord
+                   :after-ornament-end after-ornament-end
+                   }
+                  ))))
 
 
 (def lilypond-break  "\\break\n")
@@ -377,8 +386,7 @@
 (defn draw-beat[beat]
   "TODO: review durations. The durations will be a function of the beat subdivisions"
   "and the note count of pulses" 
-  ;;(println "beat is")
-  ;;(pprint beat)
+
 
   ;;    if item.my_type is "beat"
   ;;       beat=item
@@ -409,8 +417,6 @@
       (let [x 2]
         (render beat-tuplet-template {:beat-content  beat-content
                                       :tuplet-numerator x
-                                      ;; need to change subdivisions???
-                                      ;; as in ratio-to... ???
                                       :subdivisions (:subdivisions beat)
                                       }))
       ;; else
@@ -597,24 +603,13 @@
       ;;  (-> "fixtures/yesterday.txt" resource slurp)
 
       )))
-(comment
-  (println (to-lilypond 
-             (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-               "S-G--"
-               ; "S-G ---"
-               ;;        "S--g -"
-               ;;   (-> "fixtures/waltz.txt" resource slurp)
-               )))
-  )
+
 (comment true ;comment
-         (print-stack-trace *e)
+  (print-stack-trace *e)
          (println (to-lilypond 
                     (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-                      "S------------R--"
-                   ;;   "S----R--"
-                      ;;   "S-G"
-                    ;;  "SS S-m S-G-- S-G SRGm SRGmP"
-                      ; "S-G ---"
+                      "S-G--"
+                     ; "S-G ---"
                       ;;        "S--g -"
                       ;;   (-> "fixtures/waltz.txt" resource slurp)
                       )))
