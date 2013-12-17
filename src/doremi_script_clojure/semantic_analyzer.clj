@@ -440,20 +440,6 @@
                           :attributes
                           ]
   )
-(def default-attributes
-  {:key "C"
-   :mode "major"
-   :author ""
-   :force_sargam_chars_hash {}
-   :notes_used ""
-   :warnings []
- ;;  :time_signature "4/4"
-   :apply_hyphenated_lyrics false
-   :filename "untitled"
-   })
-
-(def default-attribute-keys
-  (into #{} (keys default-attributes)))
 
 (defn- handle-composition-in-main-walk[node2]
   (let [
@@ -473,7 +459,7 @@
         ] 
     (assert (map? items-map2))
    ;; (println "items-map2--->")
-    ;;(pprint items-map2)
+   ;; (pprint items-map2)
     (merge (dissoc node2 :items) {
                                   :key 
                                   (:key items-map2 "c")
@@ -484,6 +470,7 @@
                                   :mode (:mode items-map2 "major") 
                                   :filename (:filename items-map2 "untitled") 
                                   :author (:author items-map2 "")
+                                  :title (:title items-map2 "")
                                   :notes_used (:notes_used items-map2 "")
                                   :force_sargam_chars_hash (:force_sargam_chars_hash items-map2 {})
                                   :warnings []

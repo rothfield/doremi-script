@@ -2,7 +2,7 @@
   (:require	
     [clabango.parser :refer [render]]
     [clojure.java.io :refer [resource]]
-    [clojure.string :refer [join upper-case lower-case]] 
+    [clojure.string :refer [trim join upper-case lower-case]] 
     [clojure.pprint :refer [pprint]] 
     ))
 
@@ -60,7 +60,7 @@
    }
   )
 (def grace-note-pitch-template
-  (-> "lilypond/grace_note_pitch.tpl" resource slurp))
+  (-> "lilypond/grace_note_pitch.tpl" resource slurp trim))
 
 (defn lilypond-grace-note-pitch[pitch]
   "generate a single pitch for use as a grace note"
@@ -324,13 +324,11 @@
     ))
 
 (def partial-template
-  (-> "lilypond/partial.tpl" resource slurp))
+  (-> "lilypond/partial.tpl" resource slurp trim))
 (def ending-template
-  (-> "lilypond/ending.tpl" resource slurp))
+  (-> "lilypond/ending.tpl" resource slurp trim))
 
-
-
-(defn normalized-pitch-to-lilypond[pitch in-slur]
+(defn draw-pitch[pitch in-slur]
   "Also handles dashes"
   "Render a pitch/dash as lilypond"
   (let
@@ -359,8 +357,8 @@
                               has-after-ornament)
                        ")")
      ;;begin-slur (if (and (= :after placement)
-     pitch-template (-> "lilypond/pitch.tpl" resource slurp)
-     rest-template (-> "lilypond/rest.tpl" resource slurp)
+     pitch-template (-> "lilypond/pitch.tpl" resource slurp trim)
+     rest-template (-> "lilypond/rest.tpl" resource slurp trim)
      lilypond-octave  (octave-number->lilypond-octave (:octave pitch))
      duration (calculate-lilypond-duration 
                 (:numerator pitch) 
@@ -420,57 +418,79 @@
                    }
                   ))))
 
+
 (def lilypond-break  "\\break\n")
 
-(defn line-to-lilypond-array[line & options]
-  ;; Try processing recursively?
-  ;; 
-  ;;(println "entering line-to-lilypond-array")
-  ;;(pprint line)
-  ;;    # Line is a line from the parsed doremi-script
-  ;;    # Returns an array of items - join them with a string
+(defn draw-beat[beat]
+  (join " " (map
+              (fn draw-beat-item[item]
+                (let [my-type (:my_type item)]
+                  (cond (#{:pitch :dash} my-type)
+                        (draw-pitch item false)
+                        true
+                        (str "<" my-type ">"))))
+              (:items beat))))
+
+(defn draw-barline[barline]
+  (barline->lilypond-barline (:my_type barline)))
+ 
+
+(defn draw-measure[measure]
+  (:pre (= :measure (:my_type measure))) ;; TODO: not checking it!!!
+  "Measures look like :barline :beat :beat :barline etc "
+  ;; (println "draw-measure")
+  ;;(println "items in measure are")
+  ;;(pprint (map :my_type (:items measure)))
+  (str 
+      (render partial-template 
+      {:beat-count (:beat_count measure)})
+      
+     " "
+  (join " "
+     (map 
+               (fn draw-measure-item[item]
+                   (let [my-type (:my_type item)]
+                     (cond 
+                          ;; (:is_barline item)
+                          ;; (draw-barline item)
+                           (= :beat my-type)
+                           (draw-beat item)
+                           true
+                           (str "<unknown my-type" my-type ">")
+                           )))
+               (:items measure)
+                )))) 
+
+(def draw-line-break "\\break\n")
+
+(defn draw-line[line & options]
+  "line consists of optional :line_number followed by :measure :measure etc "
+  "We don't render line numbers in lilypond. (yet)"
+  "TODO: use the atoms properly"
   (let [in-slur (atom false)
         in-times (atom false)
         at-beginning-of-first-measure-of-line (atom false)
-        process-measure (fn process-measure[measure] 
-                          (render partial-template 
-                                  {:beat-count (:beat_count measure)})
-                          )
-        process-beat (fn process-beat[beat] 
-                       ;; TODO
-                       "")
-        process-barline (fn process-barline[x] 
-                          (barline->lilypond-barline (:my_type x)))
-        process-beat (fn process-beat[x] 
-                       ""
-                       )
-        process-item (fn process-item[item]
-                       (let [ my-type (:my_type item) ]
-                         ;;(println "in process-item, my-type is " my-type)
-                         (cond 
-                           (or (= :pitch my-type) 
-                               (= :dash my-type))
-
-                           ;;        last-pitch=item  #use this to help render ties better(hopefully)
-                           ;;        if dashes-at-beginning-of-line-array.length > 0
-                           ;;          for dash in dashes-at-beginning-of-line-array
-                           ;;            ary.push normalized-pitch-to-lilypond(dash,{last-pitch:last-pitch})
-                           ;;          dashes-at-beginning-of-line-array=[]
-                           ;;        ary.push normalized-pitch-to-lilypond(item,{in-slur:  in-slur,last-pitch:last-pitch})
-                           (normalized-pitch-to-lilypond item in-slur)
-                           (= :measure my-type)
-                           (process-measure item)
-                           (= :beat my-type)
-                           (process-beat item)
-                           (:is_barline item)
-                           (process-barline item)
-                           true
-                           ""
-                           )))
-        ]
-    (conj (map process-item (filter :my_type (my-seq2(:items line)))) lilypond-break)
-    ))
-
+        first-item (first (:items line))
+        my-items (if (= :line_number (:my_type first-item))
+                   (rest (:items line))
+                   (:items line))
+                   
+      ] 
+    (str
+    (join " " 
+         (map (fn draw-measure-item[item]
+                (let [my-type (:my_type item)]
+                  (cond (= :measure my-type)
+                        (draw-measure item)
+                        (:is_barline item)
+                        (draw-barline item)
+                        true
+                        (str "<??" my-type "??>"))))
+                my-items)) 
+       " " 
+     draw-line-break) 
+      ))
+      
 
 (defn has-after-ornament[pitch]
   ;; (pprint pitch)
@@ -507,9 +527,9 @@
   (some is-abc-line (:lines composition-data)))
 
 (def transpose-template
-  (-> "lilypond/transpose.tpl" resource slurp))
+  (-> "lilypond/transpose.tpl" resource slurp trim))
 (def time-signature-template
-  (-> "lilypond/time_signature.tpl" resource slurp))
+  (-> "lilypond/time_signature.tpl" resource slurp trim))
 
 (defn lilypond-transpose[composition-data]
   "return transpose snippet for lilypond"
@@ -534,42 +554,30 @@
                    (my-seq2 x))))
 
 
-
-(defn line-to-lilypond[line & options]
-  ;;(println "my-seq2 line is")
-  ;;(pprint (map :my_type (filter :my_type (my-seq2 line))))
-  (join " " (line-to-lilypond-array line)))
-;;(to-lilypond "" {})
-
-
-
 (defn to-lilypond[doremi-data]
+  "TODO: render lyrics??"
   :pre (map? doremi-data)
   :pre (= :composition (:my_type doremi-data))
   "Takes parsed doremi-script and returns lilypond text"
   ""
   (let [ src "source here"
-        template (-> "lilypond/composition.tpl" resource slurp)
-        key-template (-> "lilypond/key.tpl" resource slurp)
+        template (-> "lilypond/composition.tpl" resource slurp trim)
+        key-template (-> "lilypond/key.tpl" resource slurp trim)
         ]
-    ;;(println "doremi-data:")
-    ;;(pprint doremi-data)
-    ;;(println "time signature is: " (:time_signature doremi-data))
     (render template 
             {:transpose-snip (lilypond-transpose doremi-data) 
              :extracted-lyrics (apply str (join " " (extract-lyrics doremi-data)))
-             ;; :zzz (pprint (extract-lyrics doremi-data))
              :beats-per-minute 200
-             :title-snippet ""
+             :title (:title doremi-data)
+             :author (:author doremi-data)
              :src-snippet (str  "%{\n " (lilypond-escape (:source doremi-data)) " \n %}\n")
              :time-signature-snippet (if (:time_signature doremi-data)
                              (render time-signature-template {:time-signature (:time_signature doremi-data) }))
              
-             :key-snippet (render key-template { :key "c"  ;; Always set to c as we are transposing. TODO: review.
+             :key-snippet (render key-template { :key "c"  ;; Always set key to c !! Transpose is used to move it to the right key
                                                 :mode (lower-case (:mode doremi-data "major"))
                                                 }) 
-             :notes (join "\n" (map line-to-lilypond (:lines doremi-data))) 
-             ;;:time-signature "4/4"
+             :notes (join "\n" (map draw-line (:lines doremi-data))) 
              })))
 
 (comment
@@ -586,18 +594,33 @@
 
 
 (comment
-             (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-               (-> "fixtures/waltz.txt" resource slurp)))
+  (println (to-lilypond
+             (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+             ;;  (-> "fixtures/waltz.txt" resource slurp)
+               (-> "fixtures/yesterday.txt" resource slurp)
+                       
+                       )))
 
 
 
   )
+
+
 (comment
+  (pprint  
+             (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+               "Author: me\nTitle: my title\n\nS"
+             ;;  (-> "fixtures/waltz.txt" resource slurp)
+             ;;  (-> "fixtures/yesterday.txt" resource slurp)
+                       
+                       )))
+
+(comment if true ;comment
   (println (to-lilypond 
              (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-               ;"S--g - R | S R G m |"
+               "S | R | G"
                ;;        "S--g -"
-               (-> "fixtures/waltz.txt" resource slurp)
+            ;;   (-> "fixtures/waltz.txt" resource slurp)
                )))
   )
 ;;)
