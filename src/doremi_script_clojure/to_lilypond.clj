@@ -127,7 +127,7 @@
     ;; S is 5 microbeats amounting to 5/32nds. To get 5 we have to tie either
     ;; 4/8th of a beat plus 1/32nd  or there are other approaches.
     (if (not (ratio? my-ratio))
-      
+
       ({ 1 "4"
         2 "2"
         3 "2."
@@ -158,7 +158,7 @@
              (/ 7 16) ["16" "32."] ;; 1/4+ 3/16   
              (/ 7 32) ["64" "128."] ;;   
              (/ 11 16) ["8" "64."] ;; 1/2 + 
-             
+
              } 
             ;;  
             new-denominator 
@@ -322,7 +322,7 @@
                                                          :lilypond-octave lilypond-octave
                                                          }
                                                         ))
-                                          (rest duration-ary)    
+                                              (rest duration-ary)    
                                               ))))
        ;;_ (println "extra-tied-durations" extra-tied-durations)
        ]
@@ -394,15 +394,43 @@
   ;;           in_times=true #hack
   ;;  if in_times
   ;;    ary.push "}"
-  (let [beat-content
-        (join " " (map
-                    (fn draw-beat-item[item]
-                      (let [my-type (:my_type item)]
-                        (cond (#{:pitch :dash} my-type)
-                              (draw-pitch item false (:subdivisions beat))
-                              true
-                              (str "<" my-type ">"))))
-                    (:items beat)))
+  (let [
+        ;; beam beat as follows: SR -> c'[ d']  
+        ;; This is lilypond's manual beaming.
+        ;; only beam if more than one beat.
+        ;; get ids identifying the pitches
+        ;; perhaps move this code down into pitch.tpl
+        ;;
+        lilypond-beam-start "["
+        lilypond-beam-end "]"
+        ;; Get list of pitch ids. This gives us a count and helps identify the first
+        ;; and last pitches.
+        pitch-ids (map :pitch-counter 
+                       (filter 
+                         #(and (= :pitch (:my_type %))
+                               (:pitch-counter %))
+                         (:items beat)))
+        beamable? (and (> (count pitch-ids) 1)
+                     (not (#{3 5 7} (:subdivisions beat))))  ;; beam if more than one pitch in beat
+        beat-ary (map (fn draw-beat-item[ item]
+                           (let [
+                                 ;; If this is the first pitch and there are
+                                 ;; more than one in the beat, add [ to end of note to
+                                 ;; indicate beam start.
+                                 beam-start    (if (and beamable?
+                                                        (= (first pitch-ids) (:pitch-counter item)))
+                                           lilypond-beam-start) 
+                                 beam-end (if  (and beamable?      
+                                                   (= (last pitch-ids) (:pitch-counter item)))
+                                           lilypond-beam-end)
+                                 my-type (:my_type item)]
+                             (cond (#{:pitch :dash} my-type)
+                                   (str  (draw-pitch item false (:subdivisions beat))
+                                        beam-start beam-end)
+                                   true
+                                   (str "<" my-type ">"))))
+                         (:items beat))
+        beat-content (join " " beat-ary)
         ]
     (if (and (not (#{0 1 2 4 8 16 32 64 128} (:subdivisions beat)))
              (not (beat-is-all-dashes? beat)))
@@ -416,7 +444,6 @@
       ;; else
       beat-content)     
     ))
-
 (defn draw-barline[barline]
   (barline->lilypond-barline (:my_type barline)))
 
@@ -556,11 +583,11 @@
              :author (:author doremi-data)
              :src-snippet (str  "%{\n " (lilypond-escape (:source doremi-data)) " \n %}\n")
              :omit-time-signature-snippet (if (:time-signature doremi-data)
-                                           omit-time-signature-snippet) 
+                                            omit-time-signature-snippet) 
              :time-signature-snippet (if (:time_signature doremi-data)
                                        (render time-signature-template {:time-signature (:time_signature doremi-data) })
-                                        ;; else
-                                        ;; TODO: neomit-time-signature-snippet 
+                                       ;; else
+                                       ;; TODO: neomit-time-signature-snippet 
                                        )
 
              :key-snippet (render key-template { :key "c"  ;; Always set key to c !! Transpose is used to move it to the right key
@@ -569,6 +596,9 @@
              :notes (join "\n" (map draw-line (:lines doremi-data))) 
              })))
 
+
+
+;;;;;;;;;;;; For testing ;;;;;
 (comment
   (use 'clojure.stacktrace) 
   (print-stack-trace *e)
@@ -581,48 +611,12 @@
 
     ))
 
-
-(comment
-  (println (to-lilypond
-             (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-               ;;  (-> "fixtures/waltz.txt" resource slurp)
-               (-> "fixtures/yesterday.txt" resource slurp)
-
-               )))
-
-
-
-  )
-
-
-(comment
-  (pprint  
-    (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-      "Author: me\nTitle: my title\n\nS"
-      ;;  (-> "fixtures/waltz.txt" resource slurp)
-      ;;  (-> "fixtures/yesterday.txt" resource slurp)
-
-      )))
 (comment
   (println (to-lilypond 
+
              (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-               "S-G--"
-               ; "S-G ---"
-               ;;        "S--g -"
-               ;;   (-> "fixtures/waltz.txt" resource slurp)
-               )))
-  )
-(comment true ;comment
-         (print-stack-trace *e)
-         (println (to-lilypond 
-                    (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-                      "S------------R--"
-                   ;;   "S----R--"
-                      ;;   "S-G"
-                    ;;  "SS S-m S-G-- S-G SRGm SRGmP"
-                      ; "S-G ---"
-                      ;;        "S--g -"
-                      ;;   (-> "fixtures/waltz.txt" resource slurp)
-                      )))
-         )
-;;)
+               ;;"S------------R--"
+               ;;   "S----R--"
+               "S-GG m-P-"
+               ))))
+
