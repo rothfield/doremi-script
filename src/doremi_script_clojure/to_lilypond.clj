@@ -231,12 +231,12 @@
   " maps barline-type field for barlines"
   (let [my-map
         {
-         :reverse-final-barline "\\bar \"|.\""
-         :final-barline "\\bar \"||\" "
-         :double-barline "\\bar \"||\" " 
-         :single-barline "\\bar \"|\"" 
-         :left-repeat "\\bar \"|:\"" 
-         :right-repeat "\\bar \":|\"" 
+         :reverse_final-barline "\\bar \".|\""
+         :final_barline "\\bar \"|.\" "
+         :double_barline "\\bar \"||\" " 
+         :single_barline "\\bar \"|\"" 
+         :left_repeat "\\bar \"|:\"" 
+         :right_repeat "\\bar \":|\"" 
          }
         ]
     (or (barline-type my-map) (:single-barline my-map))
@@ -249,7 +249,7 @@
 (def tied-pitch-template
   (-> "lilypond/tied_pitch.tpl" resource slurp trim))
 
-(defn draw-pitch[pitch in-slur beat-subdivisions]
+(defn draw-pitch[pitch in-slur beat-subdivisions beam-val]
 
   "Also handles dashes"
   "Render a pitch/dash as lilypond"
@@ -317,6 +317,7 @@
                                          (map (fn[duration] 
                                                 (render tied-pitch-template
                                                         {
+                                                         :beam-val beam-val
                                                          :duration duration
                                                          :lilypond-pitch lilypond-pitch
                                                          :lilypond-octave lilypond-octave
@@ -349,6 +350,7 @@
                      :lilypond-pitch lilypond-pitch
                      :lilypond-octave lilypond-octave
                      :duration duration
+                     :beam-val beam-val
                      :lilypond-symbol-for-tie 
                      (if (and (:tied pitch)
                               (not has-after-ornament)) 
@@ -411,25 +413,25 @@
                                (:pitch-counter %))
                          (:items beat)))
         beamable? (and (> (count pitch-ids) 1)
-                     (not (#{3 5 7} (:subdivisions beat))))  ;; beam if more than one pitch in beat
+                       (not (#{3 5 7} (:subdivisions beat))))  ;; beam if more than one pitch in beat
         beat-ary (map (fn draw-beat-item[ item]
-                           (let [
-                                 ;; If this is the first pitch and there are
-                                 ;; more than one in the beat, add [ to end of note to
-                                 ;; indicate beam start.
-                                 beam-start    (if (and beamable?
-                                                        (= (first pitch-ids) (:pitch-counter item)))
-                                           lilypond-beam-start) 
-                                 beam-end (if  (and beamable?      
-                                                   (= (last pitch-ids) (:pitch-counter item)))
-                                           lilypond-beam-end)
-                                 my-type (:my_type item)]
-                             (cond (#{:pitch :dash} my-type)
-                                   (str  (draw-pitch item false (:subdivisions beat))
-                                        beam-start beam-end)
-                                   true
-                                   (str "<" my-type ">"))))
-                         (:items beat))
+                        (let [
+                              ;; If this is the first pitch and there are
+                              ;; more than one in the beat, add [ to end of note to
+                              ;; indicate beam start.
+                              beam-val    (cond (and beamable?
+                                                     (= (first pitch-ids) (:pitch-counter item)))
+                                              lilypond-beam-start 
+                              (and beamable?      
+                                                 (= (last pitch-ids) (:pitch-counter item)))
+                                         lilypond-beam-end)
+                              my-type (:my_type item)]
+                          (cond (#{:pitch :dash} my-type)
+                                (draw-pitch item false (:subdivisions beat)
+                                            beam-val)
+                                true
+                                (str "<" my-type ">"))))
+                      (:items beat))
         beat-content (join " " beat-ary)
         ]
     (if (and (not (#{0 1 2 4 8 16 32 64 128} (:subdivisions beat)))
@@ -447,8 +449,47 @@
 (defn draw-barline[barline]
   (barline->lilypond-barline (:my_type barline)))
 
+(defn merge-tied-notes[measure]
+  measure)
+
+(defn zmerge-tied-notes[measure]
+    (let [x 1
+        combined-beats (atom [])
+         measure2 (assoc measure :items  
+      (reverse (map (fn[my-beat]
+                     ;;(pprint my-beat)
+                      (if (and 
+                     (= 1 (:subdivisions my-beat))
+                          (:dash_to_tie (first (:items my-beat))) 
+                            )
+                        (do 
+                          ;;(println "zzz")
+                            (swap! combined-beats (fn[x1] (conj x1 my-beat)))
+                         (assoc my-beat :marked-for-removal true)
+                       )
+                       my-beat 
+                        ))
+                   (:items measure) 
+                    )))
+          ]
+      ;;(println "****")
+      ;;(pprint @combined-beats)
+     ;; (println "****")
+      measure2
+    )
+  )
 
 (defn draw-measure[measure]
+  ;; It would be nice to combine those pitches which are tied and take up one 
+  ;; beat!!! TODO
+  ;;
+  ;;
+  ;;
+  ;;
+  ;;
+  ;;
+  ;;
+  ;;
   (:pre (= :measure (:my_type measure))) ;; TODO: not checking it!!!
   "Measures look like :barline :beat :beat :barline etc "
   ;; (println "draw-measure")
@@ -494,7 +535,7 @@
             (map (fn draw-measure-item[item]
                    (let [my-type (:my_type item)]
                      (cond (= :measure my-type)
-                           (draw-measure item)
+                           (draw-measure (merge-tied-notes item))
                            (:is_barline item)
                            (draw-barline item)
                            true
@@ -618,5 +659,29 @@
                ;;"S------------R--"
                ;;   "S----R--"
                "S-GG m-P-"
-               ))))
+               )))
+  )
 
+(comment (pprint
+             (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+               ;;"S------------R--"
+               ;;   "S----R--"
+               "S - -"
+               )))
+(comment
+  (println (to-lilypond 
+
+             (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+               ;;"S------------R--"
+               ;;   "S----R--"
+               "g - -"
+               )))
+)
+(comment
+(println
+             (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+               ;;"S------------R--"
+               ;;   "S----R--"
+               "|: S - -"
+               )))
+)

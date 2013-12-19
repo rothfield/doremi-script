@@ -1,1 +1,1 @@
-{{lilypond-pitch}}{{lilypond-octave}}{{duration}}
+{{lilypond-pitch}}{{lilypond-octave}}{{duration}}{{beam-val}}
