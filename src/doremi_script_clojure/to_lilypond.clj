@@ -265,7 +265,8 @@
        placement (:placement ornament)
        has-after-ornament (= :after placement)
        has-before-ornament (= :before placement)    
-       suppress-slurs (and has-after-ornament
+       suppress-slurs true
+       old-suppress-slurs (and has-after-ornament
                            (or in-slur (:tied pitch)))
        after-ornament-start (if has-after-ornament
                               "\\afterGrace ")
@@ -623,13 +624,11 @@
              :title (:title doremi-data)
              :author (:author doremi-data)
              :src-snippet (str  "%{\n " (lilypond-escape (:source doremi-data)) " \n %}\n")
-             :omit-time-signature-snippet (if (:time-signature doremi-data)
-                                            omit-time-signature-snippet) 
              :time-signature-snippet (if (:time_signature doremi-data)
-                                       (render time-signature-template {:time-signature (:time_signature doremi-data) })
+                                       (render time-signature-template 
+                                               {:time-signature (:time_signature doremi-data)})
                                        ;; else
-                                       ;; TODO: neomit-time-signature-snippet 
-                                       )
+                                            omit-time-signature-snippet) 
 
              :key-snippet (render key-template { :key "c"  ;; Always set key to c !! Transpose is used to move it to the right key
                                                 :mode (lower-case (:mode doremi-data "major"))

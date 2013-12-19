@@ -8,9 +8,9 @@ composer = "{{author}}"
 }
 {{src-snippet}}  
 melody = {
+{{time-signature-snippet}}
 \clef treble
 {{key-snippet}}
-{{time-signature-snippet}}
 \autoBeamOn  
 \cadenzaOn
 {{notes}}

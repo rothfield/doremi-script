@@ -62,3 +62,4 @@ echo "<script src='zepto.min.js'></script><script src='report.js'></script></bod
 
 echo "Report is at $report"
 cp $report $report2
+chromium $report

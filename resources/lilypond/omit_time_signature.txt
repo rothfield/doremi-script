@@ -1,4 +1,1 @@
-\context { 
-  \Staff 
-  \remove Time_signature_engraver 
-} 
+\once \override Staff.TimeSignature #'stencil = ##f 

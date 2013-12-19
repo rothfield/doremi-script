@@ -1,0 +1,910 @@
+<html><head>
+<link rel='stylesheet' href='report.css'>
+<title>doremi-script report: 4 files tested</title>
+</head>
+<body>
+<h2>doremi-script end to end test</h1>
+<h3>Thu Dec 19 10:35:08 PST 2013</h3>
+<hr>
+<h2>do_not_add_in_bar_lines.txt</h2>
+<pre class=doremi-source>
+TimeSignature: 5/4
+
+S R G m P D N 
+</pre>
+<button  class=show_ly data-which='1'>Show Lilypond Source</button>
+<button class=show_json data-which='1'>Show json</button>
+<pre id='ly1' class='ly-data'>
+#(ly:set-option 'midi-extension &quot;mid&quot;)
+\version &quot;2.12.3&quot;
+\include &quot;english.ly&quot;
+\header{ 
+title = &quot;&quot;
+composer = &quot;&quot;
+  tagline = &quot;&quot;  % removed 
+}
+%{
+ TimeSignature: 5/4
+
+S R G m P D N  
+ %}
+  
+melody = {
+\time 5/4
+\clef treble
+\key c \major
+\autoBeamOn  
+\cadenzaOn
+ c'4 d'4 e'4 f'4 g'4 a'4 b'4 \break
+
+}
+
+text = \lyricmode {
+  
+}
+
+\score{
+
+&lt;&lt;
+  \new Voice = &quot;one&quot; {
+    \melody
+  }
+  \new Lyrics \lyricsto &quot;one&quot; \text
+&gt;&gt;
+\layout {
+  \context {
+       \Score
+    \remove &quot;Bar_number_engraver&quot;
+  } 
+  }
+\midi { 
+  \context {
+    \Score
+    tempoWholesPerMinute = #(ly:make-moment 200 4)
+   }
+ }
+}
+</pre>
+<pre id='json1' class='json-data'>
+{&quot;lines&quot;:
+ [{&quot;kind&quot;:&quot;latin_sargam&quot;,
+   &quot;start_index&quot;:20,
+   &quot;my_type&quot;:&quot;sargam_line&quot;,
+   &quot;items&quot;:
+   [{&quot;items&quot;:
+     [{&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:20,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;S&quot;,
+         &quot;normalized_pitch&quot;:&quot;C&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:20,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:0,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;S&quot;}]},
+      {&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:22,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;R&quot;,
+         &quot;normalized_pitch&quot;:&quot;D&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:22,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:1,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;R&quot;}]},
+      {&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:24,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;G&quot;,
+         &quot;normalized_pitch&quot;:&quot;E&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:24,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:2,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;G&quot;}]},
+      {&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:26,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;m&quot;,
+         &quot;normalized_pitch&quot;:&quot;F&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:26,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:3,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;m&quot;}]},
+      {&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:28,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;P&quot;,
+         &quot;normalized_pitch&quot;:&quot;G&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:28,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:4,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;P&quot;}]},
+      {&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:30,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;D&quot;,
+         &quot;normalized_pitch&quot;:&quot;A&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:30,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:5,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;D&quot;}]},
+      {&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:32,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;N&quot;,
+         &quot;normalized_pitch&quot;:&quot;B&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:32,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:6,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;N&quot;}]}],
+     &quot;is_partial&quot;:true,
+     &quot;beat_count&quot;:7,
+     &quot;my_type&quot;:&quot;measure&quot;,
+     &quot;start_index&quot;:20}]}],
+ &quot;force_sargam_chars_hash&quot;:{},
+ &quot;notes_used&quot;:&quot;&quot;,
+ &quot;time_signature&quot;:&quot;5\/4&quot;,
+ &quot;key&quot;:&quot;c&quot;,
+ &quot;author&quot;:&quot;&quot;,
+ &quot;start_index&quot;:0,
+ &quot;apply_hyphenated_lyrics&quot;:false,
+ &quot;title&quot;:&quot;&quot;,
+ &quot;my_type&quot;:&quot;composition&quot;,
+ &quot;attributes&quot;:
+ {&quot;items_map&quot;:{&quot;TimeSignature&quot;:&quot;5\/4&quot;},
+  &quot;source&quot;:&quot;TODO&quot;,
+  &quot;start_index&quot;:0,
+  &quot;my_type&quot;:&quot;attributes&quot;,
+  &quot;items&quot;:
+  [{&quot;my_type&quot;:&quot;attribute&quot;, &quot;key&quot;:&quot;TimeSignature&quot;, &quot;value&quot;:&quot;5\/4&quot;}]},
+ &quot;warnings&quot;:[],
+ &quot;filename&quot;:&quot;untitled&quot;,
+ &quot;mode&quot;:&quot;major&quot;,
+ &quot;source&quot;:&quot;TimeSignature: 5\/4\n\nS R G m P D N &quot;}
+</pre>
+<div><img src='do_not_add_in_bar_lines.txt.png'></div>
+<hr>
+<h2>do_not_manually_beam_tuplets.txt</h2>
+<pre class=doremi-source>
+S-R S---g  SRG SRGmP
+</pre>
+<button  class=show_ly data-which='2'>Show Lilypond Source</button>
+<button class=show_json data-which='2'>Show json</button>
+<pre id='ly2' class='ly-data'>
+#(ly:set-option 'midi-extension &quot;mid&quot;)
+\version &quot;2.12.3&quot;
+\include &quot;english.ly&quot;
+\header{ 
+title = &quot;&quot;
+composer = &quot;&quot;
+  tagline = &quot;&quot;  % removed 
+}
+%{
+ S-R S---g  SRG SRGmP 
+ %}
+  
+melody = {
+\once \override Staff.TimeSignature #'stencil = ##f
+\clef treble
+\key c \major
+\autoBeamOn  
+\cadenzaOn
+ \times2/3 { c'4  d'8 } \times2/5 { c'4    ef'16 } \times2/3 { c'8 d'8 e'8 } \times2/5 { c'16 d'16 e'16 f'16 g'16 } \break
+
+}
+
+text = \lyricmode {
+  
+}
+
+\score{
+
+&lt;&lt;
+  \new Voice = &quot;one&quot; {
+    \melody
+  }
+  \new Lyrics \lyricsto &quot;one&quot; \text
+&gt;&gt;
+\layout {
+  \context {
+       \Score
+    \remove &quot;Bar_number_engraver&quot;
+  } 
+  }
+\midi { 
+  \context {
+    \Score
+    tempoWholesPerMinute = #(ly:make-moment 200 4)
+   }
+ }
+}
+</pre>
+<pre id='json2' class='json-data'>
+{&quot;lines&quot;:
+ [{&quot;kind&quot;:&quot;latin_sargam&quot;,
+   &quot;start_index&quot;:0,
+   &quot;my_type&quot;:&quot;sargam_line&quot;,
+   &quot;items&quot;:
+   [{&quot;items&quot;:
+     [{&quot;subdivisions&quot;:3,
+       &quot;start_index&quot;:0,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:2, &quot;denominator&quot;:3}],
+         &quot;pitch_source&quot;:&quot;S&quot;,
+         &quot;normalized_pitch&quot;:&quot;C&quot;,
+         &quot;numerator&quot;:2,
+         &quot;start_index&quot;:0,
+         &quot;denominator&quot;:3,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:0,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;S&quot;},
+        {&quot;ignore&quot;:true, &quot;my_type&quot;:&quot;dash&quot;, &quot;start_index&quot;:1},
+        {&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:3}],
+         &quot;pitch_source&quot;:&quot;R&quot;,
+         &quot;normalized_pitch&quot;:&quot;D&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:2,
+         &quot;denominator&quot;:3,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:1,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:1,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;R&quot;}]},
+      {&quot;subdivisions&quot;:5,
+       &quot;start_index&quot;:4,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:4, &quot;denominator&quot;:5}],
+         &quot;pitch_source&quot;:&quot;S&quot;,
+         &quot;normalized_pitch&quot;:&quot;C&quot;,
+         &quot;numerator&quot;:4,
+         &quot;start_index&quot;:4,
+         &quot;denominator&quot;:5,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:2,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;S&quot;},
+        {&quot;ignore&quot;:true, &quot;my_type&quot;:&quot;dash&quot;, &quot;start_index&quot;:5},
+        {&quot;ignore&quot;:true, &quot;my_type&quot;:&quot;dash&quot;, &quot;start_index&quot;:6},
+        {&quot;ignore&quot;:true, &quot;my_type&quot;:&quot;dash&quot;, &quot;start_index&quot;:7},
+        {&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:5}],
+         &quot;pitch_source&quot;:&quot;g&quot;,
+         &quot;normalized_pitch&quot;:&quot;Eb&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:8,
+         &quot;denominator&quot;:5,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:1,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:3,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;g&quot;}]},
+      {&quot;subdivisions&quot;:3,
+       &quot;start_index&quot;:11,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:3}],
+         &quot;pitch_source&quot;:&quot;S&quot;,
+         &quot;normalized_pitch&quot;:&quot;C&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:11,
+         &quot;denominator&quot;:3,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:4,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;S&quot;},
+        {&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:3}],
+         &quot;pitch_source&quot;:&quot;R&quot;,
+         &quot;normalized_pitch&quot;:&quot;D&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:12,
+         &quot;denominator&quot;:3,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:1,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:5,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;R&quot;},
+        {&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:3}],
+         &quot;pitch_source&quot;:&quot;G&quot;,
+         &quot;normalized_pitch&quot;:&quot;E&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:13,
+         &quot;denominator&quot;:3,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:2,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:6,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;G&quot;}]},
+      {&quot;subdivisions&quot;:5,
+       &quot;start_index&quot;:15,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:5}],
+         &quot;pitch_source&quot;:&quot;S&quot;,
+         &quot;normalized_pitch&quot;:&quot;C&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:15,
+         &quot;denominator&quot;:5,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:7,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;S&quot;},
+        {&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:5}],
+         &quot;pitch_source&quot;:&quot;R&quot;,
+         &quot;normalized_pitch&quot;:&quot;D&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:16,
+         &quot;denominator&quot;:5,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:1,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:8,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;R&quot;},
+        {&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:5}],
+         &quot;pitch_source&quot;:&quot;G&quot;,
+         &quot;normalized_pitch&quot;:&quot;E&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:17,
+         &quot;denominator&quot;:5,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:2,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:9,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;G&quot;},
+        {&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:5}],
+         &quot;pitch_source&quot;:&quot;m&quot;,
+         &quot;normalized_pitch&quot;:&quot;F&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:18,
+         &quot;denominator&quot;:5,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:3,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:10,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;m&quot;},
+        {&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:5}],
+         &quot;pitch_source&quot;:&quot;P&quot;,
+         &quot;normalized_pitch&quot;:&quot;G&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:19,
+         &quot;denominator&quot;:5,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:4,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:11,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;P&quot;}]}],
+     &quot;is_partial&quot;:true,
+     &quot;beat_count&quot;:4,
+     &quot;my_type&quot;:&quot;measure&quot;,
+     &quot;start_index&quot;:0}]}],
+ &quot;force_sargam_chars_hash&quot;:{},
+ &quot;notes_used&quot;:&quot;&quot;,
+ &quot;time_signature&quot;:null,
+ &quot;key&quot;:&quot;c&quot;,
+ &quot;author&quot;:&quot;&quot;,
+ &quot;start_index&quot;:0,
+ &quot;apply_hyphenated_lyrics&quot;:false,
+ &quot;title&quot;:&quot;&quot;,
+ &quot;my_type&quot;:&quot;composition&quot;,
+ &quot;attributes&quot;:null,
+ &quot;warnings&quot;:[],
+ &quot;filename&quot;:&quot;untitled&quot;,
+ &quot;mode&quot;:&quot;major&quot;,
+ &quot;source&quot;:&quot;S-R S---g  SRG SRGmP&quot;}
+</pre>
+<div><img src='do_not_manually_beam_tuplets.txt.png'></div>
+<hr>
+<h2>do_not_slur_ornament_within_slur.txt</h2>
+<pre class=doremi-source>
+      n
+(g m P d) | P
+ri        ba-
+</pre>
+<button  class=show_ly data-which='3'>Show Lilypond Source</button>
+<button class=show_json data-which='3'>Show json</button>
+<pre id='ly3' class='ly-data'>
+#(ly:set-option 'midi-extension &quot;mid&quot;)
+\version &quot;2.12.3&quot;
+\include &quot;english.ly&quot;
+\header{ 
+title = &quot;&quot;
+composer = &quot;&quot;
+  tagline = &quot;&quot;  % removed 
+}
+%{
+       n
+(g m P d) | P
+ri        ba- 
+ %}
+  
+melody = {
+\once \override Staff.TimeSignature #'stencil = ##f
+\clef treble
+\key c \major
+\autoBeamOn  
+\cadenzaOn
+ ef'4( f'4 \afterGrace g'4( { bf'32 } af'4) \bar &quot;|&quot;  g'4 \break
+
+}
+
+text = \lyricmode {
+  ri ba-
+}
+
+\score{
+
+&lt;&lt;
+  \new Voice = &quot;one&quot; {
+    \melody
+  }
+  \new Lyrics \lyricsto &quot;one&quot; \text
+&gt;&gt;
+\layout {
+  \context {
+       \Score
+    \remove &quot;Bar_number_engraver&quot;
+  } 
+  }
+\midi { 
+  \context {
+    \Score
+    tempoWholesPerMinute = #(ly:make-moment 200 4)
+   }
+ }
+}
+</pre>
+<pre id='json3' class='json-data'>
+{&quot;lines&quot;:
+ [{&quot;kind&quot;:&quot;latin_sargam&quot;,
+   &quot;start_index&quot;:8,
+   &quot;my_type&quot;:&quot;sargam_line&quot;,
+   &quot;items&quot;:
+   [{&quot;items&quot;:
+     [{&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:8,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:&quot;ri&quot;,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;g&quot;,
+         &quot;normalized_pitch&quot;:&quot;Eb&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:9,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[{&quot;my_type&quot;:&quot;begin_slur&quot;, &quot;start_index&quot;:8}],
+         &quot;pitch-counter&quot;:0,
+         &quot;column_offset&quot;:1,
+         &quot;tala&quot;:null,
+         &quot;source&quot;:&quot;(g&quot;,
+         &quot;value&quot;:&quot;g&quot;}]},
+      {&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:11,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;m&quot;,
+         &quot;normalized_pitch&quot;:&quot;F&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:11,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:1,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;m&quot;}]},
+      {&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:13,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;P&quot;,
+         &quot;normalized_pitch&quot;:&quot;G&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:13,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:1,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:
+         [{&quot;placement&quot;:&quot;after&quot;,
+           &quot;ornament_items&quot;:
+           [{&quot;pitch_source&quot;:&quot;n&quot;,
+             &quot;normalized_pitch&quot;:&quot;Bb&quot;,
+             &quot;start_index&quot;:6,
+             &quot;pointer&quot;:true,
+             &quot;octave&quot;:0,
+             &quot;beat-counter&quot;:0,
+             &quot;my_type&quot;:&quot;pitch&quot;,
+             &quot;pitch-counter&quot;:2,
+             &quot;value&quot;:&quot;n&quot;}],
+           &quot;usable_source&quot;:null,
+           &quot;start_index&quot;:6,
+           &quot;my_type&quot;:&quot;ornament&quot;}],
+         &quot;pitch-counter&quot;:3,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;P&quot;}]},
+      {&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:15,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;d&quot;,
+         &quot;normalized_pitch&quot;:&quot;Ab&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:15,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[{&quot;my_type&quot;:&quot;end_slur&quot;, &quot;start_index&quot;:16}],
+         &quot;pitch-counter&quot;:4,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;source&quot;:null,
+         &quot;value&quot;:&quot;d&quot;}]}],
+     &quot;is_partial&quot;:true,
+     &quot;beat_count&quot;:4,
+     &quot;my_type&quot;:&quot;measure&quot;,
+     &quot;start_index&quot;:8},
+    {&quot;is_barline&quot;:true, &quot;my_type&quot;:&quot;single_barline&quot;, &quot;start_index&quot;:18},
+    {&quot;items&quot;:
+     [{&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:20,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:&quot;ba-&quot;,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;P&quot;,
+         &quot;normalized_pitch&quot;:&quot;G&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:20,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;pitch-counter&quot;:5,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;P&quot;}]}],
+     &quot;is_partial&quot;:true,
+     &quot;beat_count&quot;:1,
+     &quot;my_type&quot;:&quot;measure&quot;,
+     &quot;start_index&quot;:19}]}],
+ &quot;force_sargam_chars_hash&quot;:{},
+ &quot;notes_used&quot;:&quot;&quot;,
+ &quot;time_signature&quot;:null,
+ &quot;key&quot;:&quot;c&quot;,
+ &quot;author&quot;:&quot;&quot;,
+ &quot;start_index&quot;:0,
+ &quot;apply_hyphenated_lyrics&quot;:false,
+ &quot;title&quot;:&quot;&quot;,
+ &quot;my_type&quot;:&quot;composition&quot;,
+ &quot;attributes&quot;:null,
+ &quot;warnings&quot;:[],
+ &quot;filename&quot;:&quot;untitled&quot;,
+ &quot;mode&quot;:&quot;major&quot;,
+ &quot;source&quot;:&quot;      n\n(g m P d) | P\nri        ba-&quot;}
+</pre>
+<div><img src='do_not_slur_ornament_within_slur.txt.png'></div>
+<hr>
+<h2>do_not_tie_quarter_notes.txt</h2>
+<pre class=doremi-source>
+S - - 
+</pre>
+<button  class=show_ly data-which='4'>Show Lilypond Source</button>
+<button class=show_json data-which='4'>Show json</button>
+<pre id='ly4' class='ly-data'>
+#(ly:set-option 'midi-extension &quot;mid&quot;)
+\version &quot;2.12.3&quot;
+\include &quot;english.ly&quot;
+\header{ 
+title = &quot;&quot;
+composer = &quot;&quot;
+  tagline = &quot;&quot;  % removed 
+}
+%{
+ S - -  
+ %}
+  
+melody = {
+\once \override Staff.TimeSignature #'stencil = ##f
+\clef treble
+\key c \major
+\autoBeamOn  
+\cadenzaOn
+ c'4~ c'4~ c'4 \break
+
+}
+
+text = \lyricmode {
+  
+}
+
+\score{
+
+&lt;&lt;
+  \new Voice = &quot;one&quot; {
+    \melody
+  }
+  \new Lyrics \lyricsto &quot;one&quot; \text
+&gt;&gt;
+\layout {
+  \context {
+       \Score
+    \remove &quot;Bar_number_engraver&quot;
+  } 
+  }
+\midi { 
+  \context {
+    \Score
+    tempoWholesPerMinute = #(ly:make-moment 200 4)
+   }
+ }
+}
+</pre>
+<pre id='json4' class='json-data'>
+{&quot;lines&quot;:
+ [{&quot;kind&quot;:&quot;latin_sargam&quot;,
+   &quot;start_index&quot;:0,
+   &quot;my_type&quot;:&quot;sargam_line&quot;,
+   &quot;items&quot;:
+   [{&quot;items&quot;:
+     [{&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:0,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;syllable&quot;:null,
+         &quot;chord&quot;:null,
+         &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;pitch_source&quot;:&quot;S&quot;,
+         &quot;normalized_pitch&quot;:&quot;C&quot;,
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:0,
+         &quot;denominator&quot;:1,
+         &quot;octave&quot;:0,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;pitch&quot;,
+         &quot;attributes&quot;:[],
+         &quot;tied&quot;:true,
+         &quot;pitch-counter&quot;:0,
+         &quot;column_offset&quot;:0,
+         &quot;tala&quot;:null,
+         &quot;value&quot;:&quot;S&quot;}]},
+      {&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:2,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:2,
+         &quot;denominator&quot;:1,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;dash&quot;,
+         &quot;tied&quot;:true,
+         &quot;case3&quot;:true,
+         &quot;pitch-counter&quot;:1,
+         &quot;pitch_to_use_for_tie&quot;:
+         {&quot;syllable&quot;:null,
+          &quot;chord&quot;:null,
+          &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+          &quot;pitch_source&quot;:&quot;S&quot;,
+          &quot;normalized_pitch&quot;:&quot;C&quot;,
+          &quot;numerator&quot;:1,
+          &quot;start_index&quot;:0,
+          &quot;denominator&quot;:1,
+          &quot;pointer&quot;:true,
+          &quot;octave&quot;:0,
+          &quot;my_type&quot;:&quot;pitch&quot;,
+          &quot;attributes&quot;:[],
+          &quot;pitch-counter&quot;:0,
+          &quot;column_offset&quot;:0,
+          &quot;tala&quot;:null,
+          &quot;value&quot;:&quot;S&quot;},
+         &quot;dash_to_tie&quot;:true}]},
+      {&quot;subdivisions&quot;:1,
+       &quot;start_index&quot;:4,
+       &quot;my_type&quot;:&quot;beat&quot;,
+       &quot;items&quot;:
+       [{&quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+         &quot;numerator&quot;:1,
+         &quot;start_index&quot;:4,
+         &quot;denominator&quot;:1,
+         &quot;beat-counter&quot;:0,
+         &quot;my_type&quot;:&quot;dash&quot;,
+         &quot;case3&quot;:true,
+         &quot;pitch-counter&quot;:2,
+         &quot;pitch_to_use_for_tie&quot;:
+         {&quot;syllable&quot;:null,
+          &quot;chord&quot;:null,
+          &quot;fraction_array&quot;:[{&quot;numerator&quot;:1, &quot;denominator&quot;:1}],
+          &quot;pitch_source&quot;:&quot;S&quot;,
+          &quot;normalized_pitch&quot;:&quot;C&quot;,
+          &quot;numerator&quot;:1,
+          &quot;start_index&quot;:0,
+          &quot;denominator&quot;:1,
+          &quot;pointer&quot;:true,
+          &quot;octave&quot;:0,
+          &quot;my_type&quot;:&quot;pitch&quot;,
+          &quot;attributes&quot;:[],
+          &quot;pitch-counter&quot;:0,
+          &quot;column_offset&quot;:0,
+          &quot;tala&quot;:null,
+          &quot;value&quot;:&quot;S&quot;},
+         &quot;dash_to_tie&quot;:true}]}],
+     &quot;is_partial&quot;:true,
+     &quot;beat_count&quot;:3,
+     &quot;my_type&quot;:&quot;measure&quot;,
+     &quot;start_index&quot;:0}]}],
+ &quot;force_sargam_chars_hash&quot;:{},
+ &quot;notes_used&quot;:&quot;&quot;,
+ &quot;time_signature&quot;:null,
+ &quot;key&quot;:&quot;c&quot;,
+ &quot;author&quot;:&quot;&quot;,
+ &quot;start_index&quot;:0,
+ &quot;apply_hyphenated_lyrics&quot;:false,
+ &quot;title&quot;:&quot;&quot;,
+ &quot;my_type&quot;:&quot;composition&quot;,
+ &quot;attributes&quot;:null,
+ &quot;warnings&quot;:[],
+ &quot;filename&quot;:&quot;untitled&quot;,
+ &quot;mode&quot;:&quot;major&quot;,
+ &quot;source&quot;:&quot;S - - &quot;}
+</pre>
+<div><img src='do_not_tie_quarter_notes.txt.png'></div>
+<script src='zepto.min.js'></script><script src='report.js'></script></body></html>
