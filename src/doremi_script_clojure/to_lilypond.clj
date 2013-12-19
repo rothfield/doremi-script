@@ -513,7 +513,8 @@
   (-> "lilypond/transpose.tpl" resource slurp trim))
 (def time-signature-template
   (-> "lilypond/time_signature.tpl" resource slurp trim))
-
+(def omit-time-signature-snippet
+  (-> "lilypond/omit_time_signature.txt" resource slurp trim))
 (defn lilypond-transpose[composition-data]
   "return transpose snippet for lilypond"
   "Don't transpose non-sargam."
@@ -554,8 +555,13 @@
              :title (:title doremi-data)
              :author (:author doremi-data)
              :src-snippet (str  "%{\n " (lilypond-escape (:source doremi-data)) " \n %}\n")
+             :omit-time-signature-snippet (if (:time-signature doremi-data)
+                                           omit-time-signature-snippet) 
              :time-signature-snippet (if (:time_signature doremi-data)
-                                       (render time-signature-template {:time-signature (:time_signature doremi-data) }))
+                                       (render time-signature-template {:time-signature (:time_signature doremi-data) })
+                                        ;; else
+                                        ;; TODO: neomit-time-signature-snippet 
+                                       )
 
              :key-snippet (render key-template { :key "c"  ;; Always set key to c !! Transpose is used to move it to the right key
                                                 :mode (lower-case (:mode doremi-data "major"))

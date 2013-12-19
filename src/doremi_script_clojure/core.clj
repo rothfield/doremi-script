@@ -1,7 +1,8 @@
 (ns doremi_script_clojure.core
   (:gen-class
-    :methods [#^{:static true}[myparse [String] String]
-              #^{:static true}[json_text_to_lilypond[String] String]])
+    :methods [
+              #^{:static true}[doremi_text_to_lilypond [String] String]
+              ])
   (:require	
     [instaparse.core :as insta]
 
@@ -114,15 +115,17 @@
     (let [ x (transform-parse-tree 
                (doremi-text->parse-tree  txt) txt)
           ]
-      (pprint-results x))
+      x)
     (catch Exception e (str "Error:" (.getMessage e)))
     )) 
 
+(comment
+(pprint (-myparse "S"))
+)
 (defn main-json[txt]
   (pprint-results 
     (transform-parse-tree (doremi-text->parse-tree  txt)
                           txt)))
-
 (defn doremi-text->json-data[txt]
    (let [
          parse-tree (doremi-text->parse-tree txt)
@@ -137,6 +140,10 @@
          ]
      (to-lilypond json-data)
   ))
+
+(defn -doremi_text_to_lilypond[x]
+   (doremi-text->lilypond x)
+  )
 
 ;;(pprint (doremi-text->lilypond "S"))
 
@@ -154,10 +161,12 @@
   (try
     (let [
           txt (get-stdin)
-          x (transform-parse-tree (doremi-text->parse-tree  txt)
-                                  txt)
+          parse-tree (doremi-text->parse-tree  txt)
+          x (transform-parse-tree parse-tree txt)
           ]
   (cond 
+    (= (first args) "--parse-tree")
+      (pprint parse-tree)
     (= (first args) "--json")
       (println (pprint-results x))
     (or (= (first args) "--ly") (empty? args)) 
@@ -166,9 +175,10 @@
      (println (usage))
       )
       )
-    (catch Exception e (str "Error:" (.getMessage e)))
+    (catch Exception e (println (str "Error:" (.getMessage e))))
     ))
-
-
-
+;; (println (doremi-text->lilypond "<S-R>"))
+;;(pprint (doremi-text->parse-tree "<S-R>"))
+;;(pprint (doremi-text->parse-tree "S-R"))
+;; (pprint (doremi-text->parse-tree (slurp (resource "fixtures/bracketed_beat.txt"))))
 

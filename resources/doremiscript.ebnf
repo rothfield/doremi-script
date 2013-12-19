@@ -206,7 +206,7 @@ LINE_NUMBER (*    1)    2)     3) etc     *)
 <DIGITS> = (* One or more digits *)  #'\d+'
 
 BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES (* <S  - - R > *) = SARGAM_PITCH2
-(WHITE_SPACE | DASHES)+
+(WHITE_SPACE* DASH)+
 
 REPEAT_SYMBOL = '%'
 

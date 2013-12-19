@@ -423,7 +423,7 @@
   ;; set :ignore true for all the dashes
   ;;  and set numerator for pitch
   (let [micro-beats (inc (count (filter #(= :dash (:my_type %)) rest)))]
-    (assert (#{:PITCH_WITH_DASHES :DASHES} my-key))
+    (assert (#{:BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES :PITCH_WITH_DASHES :DASHES} my-key))
     (into [] (concat [ (assoc pitch
                               :numerator micro-beats)] 
                      (map (fn[x] (if (= :dash (:my_type x))
@@ -461,8 +461,9 @@
     (merge (dissoc node2 :items) {
                                   :key 
                                   (:key items-map2 "c")
+                                  ;; Don't set default time signature!
                                   :time_signature
-                                  (:timesignature items-map2 "4/4") 
+                                  (:timesignature items-map2 nil) 
                                   :apply_hyphenated_lyrics
                                   (:apply_hyphenated_lyrics items-map2 false)
                                   :mode (:mode items-map2 "major") 
@@ -651,6 +652,8 @@
 :COMPOSITION 
 (handle-composition-in-main-walk (assoc node2 :source (get-source node txt)))
 :PITCH_WITH_DASHES
+(handle-pitch-with-dashes-in-main-walk node)
+:BEAT_DELIMITED_SARGAM_PITCH_WITH_DASHES
 (handle-pitch-with-dashes-in-main-walk node)
 :DASHES
 (handle-pitch-with-dashes-in-main-walk node)

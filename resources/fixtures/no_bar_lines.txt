@@ -1,3 +1,2 @@
-TimeSignature 300/4
 
-S R G m P D N
+S R G m P D N R G m P D N R 

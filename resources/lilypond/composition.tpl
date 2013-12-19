@@ -12,6 +12,7 @@ melody = {
 {{key-snippet}}
 {{time-signature-snippet}}
 \autoBeamOn  
+\cadenzaOn
 {{notes}}
 }
 
