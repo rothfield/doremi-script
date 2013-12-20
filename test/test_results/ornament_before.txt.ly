@@ -17,7 +17,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|"  e'4 \break
+\bar "|"  \acciaccatura {g'32[ f'32]}e'4 \break
 
 }
 

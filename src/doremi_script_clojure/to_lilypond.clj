@@ -261,10 +261,12 @@
        ;;if pitch.dash_to_tie and has_after_ornament(context.last_pitch)
        ;; _ (println "normalized-pitch-to-lilypond, pitch=") 
        ;; _ (pprint pitch)
+       ;; _ (pprint pitch)
        ornament (get-ornament pitch)
        placement (:placement ornament)
        has-after-ornament (= :after placement)
        has-before-ornament (= :before placement)    
+
        suppress-slurs true
        old-suppress-slurs (and has-after-ornament
                            (or in-slur (:tied pitch)))
@@ -276,12 +278,11 @@
        after-ornament-end (if has-after-ornament
                             (str " { " (lilypond-grace-notes ornament suppress-slurs) " }")) 
 
-       begin-slur (if (or (get-attribute pitch :begin_slur)
-                          (and (not in-slur) has-after-ornament))
-                    "(" )
-       extra_end_slur  (if (and (:dash_to_tie pitch) 
-                                has-after-ornament)
-                         ")")
+       begin-slur (if (get-attribute pitch :begin_slur) "(" )
+       extra_end_slur  "" 
+       ;;(if (and (:dash_to_tie pitch) 
+        ;;                        has-after-ornament)
+         ;;                ")")
        ;;begin-slur (if (and (= :after placement)
        pitch-template (-> "lilypond/pitch.tpl" resource slurp trim)
        rest-template (-> "lilypond/rest.tpl" resource slurp trim)
@@ -677,10 +678,14 @@
                )))
 )
 (comment
+(pprint (doremi_script_clojure.core/doremi-text->parse-tree 
+          "P\n m"))
+(pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+          " n\nP d"))
 (println
              (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
                ;;"S------------R--"
                ;;   "S----R--"
-               "|: S - -"
+               "P\n m"
                )))
 )

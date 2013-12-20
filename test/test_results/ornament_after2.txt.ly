@@ -7,9 +7,9 @@ composer = ""
   tagline = ""  % removed 
 }
 %{
-      .
-   .NS
- | S  R 
+     Pm
+ P m | r - S
+ wa-ta ho-ri 
  %}
   
 melody = {
@@ -18,12 +18,12 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|"  \afterGrace c''4 { b'32[ c'32] } \acciaccatura {b'32[ c'32]}d'4 \break
+ g'4 \afterGrace f'4 { g'32[ f'32] } \bar "|"  df'4~ df'4 c'4 \break
 
 }
 
 text = \lyricmode {
-  
+  wa- ta ho- ri
 }
 
 \score{

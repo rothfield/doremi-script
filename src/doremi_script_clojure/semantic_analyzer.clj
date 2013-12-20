@@ -188,34 +188,29 @@
                                   has-end-slur (some (fn[x] (= :end_slur (:my_type x))) (:attributes node))
                                   all-orns1 (filter #(= :ornament (:my_type %)) (my-seq sargam-section))
                                   all-orns (filter #(not (@assigned %)) all-orns1)
-
-                                  _ (if false (do (println "all-orns *****")
-                                                  (pprint all-orns) 
-                                                  (println "all-orns *****")))
                                   ;; To find the orns before, look at each ornament and
                                   ;; find the ones where column + length of source is one less
                                   ;; than the pitch's column
-                                  orns-before (map #(assoc % :placement :before)
-                                                   (filter #(= column (+ (count (:source %)) (column-for-node %)))
-                                                           all-orns))
-                                  orns-after (map #(assoc % :placement :after)
-                                                  (filter #(= column (dec (column-for-node %)))
-                                                          all-orns))
+                                  orns-before (filter #(= column (+ (count (:source %)) (column-for-node %)))
+                                                           all-orns)
+                                  orns-after (filter #(= column (dec (column-for-node %)))
+                                                          all-orns)
                                   orns (concat orns-before orns-after)
+                                  ;; Have to update @assigned set before 'modifying' the orns
                                   _ (swap! assigned clojure.set/union @assigned (set orns))
-
-                                  ;; _ (println "orns****" orns)
+                                  orns-before2 (map #(assoc % :placement :before) orns-before)
+                                  orns-after2 (map #(assoc % :placement :after) orns-after)
+                                  orns2 (concat orns-before2 orns-after2)
                                   next-syl (first @syls-to-apply)
                                   my-syl (if (and next-syl
                                                   (not @in-slur))
                                            (do (swap! syls-to-apply rest)
                                                next-syl))
-                                  ;; _ (println "my-syl is:" my-syl)
                                   ]
                               (if has-begin-slur (reset! in-slur true)) 
                               (if has-end-slur (reset! in-slur false)) 
 
-                              (update-sargam-pitch-node node (concat nodes orns) my-syl)
+                              (update-sargam-pitch-node node (concat nodes orns2) my-syl)
                               ))
                           ;; TODO: Actually only some nodes get this 
                           ;; treatment. And  
@@ -573,13 +568,15 @@
         (let [
               my-items (:items node2)
               node3 (dissoc node2 :items)
+              source (get-source node txt)
               ]
           ;;(println :SARGAM_ORNAMENT)
           (merge 
             node3 
             {
              :my_type :ornament
-             :usable_source (:source node2)
+             :usable_source source
+             :source source
              :ornament_items (into [] 
                                    (map (fn[x] 
                                           ;; TODO

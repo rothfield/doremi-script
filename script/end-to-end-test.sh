@@ -1,9 +1,9 @@
 #!/bin/bash
 
 time {
+		tempdir=$HOME/tmp
 		fname=$tempdir/$(basename $1)
 		dirname=`dirname $0`
-		tempdir=$HOME/tmp
 		mkdir -p $tempdir
 		cp $1 $tempdir
 		#cat $1 | lein run --json > $fname.json
