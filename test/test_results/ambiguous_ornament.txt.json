@@ -1,3 +1,5 @@
+upper dot nodes for this ornament
+[]
 {"lines":
  [{"kind":"latin_sargam",
    "start_index":6,
@@ -23,8 +25,10 @@
          "attributes":
          [{"placement":"after",
            "ornament_items":
-           [{"pitch_source":"n",
+           [{"group_line_no":0,
+             "pitch_source":"n",
              "normalized_pitch":"Bb",
+             "in_ornament":true,
              "start_index":3,
              "pointer":true,
              "octave":0,

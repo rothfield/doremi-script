@@ -678,10 +678,8 @@
                )))
 )
 (comment
-(pprint (doremi_script_clojure.core/doremi-text->parse-tree 
-          "P\n m"))
-(pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-          " n\nP d"))
+(pprint (doremi_script_clojure.core/doremi-text->parse-tree "P\n m"))
+(pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script " n\nP d"))
 (println
              (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
                ;;"S------------R--"

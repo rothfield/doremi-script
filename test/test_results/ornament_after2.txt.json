@@ -1,3 +1,7 @@
+upper dot nodes for this ornament
+[]
+upper dot nodes for this ornament
+[]
 {"lines":
  [{"kind":"latin_sargam",
    "start_index":7,
@@ -42,8 +46,10 @@
          "attributes":
          [{"placement":"after",
            "ornament_items":
-           [{"pitch_source":"P",
+           [{"group_line_no":0,
+             "pitch_source":"P",
              "normalized_pitch":"G",
+             "in_ornament":true,
              "start_index":4,
              "pointer":true,
              "octave":0,
@@ -51,8 +57,10 @@
              "my_type":"pitch",
              "pitch-counter":1,
              "value":"P"},
-            {"pitch_source":"m",
+            {"group_line_no":0,
+             "pitch_source":"m",
              "normalized_pitch":"F",
+             "in_ornament":true,
              "start_index":5,
              "pointer":true,
              "octave":0,

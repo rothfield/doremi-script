@@ -1,3 +1,13 @@
+upper dot nodes for this ornament
+[]
+upper dot nodes for this ornament
+[]
+upper dot nodes for this ornament
+[]
+upper dot nodes for this ornament
+[]
+upper dot nodes for this ornament
+[]
 {"lines":
  [{"kind":"latin_sargam",
    "start_index":168,
@@ -299,8 +309,10 @@
          "attributes":
          [{"placement":"after",
            "ornament_items":
-           [{"pitch_source":"R",
+           [{"group_line_no":0,
+             "pitch_source":"R",
              "normalized_pitch":"D",
+             "in_ornament":true,
              "start_index":156,
              "pointer":true,
              "octave":0,
@@ -308,8 +320,10 @@
              "my_type":"pitch",
              "pitch-counter":11,
              "value":"R"},
-            {"pitch_source":"m",
+            {"group_line_no":0,
+             "pitch_source":"m",
              "normalized_pitch":"F",
+             "in_ornament":true,
              "start_index":157,
              "pointer":true,
              "octave":0,
@@ -317,8 +331,10 @@
              "my_type":"pitch",
              "pitch-counter":12,
              "value":"m"},
-            {"pitch_source":"g",
+            {"group_line_no":0,
+             "pitch_source":"g",
              "normalized_pitch":"Eb",
+             "in_ornament":true,
              "start_index":158,
              "pointer":true,
              "octave":0,
@@ -326,8 +342,10 @@
              "my_type":"pitch",
              "pitch-counter":13,
              "value":"g"},
-            {"pitch_source":"R",
+            {"group_line_no":0,
+             "pitch_source":"R",
              "normalized_pitch":"D",
+             "in_ornament":true,
              "start_index":159,
              "pointer":true,
              "octave":0,
@@ -335,8 +353,10 @@
              "my_type":"pitch",
              "pitch-counter":14,
              "value":"R"},
-            {"pitch_source":"g",
+            {"group_line_no":0,
+             "pitch_source":"g",
              "normalized_pitch":"Eb",
+             "in_ornament":true,
              "start_index":160,
              "pointer":true,
              "octave":0,
@@ -344,7 +364,8 @@
              "my_type":"pitch",
              "pitch-counter":15,
              "value":"g"}],
-           "usable_source":null,
+           "source":"RmgRg",
+           "usable_source":"RmgRg",
            "start_index":156,
            "my_type":"ornament"}],
          "pitch-counter":16,

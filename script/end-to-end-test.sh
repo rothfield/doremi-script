@@ -10,6 +10,7 @@ time {
 		echo "lein run --ly ..."
 		cat $1 | lein run --ly >  $fname.ly 
 		echo "lily2image..."
+		rm -f $fname.png
 		lily2image -r=72 -f=png $fname 2>&1  
 		rm -f $fname.mid $fname.ps
 }

@@ -1,3 +1,7 @@
+upper dot nodes for this ornament
+[]
+upper dot nodes for this ornament
+[{:group_line_no 0, :my_type :upper_octave_dot, :start_index 5}]
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
@@ -18,7 +22,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|"  \afterGrace c''4 { b'32[ c'32] } \acciaccatura {b'32[ c'32]}d'4 \break
+\bar "|"  \afterGrace c''4 { b'32[ c'32] } d'4 \break
 
 }
 

@@ -1,3 +1,13 @@
+upper dot nodes for this ornament
+[{:group_line_no 1, :my_type :upper_octave_dot, :start_index 23}]
+upper dot nodes for this ornament
+[]
+upper dot nodes for this ornament
+[]
+upper dot nodes for this ornament
+[{:group_line_no 1, :my_type :upper_octave_dot, :start_index 26}]
+upper dot nodes for this ornament
+[]
 {"lines":
  [{"kind":"latin_sargam",
    "start_index":28,
@@ -23,8 +33,10 @@
          "attributes":
          [{"placement":"after",
            "ornament_items":
-           [{"pitch_source":"N",
+           [{"group_line_no":0,
+             "pitch_source":"N",
              "normalized_pitch":"B",
+             "in_ornament":true,
              "start_index":14,
              "pointer":true,
              "octave":0,
@@ -32,8 +44,10 @@
              "my_type":"pitch",
              "pitch-counter":0,
              "value":"N"},
-            {"pitch_source":"R",
+            {"group_line_no":0,
+             "pitch_source":"R",
              "normalized_pitch":"D",
+             "in_ornament":true,
              "start_index":15,
              "pointer":true,
              "octave":0,
@@ -41,8 +55,10 @@
              "my_type":"pitch",
              "pitch-counter":1,
              "value":"R"},
-            {"pitch_source":"S",
+            {"group_line_no":0,
+             "pitch_source":"S",
              "normalized_pitch":"C",
+             "in_ornament":true,
              "start_index":16,
              "pointer":true,
              "octave":0,
@@ -50,8 +66,10 @@
              "my_type":"pitch",
              "pitch-counter":2,
              "value":"S"},
-            {"pitch_source":"N",
+            {"group_line_no":0,
+             "pitch_source":"N",
              "normalized_pitch":"B",
+             "in_ornament":true,
              "start_index":17,
              "pointer":true,
              "octave":0,
@@ -59,8 +77,10 @@
              "my_type":"pitch",
              "pitch-counter":3,
              "value":"N"},
-            {"pitch_source":"S",
+            {"group_line_no":0,
+             "pitch_source":"S",
              "normalized_pitch":"C",
+             "in_ornament":true,
              "start_index":18,
              "pointer":true,
              "octave":0,
