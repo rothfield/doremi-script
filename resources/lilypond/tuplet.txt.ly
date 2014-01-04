@@ -14,7 +14,6 @@ melody = {
 \clef treble
 \key c \major
 \time 4/4
-\autoBeamOn  
 \partial 4*2  \bar "|"  \times 2/5 {d'16 e'8 d'16 e'16 } d'4 \break
 
 }

@@ -224,8 +224,8 @@
                                                                                  ))))
                                                              nodes))
                                                              ]
-                            (println "upper dot nodes for this ornament")
-                              (pprint dot-nodes)
+                           ;; (println "upper dot nodes for this ornament")
+                            ;;  (pprint dot-nodes)
                             node
                                   )
                                ;; (println "in_ornament case")
@@ -785,7 +785,7 @@ node2
                       parse-tree)))
 (comment
 (pprint (doremi_script_clojure.core/doremi-text->parse-tree 
-               (-> "fixtures/ornament_in_lower_octave.txt" 
+               (-> "fixtures/bracketed_beat_fails.txt" ;;ornament_in_lower_octave.txt" 
                    resource slurp)))
 (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script
                (-> "fixtures/ornament_in_lower_octave.txt" 
@@ -794,7 +794,8 @@ node2
 
 (comment
 (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script
-          (-> "fixtures/ornament_in_lower_octave.txt" 
-           ;;    (-> "fixtures/ornament_with_both_upper_and_lower_dots.txt" 
-                   resource slurp)))
+          "<P d>"))
+       ;;   (-> "fixtures/ornament_in_lower_octave.txt" 
+                   ;;resource slurp)))
+              ;;    (-> "fixtures/ornament_with_both_upper_and_lower_dots.txt" 
 )

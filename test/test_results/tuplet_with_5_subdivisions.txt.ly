@@ -16,7 +16,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|"  \times2/5 { c'4    d'16 } \break
+\bar "|"  \times4/5 { c'4    d'16 } \break
 
 }
 

@@ -1,5 +1,3 @@
-upper dot nodes for this ornament
-[]
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
@@ -19,7 +17,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|"  \acciaccatura {b'32}c'4 \break
+\bar "|"  \acciaccatura { b'32 }c'4 \break
 
 }
 

@@ -33,7 +33,8 @@
    })
 
 (def normalized-pitch->lilypond-pitch
-  "includes dash (-) -> r "
+  ;; TODO: double sharps and flats, half-flats ??"
+  ;; includes dash (-) -> r "
   {
    "-" "r"
    "C" "c"
@@ -203,7 +204,7 @@
 
 
 (defn lilypond-escape[x]
-  ;;(println "x is " x)
+ ;; (println "x is " x)
   ;;      # Anything that is enclosed in %{ and %} is ignored  by lilypond
   ;;      composition-data.source="" if !composition-data.source?
   ;;      src1= composition-data.source.replace /%\{/gi, "% {"
@@ -242,6 +243,13 @@
     (or (barline-type my-map) (:single-barline my-map))
     ))
 
+
+(def pitch-template (-> "lilypond/pitch.tpl" resource slurp trim))
+(def rest-template (-> "lilypond/rest.tpl" resource slurp trim))
+
+(def before-ornament-template
+  (-> "lilypond/before_ornament.tpl" resource slurp trim))
+
 (def partial-template
   (-> "lilypond/partial.tpl" resource slurp trim))
 (def ending-template
@@ -249,19 +257,16 @@
 (def tied-pitch-template
   (-> "lilypond/tied_pitch.tpl" resource slurp trim))
 
-(defn draw-pitch[pitch in-slur beat-subdivisions beam-val]
+(def lilypond-after-ornament-directive "\\afterGrace ")
 
+(defn draw-pitch[pitch in-slur beat-subdivisions beam-start-or-end]
+  "Does alot. Not sure how to refactor."
   "Also handles dashes"
   "Render a pitch/dash as lilypond"
-  ;; (println "entering draw-pitch" beat-subdivisions)
   (if (:ignore pitch)
     ""
     (let
       [ 
-       ;;if pitch.dash_to_tie and has_after_ornament(context.last_pitch)
-       ;; _ (println "normalized-pitch-to-lilypond, pitch=") 
-       ;; _ (pprint pitch)
-       ;; _ (pprint pitch)
        ornament (get-ornament pitch)
        placement (:placement ornament)
        has-after-ornament (= :after placement)
@@ -269,23 +274,14 @@
 
        suppress-slurs true
        old-suppress-slurs (and has-after-ornament
-                           (or in-slur (:tied pitch)))
-       after-ornament-start (if has-after-ornament
-                              "\\afterGrace ")
-       before-ornament-snippet (if has-before-ornament
-                                 (str "\\acciaccatura {" (lilypond-grace-notes ornament suppress-slurs) "}"))
-
-       after-ornament-end (if has-after-ornament
-                            (str " { " (lilypond-grace-notes ornament suppress-slurs) " }")) 
+                               (or in-slur (:tied pitch)))
 
        begin-slur (if (get-attribute pitch :begin_slur) "(" )
        extra_end_slur  "" 
        ;;(if (and (:dash_to_tie pitch) 
-        ;;                        has-after-ornament)
-         ;;                ")")
+       ;;                        has-after-ornament)
+       ;;                ")")
        ;;begin-slur (if (and (= :after placement)
-       pitch-template (-> "lilypond/pitch.tpl" resource slurp trim)
-       rest-template (-> "lilypond/rest.tpl" resource slurp trim)
        lilypond-octave  (octave-number->lilypond-octave (:octave pitch))
        ;;_ (pprint pitch)
        duration-ary (ratio-to-lilypond 
@@ -319,7 +315,7 @@
                                          (map (fn[duration] 
                                                 (render tied-pitch-template
                                                         {
-                                                         :beam-val beam-val
+                                                         :beam-start-or-end beam-start-or-end
                                                          :duration duration
                                                          :lilypond-pitch lilypond-pitch
                                                          :lilypond-octave lilypond-octave
@@ -327,7 +323,6 @@
                                                         ))
                                               (rest duration-ary)    
                                               ))))
-       ;;_ (println "extra-tied-durations" extra-tied-durations)
        ]
       ;; this function returns the value of the following cond:
       (cond (:ignore pitch2)
@@ -336,23 +331,27 @@
             ""
             (and (= :dash (:my_type pitch2)) 
                  (not (:dash_to_tie pitch2)))
-            (render rest-template {
-                                   :duration duration
+            (render rest-template { :duration duration
                                    :chord chord
                                    :ending ending-snippet                
                                    })
             (or (= :pitch (:my_type pitch2))
                 (= :dash (:my_type pitch2)))
             ;;
-            ;;{{before-ornament-snippet}}{{after-ornament-start}}{{lilypond-pitch}}{{lilypond-octave}}{{duration}}{{lilypond-symbol-for-tie}}{{mordent}}{{begin-slur}}{{extra-end-slur}}{{end-slur}}{{ending}}{{chord}}{{after-ornament-end}}
+            ;;{{before-ornament-snippet}}{{after-ornament-start}}{{lilypond-pitch}}{{lilypond-octave}}{{duration}}{{lilypond-symbol-for-tie}}{{mordent}}{{begin-slur}}{{extra-end-slur}}{{end-slur}}{{ending}}{{chord}}{{after-ornament-contents}}
             (render pitch-template 
                     {
-                     :before-ornament-snippet before-ornament-snippet
-                     :after-ornament-start after-ornament-start
+                     :before-ornament-snippet 
+                     (if has-before-ornament
+                       (render before-ornament-template {:grace-notes  
+                                                         (lilypond-grace-notes ornament suppress-slurs) }))
+
+                     :after-ornament-directive (if has-after-ornament 
+                                                 lilypond-after-ornament-directive) 
                      :lilypond-pitch lilypond-pitch
                      :lilypond-octave lilypond-octave
                      :duration duration
-                     :beam-val beam-val
+                     :beam-start-or-end beam-start-or-end
                      :lilypond-symbol-for-tie 
                      (if (and (:tied pitch)
                               (not has-after-ornament)) 
@@ -363,13 +362,16 @@
                      :end-slur (if (get-attribute pitch2 :end_slur) ")" )
                      :ending ending-snippet                  
                      :chord chord
-                     :after-ornament-end after-ornament-end
+                     :after-ornament-contents  (if has-after-ornament
+                                                 (str " { " (lilypond-grace-notes ornament suppress-slurs) " }"))
                      :extra-tied-durations extra-tied-durations
                      }
                     )))))
 
 
 (def lilypond-break  "\\break\n")
+(def lilypond-beam-start "[")
+(def lilypond-beam-end "]")
 
 (defn beat-is-all-dashes?[beat] 
   (:pre (= (:my_type "beat")))
@@ -378,76 +380,109 @@
 (def beat-tuplet-template 
   (-> "lilypond/beat_with_tuplet.tpl" resource slurp trim))
 
+(defn tuplet-numerator-for-odd-subdivisions[subdivisions-in-beat]
+  ;; fills in numerator for times. For example
+  ;; \times ???/5 {d'16 e'8 d'16 e'16 }
+  ;; The ??? should be such that 5/16 *  ???/5 =  1/4
+  ;; So ??? = 4
+  ;; TODO: dry with duration code
+  (cond (= 3 subdivisions-in-beat) 
+        2 
+        (<  subdivisions-in-beat 8)
+        4 
+        (< subdivisions-in-beat 16)
+        8 
+        (< subdivisions-in-beat 32)
+        16 
+        (< subdivisions-in-beat 64)
+        32 
+        true
+        32 
+        )
+  )
+
 (defn draw-beat[beat]
+  ;;(println "entering draw-beat")
+  ;;(pprint beat)
   "TODO: review durations. The durations will be a function of the beat subdivisions"
   "and the note count of pulses" 
-  ;;(println "beat is")
-  ;;(pprint beat)
-
-  ;;    if item.my_type is "beat"
-  ;;       beat=item
-  ;;       if beat.subdivisions not in [0,1,2,4,8,16,32,64,128] and !beat_is_all_dashes(beat)
-  ;;           #@log "odd beat.subdivisions=",beat.subdivisions
-  ;;           x=2
-  ;;           if beat.subdivisions is 6
-  ;;             x=4
-  ;;           if  beat.subdivisions is 5
-  ;;             x=4
-  ;;           disable_tuplet_numbers="\\override TupletNumber #'stencil = ##f"
-  ;;           ary.push "#{disable_tuplet_numbers} \\times #{x}/#{beat.subdivisions} { {{beat-contents}} } "
-  ;;           in_times=true #hack
-  ;;  if in_times
-  ;;    ary.push "}"
+  "Manually put in lilypond beaming rather than using autobeaming"
+  "Previous version didn't beam 3,5, and 7 per beat. This version does"
+  "One case that beaming produces a bad result is the following S-G"
   (let [
         ;; beam beat as follows: SR -> c'[ d']  
         ;; This is lilypond's manual beaming.
         ;; only beam if more than one beat.
         ;; get ids identifying the pitches
         ;; perhaps move this code down into pitch.tpl
-        ;;
-        lilypond-beam-start "["
-        lilypond-beam-end "]"
+        ;; The composition template sets autoBeam on. However, I seem to have found
+        ;; that I need to manually beam each beat. Except, apparently for 3,5 and 7 per beat.
         ;; Get list of pitch ids. This gives us a count and helps identify the first
         ;; and last pitches.
+        ;; _ (pprint (:items beat))
         pitch-ids (map :pitch-counter 
                        (filter 
-                         #(and (= :pitch (:my_type %))
+                         #(and (#{ :dash :pitch } (:my_type %))
                                (:pitch-counter %))
                          (:items beat)))
+        subdivisions (:subdivisions beat)
+        first-pitch (some #(if (= :pitch (:my_type %)) %) (:items beat))
+        ;;_ (println first-pitch)
+                      ;; special case S-R. Maybe applies whenever fraction
+        ;; is over 1/2 
+        ;;_ (println subdivisions)
+        ;;_ (println (:fraction_array first-pitch))
+        ;; _ (println "frac" (/ (:numerator first-pitch) (:denominator first-pitch)))
+
+        do-not-beam-case (and (#{3 5 7 9} subdivisions)  ;; TODO: test
+                              (some 
+                            (fn[pitch] 
+                              (and
+                                        (#{:pitch :dash}  (:my_type pitch))
+                                        (not (:ignore pitch))
+                                        (> 
+                                           (/ (:numerator pitch)
+                                             (:denominator pitch))
+                                          (/ 1 2))))
+                            (:items beat))) 
+                           ;;   (:fraction_array first-pitch)))
+        ;; _ (println "do-not-beam-case" do-not-beam-case)
         beamable? (and (> (count pitch-ids) 1)
-                       (not (#{3 5 7} (:subdivisions beat))))  ;; beam if more than one pitch in beat
+                       (not do-not-beam-case))
+       ;; _ (println beamable? "beamable")
+        ;;
         beat-ary (map (fn draw-beat-item[ item]
                         (let [
-                              ;; If this is the first pitch and there are
+                              ;; If this is the first pitch or tied rest and there are
                               ;; more than one in the beat, add [ to end of note to
                               ;; indicate beam start.
-                              beam-val    (cond (and beamable?
-                                                     (= (first pitch-ids) (:pitch-counter item)))
-                                              lilypond-beam-start 
-                              (and beamable?      
-                                                 (= (last pitch-ids) (:pitch-counter item)))
-                                         lilypond-beam-end)
+                              beam-start-or-end    (cond (and beamable?
+                                                              (= (first pitch-ids) (:pitch-counter item)))
+                                                         lilypond-beam-start 
+                                                         (and beamable?      
+                                                              (= (last pitch-ids) (:pitch-counter item)))
+                                                         lilypond-beam-end)
                               my-type (:my_type item)]
                           (cond (#{:pitch :dash} my-type)
                                 (draw-pitch item false (:subdivisions beat)
-                                            beam-val)
+                                            beam-start-or-end)
                                 true
-                                (str "<" my-type ">"))))
+                                (str "<item" item " Unknown my-type" my-type ">"))))
                       (:items beat))
         beat-content (join " " beat-ary)
         ]
     (if (and (not (#{0 1 2 4 8 16 32 64 128} (:subdivisions beat)))
              (not (beat-is-all-dashes? beat)))
-      (let [x 2]
-        (render beat-tuplet-template {:beat-content  beat-content
-                                      :tuplet-numerator x
-                                      ;; need to change subdivisions???
-                                      ;; as in ratio-to... ???
-                                      :subdivisions (:subdivisions beat)
-                                      }))
+      ;; example: SRGRGmGmp  emits 2/9 followed by 9 16th notes. 2/9 * 9/16 = 1/8 which seems wrong. should be 4/9 * 9/16= 1/4
+      (render beat-tuplet-template {:beat-content  beat-content
+                                    :tuplet-numerator 
+                                    (tuplet-numerator-for-odd-subdivisions (:subdivisions beat))
+                                    :subdivisions (:subdivisions beat)
+                                    })
       ;; else
       beat-content)     
     ))
+
 (defn draw-barline[barline]
   (barline->lilypond-barline (:my_type barline)))
 
@@ -455,48 +490,36 @@
   measure)
 
 (defn zmerge-tied-notes[measure]
-    (let [x 1
+  (let [x 1
         combined-beats (atom [])
-         measure2 (assoc measure :items  
-      (reverse (map (fn[my-beat]
-                     ;;(pprint my-beat)
-                      (if (and 
-                     (= 1 (:subdivisions my-beat))
-                          (:dash_to_tie (first (:items my-beat))) 
-                            )
-                        (do 
-                          ;;(println "zzz")
-                            (swap! combined-beats (fn[x1] (conj x1 my-beat)))
-                         (assoc my-beat :marked-for-removal true)
-                       )
-                       my-beat 
-                        ))
-                   (:items measure) 
-                    )))
-          ]
-      ;;(println "****")
-      ;;(pprint @combined-beats)
-     ;; (println "****")
-      measure2
+        measure2 (assoc measure :items  
+                        (reverse (map (fn[my-beat]
+                                        ;;(pprint my-beat)
+                                        (if (and 
+                                              (= 1 (:subdivisions my-beat))
+                                              (:dash_to_tie (first (:items my-beat))) 
+                                              )
+                                          (do 
+                                            ;;(println "zzz")
+                                            (swap! combined-beats (fn[x1] (conj x1 my-beat)))
+                                            (assoc my-beat :marked-for-removal true)
+                                            )
+                                          my-beat 
+                                          ))
+                                      (:items measure) 
+                                      )))
+        ]
+    ;;(println "****")
+    ;;(pprint @combined-beats)
+    ;; (println "****")
+    measure2
     )
   )
 
 (defn draw-measure[measure]
   ;; It would be nice to combine those pitches which are tied and take up one 
   ;; beat!!! TODO
-  ;;
-  ;;
-  ;;
-  ;;
-  ;;
-  ;;
-  ;;
-  ;;
   (:pre (= :measure (:my_type measure))) ;; TODO: not checking it!!!
-  "Measures look like :barline :beat :beat :barline etc "
-  ;; (println "draw-measure")
-  ;;(println "items in measure are")
-  ;;(pprint (map :my_type (:items measure)))
   (str 
     (render partial-template 
             {:beat-count (:beat_count measure)})
@@ -507,8 +530,6 @@
             (fn draw-measure-item[item]
               (let [my-type (:my_type item)]
                 (cond 
-                  ;; (:is_barline item)
-                  ;; (draw-barline item)
                   (= :beat my-type)
                   (draw-beat item)
                   true
@@ -517,10 +538,14 @@
             (:items measure)
             )))) 
 
-(def draw-line-break "\\break\n")
+(def draw-line-break
+  ;; Lilypond text for line break. TODO: review emitting of line breaks
+  ;; and repeat symbols. I believe that a repeat symbol followed by break
+  ;; causes lilypond not to print the right repeat 
+  "\\break\n")
 
 (defn draw-line[line & options]
-  "line consists of optional :line_number followed by :measure :measure etc "
+  "line consists of optional :line_number followed by :barline :measure :measure etc "
   "We don't render line numbers in lilypond. (yet)"
   "TODO: use the atoms properly"
   (let [in-slur (atom false)
@@ -534,7 +559,7 @@
         ] 
     (str
       (join " " 
-            (map (fn draw-measure-item[item]
+            (map (fn draw-line-item[item]
                    (let [my-type (:my_type item)]
                      (cond (= :measure my-type)
                            (draw-measure (merge-tied-notes item))
@@ -544,6 +569,7 @@
                            (str "<??" my-type "??>"))))
                  my-items)) 
       " " 
+      ;; TODO: only draw line break if not right repeat at end of line???
       draw-line-break) 
     ))
 
@@ -583,8 +609,11 @@
   (-> "lilypond/transpose.tpl" resource slurp trim))
 (def time-signature-template
   (-> "lilypond/time_signature.tpl" resource slurp trim))
+
 (def omit-time-signature-snippet
+  "Returns a lilypond snippet that prevents printing of the time signature"
   (-> "lilypond/omit_time_signature.txt" resource slurp trim))
+
 (defn lilypond-transpose[composition-data]
   "return transpose snippet for lilypond"
   "Don't transpose non-sargam."
@@ -629,7 +658,7 @@
                                        (render time-signature-template 
                                                {:time-signature (:time_signature doremi-data)})
                                        ;; else
-                                            omit-time-signature-snippet) 
+                                       omit-time-signature-snippet) 
 
              :key-snippet (render key-template { :key "c"  ;; Always set key to c !! Transpose is used to move it to the right key
                                                 :mode (lower-case (:mode doremi-data "major"))
@@ -641,12 +670,12 @@
 
 ;;;;;;;;;;;; For testing ;;;;;
 (comment
-  (use 'clojure.stacktrace) 
-  (print-stack-trace *e)
+ ;; (use 'clojure.stacktrace) 
+ ;; (print-stack-trace *e)
   (println
     (to-lilypond 
       (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-        (-> "fixtures/waltz.txt" resource slurp)
+        (-> "fixtures/all_tuples.txt" resource slurp)
         ;;   "-- S - R"
         ))
 
@@ -658,16 +687,17 @@
              (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
                ;;"S------------R--"
                ;;   "S----R--"
-               "S-GG m-P-"
+               ;; "S-GG m-P-"
+               "S-R"
                )))
   )
 
 (comment (pprint
-             (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-               ;;"S------------R--"
-               ;;   "S----R--"
-               "S - -"
-               )))
+           (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+             ;;"S------------R--"
+             ;;   "S----R--"
+             "S - -"
+             )))
 (comment
   (println (to-lilypond 
 
@@ -676,14 +706,31 @@
                ;;   "S----R--"
                "g - -"
                )))
-)
+  )
 (comment
-(pprint (doremi_script_clojure.core/doremi-text->parse-tree "P\n m"))
-(pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script " n\nP d"))
-(println
-             (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+  (pprint (doremi_script_clojure.core/doremi-text->parse-tree "P\n m"))
+  (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script " n\nP d"))
+  (println
+    (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+                   ;;"S------------R--"
+                   ;;   "S----R--"
+          "<P d>"
+          ;;         "P\n m"
+                   )))
+  )
+(comment
+  (println 
+    (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+  ;;             "SRGm -PDnDPmG"
+    ;;   (-> "fixtures/bansuriv3.txt" resource slurp)
                ;;"S------------R--"
                ;;   "S----R--"
-               "P\n m"
+               ;; "S-GG m-P-"
+             ;;  "S-R SRGm S---R SRGm  S----R--- S----R--"
+  ;;        "<P d>"
+                   
+"<S> <S - >  <   S    R   G >  < - S >"
                )))
-)
+ )
+ ;; (print-stack-trace *e)
+

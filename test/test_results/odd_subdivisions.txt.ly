@@ -17,7 +17,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
- c'16.[   d'16.   e'16]~  e'32 f'16.[   g'16.   a'32]~ a'16  b'16.[   c''16.]   \break
+ c'16.[   d'16.   e'16]~  e'32[ f'16.   g'16.   a'32]~ a'16[  b'16.   c''16.]   \break
 
 }
 

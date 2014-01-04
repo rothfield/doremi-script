@@ -1,5 +1,3 @@
-upper dot nodes for this ornament
-[]
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"

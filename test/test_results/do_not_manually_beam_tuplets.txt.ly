@@ -16,7 +16,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
- \times2/3 { c'4  d'8 } \times2/5 { c'4    ef'16 } \times2/3 { c'8 d'8 e'8 } \times2/5 { c'16 d'16 e'16 f'16 g'16 } \break
+ \times2/3 { c'4  d'8 } \times4/5 { c'4    ef'16 } \times2/3 { c'8 d'8 e'8 } \times4/5 { c'16 d'16 e'16 f'16 g'16 } \break
 
 }
 

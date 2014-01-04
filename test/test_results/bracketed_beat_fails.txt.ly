@@ -16,7 +16,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
- \times2/3 { c'8~ r8 e'8 } \break
+ \times2/3 { c'4  e'8 } \break
 
 }
 

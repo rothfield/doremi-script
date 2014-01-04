@@ -1,13 +1,3 @@
-upper dot nodes for this ornament
-[{:group_line_no 1, :my_type :upper_octave_dot, :start_index 23}]
-upper dot nodes for this ornament
-[]
-upper dot nodes for this ornament
-[]
-upper dot nodes for this ornament
-[{:group_line_no 1, :my_type :upper_octave_dot, :start_index 26}]
-upper dot nodes for this ornament
-[]
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"

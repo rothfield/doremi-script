@@ -14,9 +14,7 @@ css_file="$DIR/report.css"
 cp $css_file $target_directory/report.css
 cp $DIR/zepto.min.js  $target_directory/
 cp $DIR/report.js  $target_directory/
-ts=`date +%s`
-report=$target_directory/report.tmp.$ts.html
-report2=$target_directory/report.html
+report=$target_directory/report.html
 
 echo "<html><head>" > $report # create new report
 echo "<link rel='stylesheet' href='report.css'>" >> $report
@@ -61,5 +59,4 @@ done
 echo "<script src='zepto.min.js'></script><script src='report.js'></script></body></html>" >> $report
 
 echo "Report is at $report"
-cp $report $report2
 chromium $report

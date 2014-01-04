@@ -7,7 +7,7 @@ composer = ""
   tagline = ""  % removed 
 }
 %{
- S S- S-S SSS SSSS S--R--G 
+ S S- S-S SSS SSSS S--R--G -SRG 
  %}
   
 melody = {
@@ -16,7 +16,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
- c'4 c'4  \times2/3 { c'4  c'8 } \times2/3 { c'8 c'8 c'8 } c'16[ c'16 c'16 c'16] \times2/7 { c'8.   d'8.   e'16 } \break
+ c'4 c'4  \times2/3 { c'4  c'8 } \times2/3 { c'8 c'8 c'8 } c'16[ c'16 c'16 c'16] \times4/7 { c'8.   d'8.   e'16~ } e'16 c'16[ d'16 e'16] \break
 
 }
 
