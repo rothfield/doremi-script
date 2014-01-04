@@ -19,8 +19,7 @@ melody = {
 \key c \aeolian
 \autoBeamOn  
 \cadenzaOn
-\bar "|"  ef'8[ f'8] g'8[ ef'8]~ ef'8[ c'8]~ c'4  \bar "|" \break
-
+\bar "|"  ef'8[ f'8] g'8[ ef'8]~ ef'8[ c'8]~ c'4  \bar "|"
 }
 
 text = \lyricmode {

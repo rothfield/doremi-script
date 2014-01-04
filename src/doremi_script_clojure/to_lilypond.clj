@@ -16,6 +16,9 @@
   (some #(if (= attribute (:my_type %)) %) (:attributes item)))
 
 (def lilypond-symbol-for-tie "~" )
+(def lilypond-invisible-grace-note 
+   ;; s is short for spacer  
+  (str "\\" "grace s64"))
 
 (def tick "'")
 (def comma ",")
@@ -60,6 +63,7 @@
    "B#" "bs"
    }
   )
+
 (def grace-note-pitch-template
   (-> "lilypond/grace_note_pitch.tpl" resource slurp trim))
 
@@ -95,21 +99,6 @@
 (defn get-ornament[pitch]
   (get-attribute pitch :ornament))
 
-(defn zzgrace-notes[pitch in-slur]
-  (if (not (get-ornament pitch))
-    {:begin-slur false}
-    ;; else
-    (let [ ornament (get-ornament pitch)
-          placement (:placement ornament)
-          suppress-slurs (if (and (= :after placement)
-                                  (or in-slur
-                                      (:tied pitch)))
-                           true)
-          begin-slur (if (and (= :after placement)
-                              (not in-slur))
-                       "(")
-          ]
-      {:begin-slur begin-slur})))
 
 (defn ratio-to-lilypond[my-numerator subdivisions-in-beat]
   (let [my-ratio (/ my-numerator subdivisions-in-beat)]
@@ -271,34 +260,23 @@
        placement (:placement ornament)
        has-after-ornament (= :after placement)
        has-before-ornament (= :before placement)    
-
        suppress-slurs true
        old-suppress-slurs (and has-after-ornament
                                (or in-slur (:tied pitch)))
 
        begin-slur (if (get-attribute pitch :begin_slur) "(" )
        extra_end_slur  "" 
-       ;;(if (and (:dash_to_tie pitch) 
-       ;;                        has-after-ornament)
-       ;;                ")")
-       ;;begin-slur (if (and (= :after placement)
        lilypond-octave  (octave-number->lilypond-octave (:octave pitch))
-       ;;_ (pprint pitch)
-       duration-ary (ratio-to-lilypond 
+       durations (ratio-to-lilypond 
                       (:numerator pitch) 
                       beat-subdivisions)
-       duration (first duration-ary)
-       ;; example grouping of 5 produces
-       ;;      (/ 5 8) ["8" "32"]
-       ;; _ (println "duration is: " duration)
+       duration (first durations) 
        chord (chord-snippet (get-chord pitch))
        ending (:source (get-attribute pitch :ending))
        ending-snippet (if ending
                         (render ending-template { :ending 
                                                  (:source (get-attribute pitch :ending))
                                                  }))
-       ; _ (println "pitch is")
-       ; _ (pprint pitch)
        pitch2 (if (and (= :dash (:my_type pitch)) 
                        (:dash_to_tie pitch))
                 (assoc pitch :normalized_pitch 
@@ -309,7 +287,7 @@
        lilypond-octave  (octave-number->lilypond-octave (:octave pitch2))
        lilypond-pitch 
        (normalized-pitch->lilypond-pitch (:normalized_pitch pitch2))
-       extra-tied-durations (if (> (count duration-ary) 1)
+       extra-tied-durations (if (> (count durations) 1)
                               (str lilypond-symbol-for-tie
                                    (join lilypond-symbol-for-tie
                                          (map (fn[duration] 
@@ -321,10 +299,9 @@
                                                          :lilypond-octave lilypond-octave
                                                          }
                                                         ))
-                                              (rest duration-ary)    
+                                              (rest durations)    
                                               ))))
        ]
-      ;; this function returns the value of the following cond:
       (cond (:ignore pitch2)
             ""
             (:pointer pitch)
@@ -337,8 +314,6 @@
                                    })
             (or (= :pitch (:my_type pitch2))
                 (= :dash (:my_type pitch2)))
-            ;;
-            ;;{{before-ornament-snippet}}{{after-ornament-start}}{{lilypond-pitch}}{{lilypond-octave}}{{duration}}{{lilypond-symbol-for-tie}}{{mordent}}{{begin-slur}}{{extra-end-slur}}{{end-slur}}{{ending}}{{chord}}{{after-ornament-contents}}
             (render pitch-template 
                     {
                      :before-ornament-snippet 
@@ -402,21 +377,13 @@
   )
 
 (defn draw-beat[beat]
-  ;;(println "entering draw-beat")
-  ;;(pprint beat)
-  "TODO: review durations. The durations will be a function of the beat subdivisions"
-  "and the note count of pulses" 
-  "Manually put in lilypond beaming rather than using autobeaming"
-  "Previous version didn't beam 3,5, and 7 per beat. This version does"
-  "One case that beaming produces a bad result is the following S-G"
+     ;; Manually beam beat as follows: SR -> c'[ d']  
+     ;; Only if more than one pitch in the beat of course
+     ;; But don't beam if there is a quarter note which can be the
+     ;; case with S-R
   (let [
-        ;; beam beat as follows: SR -> c'[ d']  
-        ;; This is lilypond's manual beaming.
-        ;; only beam if more than one beat.
         ;; get ids identifying the pitches
         ;; perhaps move this code down into pitch.tpl
-        ;; The composition template sets autoBeam on. However, I seem to have found
-        ;; that I need to manually beam each beat. Except, apparently for 3,5 and 7 per beat.
         ;; Get list of pitch ids. This gives us a count and helps identify the first
         ;; and last pitches.
         ;; _ (pprint (:items beat))
@@ -427,14 +394,8 @@
                          (:items beat)))
         subdivisions (:subdivisions beat)
         first-pitch (some #(if (= :pitch (:my_type %)) %) (:items beat))
-        ;;_ (println first-pitch)
-                      ;; special case S-R. Maybe applies whenever fraction
-        ;; is over 1/2 
-        ;;_ (println subdivisions)
-        ;;_ (println (:fraction_array first-pitch))
-        ;; _ (println "frac" (/ (:numerator first-pitch) (:denominator first-pitch)))
-
-        do-not-beam-case (and (#{3 5 7 9} subdivisions)  ;; TODO: test
+        ;; TODO: rewrite. Should deal with durations
+        do-not-beam-case (and (#{3 5 7 9} subdivisions) 
                               (some 
                             (fn[pitch] 
                               (and
@@ -445,12 +406,8 @@
                                              (:denominator pitch))
                                           (/ 1 2))))
                             (:items beat))) 
-                           ;;   (:fraction_array first-pitch)))
-        ;; _ (println "do-not-beam-case" do-not-beam-case)
         beamable? (and (> (count pitch-ids) 1)
                        (not do-not-beam-case))
-       ;; _ (println beamable? "beamable")
-        ;;
         beat-ary (map (fn draw-beat-item[ item]
                         (let [
                               ;; If this is the first pitch or tied rest and there are
@@ -539,10 +496,12 @@
             )))) 
 
 (def draw-line-break
-  ;; Lilypond text for line break. TODO: review emitting of line breaks
-  ;; and repeat symbols. I believe that a repeat symbol followed by break
-  ;; causes lilypond not to print the right repeat 
-  "\\break\n")
+  ;; Lilypond text for line break.
+  ;; Lilypond doesn't like  left-repeat break barline
+  ;; That is why I insert an invisible grace note spacer after the
+  ;; break. Otherwise lilypond will combine the left-repeat and barline
+  ;; and you lose the left repeat.
+  (str "\\break        " lilypond-invisible-grace-note " \n"))
 
 (defn draw-line[line & options]
   "line consists of optional :line_number followed by :barline :measure :measure etc "
@@ -568,9 +527,7 @@
                            true
                            (str "<??" my-type "??>"))))
                  my-items)) 
-      " " 
-      ;; TODO: only draw line break if not right repeat at end of line???
-      draw-line-break) 
+      )
     ))
 
 
@@ -581,20 +538,6 @@
     ;; else
     (= :after (:placement (get-ornament pitch)))  
     ))
-;;(pprint pitch-with-after-ornament)
-;;(pprint (has-after-ornament pitch-with-after-ornament))
-;;      console.log "line-to-lilypond" if false
-;;      line-to-lilypond-array(line,options).join ' '
-;;    
-;;    has-after-ornament = (pitch) ->
-;;      return false if !pitch?
-;;      ornament=get-ornament(pitch)
-;;      return false if !ornament?
-;;      ornament?.placement is "after"
-;;    
-;;    line-to-lilypond-array = (line,options={}) ->
-;;      # Line is a line from the parsed doremi-script
-
 
 (defn is-abc-line[line]
   (if (nil? (:kind line))
@@ -663,7 +606,7 @@
              :key-snippet (render key-template { :key "c"  ;; Always set key to c !! Transpose is used to move it to the right key
                                                 :mode (lower-case (:mode doremi-data "major"))
                                                 }) 
-             :notes (join "\n" (map draw-line (:lines doremi-data))) 
+             :notes (join draw-line-break (map draw-line (:lines doremi-data))) 
              })))
 
 
@@ -707,6 +650,7 @@
                "g - -"
                )))
   )
+
 (comment
   (pprint (doremi_script_clojure.core/doremi-text->parse-tree "P\n m"))
   (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script " n\nP d"))
@@ -728,8 +672,8 @@
                ;; "S-GG m-P-"
              ;;  "S-R SRGm S---R SRGm  S----R--- S----R--"
   ;;        "<P d>"
-                   
-"<S> <S - >  <   S    R   G >  < - S >"
+  "SSS:|\n\nRRR"                 
+;; "<S> <S - >  <   S    R   G >  < - S >"
                )))
  )
  ;; (print-stack-trace *e)

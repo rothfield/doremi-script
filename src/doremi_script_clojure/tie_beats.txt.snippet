@@ -1,0 +1,26 @@
+(defn zmerge-tied-notes[measure]
+  (let [x 1
+        combined-beats (atom [])
+        measure2 (assoc measure :items  
+                        (reverse (map (fn[my-beat]
+                                        ;;(pprint my-beat)
+                                        (if (and 
+                                              (= 1 (:subdivisions my-beat))
+                                              (:dash_to_tie (first (:items my-beat))) 
+                                              )
+                                          (do 
+                                            ;;(println "zzz")
+                                            (swap! combined-beats (fn[x1] (conj x1 my-beat)))
+                                            (assoc my-beat :marked-for-removal true)
+                                            )
+                                          my-beat 
+                                          ))
+                                      (:items measure) 
+                                      )))
+        ]
+    ;;(println "****")
+    ;;(pprint @combined-beats)
+    ;; (println "****")
+    measure2
+    )
+  )

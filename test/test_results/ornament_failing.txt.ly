@@ -17,8 +17,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
- bf'8[ g'8] \break
-
+ bf'8[ g'8]
 }
 
 text = \lyricmode {

@@ -18,10 +18,8 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|"  df'4~ df'4 c'4~ c'4 \bar ":|" \break
-
-\bar "|"  c'4 c'4 c'4 c'4 \bar "|" \break
-
+\bar "|"  df'4~ df'4 c'4~ c'4 \bar ":|"\break        \grace s64 
+\bar "|"  c'4 c'4 c'4 c'4 \bar "|"
 }
 
 text = \lyricmode {

@@ -24,8 +24,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|"  d'8[ c'8] c'4~ c'4~  c'4  \bar "|" \break
-
+\bar "|"  d'8[ c'8] c'4~ c'4~  c'4  \bar "|"
 }
 
 text = \lyricmode {

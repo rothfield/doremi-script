@@ -1,0 +1,927 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html itemscope itemtype="http://schema.org/">
+	<head>
+		<script>window.UVPERF = {};UVPERF.authtoken = '88c11d6a-17f5-4526-ba83-bee57c4a3b91';UVPERF.start = new Date().getTime();</script>
+<title>lilypond-user-gnu - Re: repeat bar at the beginning of a piece - msg#00125 - Recent Discussion OSDir.com
+</title>
+<base href="http://osdir.com/ml/lilypond-user-gnu/2010-05/"/>
+	<META http-equiv="Content-Style-Type" content="text/css">
+		<script type="text/javascript">
+			var osDirAdList = []
+			var isqus_developer = 0
+			            var isIndexPage = false
+            		       			
+		</script>
+		<link rel='stylesheet' href="/ml/css/defaultv6.css" type="text/css">
+		<link rel='stylesheet' href="/ml/css/disqusv3.css" type="text/css">
+<script type="text/javascript" src="http://partner.googleadservices.com/gampad/google_service.js">
+</script>
+<script type="text/javascript">
+GS_googleAddAdSenseService("ca-pub-2048202115983124");
+GS_googleEnableAllServices();
+</script>
+<script src="/ml/head.js"></script>
+<script> 
+	//head.js({'az2':'http://adzippery.com/async/az.php'});
+</script> 
+
+                
+<script type="text/javascript">
+GA_googleUseIframeRendering();
+</script>
+
+<!-- Start of Newest Feb 2012 Google DFP code -->
+<script type='text/javascript'>
+var googletag = googletag || {};
+googletag.cmd = googletag.cmd || [];
+(function() {
+var gads = document.createElement('script');
+gads.async = true;
+gads.type = 'text/javascript';
+var useSSL = 'https:' == document.location.protocol;
+gads.src = (useSSL ? 'https:' : 'http:') + 
+'//www.googletagservices.com/tag/js/gpt.js';
+var node = document.getElementsByTagName('script')[0];
+node.parentNode.insertBefore(gads, node);
+})();
+</script>
+<script type='text/javascript'>
+googletag.cmd.push(function() {
+googletag.defineSlot('/1006930/remnant_passback_block', [300, 250], 'div-gpt-ad-1328233401738-0').addService(googletag.pubads());
+googletag.defineSlot('/1006930/remnant_passback_LB', [728, 90], 'div-gpt-ad-1328233401738-1').addService(googletag.pubads());
+googletag.defineSlot('/1006930/remnant_passback_sky', [160, 600], 'div-gpt-ad-1328233401738-2').addService(googletag.pubads());
+googletag.pubads().enableSingleRequest();
+googletag.enableServices();
+});
+</script>
+<!-- End of Goog DFP -->
+
+
+
+
+
+
+<script type="text/JavaScript">
+<!--
+function timedRefresh(timeoutPeriod) {
+	setTimeout("location.reload(true);",timeoutPeriod);
+}
+//   -->
+</script>
+
+
+<meta itemprop="name" content="Re: repeat bar at the beginning of a piece - lilypond-user-gnu">
+<meta itemprop="description" content="Re: repeat bar at the beginning of a piece">
+
+
+
+	</head>	
+	<!-- <body onload="//addDisqus();" style="position:relative;"> -->
+	<body onload="JavaScript:timedRefresh(300000);">
+
+
+
+
+
+				<!-- FANCY BAR -->
+				<div id="topBarBox" class="round10">
+					<table border="0" cellpadding="0" cellspacing="0" width="100%" height="95">
+						<tr>
+							<td align="left" valign="middle" id="homeClick">
+								
+<font size="+3">osdir.com</font><br/>
+
+								<font size="-1">mailing list archive <a href="/ml/faq.php">F.A.Q.</a> -since 2001!</font>
+							</td>
+							<td valign="middle">
+								<center>
+									<div id="osDirAd1Post" class="adContainer banner" style="height: 90px;">
+										<script type="text/javascript">
+										//GA_googleFillSlot("MLTOP728x90");
+										GA_googleFillSlotWithSize('ca-pub-2048202115983124',"MLTOP728x90",728,90);
+										</script> 
+									</div>
+								</center>
+							</td>
+							<td align="right" valign="middle">
+								<form action="http://osdir.com/ml/search.html" id="cse-search-box">
+								    <input type="hidden" name="cx" value="partner-pub-2048202115983124:opmgflpkuzq"> 
+								    <input type="hidden" name="cof" value="FORID:10"> 
+								    <input type="hidden" name="ie" value="ISO-8859-1"> 
+									<div style="padding-top: 6px;">
+								    <input type="text" name="q" size="28"> 
+								    <input type="submit" name="sa" value="Search">
+									</div> 
+								</form>
+								<script type="text/javascript" src="http://www.google.com/coop/cse/brand?form=cse-search-box&amp;lang=en"></script>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<!-- END FANCY BAR -->
+			</td>
+		</tr>
+<!-- #PAGE HEADER -->		
+		<tr>
+			<td>
+				<center>
+				<!-- <div id="adContainerDiv1" class="adContainer banner" style="display: inline; height: 150px;"></div> -->
+								</center>
+			</td>
+		</tr>
+<!-- #PAGE HEADER END-->
+		<tr>
+			<td>
+<!-- PAGE MIDDLE -->
+				<table border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="10" valign="top">
+	<!-- LEFT COLUMN -->	
+<div style="margin-left: 80px;">
+<p>
+<br><br>
+
+
+</div>
+<!-- LEFT COLUMN END -->
+					</td>
+					<td width="1150" valign="top">
+	<!-- MIDDLE COLUMN -->
+
+	                <div class="col1" style="width:920px;">
+							<div class="osDirMsgContainer round10" id="osDirMsgPost" style="position:relative;overflow:auto !important;">
+									 
+								<div class="osDirMessageTitle">
+																		<h1>Subject: Re: repeat bar at the beginning of a piece -<br>msg#00125</h1> <span><g:plusone size="small"></g:plusone> </span>
+							
+	<h2>List: <a href='http://osdir.com/ml/lilypond-user-gnu/' title='lilypond-user-gnu'>lilypond-user-gnu</a></h2>
+</div>
+
+<p>
+								<div class="osDirPrevNext">
+									<center>
+									<span style="font-size: smaller;">
+									<b>lilypond-user-gnu Navigation:</b> 
+									</span><br/>
+								
+
+
+							
+
+	
+									Date:
+																			<a href='msg00124.html' title='repeat bar at the beginning of a piece'>Prev</a>
+																												<a href='msg00126.html' title='repeat bar at the beginning of a piece'>Next</a>
+										
+									<a href='./'>Date Index</a>
+								<!-- <a href='index.html#00125'>Index</a> -->
+									Thread:
+																			<a href='msg00124.html' title='repeat bar at the beginning of a piece'>Prev</a>
+																												<a href='msg00129.html' title='repeat bar at the beginning of a piece'>Next</a>
+										
+									<a href='./threads.html'>Thread Index</a> 
+							
+									<!-- <a href='threads.html#00125'>Index</a> -->
+
+
+
+
+
+							</center>	</div><p> <p>
+
+
+<a href='http://www.rumanalytics.com/' rel='nofollow'>Website Performance Monitoring</a>
+
+							
+							
+																	
+									<div id="messspan">Steve Tarr schrieb:<br>
+I'm working with 2.13.20, trying to reproduce a piece of shape-note 
+music that has a 4-dot (with no line) repeat bar at the beginning of 
+the piece.
+<br>
+<br>
+The snippet titled &quot;Printing a repeat sign at the beginning of a 
+piece&quot; works as described if I use the &quot;|:&quot; bar, but doesn't display 
+the bar if I use &quot;:&quot; (or any other bar style) instead.
+<br>
+<br>
+What's special about &quot;|:&quot; in this case?  Is there some property I can<br>
+override to allow arbitrary bar lines to be displayed at the beginning<br>
+of a piece?  Or is there something I can change so that &quot;:&quot; will be 
+treated as a repeat bar just as &quot;|:&quot; is?
+<br>As a somewhat hackish solution, you can start the piece with an 
+invisible grace note, like this:
+<br>
+<br>
+\version &quot;2.13.20&quot;<br>
+<br>
+test = \relative c' {<br>
+ \grace s16<br>
+ \bar &quot;:&quot;<br>
+ \repeat volta 2 {<br>
+   c4 d e f | g f e d<br>
+ }<br>
+}<br>
+<br>
+\score {<br>
+ \new Staff {<br>
+   \new Voice {<br>
+     \test<br>
+   }<br>
+ }<br>
+}<br>
+<br>
+If you have multiple voices, make sure that the invisible grace note is 
+in every
+<br>
+voice, otherwise the output will be cluttered.<br>
+<br>
+HTH,<br>
+<br>
+Marc<br>
+<br>
+
+<br>
+-Steve Tarr<br>
+<br>
+<br>
+_______________________________________________<br>
+lilypond-user mailing list<br>
+lilypond-user@xxxxxxx<br>
+<a  rel="nofollow" href="http://lists.gnu.org/mailman/listinfo/lilypond-user">http://lists.gnu.org/mailman/listinfo/lilypond-user</a><br>
+<br>
+
+<br>
+<br>
+<br>
+_______________________________________________<br>
+lilypond-user mailing list<br>
+lilypond-user@xxxxxxx<br>
+<a  rel="nofollow" href="http://lists.gnu.org/mailman/listinfo/lilypond-user">http://lists.gnu.org/mailman/listinfo/lilypond-user</a><br>
+<br></div>
+								</div>
+                                                                
+
+
+<center>
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td>
+</td>
+<td>
+<div>
+
+</div>
+</td>
+</tr>
+</table>
+<form action="http://osdir.com/ml/search.html" id="cse-search-box">
+  <div>
+    <input type="hidden" name="cx" value="partner-pub-2048202115983124:lwylboaindn" />
+    <input type="hidden" name="cof" value="FORID:9" />
+    <input type="hidden" name="ie" value="ISO-8859-1" />
+    <input type="text" name="q" size="61" />
+    <input type="submit" name="sa" value="Search" />
+  </div>
+</form>  
+<script type="text/javascript" src="http://www.google.com/cse/brand?form=cse-search-box&amp;lang=en"></script>
+</center>
+<p> 
+
+<center>
+
+</center><p> 
+
+							<div class="blueBorder round10" style="padding: 5px;"><b>Thread at a glance:</b>
+
+	                				                			<div class="osdirMsgPreview" id="osDirMsgPre3">
+	                				<h3 onclick="toggleMe('osDirMsgPre3');">Previous Message by Date:
+	                					<!--<span style="font-size: 8pt">(click to view message preview)</span>-->
+	                				</h3>
+	                				<a href='msg00124.html'>repeat bar at the beginning of a piece</a><br><br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+I'm working with 2.13.20, trying to reproduce a piece of shape-note 
+music that has a 4-dot (with no line) repeat bar at the beginning of the 
+piece.
+
+
+The snippet titled &quot;Printing a repeat sign at the beginning of a piece&quot; 
+works as described if I use the &quot;|:&quot; bar, but doesn't display the bar if 
+I use &quot;:&quot; (or any other bar style) instead.
+
+
+What's special about &quot;|:&quot; in this case?  Is there some property I can
+override to allow arbitrary bar lines to be displayed at the beginning
+of a piece?  Or is there something I can change so that &quot;:&quot; will be 
+treated as a repeat bar just as &quot;|:&quot; is?
+
+
+-Steve Tarr
+
+
+_______________________________________________
+lilypond-user mailing list
+lilypond-user@xxxxxxx
+http://lists.gnu.org/mailman/listinfo/lilypond-user
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	               				</div>
+	               				      			
+	                				                			<div class="osdirMsgPreview" id="osDirMsgPre4">
+	                				<h3 onclick="toggleMe('osDirMsgPre4');">Next Message by Date:
+	                					<!--<span style="font-size: 8pt">click to view message preview</span>-->
+	                				</h3>
+	                				<a href='msg00126.html'>Re: OMET: Online Music Editing Tools feedback?</a><br><br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Mike Blackstock schrieb:
+
+If somebody could have a quick look at http://www.vex.net/~mikeb/omet
+and tell me what they think I'd appreciate it.
+
+Keys and stuff are missing but all that code is ready to upload, as is
+code for producing midi 'on-the-fly' and generating lllypond source.
+Also I can demo real-time collaborating shortly - user A enters a note
+and it also appears on user B's screen, and real-time lilypond
+compilation is straighforward, down the road. A secure 'lilypond
+rendering farm' is what I have in mind - the webserver communicates
+with the lilypond servers etc etc.
+
+What I'd like to know specifically is whether the approach is sound -
+being able to treat the screen as if it were a blank sheet of paper
+where you can enter notes anywhere and in any order? Before I start
+uploading other stuff, is there something I'm overlooking in the basic
+interface?
+  
+
+It looks quite interesting and promising - but I am probably not
+the right guy for a profound opinion, because I would not use a
+web interface for coding lilypond (at least at the moment).
+
+Thanks a lot. I think it works across all browsers, though someone
+reported problems with FF 3.6.3 on some version of Vista, and IE 6 has
+the png bug that I gave up on. Also Google Chrome doesn't properly
+handle the turning off of the cursor it seems, at least on my system.
+  
+
+From a technical point of view, everything seems to work properly
+here with firefox/linux.
+
+Marc
+
+Mike
+
+
+_______________________________________________
+lilypond-user mailing list
+lilypond-user@xxxxxxx
+http://lists.gnu.org/mailman/listinfo/lilypond-user
+
+  
+
+
+
+
+_______________________________________________
+lilypond-user mailing list
+lilypond-user@xxxxxxx
+http://lists.gnu.org/mailman/listinfo/lilypond-user
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	               				</div>
+	               				      			
+
+	                				                			<div class="osdirMsgPreview" id="osDirMsgPre1">
+	                				<h3 onclick="toggleMe('osDirMsgPre1');">Previous Message by Thread:
+	                					<!--<span style="font-size: 8pt">click to view message preview</span>-->
+	                				</h3>
+	                				<a href='msg00124.html'>repeat bar at the beginning of a piece</a><br><br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+I'm working with 2.13.20, trying to reproduce a piece of shape-note 
+music that has a 4-dot (with no line) repeat bar at the beginning of the 
+piece.
+
+
+The snippet titled &quot;Printing a repeat sign at the beginning of a piece&quot; 
+works as described if I use the &quot;|:&quot; bar, but doesn't display the bar if 
+I use &quot;:&quot; (or any other bar style) instead.
+
+
+What's special about &quot;|:&quot; in this case?  Is there some property I can
+override to allow arbitrary bar lines to be displayed at the beginning
+of a piece?  Or is there something I can change so that &quot;:&quot; will be 
+treated as a repeat bar just as &quot;|:&quot; is?
+
+
+-Steve Tarr
+
+
+_______________________________________________
+lilypond-user mailing list
+lilypond-user@xxxxxxx
+http://lists.gnu.org/mailman/listinfo/lilypond-user
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	               				</div>
+	               				      			
+	                				                			<div class="osdirMsgPreview" id="osDirMsgPre2">
+	                				<h3 onclick="toggleMe('osDirMsgPre2');">Next Message by Thread:
+	                				<!--<span style="font-size: 8pt">click to view message preview</span>-->
+	                				</h3>
+	                				<a href='msg00129.html'>Re: repeat bar at the beginning of a piece</a><br><br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Steve Tarr schrieb:
+I'm working with 2.13.20, trying to reproduce a piece of shape-note 
+music that has a 4-dot (with no line) repeat bar at the beginning of 
+the piece.
+
+
+The snippet titled &quot;Printing a repeat sign at the beginning of a 
+piece&quot; works as described if I use the &quot;|:&quot; bar, but doesn't display 
+the bar if I use &quot;:&quot; (or any other bar style) instead.
+
+
+What's special about &quot;|:&quot; in this case?  Is there some property I can
+override to allow arbitrary bar lines to be displayed at the beginning
+of a piece?  Or is there something I can change so that &quot;:&quot; will be 
+treated as a repeat bar just as &quot;|:&quot; is?
+
+
+
+Marc Hohl wrote:
+
+&gt; As a somewhat hackish solution, you can start the piece with an
+
+invisible grace note, like this:
+
+&lt;snip&gt;
+
+HTH,
+Marc
+
+
+Thanks Marc.  That will work nicely for my case and it's simpler than 
+the documented snippet.
+I'm still curious, though, about why lilypond treats the two barlines 
+differently.
+
+It may be intentional, but what's controlling this behavior?
+
+-Steve
+
+
+_______________________________________________
+lilypond-user mailing list
+lilypond-user@xxxxxxx
+http://lists.gnu.org/mailman/listinfo/lilypond-user
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	               				</div>
+	               											</div>
+
+
+<table><tr><td>
+<div>      
+</div>
+</td></tr></table>
+
+<div id="disqus_thread" class="round10">
+
+<!-- <script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+    var disqus_shortname = 'osdir'; // required: replace example with your forum shortname
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    // var disqus_identifier = 'unique_dynamic_id_1234';
+    // var disqus_url = 'http://example.com/permalink-to-page.html';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script> -->
+<!-- <noscript>Please enable JavaScript to view the <a rel="nofollow" href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a rel="nofollow" href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>  -->
+</div>
+<center>
+
+<div > 
+ 
+<iframe 
+	src="http://osdir.com/ml/dateindex4.php?list=lilypond-user-gnu/2010-05&num=00125" 
+	class="blueBorder round10"
+	width="910" height="1245" 
+	scrolling="no" 
+	id="dlistFrame" style="padding:5px;overflow:hidden;">
+</iframe>
+							<div style="display:none;">
+								<!-- new frame here -->
+								<!--
+								<iframe 									
+									src="" 									
+									width="910" height="400" 
+									scrolling="no" 
+									id="subfooter" style="padding:5px;overflow:hidden;">
+								</iframe>
+								-->
+							</div>
+</div>
+
+
+	               			</div>      			
+					<center>	
+					                                            <div id="osDirAdN1Post"></div>
+                                            <table border="0">
+                                                <tr>
+                                                    <td>
+							<td><div id="osDirAdN2Post"></div></td>
+                                                    <td><div id="osDirAdN3Post"></div></td>
+                                              </tr>
+                                            </table>
+										
+					
+
+
+
+					</center>
+										
+							<div style="padding-top: 5px;">
+                                                        <center>
+								<div id="osDirAd4Post">
+									<script type="text/javascript">
+										//GA_googleFillSlot("mlBottomLeaderboard");
+									</script>								
+								</div>
+							</center></div>		
+
+                                                        <div style="padding-top: 5px;"><center>
+							<table border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td><div id="osDirAd5Post">
+									<script type="text/javascript">
+										//GA_googleFillSlot("mlBottomBlockLeft");
+									</script>								
+								</div></td>
+								<td><div id="osDirAd6Post">
+									<script type="text/javascript">
+										//GA_googleFillSlot("mlBottomBlockRight");
+									</script>								
+								</div></td>
+							</table>
+							</center>
+						</div>		
+					
+	                </div>
+					
+	                <div>
+
+
+
+
+
+	                <p>	<center>
+	                		<a href="/ml" title="Home">Home</a> | <a href="http://osdir.com">News</a> |  <a href="/ml/site_dir/">Sitemap</a>  | <a rel="nofollow" href="http://osdir.com/ml/faq.php">FAQ</a> | <a rel="nofollow" href="http://osdir.com/Article9135.phtml">advertise</a> | OSDir is an <a href="http://inevitablecorp.com">Inevitable</a> website. <a href="http://gbiz.org">GBiz</a> is too! 
+	                		 
+	                	</center>
+	                </div> 
+	                
+	<!-- MIDDLE COLUMN END -->
+					</td>
+					<td width="370" valign="top">
+	<!-- RIGHT COLUMN -->
+<div style="position:absolute; margin-left: 10px;">
+
+
+
+<!-- <iframe src="/ml/600.php" width="325" height="625">
+</iframe> -->
+
+</div> 
+						
+<div id="adContainerDiv2" class="adContainer banner">
+
+<div id="osDirAd2Post" style="margin-left: 10px;width:300px;height:250px">
+                                                                <script type="text/javascript">
+                                                                        //GA_googleFillSlot("mlTopBlock");
+                                                                        GA_googleFillSlotWithSize('ca-pub-2048202115983124',"mlTopBlock",300,250);
+                                                                </script>
+                                                        </div>
+<p>
+						<div id="osDirAd3Post" style="margin-left: 10px;">
+							<script type="text/javascript">
+								//GA_googleFillSlot("mlBlock2");
+								//GA_googleFillSlotWithSize('ca-pub-2048202115983124',"mlBlock2",300,250);
+								GA_googleFillSlotWithSize('ca-pub-2048202115983124',"mlSkyscraperRightCol",160,600);
+							</script>
+						</div>
+		
+<p>
+<div id="recentcomments" class="dsq-widget cleanDis  blueBorder round10" style="width: 300px;margin-left: 10px;">
+
+
+<h3>Recent Msgs:</h3><a href="http://osdir.com/ml/general/2013-12/msg34959.html">general/2013-12/msg34959.html</a><p><a href="http://osdir.com/ml/linux_php_my-sql/2013-12/msg01734.html">linux_php_my-sql/2013-12/msg01734.html</a><p><a href="http://osdir.com/ml/ruby-core/2013-12/msg00449.html">ruby-core/2013-12/msg00449.html</a><p><a href="http://osdir.com/ml/ftp-release-list/2013-12/msg00086.html">ftp-release-list/2013-12/msg00086.html</a><p><a href="http://osdir.com/ml/discuss-gnustep-gnu/2013-12/msg00106.html">discuss-gnustep-gnu/2013-12/msg00106.html</a><p><a href="http://osdir.com/ml/general/2013-12/msg34956.html">general/2013-12/msg34956.html</a><p><a href="http://osdir.com/ml/ubuntu-bugs/2013-12/msg12928.html">ubuntu-bugs/2013-12/msg12928.html</a><p><a href="http://osdir.com/ml/linux_php_my-sql/2013-12/msg01733.html">linux_php_my-sql/2013-12/msg01733.html</a><p><a href="http://osdir.com/ml/gnutls-devel-gnu/2013-12/msg00031.html">gnutls-devel-gnu/2013-12/msg00031.html</a><p><a href="http://osdir.com/ml/debian-user-debian/2013-12/msg01231.html">debian-user-debian/2013-12/msg01231.html</a><p>
+</div>
+
+<div style="margin-left: 10px;">
+<!-- <a href="http://osdir.com/technology/"><img border="0" src="/ml/images/techsection.gif"></a> -->
+</div>
+
+<div id="osDirAd7Post" style="margin-left: 10px;">
+	<script type="text/javascript">
+		//GA_googleFillSlot("MLBlock3");
+		//GA_googleFillSlotWithSize('ca-pub-2048202115983124',"MLBlock3",300,250);
+	</script>
+</div>
+
+
+
+
+							
+						<div id="osDirAdCasalePost" style="margin-left: 10px;">
+							 <script type="text/javascript">
+							//	GA_googleFillSlot("casaleblocktest");
+							</script> 				
+						</div>
+	
+
+						</div>
+	<!-- RIGHT COLUMN END -->
+				
+	</td>
+				</table>
+<!-- PAGE MIDDLE END-->
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<!-- PAGE FOOTER -->
+			</td>
+		</tr>
+	</table>
+	<br>
+<script src="/ml/oldJQ.js" type="text/javascript"></script>
+
+<script>
+//head.ready('az2',function(){
+    //AZ.fill('osDirAd2Post',300,250,'osdir1');
+    //AZ.fill('osDirAd3Post',160,600,'osdirrb1','aHR0cDovL29zZGlyLmNvbS9tbC9ydWJpMS5odG1s');
+//});
+
+//Add hotspot in banner
+$('#homeClick').click(
+	function(){
+		document.location = "/ml/";
+	}
+);
+
+
+
+//target _blank links.
+//Don't convert links that are on index pages.
+if (isIndexPage != true){
+	//console.log("getting lists", $('.cleanDis a'));
+	$("#messspan a").each(function(item,thing){
+			thing.target='_blank'
+			//thing.href = '/ml/redir.php?redir='+thing.href
+	})
+	$(".cleanDis a").each(function(item,thing){
+			thing.target='_blank'
+	})
+}
+
+
+//Preview mechanics
+var tmpToggleHeight = new Object();
+function toggleMe(theDiv){
+	//return;
+	//console.log($("#" + theDiv))
+	if(!tmpToggleHeight[theDiv]){
+		$("#" + theDiv)[0].style.height="8em"
+		tmpToggleHeight[theDiv] = 6
+	} else {
+		$("#" + theDiv)[0].style.height="3.0em"
+		tmpToggleHeight[theDiv] = 0	
+	}
+}
+
+</script>
+
+<script type="text/javascript">
+var isIE = (document.all) ? 1 : 0
+var adList = []
+
+function replaceAd(ad){
+/*
+	if (isIE){
+		adList.push(ad)
+		/*
+		setTimeout( function(){
+			$("#" + ad + "Pre").appendTo( $("#" + ad + "Post") )
+		},2000)
+		*/
+	//} else { 
+		//$("#" + ad + "Pre").appendTo( $("#" + ad + "Post") )
+	//}
+}
+
+if (typeof ord=='undefined') {ord=Math.random()*10000000000000000;}
+</script>
+<div style="border: 1px solid #000000; display: none;">
+</div>
+
+
+
+
+<script type="text/javascript">
+/*
+if(isIE){
+
+	$(adList).each(function(i,ad){
+		//$("#" + ad + "Post").append("#" + ad + "Pre")
+		$("#" + ad + "Pre").appendTo( $("#" + ad + "Post") )
+		//console.log("ad:",ad)
+	})
+
+}*/
+</script>
+
+
+<!-- GOOGLE URCHIN -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script type="text/javascript">
+	_uacct = "UA-381510-10";
+	urchinTracker();
+</script>
+<!-- END GOOGLE URCHIN -->
+
+<!-- G+ Stuff -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+
+
+</body>
+
+
+<script type="text/javascript">
+
+        q = $("#theFrame")
+        o = $('#disqus_thread')
+        o.innerHTML = ""
+
+//Inject disqus comment box
+
+function addDisqus(){
+        setTimeout(
+                function(){
+                        checkDisqus()
+                },200
+        )
+        s = document.createElement('script')
+        o.append(s);
+        window.disqus_no_style = true;
+        
+        //o.style.display = "block"
+}
+
+function checkDisqus(){
+        num = Math.floor(Math.random() * 30) + 15
+        setTimeout(
+                function(){
+                        checkDisqus()
+                }
+                ,(num * 1000)
+        )
+}
+</script>
+</html>

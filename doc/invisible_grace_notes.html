@@ -1,0 +1,363 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>Lilypond user discussion</TITLE>
+<BASE href="http://comments.gmane.org">
+<META http-equiv=Content-Type content="text/html; charset=utf-8">
+<link rel="SHORTCUT ICON" href="http://gmane.org/favicon.ico">
+<link rel="Up" href="/gmane.comp.gnu.lilypond.general>">
+<LINK href="http://gmane.org/img/leftmenu.css" type="text/css" rel="stylesheet">
+<LINK href="http://gmane.org/img/blog.css" type="text/css" rel="stylesheet">
+<style type="text/css" media="screen">
+h1.name {
+  background-image:  url(http://gmane.org/paint-blog-id.php?group=gmane.comp.gnu.lilypond.general);
+}
+</style>
+</HEAD>
+<BODY>
+<div id=banner>
+<h1 class=name>&nbsp;</h1>
+<span class=description>Lilypond user discussion</span>
+</div>
+<script src="http://gmane.org/img/jsblog.js" type="text/javascript"></script>
+
+<DIV id=content>
+<DIV class=blog>
+<div class=posting>
+<DIV class=entry>
+<DIV class=date>
+<div class=options><a rel=nofollow href="#" onclick="return toggle('o1');">headers</a></div>
+<span class=author>
+<a href="http://search.gmane.org/?author=Junge&amp;sort=date" rel=nofollow>Junge</a>
+ | </span>
+<SPAN class=day>18 Mar 12:39 2006</SPAN>
+</DIV>
+<DIV class=blogbody><A name=5></A>
+<div class=face>
+<a target="_top" href="http://ftp.cs.indiana.edu/pub/faces/picons/"><img border=0 alt="Picon" src="http://cache.gmane.org//gmane/comp/gnu/lilypond/general/21079-picon-001.gif"></a>
+<br>
+</div>
+<H2 class=title>Synchronizing staves with grace notes</h2><div id="o1" class="hidden">Junge &lt;junge &lt;at&gt; email.dk&gt;<br>
+2006-03-18 11:39:36 GMT<br>
+</div>
+<p>
+<div>
+<div>I'm having some trouble with synchronizing the 
+upper and lower stave in a piano score where I have some grace notes and 
+polyhony in the right hand.</div>
+<div>&nbsp;</div>
+<div>I need to tie a "des" in the grace notes to the 
+normal "des"-note following the grace notes and have finally managed to do that. 
+However, to synchronize the two voices in the right hand, I had to insert hidden 
+grace notes in the upper voice. I would prefer the first of the left hand notes 
+to be synchronized with the des4 in the lower voice in the right hand. But it 
+synchronizes automatically with the first of the grace notes. Is there a way 
+to&nbsp;obtain what I want? </div>
+<div>&nbsp;</div>
+<div>I don't know how much code to attach. Hope this is 
+enough (only 1 bar)... The first note in the right hand is des'' (in both 
+voices). The score is in 3/8.</div>
+<div>&nbsp;</div>
+<div>Right hand:</div>
+<div>&nbsp;&lt;&lt;<br>&nbsp;{ \hideNotes \grace { des8 
+des des } \unHideNotes \stemUp des16..-&gt;[ bes64] ges8[ f] }\\<br>&nbsp;{ 
+\stemUp \grace { des8[~ ges bes] } \stemDown des,4_\( d8\) 
+}<br>&nbsp;&gt;&gt;</div>
+<div>&nbsp;</div>
+<div>Left hand:</div>
+<div>&nbsp;\times 4/6 { bes32[ des ges bes ges des] } 
+\times 4/6 { bes[ des ges bes ges des] } \times 4/6 { b[ d f as f d] 
+}</div>
+<div>&nbsp;</div>
+<div>Regards</div>
+<div>&nbsp;</div>
+<div>Stig Junge</div>
+</div>
+<pre>
+_______________________________________________
+lilypond-user mailing list
+lilypond-user &lt;at&gt; gnu.org
+<a rel="nofollow" href="http://lists.gnu.org/mailman/listinfo/lilypond-user" target="_top">http://lists.gnu.org/mailman/listinfo/lilypond-user</a>
+</pre>
+<DIV class=posted>
+<form class="spam" method="post" action="http://spam.gmane.org/gmane.comp.gnu.lilypond.general:21079:unconfirmed" onsubmit="openSpamFrame(this); return false;">
+<A href="http://permalink.gmane.org/gmane.comp.gnu.lilypond.general/21079">Permalink</A>
+| <a href="http://post.gmane.org/post.php?group=gmane.comp.gnu.lilypond.general&amp;followup=21079" rel=nofollow>Reply</a>
+| <input class="spam" type="submit" value="Report this as spam">
+</form>
+</DIV>  
+
+</DIV>  
+</DIV>  
+
+<div class=posting>
+<DIV class=entry>
+<DIV class=date>
+<div class=options><a rel=nofollow href="#" onclick="return toggle('o2');">headers</a></div>
+<span class=author>
+<a href="http://search.gmane.org/?author=Mats+Bengtsson&amp;sort=date" rel=nofollow>Mats Bengtsson</a>
+ | </span>
+<SPAN class=day>18 Mar 15:35 2006</SPAN>
+</DIV>
+<DIV class=blogbody><A name=5></A>
+<div class=face>
+<a target="_top" href="http://ftp.cs.indiana.edu/pub/faces/picons/"><img border=0 alt="Picon" src="http://cache.gmane.org//gmane/comp/gnu/lilypond/general/21106-picon-001.gif"></a>
+<br><a target="_top" href="http://ftp.cs.indiana.edu/pub/faces/picons/"><img border=0 alt="Picon" src="http://cache.gmane.org//gmane/comp/gnu/lilypond/general/21106-picon-002.gif"></a>
+<br><img border=0 alt="Favicon" src="http://cache.gmane.org/gmane/comp/gnu/lilypond/general/21106-favicon.png">
+<br>
+</div>
+<H3 class=title>Re: Synchronizing staves with grace notes</h3><div id="o2" class="hidden">Mats Bengtsson &lt;mats.bengtsson &lt;at&gt; ee.kth.se&gt;<br>
+2006-03-18 14:35:42 GMT<br>
+</div>
+<pre>
+What LilyPond version do you use? I'm afraid you have hit a bug in 
+version 2.6. If you upgrade to the latest development version
+it seems to work much better. Still, you might need to insert
+an invisible grace note in the left hand part to get the bar lines 
+correct, see the comment at the end of Sect. "Grace notes". The 
+following example works well in version
+2.7:
+
+\version "2.7.36"
+
+\relative c'' &lt;&lt;
+\new Staff { \time 3/8  &lt;&lt; { des16..-&gt;[ bes64] ges8[ f] }\\
+{ \stemUp \grace { des8[~ ges bes] } \stemNeutral des,4_\( d8\) }
+&gt;&gt;
+}
+
+\new Staff { \time 3/8
+  \grace s4.  \times 4/6 { bes32[ des ges bes ges des] } \times 4/6 { 
+bes[ des ges bes ges des] } \times 4/6 { b[ d f as f d] }}
+&gt;&gt;
+
+   /Mats
+
+Quoting Junge &lt;junge &lt;at&gt; email.dk&gt;:
+
+&gt; I'm having some trouble with synchronizing the upper and lower stave 
+&gt; in a piano score where I have some grace notes and polyhony in the 
+&gt; right hand.
+&gt;
+&gt; I need to tie a "des" in the grace notes to the normal "des"-note 
+&gt; following the grace notes and have finally managed to do that. 
+&gt; However, to synchronize the two voices in the right hand, I had to 
+&gt; insert hidden grace notes in the upper voice. I would prefer the 
+&gt; first of the left hand notes to be synchronized with the des4 in the 
+&gt; lower voice in the right hand. But it synchronizes automatically with 
+&gt; the first of the grace notes. Is there a way to obtain what I want?
+&gt;
+&gt; I don't know how much code to attach. Hope this is enough (only 1 
+&gt; bar)... The first note in the right hand is des'' (in both voices). 
+&gt; The score is in 3/8.
+&gt;
+&gt; Right hand:
+&gt; &lt;&lt;
+&gt; { \hideNotes \grace { des8 des des } \unHideNotes \stemUp des16..-&gt;[ 
+&gt; bes64] ges8[ f] }\\
+&gt; { \stemUp \grace { des8[~ ges bes] } \stemDown des,4_\( d8\) }
+&gt; &gt;&gt;
+&gt;
+&gt; Left hand:
+&gt; \times 4/6 { bes32[ des ges bes ges des] } \times 4/6 { bes[ des ges 
+&gt; bes ges des] } \times 4/6 { b[ d f as f d] }
+&gt;
+&gt; Regards
+&gt;
+&gt; Stig Junge
+</pre>
+<DIV class=posted>
+<form class="spam" method="post" action="http://spam.gmane.org/gmane.comp.gnu.lilypond.general:21106:unconfirmed" onsubmit="openSpamFrame(this); return false;">
+<A href="http://permalink.gmane.org/gmane.comp.gnu.lilypond.general/21106">Permalink</A>
+| <a href="http://post.gmane.org/post.php?group=gmane.comp.gnu.lilypond.general&amp;followup=21106" rel=nofollow>Reply</a>
+| <input class="spam" type="submit" value="Report this as spam">
+</form>
+</DIV>  
+
+</DIV>  
+</DIV>  
+
+<div class=posting>
+<DIV class=entry>
+<DIV class=date>
+<div class=options><a rel=nofollow href="#" onclick="return toggle('o3');">headers</a></div>
+<span class=author>
+<a href="http://search.gmane.org/?author=Junge&amp;sort=date" rel=nofollow>Junge</a>
+ | </span>
+<SPAN class=day>19 Mar 21:49 2006</SPAN>
+</DIV>
+<DIV class=blogbody><A name=5></A>
+<div class=face>
+<a target="_top" href="http://ftp.cs.indiana.edu/pub/faces/picons/"><img border=0 alt="Picon" src="http://cache.gmane.org//gmane/comp/gnu/lilypond/general/21094-picon-001.gif"></a>
+<br>
+</div>
+<H3 class=title>Re: Synchronizing staves with grace notes</h3><div id="o3" class="hidden">Junge &lt;junge &lt;at&gt; email.dk&gt;<br>
+2006-03-19 20:49:39 GMT<br>
+</div>
+<pre>
+I use version 2.6.5 and run it on Win2000.
+
+I tried to upgrade to the latest version but when I tried to generate the pdf the program crashed without
+further notice. The crashes continued also after rebooting the machine. Perhaps I need to run convert-ly
+on my file first. I will try it one of the next days when I have more time.
+
+Regards Stig
+
+----- Original Message ----- 
+From: "Mats Bengtsson" &lt;mats.bengtsson &lt;at&gt; ee.kth.se&gt;
+To: "Junge" &lt;junge &lt;at&gt; email.dk&gt;
+Cc: &lt;lilypond-user &lt;at&gt; gnu.org&gt;
+Sent: Saturday, March 18, 2006 3:35 PM
+Subject: Re: Synchronizing staves with grace notes
+
+&gt; What LilyPond version do you use? I'm afraid you have hit a bug in 
+&gt; version 2.6. If you upgrade to the latest development version
+&gt; it seems to work much better. Still, you might need to insert
+&gt; an invisible grace note in the left hand part to get the bar lines 
+&gt; correct, see the comment at the end of Sect. "Grace notes". The 
+&gt; following example works well in version
+&gt; 2.7:
+&gt; 
+&gt; \version "2.7.36"
+&gt; 
+&gt; \relative c'' &lt;&lt;
+&gt; \new Staff { \time 3/8  &lt;&lt; { des16..-&gt;[ bes64] ges8[ f] }\\
+&gt; { \stemUp \grace { des8[~ ges bes] } \stemNeutral des,4_\( d8\) }
+&gt; &gt;&gt;
+&gt; }
+&gt; 
+&gt; \new Staff { \time 3/8
+&gt;   \grace s4.  \times 4/6 { bes32[ des ges bes ges des] } \times 4/6 { 
+&gt; bes[ des ges bes ges des] } \times 4/6 { b[ d f as f d] }}
+&gt; &gt;&gt;
+&gt; 
+&gt; 
+&gt; 
+&gt;    /Mats
+&gt; 
+&gt; 
+&gt; Quoting Junge &lt;junge &lt;at&gt; email.dk&gt;:
+&gt; 
+&gt; &gt; I'm having some trouble with synchronizing the upper and lower stave 
+&gt; &gt; in a piano score where I have some grace notes and polyhony in the 
+&gt; &gt; right hand.
+&gt; &gt;
+&gt; &gt; I need to tie a "des" in the grace notes to the normal "des"-note 
+&gt; &gt; following the grace notes and have finally managed to do that. 
+&gt; &gt; However, to synchronize the two voices in the right hand, I had to 
+&gt; &gt; insert hidden grace notes in the upper voice. I would prefer the 
+&gt; &gt; first of the left hand notes to be synchronized with the des4 in the 
+&gt; &gt; lower voice in the right hand. But it synchronizes automatically with 
+&gt; &gt; the first of the grace notes. Is there a way to obtain what I want?
+&gt; &gt;
+&gt; &gt; I don't know how much code to attach. Hope this is enough (only 1 
+&gt; &gt; bar)... The first note in the right hand is des'' (in both voices). 
+&gt; &gt; The score is in 3/8.
+&gt; &gt;
+&gt; &gt; Right hand:
+&gt; &gt; &lt;&lt;
+&gt; &gt; { \hideNotes \grace { des8 des des } \unHideNotes \stemUp des16..-&gt;[ 
+&gt; &gt; bes64] ges8[ f] }\\
+&gt; &gt; { \stemUp \grace { des8[~ ges bes] } \stemDown des,4_\( d8\) }
+&gt; &gt; &gt;&gt;
+&gt; &gt;
+&gt; &gt; Left hand:
+&gt; &gt; \times 4/6 { bes32[ des ges bes ges des] } \times 4/6 { bes[ des ges 
+&gt; &gt; bes ges des] } \times 4/6 { b[ d f as f d] }
+&gt; &gt;
+&gt; &gt; Regards
+&gt; &gt;
+&gt; &gt; Stig Junge
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; -- 
+&gt; No virus found in this incoming message.
+&gt; Checked by AVG Free Edition.
+&gt; Version: 7.1.375 / Virus Database: 268.2.3/281 - Release Date: 14-03-2006
+&gt; 
+</pre>
+<DIV class=posted>
+<form class="spam" method="post" action="http://spam.gmane.org/gmane.comp.gnu.lilypond.general:21094:unconfirmed" onsubmit="openSpamFrame(this); return false;">
+<A href="http://permalink.gmane.org/gmane.comp.gnu.lilypond.general/21094">Permalink</A>
+| <a href="http://post.gmane.org/post.php?group=gmane.comp.gnu.lilypond.general&amp;followup=21094" rel=nofollow>Reply</a>
+| <input class="spam" type="submit" value="Report this as spam">
+</form>
+</DIV>  
+
+</DIV>  
+</DIV>  
+
+</div>
+</div>
+</div>
+</div>
+</DIV>  
+
+</div>
+
+<div id="sidebox">
+
+<div class="sidetitle">Return</div>
+<div class="side">
+Return to <a href="http://blog.gmane.org/gmane.comp.gnu.lilypond.general">gmane.comp.gnu.lilypond.general</a>.
+</div>
+
+
+<div class="sidetitle">Advertisement</div>
+<div class="side" align="center">
+</div>
+
+
+<div class="sidetitle">Search Archive</div>
+<div class="side">
+<div align="center">
+<br/>
+<form action="http://search.gmane.org" method="get">
+<input name="query" value="" title="search_text"/><input type="submit" title="SUBMIT" value="Search"/>
+<input type=hidden name="group" value="gmane.comp.gnu.lilypond.general">
+</form>
+</div>
+</div>
+
+
+
+
+
+<div class="sidetitle">Language</div>
+<div class="side">
+   <a rel=nofollow href="http://gmane.org/language.php">Change language</a>
+</div>
+
+
+<div class="sidetitle">Options</div>
+<div class="side">
+Current view: 
+Threads only / Showing 
+whole messages /
+ Not hiding cited text.<br/>
+    Change to 
+<a rel=nofollow href="/gmane.comp.gnu.lilypond.general?set_blog_all=yes">All messages, </a><a rel=nofollow href="/gmane.comp.gnu.lilypond.general?set_lines=20">shortened messages</a>, or 
+<a rel=nofollow href="/gmane.comp.gnu.lilypond.general?set_cite=hide">hide cited text</a>.<br /><br />
+
+<a href="http://post.gmane.org/post.php?group=gmane.comp.gnu.lilypond.general" rel=nofollow>Post a message</a><br/>
+<a href="nntp://news.gmane.org/gmane.comp.gnu.lilypond.general">NNTP Newsgroup</a><br/>
+<a rel=nofollow href="http://news.gmane.org/find-root.php?message_id=%3c001201c64b96%24a4f86e40%246601a8c0%40bulder1%3e">Classic Gmane web interface</a><br/>
+
+<a href="http://rss.gmane.org/gmane.comp.gnu.lilypond.general"><img src="http://gmane.org/img/xml.gif" alt="XML" border=0>&nbsp;RSS Feed</a><br/>
+<a href="http://dir.gmane.org/gmane.comp.gnu.lilypond.general">List Information</a><br/><br/>
+<a href="http://gmane.org/faq.php">About Gmane</a><br/>
+</div>
+
+</div>
+
+    <br clear="all" />
+
+<div class="bottombox"><p class="bottomtext"><a href="http://gmane.org/">Gmane</a></p></div>
+  </body>
+</html>
+
+

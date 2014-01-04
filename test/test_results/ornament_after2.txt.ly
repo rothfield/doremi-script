@@ -18,8 +18,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
- g'4 \afterGrace f'4 { g'32[ f'32] } \bar "|"  df'4~ df'4 c'4 \break
-
+ g'4 \afterGrace f'4 { g'32[ f'32] } \bar "|"  df'4~ df'4 c'4
 }
 
 text = \lyricmode {

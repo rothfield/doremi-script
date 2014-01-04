@@ -18,8 +18,7 @@ melody = {
 \key c \phrygian
 \autoBeamOn  
 \cadenzaOn
-\bar "|"  c'4 af'4 g'4 af'4 \bar "|"  f'4 g'4 ef'4 f'4 \bar "|"  bf'4 af'4~ af'4 df'4~ \bar "|"  df'4 ef'4 f'4 g'4 \bar "|" \break
-
+\bar "|"  c'4 af'4 g'4 af'4 \bar "|"  f'4 g'4 ef'4 f'4 \bar "|"  bf'4 af'4~ af'4 df'4~ \bar "|"  df'4 ef'4 f'4 g'4 \bar "|"
 }
 
 text = \lyricmode {
