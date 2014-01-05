@@ -29,7 +29,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|"  e'8[ g'8]~ g'4~ g'4~ g'4 \bar "|"  e'8[ d'8]~ d'4~ d'4~ d'4~ \bar "|"  d'4 e'4 a'4 e'4 \bar "|"  d'4~ d'4~ d'4 c'8[ d'8] \bar "|"
+\bar "|" e'8[ g'8]~ g'4~ g'4~ g'4 \bar "|" e'8[ d'8]~ d'4~ d'4~ d'4~ \bar "|" d'4 e'4 a'4 e'4 \bar "|" d'4~ d'4~ d'4 c'8[ d'8] \bar "|"
 }
 
 text = \lyricmode {

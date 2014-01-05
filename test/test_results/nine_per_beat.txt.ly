@@ -16,7 +16,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
- \times8/9 { g'16[  c'32 ef'16  c'32 d'16.]   }
+\times8/9 { g'16[  c'32 ef'16  c'32 d'16.]   }
 }
 
 text = \lyricmode {

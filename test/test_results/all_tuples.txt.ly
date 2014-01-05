@@ -17,7 +17,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
- c'8[ c'8] \times2/3 { c'4  f'8 } \times4/5 { c'8  e'8.   } \times2/3 { c'4  e'8 } \bar "|"  c'16[ d'16 e'16 f'16] \times4/5 { c'16[ d'16 e'16 f'16 g'16] } c'8.[   d'16] c'8..[       d'32] \times4/5 { c'4    d'16 }
+c'8[ c'8] \times2/3 { c'4  f'8 } \times4/5 { c'8  e'8.   } \times2/3 { c'4  e'8 } \bar "|" c'16[ d'16 e'16 f'16] \times4/5 { c'16[ d'16 e'16 f'16 g'16] } c'8.[   d'16] c'8..[       d'32] \times4/5 { c'4    d'16 }
 }
 
 text = \lyricmode {

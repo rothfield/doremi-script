@@ -27,7 +27,7 @@ melody = {
 \key c \phrygian
 \autoBeamOn  
 \cadenzaOn
-\bar "|:"  r4  d'8[ ef'8]~ ef'8[ c'8] d'4  \bar "|"  ef'4~ ef'4~ ef'4~ \bar "|"  ef'4~ ef'4 \afterGrace ef'4 { d'32[ f'32 ef'32 d'32 ef'32] } \bar "|"  df'4 c'4~ c'4~ \bar "|"  c'4 \bar ":|"
+\bar "|:" r4  d'8[ ef'8]~ ef'8[ c'8] d'4  \bar "|" ef'4~ ef'4~ ef'4~ \bar "|" ef'4~ ef'4 \afterGrace ef'4 { d'32[ f'32 ef'32 d'32 ef'32] } \bar "|" df'4 c'4~ c'4~ \bar "|" c'4 \bar ":|"
 }
 
 text = \lyricmode {

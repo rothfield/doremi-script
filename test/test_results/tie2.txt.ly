@@ -16,7 +16,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|"  e'4~ e'4 e'4~ e'4
+\bar "|" e'4~ e'4 e'4~ e'4
 }
 
 text = \lyricmode {
