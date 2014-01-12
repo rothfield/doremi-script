@@ -6,7 +6,6 @@
     [clojure.pprint :refer [pprint]] 
     ))
 
-
 (comment
   (use 'clojure.stacktrace) 
   (print-stack-trace *e)
@@ -25,47 +24,23 @@
 
 (def comma ",")
 
-(def octave-number->lilypond-octave
-  ;; Could also do: (apply str (take 2 (repeat tick))))
-  ;;
-  {
-   -3 (str comma comma)
-   -2 comma
-   -1 ""
-   0 tick
-   1  (str tick tick) 
-   2  (str tick tick)
-   3  (str tick tick tick)
-   })
+(defn octave-number->lilypond-octave[num]
+  ;; Middle c is c'
+  (cond (nil? num)
+        tick
+        (>= num 0)
+    (apply str (take (inc num) (repeat tick)))
+        true
+    (apply str (take (dec (- num)) (repeat comma)))))
 
 (def normalized-pitch->lilypond-pitch
   ;; TODO: double sharps and flats, half-flats ??"
   ;; includes dash (-) -> r "
   {
-   "-" "r"
-   "C" "c"
-   "C#" "cs"
-   "Cb" "cf"
-   "Db" "df"
-   "D" "d"
-   "D#" "ds"
-   "Eb" "ef"
-   "E" "e"
-   "E#" "es"
-   "F" "f"
-   "Fb" "ff"
-   "F#" "fs"
-   "Gb" "gf"
-   "G" "g"
-   "G#" "gs"
-   "Ab" "af"
-   "A" "a"
-   "A#" "as"
-   "Bb" "bf"
-   "B" "b"
-   "B#" "bs"
-   }
-  )
+   "-" "r", "C" "c", "C#" "cs", "Cb" "cf", "Db" "df", "D" "d", "D#" "ds",
+   "Eb" "ef", "E" "e", "E#" "es", "F" "f", "Fb" "ff", "F#" "fs", "Gb" "gf",
+   "G" "g", "G#" "gs", "Ab" "af", "A" "a", "A#" "as", "Bb" "bf", "B" "b",
+   "B#" "bs", })
 
 (def grace-note-pitch-template
   (-> "lilypond/grace_note_pitch.tpl" resource slurp trim))
@@ -86,24 +61,23 @@
 (def lilypond-beam-end "]")
 
 (defn beam-notes[ary]
-          (assoc ary 
-                 0
-                 (str (first ary) lilypond-beam-start)
-                 (dec (count ary))  
-                 (str (last ary) lilypond-beam-end)))
+  (if  (< (count ary) 2)
+    ary
+    (let [ary2 (into [] ary)]
+      (assoc ary2 
+             0
+             (str (first ary2) lilypond-beam-start)
+             (dec (count ary2))  
+             (str (last ary2) lilypond-beam-end)))))
 
 (defn lilypond-grace-notes[ornament]
   ;;      #  c1 \afterGrace d1( { c16[ d]) } c1
   ;;      #  In the above line, generate what is between {}
-  (if (not (nil? ornament))
-    (let [ary (into [] 
-                    (map lilypond-grace-note-pitch (:ornament_items ornament)))
-          needs-beam (> (count ary) 1)
-          ]
-      (join " " (if needs-beam 
-                 (beam-notes ary)
-                 ary)))))
-
+  (->> ornament 
+       :ornament_items 
+       (map lilypond-grace-note-pitch)
+       beam-notes
+       (join " ")))
 
 (defn get-ornament[pitch]
   (get-attribute pitch :ornament))
@@ -449,7 +423,9 @@
   ;; That is why I insert an invisible grace note spacer after the
   ;; break. Otherwise lilypond will combine the left-repeat and barline
   ;; and you lose the left repeat.
-  (str "\\break        " lilypond-invisible-grace-note " \n"))
+  ;; Probably better to examine bars at end of line and beginning of next
+  ;; line and combine them into one.
+  (str " \\break        " lilypond-invisible-grace-note " \n"))
 
 (defn draw-line[line]
   ;; line consists of items consisting of
@@ -559,15 +535,16 @@
 
 ;;;;;;;;;;;; For testing ;;;;;
 (comment
-  ;; (use 'clojure.stacktrace) 
-  ;; (print-stack-trace *e)
-  (println
-    (to-lilypond 
-      (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-       ;; (-> "fixtures/all_tuples.txt" resource slurp)
-           " R\nS"
-        ))
+;; (use 'clojure.stacktrace) 
+;; (print-stack-trace *e)
+(println
+  (to-lilypond 
+    (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+     (-> "fixtures/aeolian_mode_without_key_specified.txt" resource slurp)
+   ;;   " RGm\nS\n\n R\nS"
+      ))
 
-    ))
+  )
+)
 
 

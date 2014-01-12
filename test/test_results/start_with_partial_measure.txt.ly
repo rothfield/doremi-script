@@ -2,14 +2,15 @@
 \version "2.12.3"
 \include "english.ly"
 \header{ 
-title = ""
+title = "Hapy Birthday"
 composer = ""
   tagline = ""  % removed 
 }
 %{
- | S - - -
+ Title: Hapy Birthday
 
-| R - - - 
+1) |: SS | R S m | G - :| 
+ha-ppy birth-day to you 
  %}
   
 melody = {
@@ -18,12 +19,11 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|" c'4~ c'4~ c'4~ c'4 \break        \grace s64 
-\bar "|" d'4~ d'4~ d'4~ d'4
+\bar "|:" c'8[ c'8] \bar "|" d'4 c'4 f'4 \bar "|" e'4~ e'4 \bar ":|"
 }
 
 text = \lyricmode {
-  
+  ha- ppy birth- day to you
 }
 
 \score{

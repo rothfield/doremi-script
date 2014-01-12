@@ -7,9 +7,8 @@ composer = ""
   tagline = ""  % removed 
 }
 %{
- | S - - -
-
-| R - - - 
+   DP                            . 
+<n   P>  
  %}
   
 melody = {
@@ -18,8 +17,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|" c'4~ c'4~ c'4~ c'4 \break        \grace s64 
-\bar "|" d'4~ d'4~ d'4~ d'4
+bf'8[ g'8]
 }
 
 text = \lyricmode {
