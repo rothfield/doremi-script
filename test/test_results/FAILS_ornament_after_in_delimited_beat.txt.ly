@@ -7,9 +7,8 @@ composer = ""
   tagline = ""  % removed 
 }
 %{
-   .. . 
-.NRSNS   + 
-S       | N 
+   DP                            . 
+<n   P>  
  %}
   
 melody = {
@@ -18,7 +17,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\afterGrace c''4 { b'32[ d''32 c''32 b'32 c''32] } \bar "|" b'4
+bf'8[ g'8]
 }
 
 text = \lyricmode {

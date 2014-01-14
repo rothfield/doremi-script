@@ -103,8 +103,8 @@
 
 (defn- update-sargam-pitch-node [pitch nodes syl]
   (if false (do
-  (println "entering update-sargam-pitch-node")
-  (pprint nodes)))
+              (println "entering update-sargam-pitch-node")
+              (pprint nodes)))
   (let [
         upper-dots (count (filter #(= (:my_type %) :upper_octave_dot) nodes))
         lower-dots (count (filter #(= (:my_type %) :lower_octave_dot) nodes))
@@ -137,21 +137,26 @@
   ;; group-line-no is the line number within the sargam-section 
   ;;
   (let [ctr (atom 0)]
-         (postwalk (fn[x] 
-                    (if (= :upper_octave_line (:my_type x)) 
-                      (swap! ctr inc))
-                    (if (or (upper-dot-set (:my_type x))
-                                           (:in_ornament x))
-                      (assoc x :group_line_no @ctr)
-                      ;; else
-                    x))
-                  sargam-section))
+    (postwalk (fn[x] 
+                (if (= :upper_octave_line (:my_type x)) 
+                  (swap! ctr inc))
+                (if (or (upper-dot-set (:my_type x))
+                        (:in_ornament x))
+                  (assoc x :group_line_no @ctr)
+                  ;; else
+                  x))
+              sargam-section))
   )
 
 (defn assign-octave-dots-to-ornament-pitches[sargam-section]
+
   ;; TODO:
   sargam-section
   )
+
+
+
+
 (defn- collapse-sargam-section [sargam-section txt]
   ;; TODO: refactor. getting too big
   ;; TODO: use atom to manage items removed from column map. And an atom to track unassigned
@@ -167,8 +172,8 @@
   (assert (= (:my_type sargam-section) :sargam_section))
   (assert (string? txt))
   (let [
-       ;; _ (println "sargam-section")
-       ;; _ (pprint sargam-section)
+        ;; _ (println "sargam-section")
+        ;; _ (pprint sargam-section)
         sargam-section1 (assign-group-line-numbers-to-ornament-pitches sargam-section)
         ;;_ (println "sargam-section1")
         ;;_ (pprint sargam-section1)
@@ -198,87 +203,98 @@
                       ;; _ (pprint lower-lines)
                       ))
         syls-to-apply (atom (map :source (filter #(= :syllable (:my_type %))
-                                             (mapcat #(:items %) lower-lines))))
+                                                 (mapcat #(:items %) lower-lines))))
         in-slur (atom false)
+        
+        postwalk-for-ornament-octaves  ;; Code is a little clumsy. Handle ornament octave dots.
+        (fn postwalk-for-orn-octaves[node]
+          (if (and (= (:my_type node) :pitch)
+                   (:in_ornament node)) ;; This is a pitch within an ornament
+            (let [
+                  column (column-for-node node)
+                  nodes (get column-map column) 
+                  my-dots (filter (fn[x] ((:my_type x) upper-dot-set)) nodes)
+                  nums 
+                  (map (fn map-dots[x]
+                         (let [my_type (:my_type x)]
+                           (if (< (:group_line_no x) (:group_line_no node))              
+                             (my_type upper-dot-magnitude)
+                             (- (upper-dot-magnitude my_type))
+                             )))
+                       my-dots)
+
+                  ]
+              _ (swap! assigned clojure.set/union @assigned (set my-dots))
+              (assoc node :octave (apply + nums)))
+            ;; else
+            node))
+        sargam-section2 (postwalk postwalk-for-ornament-octaves sargam-section1) 
         debug false
-        postwalk-fn (fn sargam-section-postwalker[node]
-                      ;; save this for debugging
-                      (if debug
-                      (if (:my_type node) (println "postwalker:" (:my_type node)))
-                        )
-                      (let [ my-type (:my_type node)
-                            column (if my-type (column-for-node node))
-                            nodes (if my-type (get column-map column)) 
-                            ]
-                       ;; (pprint my-type)
-                        (case my-type
-                          :pitch
-                          (cond 
-                                (:in_ornament node) ;; This is a pitch within an ornament
-                            (let [dot-nodes (into [] (filter (fn filter-upper-dots[x]
-                                                               (let [my_type (:my_type x)]
-                                                               (if (my_type upper-dot-set )
-                                                                   (if (< (:group_line_no x) (:group_line_no node))              
-                                                                         (my_type upper-dot-magnitude)
-                                                                         (- (upper-dot-magnitude my_type))
-                                                                                 ))))
-                                                             nodes))
-                                                             ]
-                           ;; (println "upper dot nodes for this ornament")
-                            ;;  (pprint dot-nodes)
-                            node
-                                  )
-                               ;; (println "in_ornament case")
-                            (:pointer node)  ;; pitch_to_use case. Messy code!! TODO: rewrite? how
+        postwalk-fn 
+        (fn sargam-section-postwalker[node]
+          ;; save this for debugging
+          (if debug
+            (if (:my_type node) (println "postwalker:" (:my_type node)))
+            )
+          (let [ my-type (:my_type node)
+                column (if my-type (column-for-node node))
+                nodes (if my-type (get column-map column)) 
+                ]
+            ;; (pprint my-type)
+            (case my-type
+              :pitch
+              (cond 
+                (:in_ornament node) ;; This is a pitch within an ornament
+                node ;; Handled above
+                (:pointer node)  ;; pitch_to_use case. Messy code!! TODO: rewrite? how
+                node 
+                ;; else
+                true
+                (let [
+                      ;; _ (println "pitch is "  "\n--------")
+                      ;; _ (pprint node)
+                      ;; _ (println "pitch is "  "\n--------")
+                      ;; _ (println "in-slur is " @in-slur)
+                      has-begin-slur (some (fn[x] (= :begin_slur (:my_type x))) (:attributes node))
+                      has-end-slur (some (fn[x] (= :end_slur (:my_type x))) (:attributes node))
+                      all-orns1 (filter #(= :ornament (:my_type %)) (my-seq sargam-section2))
+                      all-orns (filter #(not (@assigned %)) all-orns1)
+                      ;; To find the orns before, look at each ornament and
+                      ;; find the ones where column + length of source is one less
+                      ;; than the pitch's column
+                      orns-before (filter #(= column (+ (count (:source %)) (column-for-node %)))
+                                          all-orns)
+                      orns-after (filter #(= column (dec (column-for-node %)))
+                                         all-orns)
+                      orns (concat orns-before orns-after)
+                      ;; Have to update @assigned set before 'modifying' the orns
+                      _ (swap! assigned clojure.set/union @assigned (set orns))
+                      ;;
+                      orns-before-for-this-node (map #(assoc % :placement :before) orns-before)
+                      orns-after-for-this-node (map #(assoc % :placement :after) orns-after)
+                      orns-for-this-node (concat orns-before-for-this-node orns-after-for-this-node)
+                      next-syl (first @syls-to-apply)
+                      my-syl (if (and next-syl
+                                      (not @in-slur))
+                               (do (swap! syls-to-apply rest)
+                                   next-syl))
+                      ]
+                  (if has-begin-slur (reset! in-slur true)) 
+                  (if has-end-slur (reset! in-slur false)) 
 
-                            node 
-                            ;; else
-                              true
-                            (let [
-                                  ;; _ (println "pitch is "  "\n--------")
-                                  ;; _ (pprint node)
-                                  ;; _ (println "pitch is "  "\n--------")
-                                  ;; _ (println "in-slur is " @in-slur)
-                                  has-begin-slur (some (fn[x] (= :begin_slur (:my_type x))) (:attributes node))
-                                  has-end-slur (some (fn[x] (= :end_slur (:my_type x))) (:attributes node))
-                                  all-orns1 (filter #(= :ornament (:my_type %)) (my-seq sargam-section1))
-                                  all-orns (filter #(not (@assigned %)) all-orns1)
-                                  ;; To find the orns before, look at each ornament and
-                                  ;; find the ones where column + length of source is one less
-                                  ;; than the pitch's column
-                                  orns-before (filter #(= column (+ (count (:source %)) (column-for-node %)))
-                                                           all-orns)
-                                  orns-after (filter #(= column (dec (column-for-node %)))
-                                                          all-orns)
-                                  orns (concat orns-before orns-after)
-                                  ;; Have to update @assigned set before 'modifying' the orns
-                                  _ (swap! assigned clojure.set/union @assigned (set orns))
-                                  ;;
-                                  orns-before-for-this-node (map #(assoc % :placement :before) orns-before)
-                                  orns-after-for-this-node (map #(assoc % :placement :after) orns-after)
-                                  orns-for-this-node (concat orns-before-for-this-node orns-after-for-this-node)
-                                  next-syl (first @syls-to-apply)
-                                  my-syl (if (and next-syl
-                                                  (not @in-slur))
-                                           (do (swap! syls-to-apply rest)
-                                               next-syl))
-                                  ]
-                              (if has-begin-slur (reset! in-slur true)) 
-                              (if has-end-slur (reset! in-slur false)) 
-
-                              (update-sargam-pitch-node node (concat nodes orns-for-this-node) my-syl)
-                              ))
-                          ;; TODO: Actually only some nodes get this 
-                          ;; treatment. And  
-                          ;; update-sargam-pitch-node 
-                          ;; has common code re attributes
-                          node)))
-        ;; (update-node node nodes))))
-        ]
-    (assert (= :sargam_line (:my_type sargam-line)))
-    (assert (map? column-map))
-    (postwalk postwalk-fn sargam-section1)
-    ))
+                  (update-sargam-pitch-node node (concat nodes orns-for-this-node) my-syl)
+                  ))
+              ;; TODO: Actually only some nodes get this 
+              ;; treatment. And  
+              ;; update-sargam-pitch-node 
+              ;; has common code re attributes
+              node)))
+;; (update-node node nodes))))
+]
+(assert (= :sargam_line (:my_type sargam-line)))
+(assert (map? column-map))
+(postwalk postwalk-fn sargam-section2)
+))
 
 ;; Here is a good place to handle ties/dashes/rests
 ;; Number the significant pitches and dashes in this line, starting with 0
@@ -454,7 +470,7 @@
                         frac 
                         (if (= (class my-ratio) java.lang.Long)
                           (array-map  :numerator 1 
-                                         :denominator 1) 
+                                     :denominator 1) 
                           ;; else 
                           (array-map :numerator (numerator my-ratio)
                                      :denominator (denominator my-ratio)))
@@ -505,7 +521,7 @@
                                     (:items x))) sections))
         items-map2 
         (into {} (map (fn[[k v]] [(keyword (lower-case (name k))) v]) (:items_map attribute-section)))
-        
+
         lines2 (into [] (map #(assoc % :kind "latin_sargam") lines))
         ] 
     (assert (map? items-map2))
@@ -530,9 +546,9 @@
                                   }
            )))
 (comment
-             (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-               (-> "fixtures/waltz.txt" resource slurp)))
-)
+  (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+            (-> "fixtures/waltz.txt" resource slurp)))
+  )
 (defn- handle-attribute-section [node]
   (let [
         ;; make keys keywords.
@@ -701,7 +717,7 @@ node2
 :LOWER_OCTAVE_LINE
 node2
 :SYLLABLE
-        (assoc my-map :source (get-source node txt))
+(assoc my-map :source (get-source node txt))
 :ALTERNATE_ENDING_INDICATOR
 ;; TODO: finish
 (merge my-map {:my_type :ending :num 99 :source (get-source node txt) })
@@ -780,22 +796,19 @@ node2
   (if (map? parse-tree)
     parse-tree
     ;; else
-  (postwalk 
-                      (fn[node] (main-walk node txt)) 
-                      parse-tree)))
+    (postwalk 
+      (fn[node] (main-walk node txt)) 
+      parse-tree)))
 (comment
-(pprint (doremi_script_clojure.core/doremi-text->parse-tree 
-               (-> "fixtures/bracketed_beat_fails.txt" ;;ornament_in_lower_octave.txt" 
-                   resource slurp)))
-(pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script
-               (-> "fixtures/ornament_in_lower_octave.txt" 
-                   resource slurp)))
-)
+  (pprint (doremi_script_clojure.core/doremi-text->parse-tree 
+            (-> "fixtures/bracketed_beat_fails.txt" ;;ornament_in_lower_octave.txt" 
+                resource slurp)))
+  (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script
+            (-> "fixtures/ornament_in_lower_octave.txt" 
+                resource slurp)))
+  )
 
 (comment
 (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script
-          "<P d>"))
-       ;;   (-> "fixtures/ornament_in_lower_octave.txt" 
-                   ;;resource slurp)))
-              ;;    (-> "fixtures/ornament_with_both_upper_and_lower_dots.txt" 
+          (-> "fixtures/ornament_in_lower_octave.txt" resource slurp)))
 )

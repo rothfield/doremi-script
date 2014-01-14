@@ -40,7 +40,7 @@
              "in_ornament":true,
              "start_index":12,
              "pointer":true,
-             "octave":0,
+             "octave":1,
              "beat-counter":1,
              "my_type":"pitch",
              "pitch-counter":1,

@@ -1,9 +1,10 @@
 {"lines":
  [{"kind":"latin_sargam",
-   "start_index":6,
+   "start_index":4,
    "my_type":"sargam_line",
    "items":
-   [{"items":
+   [{"is_barline":true, "my_type":"single_barline", "start_index":4},
+    {"items":
      [{"subdivisions":1,
        "start_index":6,
        "my_type":"beat",
@@ -20,22 +21,21 @@
          "beat-counter":1,
          "my_type":"pitch",
          "attributes":
-         [{"placement":"after",
-           "ornament_items":
+         [{"ornament_items":
            [{"group_line_no":0,
              "pitch_source":"N",
              "normalized_pitch":"B",
              "in_ornament":true,
-             "start_index":1,
+             "start_index":2,
              "pointer":true,
-             "octave":-1,
+             "octave":0,
              "beat-counter":0,
              "my_type":"pitch",
              "pitch-counter":0,
              "value":"N"}],
            "source":"N",
            "usable_source":"N",
-           "start_index":1,
+           "start_index":2,
            "my_type":"ornament"}],
          "pitch-counter":1,
          "column_offset":0,
@@ -44,7 +44,7 @@
      "is_partial":true,
      "beat_count":1,
      "my_type":"measure",
-     "start_index":6}]}],
+     "start_index":5}]}],
  "force_sargam_chars_hash":{},
  "notes_used":"",
  "time_signature":null,
@@ -58,4 +58,4 @@
  "warnings":[],
  "filename":"untitled",
  "mode":"major",
- "source":" N\n .\nS"}
+ "source":"  N\n| S"}
