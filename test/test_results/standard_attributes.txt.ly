@@ -14,7 +14,7 @@ Author:Traditional
 Source:AAK
 Mode: phrygian
 Filename: bhairavi sargam 
-Time: 3/4
+TimeSignature: 3/4
 Key: D
 
    0             +       0    RmgRg    g+
@@ -22,7 +22,7 @@ Key: D
  %}
   
 melody = {
-\once \override Staff.TimeSignature #'stencil = ##f
+\time 3/4
 \clef treble
 \key c \phrygian
 \autoBeamOn  

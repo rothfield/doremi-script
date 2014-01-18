@@ -20,7 +20,7 @@ EnteredBy: John Rothfield
       yes-ter day      all my trou-bles seemed so far a- way
 
   Bb    C7      F       C/E  Dmi G     Bb   F 
-| -- DD Pm GR | m GG -- R- | S G R D | S GG - - |
+| -- DD Pm GR | m GG -- R- | S G R D | S GG - - ||
                                    * 
 now it looks as though they're here to stay oh I be-lieve in  Yes-ter-day
 
@@ -36,7 +36,7 @@ now it looks as though they're here to stay oh I be-lieve in  Yes-ter-day
 
       A11  A7     Dmi
                     C Bb  Dmi/A      C        F
-                      *RS      G 
+          R           *        G 
 3) || G -  G - |  D N S-  ND | N- -D P   DG | - - - - |
       why she     had  to  go  I  don't   know  she would- n't   say
 
@@ -57,10 +57,10 @@ melody = {
 \autoBeamOn  
 \cadenzaOn
 \bar "|" d'8[^"F" c'8] c'4~ c'4~  c'4~  \bar "|" c'4  e'8[ fs'8] gs'8[^"A7" a'8] b'8[ c''8] \bar "|" b'4^"Dmi" a'8[ a'8]~ a'4~  a'4  \bar "|" \break        \grace s64 
-\bar "|" r4  a'8[ a'8] g'8[^"C7" f'8] e'8[ d'8] \bar "|" f'4^"F" e'8[ e'8]~ e'4  d'4^"C/E"  \bar "|" c'4^"Dmi" e'4 d'4^"G" a4 \bar "|" c'4^"Bb" e'8[ e'8]~ e'4~ e'4 \bar "|" \break        \grace s64 
+\bar "|" r4  a'8[ a'8] g'8[^"C7" f'8] e'8[ d'8] \bar "|" f'4^"F" e'8[ e'8]~ e'4  d'4^"C/E"  \bar "|" c'4^"Dmi" e'4 d'4^"G" a4 \bar "|" c'4^"Bb" e'8[ e'8]~ e'4~ e'4 \bar "||"  \break        \grace s64 
 \bar "|" d'8[^"F" c'8] c'4~  c'4~  c'4~  \bar "|" c'4  e'8[ fs'8] gs'8[^"A7" a'8] b'8[ c''8] \bar "|" b'4^"Dmi" a'8[ a'8]~ a'4~  a'4  \bar "|" \break        \grace s64 
 \bar "|" r4  a'8[ a'8] g'8[^"C7" f'8] e'8[ d'8] \bar "|" f'4^"F" e'8[ e'8]~ e'4  d'4^"C/E"  \bar "|" c'4^"Dmi" e'4 d'4^"G" a4 \bar "|" c'4^"Bb" e'8[ e'8]~ e'4~ e'4 \bar ":|" \break        \grace s64 
-\bar "||"  e'4~^"A11" e'4 e'4~^"A7" e'4 \bar "|" a'4^"Dmi" b'4^"C" \afterGrace c''4^"Bb" { d'32[ c'32] }  b'8[^"Dmi/A" a'8] \bar "|" b'4~^"G"  b'8[ a'8] g'4^"C" a'8[ e'8]~ \bar "|" e'4~ e'4~ e'4~ e'4 \bar "|" \break        \grace s64 
+\bar "||"  e'4~^"A11" e'4 \acciaccatura { d'32 }e'4~^"A7" e'4 \bar "|" a'4^"Dmi" b'4^"C" c''4^"Bb"  b'8[^"Dmi/A" a'8] \bar "|" b'4~^"G"  b'8[ a'8] g'4^"C" a'8[ e'8]~ \bar "|" e'4~ e'4~ e'4~ e'4 \bar "|" \break        \grace s64 
 \bar "|" e'4~^"A11" e'4 e'4~^"A7" e'4 \bar "|" a'4^"Dmi" b'4^"C" c''4^"Bb"  b'8[^"Dmi/A" a'8] \bar "|" b'4~^"Gm"  b'8[ a'8] g'4^"C" b'4 \bar "|" c''4(^"1_____"^"F" g'4 f'4 e'4) \bar ":|" c''4~^"2______"^"F" c''4~ c''4~ c''4 \bar "||" 
 }
 

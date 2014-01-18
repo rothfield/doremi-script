@@ -11,6 +11,8 @@
   (print-stack-trace *e)
   )
 
+(def debug false)
+
 (defn get-attribute[item attribute]
   (some #(if (= attribute (:my_type %)) %) (:attributes item)))
 
@@ -29,9 +31,9 @@
   (cond (nil? num)
         tick
         (>= num 0)
-    (apply str (take (inc num) (repeat tick)))
+        (apply str (take (inc num) (repeat tick)))
         true
-    (apply str (take (dec (- num)) (repeat comma)))))
+        (apply str (take (dec (- num)) (repeat comma)))))
 
 (def normalized-pitch->lilypond-pitch
   ;; TODO: double sharps and flats, half-flats ??"
@@ -99,10 +101,10 @@
     ;; S is 5 microbeats amounting to 5/32nds. To get 5 we have to tie either
     ;; 4/8th of a beat plus 1/32nd  or there are other approaches.
     (if (not (ratio? my-ratio))
-      ({ 1 "4"
-        2 "2"
-        3 "2."
-        4 "1"  ;; review
+      ({ 1 ["4"]
+        2 ["2"]
+        3 ["2."]
+        4 ["1"]  ;; review
         } my-ratio)
       ;; else
       (let [ 
@@ -163,7 +165,7 @@
   (get-attribute pitch :chord_symbol))
 
 (defn chord-snippet[chord]
-  (:pre (= :chord_symbol (:my_type chord)))
+  { :pre [ (or (nil? chord) (= :chord_symbol (:my_type chord)))   ] }
   (if (nil? chord)
     ""
     ;; else
@@ -218,102 +220,165 @@
 
 (def lilypond-after-ornament-directive "\\afterGrace ")
 
+(defn whole-note?[x]
+  (= x {:numerator 1, :denominator 1}))
+
+(defn extra-tied-whole-notes[pitch]
+  (let [whole-note-count 
+        (count (filter whole-note? (:fraction_array pitch)))]
+    (if  (= 0 whole-note-count)
+      nil
+      {:numerator whole-note-count :denominator 1})))
+
 (defn draw-pitch[pitch beat-subdivisions beam-start-or-end]
   "Render a pitch/dash as lilypond text"
-  (if (:ignore pitch)
-    ""
-    (let
-      [ 
-       ornament (get-ornament pitch)
-       placement (:placement ornament)
-       has-after-ornament (= :after placement)
-       has-before-ornament (= :before placement)    
-       begin-slur (if (get-attribute pitch :begin_slur) "(" )
-       lilypond-octave  (octave-number->lilypond-octave (:octave pitch))
-       durations (ratio-to-lilypond 
-                   (:numerator pitch) 
-                   beat-subdivisions)
-       duration (first durations) 
-       chord (chord-snippet (get-chord pitch))
-       ending (:source (get-attribute pitch :ending))
-       ending-snippet (if ending
-                        (render ending-template { :ending 
-                                                 (:source (get-attribute pitch :ending))
-                                                 }))
-       pitch2 (if (and (= :dash (:my_type pitch)) 
-                       (:dash_to_tie pitch))
-                (assoc pitch :normalized_pitch 
-                       (get-in pitch [:pitch_to_use_for_tie :normalized_pitch] ) 
-                       :octave (get-in pitch [:pitch_to_use_for_tie :octave] ))
-                ;; else
-                pitch)
-       lilypond-octave  (octave-number->lilypond-octave (:octave pitch2))
-       lilypond-pitch 
-       (normalized-pitch->lilypond-pitch (:normalized_pitch pitch2))
-       extra-tied-durations
-       (if (> (count durations) 1)
-         (str lilypond-symbol-for-tie
-              (join lilypond-symbol-for-tie
-                    (map (fn[duration] 
-                           (render tied-pitch-template
-                                   {
-                                    :beam-start-or-end beam-start-or-end
-                                    :duration duration
-                                    :lilypond-pitch lilypond-pitch
-                                    :lilypond-octave lilypond-octave
-                                    }
-                                   ))
-                         (rest durations)    
-                         ))))
-       ]
-      (cond (:ignore pitch2)
-            ""
-            (:pointer pitch2)
-            ""
-            (and (= :dash (:my_type pitch2)) 
-                 (not (:dash_to_tie pitch2)))
-            (render rest-template { :duration duration
-                                   :chord chord
-                                   :ending ending-snippet                
-                                   })
-            (or (= :pitch (:my_type pitch2))
-                (= :dash (:my_type pitch2)))
-            (render pitch-template 
-                    {
-                     :before-ornament-snippet 
-                     (if has-before-ornament
-                       (render before-ornament-template 
-                               {:grace-notes  
-                                (lilypond-grace-notes ornament) }))
-                     :after-ornament-directive
-                     (if has-after-ornament 
-                       lilypond-after-ornament-directive) 
-                     :lilypond-pitch lilypond-pitch
-                     :lilypond-octave lilypond-octave
-                     :duration duration
-                     :beam-start-or-end beam-start-or-end
-                     :lilypond-symbol-for-tie 
-                     (if (and (:tied pitch)
-                              (not has-after-ornament)) 
-                       lilypond-symbol-for-tie )
-                     :mordent (if (get-attribute pitch2 :mordent) 
-                                mordent-snippet)
-                     :begin-slur begin-slur
-                     :extra-end-slur "" ;;; TODO 
-                     :end-slur (if (get-attribute pitch2 :end_slur) ")" )
-                     :ending ending-snippet                  
-                     :chord chord
-                     :after-ornament-contents 
-                     (if has-after-ornament
-                       (str " { " (lilypond-grace-notes ornament ) " }"))
-                     :extra-tied-durations extra-tied-durations
-                     }
-                    )))))
+  ;; Fraction array is set up to help render extra whole notes
+  ;; so that S - - - doesn't result in 4 tied quarters
+  ;; The fraction array will have zero or more whole notes at the tail
+  ;; end of the array. Example:
+  ;; :fraction_array
+  ;; [{:numerator 1, :denominator 2}
+  ;;   {:numerator 1, :denominator 1}
+  ;;     {:numerator 1, :denominator 1}],
+  ;; Set extra whole notes to {:numerator 2 :denominator 1} 
+  ;; or
+  ;; :fraction_array
+  ;;  [{:numerator 1, :denominator 1}
+  ;;    {:numerator 1, :denominator 1}
+  ;;      {:numerator 1, :denominator 1}],
+  ;; set duration to {:numerator 3 :denominator 1} for above
+  ;; and extra whole notes to []
+  (if true (pprint pitch))
+  (cond (:ignore pitch)
+        ""
+        ;; experimental
+        (and (= :dash (:my_type pitch))
+             (not (:rest pitch))
+             (whole-note? (first (:fraction_array pitch))))
+        ""
+        true
+        (let
+          [ 
+           debug true
+           ornament (get-ornament pitch)
+           placement (:placement ornament)
+           has-after-ornament (= :after placement)
+           has-before-ornament (= :before placement)    
+           begin-slur (if (get-attribute pitch :begin_slur) "(" )
+           lilypond-octave  (octave-number->lilypond-octave (:octave pitch))
+
+           extra-whole-notes (extra-tied-whole-notes pitch)
+           _ (if true (println "extra-whole-notes"))
+           _ (if true (println extra-whole-notes))
+           _ (if debug (println "____"))
+           fraction-array (:fraction_array pitch)
+           starts-with-wholes (whole-note? (first fraction-array)) 
+           ;; _ (println "fraction-array" fraction-array)
+           needs-tie (and
+                       (> (count fraction-array) 1)
+                       (not (every? whole-note? fraction-array)))
+
+           _ (if debug (println "needs-tie" needs-tie))
+           durations 
+           (if starts-with-wholes
+             (ratio-to-lilypond 
+               (count (filter whole-note? fraction-array))
+               1)
+             ;; else 
+             (ratio-to-lilypond 
+               (:numerator pitch) 
+               beat-subdivisions))
+           ;; _ (println "durations:" durations)
+           duration (first durations) 
+           chord (chord-snippet (get-chord pitch))
+           ending (:source (get-attribute pitch :ending))
+           ending-snippet (if ending
+                            (render ending-template { :ending 
+                                                     (:source (get-attribute pitch :ending))
+                                                     }))
+           pitch2 (if (and (= :dash (:my_type pitch)) 
+                           (:dash_to_tie pitch))
+                    (assoc pitch :normalized_pitch 
+                           (get-in pitch [:pitch_to_use_for_tie :normalized_pitch] ) 
+                           :octave (get-in pitch [:pitch_to_use_for_tie :octave] ))
+                    ;; else
+                    pitch)
+           lilypond-octave  (octave-number->lilypond-octave (:octave pitch2))
+           lilypond-pitch 
+           (normalized-pitch->lilypond-pitch (:normalized_pitch pitch2))
+           extra-tied-durations
+           (if (> (count durations) 1)
+             (str lilypond-symbol-for-tie
+                  (join lilypond-symbol-for-tie
+                        (map (fn[duration] 
+                               (render tied-pitch-template
+                                       {
+                                        :beam-start-or-end beam-start-or-end
+                                        :duration duration
+                                        :lilypond-pitch lilypond-pitch
+                                        :lilypond-octave lilypond-octave
+                                        }
+                                       ))
+                             (rest durations)    
+                             ))))
+           ;; _ (println "extra-tied-durations:" extra-tied-durations)
+
+           ]
+          (cond (:ignore pitch2)
+                ""
+                (:pointer pitch2)
+                ""
+                (and (= :dash (:my_type pitch2)) 
+                     (:dash_to_tie pitch2))
+                (render rest-template { :duration duration
+                                       :chord chord
+                                       :ending ending-snippet                
+                                       })
+                (and (= :dash (:my_type pitch2)) 
+                     (not (:dash_to_tie pitch2)))
+                (render rest-template { :duration duration
+                                       :chord chord
+                                       :ending ending-snippet                
+                                       })
+                (or (= :pitch (:my_type pitch2))
+                    (= :dash (:my_type pitch2)))
+                (render pitch-template 
+                        {
+                         :before-ornament-snippet 
+                         (if has-before-ornament
+                           (render before-ornament-template 
+                                   {:grace-notes  
+                                    (lilypond-grace-notes ornament) }))
+                         :after-ornament-directive
+                         (if has-after-ornament 
+                           lilypond-after-ornament-directive) 
+                         :lilypond-pitch lilypond-pitch
+                         :lilypond-octave lilypond-octave
+                         :duration duration
+                         :beam-start-or-end beam-start-or-end
+                         :lilypond-symbol-for-tie 
+                         (if (and needs-tie 
+                                  ;;and (:tied pitch)
+                                  (not has-after-ornament)) 
+                           lilypond-symbol-for-tie )
+                         :mordent (if (get-attribute pitch2 :mordent) 
+                                    mordent-snippet)
+                         :begin-slur begin-slur
+                         :extra-end-slur "" ;;; TODO 
+                         :end-slur (if (get-attribute pitch2 :end_slur) ")" )
+                         :ending ending-snippet                  
+                         :chord chord
+                         :after-ornament-contents 
+                         (if has-after-ornament
+                           (str " { " (lilypond-grace-notes ornament ) " }"))
+                         :extra-tied-durations extra-tied-durations
+                         }
+                        )))))
 
 (def lilypond-break  "\\break\n")
 
 (defn beat-is-all-dashes?[beat] 
-  (:pre (= (:my_type "beat")))
+  { :pre [  (= (:my_type "beat"))  ]}
   (not-any? #(= :pitch (:my_type %)) (:items beat)))
 
 (def beat-tuplet-template 
@@ -405,7 +470,7 @@
   (barline->lilypond-barline (:my_type barline)))
 
 (defn draw-measure[measure]
-  (:pre (= :measure (:my_type measure))) 
+  { :pre [(= :measure (:my_type measure))]} 
   (join " "
         (map 
           (fn draw-measure-item[item]
@@ -500,8 +565,10 @@
   (-> "lilypond/key.tpl" resource slurp trim))
 
 (defn to-lilypond[doremi-data]
-  :pre (map? doremi-data)
-  :pre (= :composition (:my_type doremi-data))
+  {:pre  [(map? doremi-data)
+          (= :composition (:my_type doremi-data))
+          ]
+   }
   "Takes parsed doremi-script and returns lilypond text"
   (render composition-template 
           {:transpose-snip 
@@ -533,18 +600,21 @@
            (join draw-line-break (map draw-line (:lines doremi-data))) 
            }))
 
+(def runtest true)
 ;;;;;;;;;;;; For testing ;;;;;
-(comment
-;; (use 'clojure.stacktrace) 
-;; (print-stack-trace *e)
-(println
-  (to-lilypond 
-    (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-     (-> "fixtures/aeolian_mode_without_key_specified.txt" resource slurp)
-   ;;   " RGm\nS\n\n R\nS"
-      ))
+(if runtest
+  ;; (use 'clojure.stacktrace) 
+  ;; (print-stack-trace *e)
+  (println
+    (to-lilypond 
+      (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+        "-P --"
+        ;; (-> "fixtures/yesterday.txt" resource slurp)
+        ;;  (-> "fixtures/aeolian_mode_without_key_specified.txt" resource slurp)
+        ;;   " RGm\nS\n\n R\nS"
+        ))
 
+    )
   )
-)
 
 

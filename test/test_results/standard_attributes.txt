@@ -5,7 +5,7 @@ Author:Traditional
 Source:AAK
 Mode: phrygian
 Filename: bhairavi sargam 
-Time: 3/4
+TimeSignature: 3/4
 Key: D
 
    0             +       0    RmgRg    g+
