@@ -350,24 +350,32 @@
   )
 
 
-(defn collect-tied-whole-notes-by-pitch-counter[line]
-  ;; TODO: 
-  ;; Better to do the following:
-  ;;  Create a state machine that collects the tied notes for
-  ;;  each pitch or rest in a line.
-  ;;  States are: looking-for-pitch collecting-pitches collectiong whole-notes
-  ;;  Take into account barlines, phrase markings, and end of line.
-  ;;  Mark ignore for the items that were added to the pitch.
-  ;;  
-  ;;     Dm 
-  ;; S - - - |  TODO: how to handle ??? 
-  ;;
+(defn tied-over-barline-fix[line]
+  ;; IMPORTANT TODO TODO TODO
+  ;; This is to fix  where S - | - - is emitting a whole note followed
+  ;; by a barline instead of 1/2 note barline 1/2 note
+  ;; The current code has set the pitch_counter of the second dash of measure
+  ;; 2 to the pitch-counter of the S. We need to set the pitch counter of the second dash to the pitch-counter of the first dash of measure 2. 
+  ;; TODO
+  ;; For each measure in line
+  ;;   if measure starts with a dash
+  ;;     set pitch-counter of following dashes to the pitch-counter of the first dash
+  {:pre [(is-line? (:my_type line))]
+   :post [(is-line? %)]
+   }
+ line
+  )
+
+(defn combine-tied-whole-notes-by-pitch-counter[line]
+  ;; TODO:  Can make it work by doing the following. 
+  ;; 
   ;; Collecting tied notes
   {:pre [(is-line? (:my_type line))]
    :post [ (map? %)
           (every? integer? (keys %)) 
           ] 
    }
+  (if false (pprint line))
   ;; TODO: have fraction array collect items by barline!
   ;; To avoid S - - | - R - | having the Sa be a whole note
   ;;
@@ -885,7 +893,7 @@ my-map
       tied2 (tie-and-measure-pitches (some #(if (= (:my_type %) :sargam_line) %) (:items collapsed)))
 
       ;; should do it by measure, not line!! TODO  S - - - | - - - - | should result in tied wholes.
-      tied-whole-notes-by-pitch-counter (collect-tied-whole-notes-by-pitch-counter tied2)
+      tied-whole-notes-by-pitch-counter (combine-tied-whole-notes-by-pitch-counter tied2)
       ;; experimental code
      ;; new-line (new-collect-tied-notes (some #(if (= (:my_type %) :sargam_line) %) (:items collapsed)))
       tied3 (postwalk (fn[node]
@@ -948,7 +956,7 @@ node2
 
 
 (if run-tests
-  (let [txt "S- | - R"
+  (let [txt "S | - "
         _ (println txt)]
     (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script
               txt
