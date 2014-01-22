@@ -295,12 +295,34 @@ ALTERNATE_ENDING_INDICATOR
 (*   1._______ 2.___ etc. The period is optional. Must have either dot or underscores. TODO: accepts 1_.___ which is not exactly what I want.  *)
 
 = #"[1-3]"  #"[\._]+" 
-<UPPER_OCTAVE_LINE_ITEM> (* Things above notes, including talas, octaves,chords, and 1st and second ending symbols *)
+<UPPER_OCTAVE_LINE_ITEM> (* Things above notes, including talas, octaves,chords,
+and 1st and second ending symbols. 
+TODO:
+Note that there is controversy over whether something is a chord or an
+ornament! For now I've put ornaments BEFORE chords. Perhaps we should have
+an ORNAMENT_OR_CHORD item and let the semantic analyzer distinguish them.
+The semantic analyzer can decide whether something is an ornament or not
+by looking at the column.
+Since ornaments are either before or after a note according to the current
+scheme, there should be little overlap!!
+Another idea is to tag the lines as follows:
+
+chords:
+ornaments:
+tala:
+
+But that seems ugly
+
+Another idea is to have a
+CHORD_UPPER_LINE = 3 or more chords ??? That could disambiguate it.
+
+Another idea is to use [chord-symbol] vs <ornament> to disambiguate the 2.
+ *)
   = <WHITE_SPACE> /
  UPPER_OCTAVE_DOT /
  TALA /
+	   SARGAM_ORNAMENT /
      CHORD_SYMBOL /
-	    SARGAM_ORNAMENT /
  MORDENT /
  UPPER_UPPER_OCTAVE_SYMBOL /
 ALTERNATE_ENDING_INDICATOR 

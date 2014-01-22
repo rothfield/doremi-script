@@ -63,7 +63,9 @@
          "value":"P"},
         {"syllable":"rig-",
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":2}],
+         "fraction_array":
+         [{"numerator":1, "denominator":2},
+          {"numerator":1, "denominator":2}],
          "pitch_source":"g",
          "normalized_pitch":"Eb",
          "numerator":1,
@@ -110,7 +112,9 @@
          "dash_to_tie":true},
         {"syllable":"by",
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":2}],
+         "fraction_array":
+         [{"numerator":1, "denominator":2},
+          {"numerator":1, "denominator":1}],
          "pitch_source":"S",
          "normalized_pitch":"C",
          "numerator":1,

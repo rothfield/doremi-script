@@ -203,7 +203,9 @@
        "items":
        [{"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":1}],
+         "fraction_array":
+         [{"numerator":1, "denominator":1},
+          {"numerator":1, "denominator":1}],
          "pitch_source":"d",
          "normalized_pitch":"Ab",
          "numerator":1,
@@ -254,7 +256,9 @@
        "items":
        [{"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":1}],
+         "fraction_array":
+         [{"numerator":1, "denominator":1},
+          {"numerator":1, "denominator":1}],
          "pitch_source":"r",
          "normalized_pitch":"Db",
          "numerator":1,

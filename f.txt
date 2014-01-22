@@ -1,0 +1,176 @@
+[:composition
+ [[:sargam_line
+   [:line_number
+    :single_barline
+    [:measure
+     [[:beat
+       [[:R 0 "yes-" {:ornament nil}] [:S 0 "ter" {:ornament nil}]]]
+      [:beat [[:S 0 "day" {:ornament nil}]]]
+      [:beat [:dash :dash]]
+      [:beat [:dash :dash]]]]
+    :single_barline
+    [:measure
+     [[:beat [:dash :dash]]
+      [:beat
+       [[:G 0 "all" {:ornament nil}] [:M 0 "my" {:ornament nil}]]]
+      [:beat
+       [[:Psharp 0 "trou-" {:ornament nil}]
+        [:D 0 "bles" {:ornament nil}]]]
+      [:beat
+       [[:N 0 "seemed" {:ornament nil}] [:S 1 "so" {:ornament nil}]]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:N 0 "far" {:ornament nil}]]]
+      [:beat
+       [[:D 0 "a-" {:ornament nil}] [:D 0 "way" {:ornament nil}]]]
+      [:beat [:dash :dash]]
+      [:beat [:dash :dash]]]]
+    :single_barline]]
+  [:sargam_line
+   [:single_barline
+    [:measure
+     [[:beat [:dash :dash]]
+      [:beat
+       [[:D 0 "now" {:ornament nil}] [:D 0 "it" {:ornament nil}]]]
+      [:beat
+       [[:P 0 "looks" {:ornament nil}] [:m 0 "as" {:ornament nil}]]]
+      [:beat
+       [[:G 0 "though" {:ornament nil}]
+        [:R 0 "they're" {:ornament nil}]]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:m 0 "here" {:ornament nil}]]]
+      [:beat
+       [[:G 0 "to" {:ornament nil}] [:G 0 "stay" {:ornament nil}]]]
+      [:beat [:dash :dash]]
+      [:beat [[:R 0 "oh" {:ornament nil}] :dash]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:S 0 "I" {:ornament nil}]]]
+      [:beat [[:G 0 "be-" {:ornament nil}]]]
+      [:beat [[:R 0 "lieve" {:ornament nil}]]]
+      [:beat [[:D -1 "in" {:ornament nil}]]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:S 0 "Yes-" {:ornament nil}]]]
+      [:beat
+       [[:G 0 "ter-" {:ornament nil}] [:G 0 "day" {:ornament nil}]]]
+      [:beat [:dash]]
+      [:beat [:dash]]]]
+    :double_barline]]
+  [:sargam_line
+   [:line_number
+    :single_barline
+    [:measure
+     [[:beat
+       [[:R 0 "sudd-" {:ornament nil}] [:S 0 "en-" {:ornament nil}]]]
+      [:beat [[:S 0 "ly" {:ornament nil}] :dash]]
+      [:beat [:dash :dash]]
+      [:beat [:dash :dash]]]]
+    :single_barline
+    [:measure
+     [[:beat [:dash :dash]]
+      [:beat
+       [[:G 0 "I'm" {:ornament nil}] [:M 0 "not" {:ornament nil}]]]
+      [:beat
+       [[:Psharp 0 "half" {:ornament nil}]
+        [:D 0 "the" {:ornament nil}]]]
+      [:beat
+       [[:N 0 "man" {:ornament nil}] [:S 1 "I" {:ornament nil}]]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:N 0 "used" {:ornament nil}]]]
+      [:beat [[:D 0 "to" {:ornament nil}] [:D 0 "be" {:ornament nil}]]]
+      [:beat [:dash :dash]]
+      [:beat [:dash :dash]]]]
+    :single_barline]]
+  [:sargam_line
+   [:single_barline
+    [:measure
+     [[:beat [:dash :dash]]
+      [:beat
+       [[:D 0 "theres" {:ornament nil}] [:D 0 "a" {:ornament nil}]]]
+      [:beat
+       [[:P 0 "sha-" {:ornament nil}] [:m 0 "dow" {:ornament nil}]]]
+      [:beat
+       [[:G 0 "hang-" {:ornament nil}] [:R 0 "ing" {:ornament nil}]]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:m 0 "o-" {:ornament nil}]]]
+      [:beat
+       [[:G 0 "ver" {:ornament nil}] [:G 0 "me" {:ornament nil}]]]
+      [:beat [:dash :dash]]
+      [:beat [[:R 0 "Oh" {:ornament nil}] :dash]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:S 0 "I" {:ornament nil}]]]
+      [:beat [[:G 0 "be-" {:ornament nil}]]]
+      [:beat [[:R 0 "lieve" {:ornament nil}]]]
+      [:beat [[:D -1 "in" {:ornament nil}]]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:S 0 "Yes-" {:ornament nil}]]]
+      [:beat
+       [[:G 0 "ter-" {:ornament nil}] [:G 0 "day" {:ornament nil}]]]
+      [:beat [:dash]]
+      [:beat [:dash]]]]
+    :right_repeat]]
+  [:sargam_line
+   [:line_number
+    :double_barline
+    [:measure
+     [[:beat [[:G 0 "why" {:ornament nil}]]]
+      [:beat [:dash]]
+      [:beat [[:G 0 "she" {:ornament nil}]]]
+      [:beat [:dash]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:D 0 "had" {:ornament nil}]]]
+      [:beat [[:N 0 "to" {:ornament nil}]]]
+      [:beat [[:S 1 "go" {:ornament nil}] :dash]]
+      [:beat
+       [[:N 0 "I" {:ornament nil}] [:D 0 "don't" {:ornament nil}]]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:N 0 "know" {:ornament nil}] :dash]]
+      [:beat [:dash [:D 0 "she" {:ornament nil}]]]
+      [:beat [[:P 0 "would-" {:ornament nil}]]]
+      [:beat
+       [[:D 0 "n't" {:ornament nil}] [:G 0 "say" {:ornament nil}]]]]]
+    :single_barline
+    [:measure
+     [[:beat [:dash]] [:beat [:dash]] [:beat [:dash]] [:beat [:dash]]]]
+    :single_barline]]
+  [:sargam_line
+   [:single_barline
+    [:measure
+     [[:beat [[:G 0 "I" {:ornament nil}]]]
+      [:beat [:dash]]
+      [:beat [[:G 0 "said" {:ornament nil}]]]
+      [:beat [:dash]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:D 0 "some-" {:ornament nil}]]]
+      [:beat [[:N 0 "thing" {:ornament nil}]]]
+      [:beat [[:S 1 "wrong" {:ornament nil}] :dash]]
+      [:beat
+       [[:N 0 "now" {:ornament nil}] [:D 0 "I" {:ornament nil}]]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:N 0 "long" {:ornament nil}] :dash]]
+      [:beat [:dash [:D 0 "for" {:ornament nil}]]]
+      [:beat [[:P 0 "yes-" {:ornament nil}]]]
+      [:beat [[:N 0 "ter-" {:ornament nil}]]]]]
+    :single_barline
+    [:measure
+     [[:beat [[:S 1 "day" {:ornament nil}]]]
+      [:beat [[:P 0 nil {:ornament nil}]]]
+      [:beat [[:m 0 nil {:ornament nil}]]]
+      [:beat [[:G 0 nil {:ornament nil}]]]]]
+    :right_repeat
+    [:measure
+     [[:beat [[:S 1 "day" {:ornament nil}]]]
+      [:beat [:dash]]
+      [:beat [:dash]]
+      [:beat [:dash]]]]
+    :double_barline]]]]

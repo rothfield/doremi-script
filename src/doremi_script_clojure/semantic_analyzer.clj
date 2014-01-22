@@ -16,15 +16,15 @@
 
 
 (defn my-seqable?
-    "Returns true if (seq x) will succeed, false otherwise."
-    [x]
-    (or (seq? x)
-              (instance? clojure.lang.Seqable x)
-              (nil? x)
-              (instance? Iterable x)
-              (-> x .getClass .isArray)
-              (string? x)
-              (instance? java.util.Map x)))
+  "Returns true if (seq x) will succeed, false otherwise."
+  [x]
+  (or (seq? x)
+      (instance? clojure.lang.Seqable x)
+      (nil? x)
+      (instance? Iterable x)
+      (-> x .getClass .isArray)
+      (string? x)
+      (instance? java.util.Map x)))
 
 (def upper-dot-set
   #{ :upper_octave_dot :upper_upper_octave_symbol }
@@ -111,9 +111,9 @@
 
 (defn- get-source[node txt]
   {
-  :pre [ (string? txt)]
+   :pre [ (string? txt)]
    :post [ (or (nil? %) (string? %))] }
- "Get instaparse source for the node or nil if not available." 
+  "Get instaparse source for the node or nil if not available." 
   (let [ s (:instaparse.gll/start-index (meta node))
         e (:instaparse.gll/end-index (meta node))]
     (if (and s e)
@@ -121,12 +121,12 @@
 
 (defn- update-sargam-pitch-node [pitch nodes syl]
   {
-  :pre [
-        (#{:pitch} (:my_type pitch))
-        (my-seqable? nodes)
-        (or (nil? syl) (string? syl))
-        ]
-  :post [ (#{:pitch} (:my_type %))]
+   :pre [
+         (#{:pitch} (:my_type pitch))
+         (my-seqable? nodes)
+         (or (nil? syl) (string? syl))
+         ]
+   :post [ (#{:pitch} (:my_type %))]
    }
   (if false (do
               (println "entering update-sargam-pitch-node")
@@ -181,7 +181,7 @@
 (defn- collapse-sargam-section [sargam-section txt]
   {
    :pre [ (= :sargam_section (:my_type sargam-section))
-          (string? txt) ]
+         (string? txt) ]
    :post [ (= :sargam_section (:my_type %)) ]
    }
   ;; TODO: refactor. "GOD method" 
@@ -330,7 +330,7 @@
 
 (defn number-significant-pitches-in-beat[my-beat]
   {:pre [(= :beat (:my_type my-beat))]
-  :post [(= :beat (:my_type %))]
+   :post [(= :beat (:my_type %))]
    }
   "add beat-counter to significant pitches in a beat"
   (let [ beat-counter (atom -1) ]
@@ -346,24 +346,40 @@
 (def is-line? #{:sargam_line})
 
 (defn whole-note?[node]
-      (= (:fraction_array node) [{:numerator 1, :denominator 1}])
+  (= (:fraction_array node) [{:numerator 1, :denominator 1}])
   )
 
+
 (defn collect-tied-whole-notes-by-pitch-counter[line]
+  ;; TODO: 
+  ;; Better to do the following:
+  ;;  Create a state machine that collects the tied notes for
+  ;;  each pitch or rest in a line.
+  ;;  States are: looking-for-pitch collecting-pitches collectiong whole-notes
+  ;;  Take into account barlines, phrase markings, and end of line.
+  ;;  Mark ignore for the items that were added to the pitch.
+  ;;  
+  ;;     Dm 
+  ;; S - - - |  TODO: how to handle ??? 
+  ;;
+  ;; Collecting tied notes
   {:pre [(is-line? (:my_type line))]
-  :post [ (map? %)
+   :post [ (map? %)
           (every? integer? (keys %)) 
-         ] 
+          ] 
    }
+  ;; TODO: have fraction array collect items by barline!
+  ;; To avoid S - - | - R - | having the Sa be a whole note
+  ;;
   ;; Doesn't handle case of S - - - | - - - - |
   ;; TODO: rewrite in more idiomatic clojure
   ;;(println "my-seq line")
   ;;(pprint (my-seq line))
   ;;(println "my-seq line")
   (reduce (fn [accumulator node]
-           ;; (pprint "in fn: node is:")
-           ;; (pprint node)
-           
+            ;; (pprint "in fn: node is:")
+            ;; (pprint node)
+
             (let [
                   fraction-array (:fraction_array node)
                   pitch-to-use-for-tie (:pitch_to_use_for_tie node)
@@ -371,38 +387,38 @@
                   ary (or (get accumulator pitch-counter
                                ) [])
                   ]
-             (if pitch-counter ;; TODO: review (whole-note? node)
-              (assoc accumulator pitch-counter (conj ary (first fraction-array))) 
-               ;; else
-                  accumulator 
-                     )))
+              (if pitch-counter ;; TODO: review (whole-note? node)
+                (assoc accumulator pitch-counter (conj ary (first fraction-array))) 
+                ;; else
+                accumulator 
+                )))
           {} (filter #(:dash_to_tie %)  (my-seq line))
           ))
-  
 
 
-  
+
+
 (defn fix-fraction-array[line]
   {:pre [(is-line? (:my_type line))]
-  :post [(is-line? (:my_type %))] }
-(let [pitch-counter-to-index
-      []
-      ]
-line
-      ))
+   :post [(is-line? (:my_type %))] }
+  (let [pitch-counter-to-index
+        []
+        ]
+    line
+    ))
 
 (defn add-pitch-counters[line]
   {:pre [(is-line? (:my_type line))]
-  :post [(is-line? (:my_type %))] }
+   :post [(is-line? (:my_type %))] }
   "Add pitch-counter to every significant item in the line"
   (let [ pitch-counter (atom -1)]
-        (postwalk (fn add-pitch-counters[item-in-line] 
-                          (if-not (significant? item-in-line)
-                            item-in-line
-                            (do
-                              (swap! pitch-counter inc)
-                              (assoc item-in-line :pitch-counter @pitch-counter))))
-                        line)))
+    (postwalk (fn add-pitch-counters[item-in-line] 
+                (if-not (significant? item-in-line)
+                  item-in-line
+                  (do
+                    (swap! pitch-counter inc)
+                    (assoc item-in-line :pitch-counter @pitch-counter))))
+              line)))
 
 
 ;; Here is a good place to handle ties/dashes/rests
@@ -461,7 +477,7 @@ line
 ;;
 (defn- tie-and-measure-pitches[line]
   {:pre [(is-line? (:my_type line))]
-  :post [(is-line? (:my_type %))] }
+   :post [(is-line? (:my_type %))] }
   ;; Needs to be called from within collapse-sargam-section
   ;; TODO: not setting fraction_array and fraction_total properly
   ;; example | S -
@@ -469,10 +485,10 @@ line
         line2 (add-pitch-counters line)
         pitches (into []  (filter significant? (my-seq line2) ))
         line3 (postwalk 
-            (fn [node-in-line] (if (= :beat (:my_type node-in-line))
-              (number-significant-pitches-in-beat node-in-line)
-              node-in-line))
-          line2)
+                (fn [node-in-line] (if (= :beat (:my_type node-in-line))
+                                     (number-significant-pitches-in-beat node-in-line)
+                                     node-in-line))
+                line2)
         ]
     (postwalk (fn walk-line-tieing-dashes-and-pitches[node-in-line] 
                 "if item is dash at beginning of line, set :dash_to_tie false and :rest true
@@ -506,43 +522,43 @@ line
                         ;; and add to fraction-array of current note!
                         (assoc node-in-line :tied true)   ;; tie to next dash
                         )
-                        ;; 
-                        ;; )
-                        ;; Case 3: dash at beginning of beat
-                        (and (= :dash my-key) 
-                             (= 0 (:beat-counter node-in-line)))
-                        ;; doremi-v1 requires that the :tied attribute not
-                        ;; be set to anything if not tied
-                        (let [prev-pitch         ;; previous pitch in this line 
-                              (last (filter #(and (= :pitch (:my_type %))
-                                                  (< 
-                                                    (:pitch-counter %)
-                                                    (:pitch-counter node-in-line)))
-                                            pitches))
-                              my-tied (and next-item (= :dash (:my_type next-item))) 
-                              ;;  _ (println "prev-pitch")
-                              ;;  _ (pprint prev-pitch)
-                              my-result1 (assoc node-in-line 
-                                                :case3 true
-                                                :dash_to_tie true
-                                                :pitch_to_use_for_tie (assoc prev-pitch :pointer true))
-                              ]
-                          ;; set dash_to_tie true ; tied true, and pitch_to_use_for_tie
-                          (if my-tied
-                            (assoc my-result1 :tied true)
-                            ;; else
-                            my-result1))
-                        true
-                        node-in-line
-                        )
+                      ;; 
+                      ;; )
+                      ;; Case 3: dash at beginning of beat
+                      (and (= :dash my-key) 
+                           (= 0 (:beat-counter node-in-line)))
+                      ;; doremi-v1 requires that the :tied attribute not
+                      ;; be set to anything if not tied
+                      (let [prev-pitch         ;; previous pitch in this line 
+                            (last (filter #(and (= :pitch (:my_type %))
+                                                (< 
+                                                  (:pitch-counter %)
+                                                  (:pitch-counter node-in-line)))
+                                          pitches))
+                            my-tied (and next-item (= :dash (:my_type next-item))) 
+                            ;;  _ (println "prev-pitch")
+                            ;;  _ (pprint prev-pitch)
+                            my-result1 (assoc node-in-line 
+                                              :case3 true
+                                              :dash_to_tie true
+                                              :pitch_to_use_for_tie (assoc prev-pitch :pointer true))
+                            ]
+                        ;; set dash_to_tie true ; tied true, and pitch_to_use_for_tie
+                        (if my-tied
+                          (assoc my-result1 :tied true)
+                          ;; else
+                          my-result1))
+                      true
+                      node-in-line
                       )
-                    ))
-                line3)
-              ))
+                    )
+                  ))
+              line3)
+    ))
 
 (defn- handle-beat-in-main-walk[ node2]
   {:pre [(= :beat (:my_type node2))]
-  :post [(= :beat (:my_type %))] }
+   :post [(= :beat (:my_type %))] }
   (let [
         ;; [ [pitch dash dash] pitch pitch ] => [pitch dash dash pitch pitch]
         ;; apply concat to get rid of pitch with dashes' array
@@ -579,10 +595,10 @@ line
               my-beat)))
 
 (defn- handle-pitch-with-dashes-in-main-walk[[pitch & rest]]
-   {:pre [ (contains? #{:dash :pitch} (:my_type pitch))]
+  {:pre [ (contains? #{:dash :pitch} (:my_type pitch))]
    :post [ (vector? %)
           ]
-  }
+   }
   "Handle  - and S--  and  ---. Returns vector of pitches"
   ;; set :ignore true for all the dashes
   ;;  and set numerator for pitch
@@ -605,9 +621,9 @@ line
   )
 
 (defn- handle-composition-in-main-walk[node2]
-   {:pre [ (= :composition (:my_type node2))]
+  {:pre [ (= :composition (:my_type node2))]
    :post [ (= :composition (:my_type %))]
-  }
+   }
   (let [
         attribute-sections 
         (filter #(= :attributes (:my_type %))  (:items node2))
@@ -646,12 +662,12 @@ line
            )))
 
 (defn- handle-attribute-section [node]
-   {:pre [ (= :attribute_section (:my_type node))]
+  {:pre [ (= :attribute_section (:my_type node))]
    :post [ ;;(pprint %)
           (= :attributes (:my_type %))]
-  }
-;;  (println "my_type node is:" (:my_type node))
- ;; (pprint node)
+   }
+  ;;  (println "my_type node is:" (:my_type node))
+  ;; (pprint node)
 
   ;;(pprint node)
   (let [
@@ -785,6 +801,7 @@ line
                 )
               beat-count (count (filter #(= (:my_type %) :beat) my-items3))
               ]
+          ;; TODO: review is_partial. It is not really needed if always set true
           (assoc my-map :beat_count beat-count :is_partial true :items my-items3))
         :TALA 
         (assoc my-map :source (get-source node txt))
@@ -869,6 +886,8 @@ my-map
 
       ;; should do it by measure, not line!! TODO  S - - - | - - - - | should result in tied wholes.
       tied-whole-notes-by-pitch-counter (collect-tied-whole-notes-by-pitch-counter tied2)
+      ;; experimental code
+     ;; new-line (new-collect-tied-notes (some #(if (= (:my_type %) :sargam_line) %) (:items collapsed)))
       tied3 (postwalk (fn[node]
                         (if (and (:pitch-counter node) (not (:pointer node)))
                           (assoc node 
@@ -877,9 +896,9 @@ my-map
                                                   (get tied-whole-notes-by-pitch-counter (:pitch-counter node)))))
                           ;; else
                           node
-                        )) tied2)
+                          )) tied2)
       ;;  _ (println "tied-whole-notes-by-pitch-counter")
-       ;; _ (pprint tied-whole-notes-by-pitch-counter)
+      ;; _ (pprint tied-whole-notes-by-pitch-counter)
 
       ]
   (if false (println "collapsed"))
@@ -919,17 +938,20 @@ node2
       (fn[node] (main-walk node txt)) 
       parse-tree)))
 
+
+(def run-tests false)
 (comment
   (pprint (doremi_script_clojure.core/doremi-text->parse-tree 
-         ;;   (-> "fixtures/yesterday.txt" resource slurp)))
+            ;;   (-> "fixtures/yesterday.txt" resource slurp)))
             "<S-- R> -- -S"))
   )
 
 
-(comment
-  (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script
-            "-S - - - | R - - - "))
-
+(if run-tests
+  (let [txt "S- | - R"
+        _ (println txt)]
+    (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script
+              txt
+              ))))
 ;;           (-> "fixtures/yesterday.txt" resource slurp)))
-;;)
-)
+

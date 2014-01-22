@@ -20,7 +20,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|" c'4~ c'4~ c'4 \bar "|" d'4~ d'4 c'4 \bar "|" b4~ b4~ b4~ \bar "|" b4~ b4~ b4 \bar "|"
+\bar "|" c'2.    \bar "|" d'2   c'4  \bar "|" b4~b4~b4~b4~b4~b4    \bar "|"    \bar "|"
 }
 
 text = \lyricmode {

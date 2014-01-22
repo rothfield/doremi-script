@@ -47,10 +47,10 @@ melody = {
 \key c \phrygian
 \autoBeamOn  
 \cadenzaOn
-\bar "|:" c'8[( df'8] \bar "|" \acciaccatura { c'32 }bf4) c'4 ef'8[( f'8] \afterGrace g'8[ { bf'32 } af'8]) \bar "|" g'4~^"i" g'4 g'4 g'4 \bar "|" g'4~^"IV" g'4 a'4 bf'4 \bar "|" \break        \grace s64 
-\bar "|" g'4 af'4\mordent g'4 af'4 \bar "|" g'8[( f'8] g'16[ f'16 bf'16 g'16]) \acciaccatura { f'32[ ef'32 f'32] }ef'4( f'4) \bar "|" g'16[( af'16 bf'16 c''16]~) c''4  ef''4 c''4 \bar "|" \break        \grace s64 
-\bar "|" af'8[(  g'16 f'16] ef'4) g'4 \afterGrace f'4 { g'32[ f'32] } \bar "|" df'4~\mordent df'4 c'4 \bar ":|" \break        \grace s64 
-\bar "|" ef'4 f'4 af'4 bf'4 \bar "|" c''4~ c''4 df''4 c''4 \bar "|"
+\bar "|:" c'8[(  df'8]  \bar "|" \acciaccatura { c'32 }bf4)  c'4  ef'8[(  f'8]  \afterGrace g'8[ { bf'32 }  af'8])  \bar "|" g'2^"i"   g'4  g'4  \bar "|" g'2^"IV"   a'4  bf'4  \bar "|" \break        \grace s64 
+\bar "|" g'4  af'4\mordent  g'4  af'4  \bar "|" g'8[(  f'8]  g'16[  f'16  bf'16  g'16])  \acciaccatura { f'32[ ef'32 f'32] }ef'4(  f'4)  \bar "|" g'16[(  af'16  bf'16  c''16]~)~c''4]    ef''4  c''4  \bar "|" \break        \grace s64 
+\bar "|" af'8[(   g'16  f'16]  ef'4)  g'4  \afterGrace f'4 { g'32[ f'32] }  \bar "|" df'2\mordent   c'4  \bar ":|" \break        \grace s64 
+\bar "|" ef'4  f'4  af'4  bf'4  \bar "|" c''2   df''4  c''4  \bar "|"
 }
 
 text = \lyricmode {

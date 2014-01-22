@@ -195,7 +195,9 @@
        "items":
        [{"syllable":"ba-",
          "chord":"i",
-         "fraction_array":[{"numerator":1, "denominator":1}],
+         "fraction_array":
+         [{"numerator":1, "denominator":1},
+          {"numerator":1, "denominator":1}],
          "pitch_source":"P",
          "normalized_pitch":"G",
          "numerator":1,
@@ -296,7 +298,9 @@
        "items":
        [{"syllable":"hi",
          "chord":"IV",
-         "fraction_array":[{"numerator":1, "denominator":1}],
+         "fraction_array":
+         [{"numerator":1, "denominator":1},
+          {"numerator":1, "denominator":1}],
          "pitch_source":"P",
          "normalized_pitch":"G",
          "numerator":1,

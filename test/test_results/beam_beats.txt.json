@@ -244,7 +244,9 @@
         {"ignore":true, "my_type":"dash", "start_index":23},
         {"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":7}],
+         "fraction_array":
+         [{"numerator":1, "denominator":7},
+          {"numerator":1, "denominator":4}],
          "pitch_source":"G",
          "normalized_pitch":"E",
          "numerator":1,
@@ -323,7 +325,9 @@
          "value":"R"},
         {"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":4}],
+         "fraction_array":
+         [{"numerator":1, "denominator":4},
+          {"numerator":1, "denominator":8}],
          "pitch_source":"G",
          "normalized_pitch":"E",
          "numerator":1,

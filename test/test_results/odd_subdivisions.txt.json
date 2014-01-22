@@ -46,7 +46,9 @@
         {"ignore":true, "my_type":"dash", "start_index":30},
         {"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":4}],
+         "fraction_array":
+         [{"numerator":1, "denominator":4},
+          {"numerator":1, "denominator":8}],
          "pitch_source":"G",
          "normalized_pitch":"E",
          "numerator":2,
@@ -130,7 +132,9 @@
         {"ignore":true, "my_type":"dash", "start_index":40},
         {"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":8}],
+         "fraction_array":
+         [{"numerator":1, "denominator":8},
+          {"numerator":1, "denominator":4}],
          "pitch_source":"D",
          "normalized_pitch":"A",
          "numerator":1,

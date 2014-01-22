@@ -4,12 +4,33 @@
     [clojure.java.io :refer [resource]]
     [clojure.string :refer [trim join upper-case lower-case]] 
     [clojure.pprint :refer [pprint]] 
+    [clojure.walk :refer [postwalk
+                          postwalk-replace keywordize-keys]]
     ))
 
 (comment
   (use 'clojure.stacktrace) 
   (print-stack-trace *e)
   )
+
+(defn- my-seq[x]
+  "seq through the data structure, which is like"
+  " {:items [ {:items [1 2 3]} 2 3]}"
+  "Don't include items like {:items [1 2 3]} "
+  "just [1 2 3]"
+  ;; TODO: redo
+  ;;(filter #(not (:items %))
+  (tree-seq
+    (fn branch?[x] (or (vector? x) (map? x))) 
+    (fn children[y] 
+      (cond 
+        (and (map? y) (:items y)) 
+        (:items y)
+        (and (map? y) (:lines y)) 
+        (:lines y)
+        (vector? y)
+        (rest y)))
+    x))
 
 (def debug false)
 
@@ -86,8 +107,8 @@
 
 (defn ratio-to-lilypond[my-numerator subdivisions-in-beat]
   { :pre [ (integer? my-numerator)
-       (integer? subdivisions-in-beat)]
-    :post [ (vector? %)] 
+          (integer? subdivisions-in-beat)]
+   :post [ (vector? %)] 
    }
 
   (let [my-ratio (/ my-numerator subdivisions-in-beat)]
@@ -110,6 +131,7 @@
         2 ["2"]
         3 ["2."]
         4 ["1"]  ;; review
+        8 ["1" "1"]
         } my-ratio
        (into [] (repeat my-numerator "4"))
        )
@@ -238,23 +260,53 @@
       {:numerator whole-note-count :denominator 1})))
 
 (defn combine-whole-notes-in-fraction-array[ary]
+  ;; Problem when the whole notes go into next measure!!!
   (let [z (partition-by identity ary)]
-  (into [] (flatten (map #(if (whole-note? (first %))
-                            {:numerator (count %) :denominator 1}
-                            %) z)))))
+    (into [] (flatten (map #(if (whole-note? (first %))
+                              {:numerator (count %) :denominator 1}
+                              %) z)))))
 
- (def x [{:numerator 1, :denominator 1}{:numerator 1, :denominator 1} {:numerator 1, :denominator 3}{:numerator 1, :denominator 3} {:numerator 1, :denominator 1} ])
+(def x [{:numerator 1, :denominator 1}{:numerator 1, :denominator 1} {:numerator 1, :denominator 3}{:numerator 1, :denominator 3} {:numerator 1, :denominator 1} ])
 
 (if false
   (pprint (combine-whole-notes-in-fraction-array x)))
 
+(defn draw-pitch-with-one-duration[pitch duration]
+  { :pre [  (= (:pitch (:my_type pitch)))
+            (:numerator pitch)
+          (string? duration)
+         (:denominator pitch) 
+          ]
+   :post [ (string? %)]  
+   }
+   (str (normalized-pitch->lilypond-pitch (:normalized_pitch pitch))
+        (octave-number->lilypond-octave (:octave pitch)))
+  )
+
+(defn new-draw-pitch[pitch]
+  { :pre [  (= (:pitch (:my_type pitch)))
+            (:numerator pitch)
+         (:denominator pitch) 
+          ]
+   :post [ (string? %)]  
+   }
+(let [durations 
+      (ratio-to-lilypond (:numerator pitch)
+                         (:denominator pitch))]
+  (println "numerator denominator:" (:numerator pitch) (:denominator pitch))
+(if (= 1 (count durations))
+  (draw-pitch-with-one-duration pitch (first durations))
+  "TODO")
+  ))
+
+
 (defn draw-pitch[pitch beat-subdivisions beam-start-or-end]
   { :pre [  (#{:pitch :dash}  (:my_type pitch)) 
-            (integer? beat-subdivisions) 
-            (contains? #{nil lilypond-beam-start lilypond-beam-end}
-                       beam-start-or-end)
+          (integer? beat-subdivisions) 
+          (contains? #{nil lilypond-beam-start lilypond-beam-end}
+                     beam-start-or-end)
           ]
-    :post [ (string? %)] 
+   :post [ (string? %)] 
    }
   "Render a pitch/dash as lilypond text. Renders tied notes as needed"
   ;; "Rests are never tied"
@@ -262,8 +314,8 @@
   ;; In draw-pitch for the Sa in the following:  
   ;; -S -- -- -R
   (if debug (do
-             (println "entering draw-pitch- pitch is")
-  (pprint pitch)))
+              (println "entering draw-pitch- pitch is")
+              (pprint pitch)))
   ;;; {:fraction_array [{:numerator 1, :denominator 2}],
   ;;;  :numerator 1,
   ;;;   :start_index 3,
@@ -331,14 +383,14 @@
   ;; aargh!!!!
   (cond (:ignore pitch)
         ""
-      ;; (and  (:dash_to_tie pitch) (= :dash (:my_type pitch)))
-       ;; ""
-       (and  (:tied pitch) (not= :pitch (:my_type pitch)))
+        ;; (and  (:dash_to_tie pitch) (= :dash (:my_type pitch)))
+        ;; ""
+        (and  (:tied pitch) (not= :pitch (:my_type pitch)))
         ""
         (and (:dash_to_tie pitch) (:octave (:pitch_to_use_for_tie pitch)))
         ""
         ;;(and  (:dash_to_tie pitch) (= :dash (:my_type pitch))))
-       ;; (and (= :dash (:my_type pitch)) (not (:dash_to_tie pitch))
+        ;; (and (= :dash (:my_type pitch)) (not (:dash_to_tie pitch))
         ;;     (not (:rest pitch)))
         true
         (let
@@ -356,22 +408,22 @@
            (combine-whole-notes-in-fraction-array (:fraction_array pitch))
            _ (if debug (do 
                          (println "combined fraction array:")
-           (pprint combined-fraction-array)))
+                         (pprint combined-fraction-array)))
            needs-tie (> (count combined-fraction-array) 1)
            _ (if debug (println "needs-tie" needs-tie))
            durations-for-first-note 
-             (ratio-to-lilypond 
-               (:numerator (first combined-fraction-array)) 
-               (:denominator (first combined-fraction-array)))
+           (ratio-to-lilypond 
+             (:numerator (first combined-fraction-array)) 
+             (:denominator (first combined-fraction-array)))
            _ (if debug (do
                          (println "durations-for-first-note:" durations-for-first-note)
-           (println)
-           (println "before setting durations2")
-           (pprint combined-fraction-array)
+                         (println)
+                         (println "before setting durations2")
+                         (pprint combined-fraction-array)
                          ))
            durations2 (flatten (map #(ratio-to-lilypond (:numerator %)
-                                                  (:denominator %)) 
-                              (rest combined-fraction-array)))
+                                                        (:denominator %)) 
+                                    (rest combined-fraction-array)))
            _ (if debug (do (println "durations2") (pprint durations2)))
            duration (first durations-for-first-note) 
            chord (chord-snippet (get-chord pitch))
@@ -650,10 +702,125 @@
 (def key-template
   (-> "lilypond/key.tpl" resource slurp trim))
 
+(def is-line? #{:sargam_line})
+(comment
+  (use 'clojure.stacktrace) 
+  (print-stack-trace *e)
+  )
+
+(defn new-to-lilypond[composition]
+  ;; new approach . TODO experimental
+  ;; collect results and attach them to items in line.
+  ;; {:pre [(= :composition (:my_type composition))] }
+  ;;  :post [ (map? %)
+  ;;        (do (println "leaving new-collect-tied-notes, returns")
+  ;;           (pprint %) true) 
+  (if debug (do  (pprint composition)))
+  (let [ 
+        states [:in-line :looking-for-pitch]
+        start-state :start
+        my-state (atom start-state)
+        current-pitch (atom nil) 
+        measure-length (atom nil)
+        microbeat-counter (atom nil)
+        beat-subdivisions (atom nil)
+        last-pitch (atom nil)
+        state-transition-function
+        (fn state-transition-function[accumulator node]
+          (let [
+                my-type (cond (:is_barline node)
+                              :barline
+                              true
+                              (:my_type node))
+                pair [@my-state my-type]
+                ]
+            (if false (do
+                        (print "reducing. type of node is")
+                        (pprint my-type)))
+            (if true (println "pair is" pair))
+            (if (vector? node)
+              accumulator
+              ;; else
+              (case pair
+                [:collecting-pitch-in-beat :measure]
+                (do (reset! my-state :collecting-pitch-in-beat-and-in-new-measure)
+                    accumulator) 
+                [:collecting-pitch-in-beat-and-in-new-measure :ignore]
+                accumulator
+                [:in-beat :pitch]
+                (do
+                  (reset! my-state :collecting-pitch-in-beat)
+                  (reset! current-pitch node)  
+                  (reset! microbeat-counter 1)  
+                  (reset! beat-subdivisions 1)  
+                  accumulator
+                  )
+                [:collecting-pitch-in-beat-and-in-new-measure :dash]
+                (do 
+                  (swap! microbeat-counter inc)
+                  (swap! beat-subdivisions inc)
+                  accumulator)
+                [:in-measure :beat]
+                (do (reset! my-state :in-beat)
+                    accumulator)
+                [:in-line :measure]
+                (do 
+                  (reset!  measure-length 0)
+                  (reset! my-state :in-measure)
+                  accumulator)
+                [:in-line :barline]
+                (do (reset! my-state :in-line)
+                    ;; (pprint node)
+                    (conj accumulator (draw-barline node)))
+                [:start :sargam_line]
+                (do (reset! my-state :in-line)
+                    accumulator)
+                [:start :composition]
+                accumulator
+                [:collecting-pitch-in-beat :eof]
+                (do 
+                (new-draw-pitch (assoc @current-pitch
+                                       :numerator @microbeat-counter 
+                                       :denominator @beat-subdivisions)))
+                [:looking-for-pitch :sargam_line]
+                accumulator
+                [:looking-for-pitch :measure]
+                accumulator
+                [:in-line :beat]
+                accumulator
+                [:collecting-pitch-in-beat :beat]
+                accumulator
+                [:looking-for-pitch :dash]
+                accumulator
+                [:collecting-pitch-in-beat :dash]
+                (do (swap! microbeat-counter inc)
+                   (swap! beat-subdivisions inc) 
+                accumulator)
+                [:looking-for-pitch :barline]
+                accumulator
+                [:looking-for-pitch :pitch]
+                (do (reset! my-state :collecting-pitch-in-beat)
+                    accumulator)
+                [:collecting-pitch-in-beat :pitch]
+                (do (reset! current-pitch (:pitch-counter node))
+                    accumulator) 
+                [:collecting-pitch-in-beat :barline]
+                (do (reset! my-state :looking-for-pitch)
+                    (pprint pair) accumulator)
+
+                ;; (do (println "default case")
+                ;;    accumulator)
+              ))))
+        ]
+    (str (join " " (reduce state-transition-function [] (my-seq composition)))
+         " " (str (state-transition-function [] {:my_type :eof})))
+    ))
+
 (defn to-lilypond[doremi-data]
   {:pre  [(map? doremi-data)
           (= :composition (:my_type doremi-data))
           ]
+   :post [ (string? %)]
    }
   "Takes parsed doremi-script and returns lilypond text"
   (render composition-template 
@@ -686,16 +853,68 @@
            (join draw-line-break (map draw-line (:lines doremi-data))) 
            }))
 
-(def runtest false)
-;;;;;;;;;;;; For testing ;;;;;
+
+(defn pprint-composition[node]
+  ;; (pprint node)
+  ;; (spit "f.txt" (with-out-str 
+  (pprint (postwalk (fn[node] (cond 
+                                (= :pitch (:my_type node))
+                                (let [attributes (:attributes node)
+                                      ;;   _ (println ":pitch case")
+                                      ;;  _ (println "attributes are" attributes)
+
+                                      attrs (if (get-attribute node :ornament) 
+                                              {:ornament (get-attribute node :ornament)} ;;(:ornament (:attributes node))} 
+                                              nil)
+                                      base [(:value node) (:octave node) (:syllable node) ]
+                                      ]
+                                  ;;    (println "pitch node is"  node)
+                                  ;; (println "attrs is" attrs)
+                                  (if attrs
+                                    (conj base attrs)
+                                    base))
+                                (and (map? node) (:ornament_items node))
+                                node
+                                ;;   (do (pprint node)
+                                ;;      [ (:my_type node) (:ornament_items node)])
+                                (and (map? node) (:items node))
+                                [ (:my_type node) (:items node)]
+                                (and (map? node) (:lines node))
+                                [ (:my_type node) (:lines node)]
+                                (:my_type node)
+                                (:my_type node)
+                                true
+                                node)) 
+                    node)))
+
+(def runtest true)
+
+(if false
+  (pprint
+    (doremi_script_clojure.core/doremi-text->parse-tree
+      "GR\n  S |")))
+;;srruby turn your record into a map like this: (into {}  (->aaa 1 2))
 (if runtest
+  (println (new-to-lilypond 
+             (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script
+               ;; (-> "fixtures/yesterday.txt" resource slurp)
+               "| SR"
+               )
+             )))
+
+(if false
+  (pprint
+    (new-to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script " | S - - - | - - - - "))))
+
+;;;;;;;;;;;; For testing ;;;;;
+(if false
   ;; (use 'clojure.stacktrace) 
   ;; (print-stack-trace *e)
   (println
     (to-lilypond 
       (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-       "-- -R | S - - |"
-;;        "P - - - - - - - -"
+        " | S---"
+        ;;        "P - - - - - - - -"
         ;; (-> "fixtures/yesterday.txt" resource slurp)
         ;;  (-> "fixtures/aeolian_mode_without_key_specified.txt" resource slurp)
         ;;   " RGm\nS\n\n R\nS"

@@ -30,7 +30,9 @@
         {"ignore":true, "my_type":"dash", "start_index":45},
         {"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":3, "denominator":8}],
+         "fraction_array":
+         [{"numerator":3, "denominator":8},
+          {"numerator":1, "denominator":4}],
          "pitch_source":"R",
          "normalized_pitch":"D",
          "numerator":3,
@@ -100,7 +102,9 @@
         {"ignore":true, "my_type":"dash", "start_index":56},
         {"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":8}],
+         "fraction_array":
+         [{"numerator":1, "denominator":8},
+          {"numerator":1, "denominator":2}],
          "pitch_source":"m",
          "normalized_pitch":"F",
          "numerator":1,
@@ -150,7 +154,9 @@
         {"ignore":true, "my_type":"dash", "start_index":62},
         {"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":2}],
+         "fraction_array":
+         [{"numerator":1, "denominator":2},
+          {"numerator":1, "denominator":8}],
          "pitch_source":"P",
          "normalized_pitch":"G",
          "numerator":4,
@@ -220,7 +226,9 @@
         {"ignore":true, "my_type":"dash", "start_index":73},
         {"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":4}],
+         "fraction_array":
+         [{"numerator":1, "denominator":4},
+          {"numerator":3, "denominator":8}],
          "pitch_source":"N",
          "normalized_pitch":"B",
          "numerator":2,

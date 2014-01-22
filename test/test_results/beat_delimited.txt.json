@@ -83,7 +83,9 @@
          "value":"R"},
         {"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":3}],
+         "fraction_array":
+         [{"numerator":1, "denominator":3},
+          {"numerator":1, "denominator":2}],
          "pitch_source":"G",
          "normalized_pitch":"E",
          "numerator":1,

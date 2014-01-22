@@ -13,6 +13,7 @@ time {
 		rm -f $fname.png
 		lily2image -r=72 -f=png $fname 2>&1  
 		rm -f $fname.mid $fname.ps
+		cat $1 
 }
 feh $fname.png 
 

@@ -120,7 +120,9 @@
        "items":
        [{"syllable":"you",
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":1}],
+         "fraction_array":
+         [{"numerator":1, "denominator":1},
+          {"numerator":1, "denominator":1}],
          "pitch_source":"G",
          "normalized_pitch":"E",
          "numerator":1,

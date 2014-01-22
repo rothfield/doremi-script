@@ -121,7 +121,9 @@
        "items":
        [{"syllable":"see",
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":1}],
+         "fraction_array":
+         [{"numerator":1, "denominator":1},
+          {"numerator":1, "denominator":1}],
          "pitch_source":"S",
          "normalized_pitch":"C",
          "numerator":1,

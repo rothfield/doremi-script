@@ -153,7 +153,9 @@
        "items":
        [{"syllable":null,
          "chord":null,
-         "fraction_array":[{"numerator":1, "denominator":1}],
+         "fraction_array":
+         [{"numerator":1, "denominator":1},
+          {"numerator":1, "denominator":1}],
          "pitch_source":"m",
          "normalized_pitch":"F",
          "numerator":1,
