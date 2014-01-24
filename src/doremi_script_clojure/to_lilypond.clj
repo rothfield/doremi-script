@@ -99,7 +99,40 @@
  (def lilypond-beam-start "[")
  
  (def lilypond-beam-end "]")
- 
+
+(defn beam-beat[ary]
+  ;; Manually beam beat as follows: SR -> c'[ d']  
+  ;; Only if more than one pitch in the beat of course
+  ;; But don't beam if there is a quarter note which can be the
+  ;; case with S-R
+  ;;   ([{:id 320, :val "c'8"}] [{:id 323, :val "c'8"}])
+  (let [
+        ;;flattened (flatten ary)
+        flattened 
+        (remove (fn[x]  (empty? x)) (flatten ary))
+        my-num (count flattened)
+        _ (if false (do (println "flattened")
+        (pprint flattened)))
+        ]
+    (if false (do
+    (println "num is" my-num)))
+   (map-indexed (fn[idx x]
+                  (let [my-val (or (:val x)
+                                x)
+                    val2 (cond (= idx 0)
+                               (str my-val "[")
+                               (= idx (dec my-num))
+                               (str my-val "]")
+                               true
+                              x 
+                               )]
+                    (if (:val x)
+                      (assoc x :val val2)
+                      val2)
+                  ))
+               
+                flattened)
+  ))
  (defn beam-notes[ary]
    (if  (< (count ary) 2)
      ary
@@ -393,6 +426,7 @@
                     (swap! pitch-ids-to-add-tilde conj  @last-pitch-id)) 
 
                   (reset! last-pitch-id (:id pitch2)) 
+                  ;; a8[ ais] d[ ees r d] c16 b a8
                   (into [] (concat [ 
                                     {:id (:id pitch2)
                                      :val       (str 
@@ -415,7 +449,9 @@
                                                     (if (> (count extra-tied-durations) 0) "~")
                                                     (if has-after-ornament
                                                       (str " { " (lilypond-grace-notes ornament ) " }"))
-                                                    ))}]
+                                                    ))}
+                                    
+                                    ]
                                    extra-tied-durations))
                   )
                 ))))
@@ -449,10 +485,6 @@
 
 (defn draw-beat[beat]
   (if false (do (println "\n\n****draw-beat:") (pprint beat) (println "\n\n\n")))
-  ;; Manually beam beat as follows: SR -> c'[ d']  
-  ;; Only if more than one pitch in the beat of course
-  ;; But don't beam if there is a quarter note which can be the
-  ;; case with S-R
   (let [
         ;; Use pitch-ids to identify first and last pitches
         pitch-ids (map :pitch-counter 
@@ -478,7 +510,7 @@
         (and (> (count pitch-ids) 1)
              (not do-not-beam-case))
         beat-ary 
-        (map (fn draw-beat-item[ item]
+        (map-indexed (fn draw-beat-item[idx item]
                (if false (do
                            (println "draw-beat-item, item is ")
                            (pprint item)))
@@ -491,19 +523,26 @@
                        (draw-pitch item (:subdivisions beat))
                        )))
              (:items beat))
-        beat-content beat-ary
+        _ (if false (do
+            (println "in draw-beat, beat-ary is")
+            (pprint beat-ary)))
+        beat-content (beam-beat beat-ary)
+        ;; _ (println "beat-content is")
+        ;; _ (pprint beat-content)
         ]
     (if (and (not (#{0 1 2 4 8 16 32 64 128} (:subdivisions beat)))
              (not (beat-is-all-dashes? beat)))
+      (do (if false (do (println "USING beat-ary")))
       (into [] (concat  
                  [ (str "\\times "
                         (tuplet-numerator-for-odd-subdivisions (:subdivisions beat))
                         "/" 
                         (:subdivisions beat)
                         "{")
-                  ] beat-ary ["}"]))
+                  ] beat-ary ["}"])))
       ;;    {{tuplet-numerator}}/{{subdivisions}} { {{beat-content}} }
-      beat-content)     
+      ;;    else
+      beat-content)   
     ))
 
 (defn draw-barline[barline]
@@ -753,6 +792,7 @@
 ;;;;;;;;;;;; For testing ;;;;;
 (if nil 
   (let [
+        txt "S----S RGmP" ;; S S- -R"
         txt1 "| GP - -  - | GR - - - |\nGeo-rgia geo-rgia"
         txt2 "S - -R - | - G m-m"
         txt3 "SR" ;; - -R - | - G m-m"
@@ -761,18 +801,12 @@
         txt6 "P - - - | -- DD Pm GR |"
 txt7 (str " RS S -- --  | -- GM P#D NN | N DD -- -- |"
 "\n\n| -- DD Pm GR | m GG -- R- | S G R R | S GG - - ||")
-txt
+txt9
 
 (str                               
 "N DD -- -- |"
   "\n\n"
 "| -- DD Pm GR |")
-
-
- 
-
- 
-
         ]
     (println txt)
     ;; (use 'clojure.stacktrace) 
