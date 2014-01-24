@@ -303,9 +303,10 @@
   ;; Use fraction-array to draw the tied notes
   ;; In draw-pitch for the Sa in the following:  
   ;; -S -- -- -R
-  (if debug (do
+  (if false (do
               (println "entering draw-pitch- pitch is")
-              (pprint pitch)))
+              (pprint pitch)
+             (println "\n\n")))
   ;;; {:fraction_array [{:numerator 1, :denominator 2}],
   ;;;  :numerator 1,
   ;;;   :start_index 3,
@@ -399,7 +400,8 @@
            _ (if debug (do 
                          (println "combined fraction array:")
                          (pprint combined-fraction-array)))
-           needs-tie (> (count combined-fraction-array) 1)
+           needs-tie (or (:tied pitch)
+                         (> (count combined-fraction-array) 1))
            _ (if debug (println "needs-tie" needs-tie))
            durations-for-first-note 
            (ratio-to-lilypond 
@@ -534,6 +536,7 @@
   )
 
 (defn draw-beat[beat]
+  (if false (do (println "\n\n****draw-beat:") (pprint beat) (println "\n\n\n")))
   ;; Manually beam beat as follows: SR -> c'[ d']  
   ;; Only if more than one pitch in the beat of course
   ;; But don't beam if there is a quarter note which can be the
@@ -564,6 +567,9 @@
              (not do-not-beam-case))
         beat-ary 
         (map (fn draw-beat-item[ item]
+               (if false (do
+               (println "draw-beat-item, item is ")
+               (pprint item)))
                (let [
                      ;; If this is the first pitch or tied rest and there are
                      ;; more than one in the beat, add [ to end of note to
@@ -598,6 +604,7 @@
   (barline->lilypond-barline (:my_type barline)))
 
 (defn draw-measure[measure]
+  (if false (do (println "\n\ndraw-measure") (pprint measure) (println "\n\n\n")))
   { :pre [(= :measure (:my_type measure))]} 
   (join " "
         (map 
@@ -621,6 +628,12 @@
   (str " \\break        " lilypond-invisible-grace-note " \n"))
 
 (defn draw-line[line]
+  (if false (do
+  (println "draw-line. Line is:")
+  (pprint line)
+             (println "\n\n\n")
+    
+    ))
   ;; line consists of items consisting of
   ;; optional :line_number followed by :barline :measure :measure etc "
   ;; We don't render line numbers in lilypond. (yet)"
@@ -631,6 +644,7 @@
                    (:items line))
 
         ] 
+    (if false (do (println "\n\n\ndraw-line, my-items") (pprint my-items) (println "------>")))
     (join " " 
           (map (fn draw-line-item[item]
                  (let [my-type (:my_type item)]
@@ -705,6 +719,7 @@
           ]
    :post [ (string? %)]
    }
+ ;; (pprint doremi-data)
   "Takes parsed doremi-script and returns lilypond text"
   (render composition-template 
           {:transpose-snip 
@@ -793,13 +808,14 @@
     (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script " | S - - - | - - - - "))))
 
 ;;;;;;;;;;;; For testing ;;;;;
-(if false
+(if nil 
   ;; (use 'clojure.stacktrace) 
   ;; (print-stack-trace *e)
   (println
     (to-lilypond 
       (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-        " SS -S"
+      ;;  " S - - - | - - R - "
+        "S | -"
         ;;        "P - - - - - - - -"
         ;; (-> "fixtures/yesterday.txt" resource slurp)
         ;;  (-> "fixtures/aeolian_mode_without_key_specified.txt" resource slurp)

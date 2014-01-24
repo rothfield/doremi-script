@@ -14,11 +14,6 @@
 ;;  vars are public ("exported") by default; putting ^:private on the var's name prevents this (but does not make it truly inaccessible.)
 
 
-(defn is-barline?[item]
-(:is_barline item)
-  )
-
-(def debug false)
 
 (defn my-seqable?
   "Returns true if (seq x) will succeed, false otherwise."
@@ -362,150 +357,69 @@
    }
   "Return the dash at start of obj's items or nil if there is a :pitch first"
   (let [my-first
-        (first (filter (fn[z] (and (not (:ignore z))
-                                   (contains? #{:pitch :dash} 
-                                              (:my_type z))))
-                       (my-seq obj))) ]
-    (cond (:rest my-first)
-         nil
-          (= :dash (:my_type my-first))
-      my-first 
-          true
+     (first (filter (fn[z] (and (not (:ignore z))
+                                     (contains? #{:pitch :dash} 
+                                                (:my_type z))))
+                    (my-seq obj))) ]
+    (if (= :dash (:my_type my-first))
+     my-first 
       nil)
-    ))
-
-;;;;      (comment   (map (fn fix[maybe-measure] 
-;;;;               (println "in fix, type of maybe-measure is " (:my_type maybe-measure))
-;;;;                (if-not (= :measure (:my_type maybe-measure))
-;;;;                  maybe-measure
-;;;;                  (let [dash-at-start  (dash-at-start maybe-measure)
-;;;;                        done (atom false)]
-;;;;                 ;;   (println "dash case" " dash-at-start is:" dash-at-start)
-;;;;                    
-;;;;                    (if (nil? dash-at-start) maybe-measure
-;;;;                      ;; else
-;;;;                      (postwalk 
-;;;;                        (fn[item] 
-;;;;                        ;;  (if true (do (println "fix:item is") (pprint item)))
-;;;;                          (cond 
-;;;;                            (= item dash-at-start)
-;;;;                            (let [pitch-to-use-for-tie (:pitch_to_use_for_tie item)]
-;;;;                              (dissoc (assoc item 
-;;;;                            ;;  :zzz (println "change dash-at-start")
-;;;;                                        :octave (:octave (:octave pitch-to-use-for-tie)) 
-;;;;                                        :normalized_pitch (:normalized_pitch pitch-to-use-for-tie) 
-;;;;                                     :my_type :pitch
-;;;;                                     :z true
-;;;;                                        )  :pitch_to_use_for_tie))
-;;;;
-;;;;                                (:pointer item)
-;;;;                                item
-;;;;                                true
-;;;;                          (do
-;;;;                            (if (= :pitch (:my_type item))
-;;;;                              (reset! done true))
-;;;;                            (if (or @done 
-;;;;                                    (not (:dash_to_tie item))) 
-;;;;                              item
-;;;;                              (assoc-in item [:pitch_to_use_for_tie :pitch-counter] (:pitch-counter dash-at-start))
-;;;;                          ))))
-;;;;                        (my-seq maybe-measure)))
-;;;;                    )))
-;;;;              (:items line)))
-
-
-
-
-(defn measure-case-for-fix[measure]
-  {:pre [ (= :measure (:my_type measure))] }
-  (if false (do
-  (println "measure-case-for-fix")
-  (println "\n\n\n\n")))
-
-  (let [done (atom false)]
-  (postwalk (fn postwalk-measure-item[x] 
-              (let [dash-at-start (dash-at-start measure)
-                    my-type (:my_type x) 
-                    ]
-              (cond
-                (not my-type)
-                x
-             ;;   (or (pprint my-type) false)
-              ;;  x
-                (:pointer x)
-                x
-                (= dash-at-start x)
-                (let [;  _ (println "dash-at-start case")
-                      z (:pitch_to_use_for_tie x)
-
-                      ]
-               (dissoc
-                  (assoc x :my_type :pitch
-                         :octave (:octave z)
-                         :normalized_pitch (:normalized_pitch z)
-                         :pitch_source (:pitch_source z)
-                         :value (:value z)
-                         ) 
-                     :pitch_to_use_for_tie))
-                (= my-type :pitch)
-                (do (reset! done true)
-                    x)
-                (and 
-                  (= my-type :dash)
-                     dash-at-start
-                  (not @done)
-                  ) 
-                (do ;; (println "******") 
-                   (assoc-in x [:pitch_to_use_for_tie :pitch-counter] (:pitch-counter dash-at-start)) 
-                    ) 
-                true
-                x
-                   ))) measure)
   ))
-
 (defn tied-over-barline-fix[line]
+  ;; IMPORTANT TODO TODO TODO
   ;; This is to fix  where S - | - - is emitting a whole note followed
   ;; by a barline instead of 1/2 note barline 1/2 note
   ;; The current code has set the pitch_counter of the second dash of measure
-  ;; 2 to the pitch-counter of the S. 
-  ;; We need to set the pitch counter of the second dash to the pitch-counter of the first dash of measure 2. 
-  ;;
+  ;; 2 to the pitch-counter of the S. We need to set the pitch counter of the second dash to the pitch-counter of the first dash of measure 2. 
+  ;; TODO
   ;; For each measure in line
   ;;   if measure starts with a dash
   ;;     set pitch-counter of following dashes to the pitch-counter of the first dash
   {:pre [
-         (is-line? (:my_type line))
-         (:items line) 
-         ]
+         ;;(pprint line)
+         (is-line? (:my_type line))]
    :post [(is-line? (:my_type line))]
-        ;;  (do (println "leaving fix, line is") (pprint %) true)
    }
-;;(if true (do (println "entering fix")(pprint line)(println "\n\n\n")))
+  ;; (pprint line)
   (assoc line :items 
-         (map (fn[line-item] 
-                {:pre [ (or  (#{:measure :line_number} (:my_type line-item))
-                            (is-barline? line-item))]}
-               ;; (println (:my_type line-item))
-               (if false (do (println "line-item type is" (:my_type line-item)))) 
-                (cond (= :measure (:my_type line-item))
-                  (measure-case-for-fix line-item)
-                      true
-                   line-item)
-                )
-             
-              (:items line))
-         )
-  )
+         (map (fn fix[maybe-measure] 
+                (if-not (= :measure (:my_type maybe-measure))
+                  maybe-measure
+                  (let [dash-at-start  (dash-at-start maybe-measure)]
+                   (if-not dash-at-start
+                     maybe-measure
+                    (let [_  (println "dash case")
+                          done (atom false) 
+                          ]
+                      ;; now update succeeding dashes, setting pitch-counter of pitch-to-use to the pitch counter of my-first. Stop when seeing a pitch. 
+                      (postwalk 
+                        (fn[item] 
+                          (do
+                            (if (= :pitch (:my_type item))
+                              (reset! done true))
+                            (if (or @done 
+                                     (not (:dash_to_tie item))) 
+                              item
+                              (assoc-in item
+                                        [:pitch_to_use_for_tie
+                                         :pitch-counter]
+                                        (:pitch-counter  dash-at-start ))))
+                              )
+                          (my-seq maybe-measure))
+                        ))
+                    )))
+              (:items line))))
 
 (defn combine-tied-whole-notes-by-pitch-counter[line]
-  ;; TODO: need to change it to do it by MEASURE. That combined with fix should do it
+  ;; TODO:  Can make it work by doing the following. 
+  ;; 
   ;; Collecting tied notes
   {:pre [(is-line? (:my_type line))]
    :post [ (map? %)
           (every? integer? (keys %)) 
           ] 
    }
-  (if false (do (println "\n\nentering combine-tied-whole-notes-by-pitch-counter") (pprint line)(println "\n\n")))
+  (if false (pprint line))
   ;; TODO: have fraction array collect items by barline!
   ;; To avoid S - - | - R - | having the Sa be a whole note
   ;;
@@ -1023,7 +937,6 @@ my-map
       tied2a (tie-and-measure-pitches (some #(if (= (:my_type %) :sargam_line) %) (:items collapsed)))
 
       ;; should do it by measure, not line!! TODO  S - - - | - - - - | should result in tied wholes.
-      ;;tied2 tied2a ;;; (tied-over-barline-fix tied2a)
       tied2 (tied-over-barline-fix tied2a)
       tied-whole-notes-by-pitch-counter (combine-tied-whole-notes-by-pitch-counter tied2)
       ;; experimental code
@@ -1079,7 +992,7 @@ node2
       parse-tree)))
 
 
-(def run-tests false)
+(def run-tests true)
 (comment
   (pprint (doremi_script_clojure.core/doremi-text->parse-tree 
             ;;   (-> "fixtures/yesterday.txt" resource slurp)))
@@ -1087,15 +1000,11 @@ node2
   )
 
 
-(if nil ;;run-tests
-  (let [txt2 "S | - - "
-        txt3 (-> "fixtures/yesterday.txt" resource slurp)
-        txt4 "- S"
-        txt "S | - "
-
-        _ (println txt "\n\n")]
-    
+(if run-tests
+  (let [txt "S | - "
+        _ (println txt)]
     (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script
               txt
               ))))
+;;           (-> "fixtures/yesterday.txt" resource slurp)))
 
