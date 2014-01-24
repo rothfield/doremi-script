@@ -37,10 +37,10 @@
 (defn get-attribute[item attribute]
   (some #(if (= attribute (:my_type %)) %) (:attributes item)))
 
-(def lilypond-symbol-for-tie "~" )
 ;; A tie is created by appending a tilde ~ to the first note being tied.
 ;;
 ;; g4~ g c2~ | c4~ c8 a~ a2 |
+;;
 ;;
 (def lilypond-invisible-grace-note 
   ;; s is short for spacer  
@@ -345,19 +345,20 @@
            lilypond-octave  (octave-number->lilypond-octave (:octave pitch2))
            lilypond-pitch 
            (normalized-pitch->lilypond-pitch (:normalized_pitch pitch2))
-           all-durations (concat (rest durations-for-first-note) durations2)   
-           _ (if debug (println "all-durations"))
-           _ (if debug (pprint all-durations))
+           all-extra-durations (concat (rest durations-for-first-note) durations2)   
+           _ (if debug (println "all-extra-durations"))
+           _ (if debug (pprint all-extra-durations))
            extra-tied-durations ;;; durations within current beat!
            ;; TODO:remove template
-           (if (> (count all-durations) 0)
+           (if (> (count all-extra-durations) 0)
              (map-indexed (fn[idx duration] 
                     (str lilypond-pitch
                          lilypond-octave
                          duration
-                         (if (not= idx (dec (count all-durations))) "~") 
+                         (if (and (> idx 0)
+                                  (< idx (inc (count all-extra-durations)))) "~") 
                          ))
-                  all-durations
+                  all-extra-durations
                   )
              )
            ]
@@ -391,12 +392,9 @@
                         (:dash_to_tie pitch2))
                     (swap! pitch-ids-to-add-tilde conj  @last-pitch-id)) 
 
-                  (reset! last-pitch-id 
-
-                          [(:measure-counter pitch2) (:pitch-counter pitch2)])
+                  (reset! last-pitch-id (:id pitch2)) 
                   (into [] (concat [ 
-                                    {:id [ (:measure-counter pitch2)
-                                          (:pitch-counter pitch2) ]
+                                    {:id (:id pitch2)
                                      :val       (str 
                                                   (if has-before-ornament
                                                     (render before-ornament-template 
@@ -408,10 +406,6 @@
                                                     lilypond-pitch
                                                     lilypond-octave
                                                     duration
-                                                    (if (and needs-tie 
-                                                             ;;and (:tied pitch)
-                                                             (not has-after-ornament)) 
-                                                      lilypond-symbol-for-tie )
                                                     (if (get-attribute pitch2 :mordent) 
                                                       mordent-snippet)
                                                     (if (get-attribute pitch :begin_slur) "(" )
@@ -426,7 +420,6 @@
                   )
                 ))))
 
-(def lilypond-break  "\\break\n")
 
 (defn beat-is-all-dashes?[beat] 
   { :pre [  (= (:my_type "beat"))  ]}
@@ -537,7 +530,8 @@
   ;; and you lose the left repeat.
   ;; Probably better to examine bars at end of line and beginning of next
   ;; line and combine them into one.
-  (str " \\break        " lilypond-invisible-grace-note " \n"))
+  ;;(str " \\break        " lilypond-invisible-grace-note " \n"))
+  (str " \\break        " "\n"))
 
 (defn draw-line[line]
   {:pre  [(:items line)
@@ -658,7 +652,7 @@
                    (str (:val x)
                         (if (contains? @pitch-ids-to-add-tilde
                                        (:id x))
-                          lilypond-symbol-for-tie ))
+                          "~" ))
                    ;; else
                    x
                    ))
@@ -763,7 +757,22 @@
         txt2 "S - -R - | - G m-m"
         txt3 "SR" ;; - -R - | - G m-m"
         txt4 "G\n RS S - - | -"
-        txt "G -----R"
+        txt5 "| S - - - G -----R"
+        txt6 "P - - - | -- DD Pm GR |"
+txt7 (str " RS S -- --  | -- GM P#D NN | N DD -- -- |"
+"\n\n| -- DD Pm GR | m GG -- R- | S G R R | S GG - - ||")
+txt
+
+(str                               
+"N DD -- -- |"
+  "\n\n"
+"| -- DD Pm GR |")
+
+
+ 
+
+ 
+
         ]
     (println txt)
     ;; (use 'clojure.stacktrace) 

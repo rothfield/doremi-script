@@ -13,6 +13,7 @@
 ;; srruby: defn- is just defn + ^:private, which can be put on any def
 ;;  vars are public ("exported") by default; putting ^:private on the var's name prevents this (but does not make it truly inaccessible.)
 
+(def id-ctr (atom 0))
 
 (defn is-barline?[item]
 (:is_barline item)
@@ -181,7 +182,6 @@
                   x))
               sargam-section))
   )
-
 
 (defn- collapse-sargam-section [sargam-section txt]
   {
@@ -448,7 +448,7 @@
                          :normalized_pitch (:normalized_pitch z)
                          :pitch_source (:pitch_source z)
                          :value (:value z)
-                         :syllable (:syllable z)
+                       ;;  :syllable (:syllable z)
                          ) 
                      :pitch_to_use_for_tie))
                 (= my-type :pitch)
@@ -883,6 +883,7 @@
           my-key (first node)
           my-map (array-map :my_type (keyword (lower-case (name my-key)))
                             :start_index (start-index node) 
+                            :id (swap! id-ctr inc)
                             )
           node2 (if (and (vector? (second node)) 
                          (keyword? (first (second node)))
