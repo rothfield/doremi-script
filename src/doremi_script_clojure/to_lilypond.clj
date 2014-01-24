@@ -237,7 +237,6 @@
     ))
 
 
-(def pitch-template (-> "lilypond/pitch.tpl" resource slurp trim))
 
 (def rest-template (-> "lilypond/rest.tpl" resource slurp trim))
 
@@ -255,13 +254,6 @@
 (defn whole-note?[x]
   (= x {:numerator 1, :denominator 1}))
 
-(defn extra-tied-whole-notes[pitch]
-  (let [whole-note-count 
-        (count (filter whole-note? (:fraction_array pitch)))]
-    (if  (= 0 whole-note-count)
-      nil
-      {:numerator whole-note-count :denominator 1})))
-
 (defn combine-whole-notes-in-fraction-array[ary]
   ;; Problem when the whole notes go into next measure!!!
   (let [z (partition-by identity ary)]
@@ -274,22 +266,8 @@
 (if false
   (pprint (combine-whole-notes-in-fraction-array x)))
 
-(defn draw-pitch-with-one-duration[pitch duration]
-  { :pre [  (= (:pitch (:my_type pitch)))
-            (:numerator pitch)
-          (string? duration)
-          (not= duration "")
-         (:denominator pitch) 
-          ]
-   :post [ (string? %)]  
-   }
-   (str (normalized-pitch->lilypond-pitch (:normalized_pitch pitch))
-        (octave-number->lilypond-octave (:octave pitch))
-         duration 
-        )
-  )
-
 (def pitch-ids-to-add-tilde (atom []))
+
 (def last-pitch-id (atom nil))
 
 (defn draw-pitch[pitch beat-subdivisions beam-start-or-end]
@@ -298,8 +276,9 @@
           (contains? #{nil lilypond-beam-start lilypond-beam-end}
                      beam-start-or-end)
           ]
-   :post [ (string? %)] 
+   :post [ (or (string? %) (vector? %))] 
    }
+  (println "last-pitch-id: " @last-pitch-id)
   "Render a pitch/dash as lilypond text. Renders tied notes as needed"
   ;; "Rests are never tied"
   ;; Use fraction-array to draw the tied notes
@@ -309,71 +288,6 @@
               (println "entering draw-pitch- pitch is")
               (pprint pitch)
              (println "\n\n")))
-  ;;; {:fraction_array [{:numerator 1, :denominator 2}],
-  ;;;  :numerator 1,
-  ;;;   :start_index 3,
-  ;;;    :denominator 2,
-  ;;;     :beat-counter 0,
-  ;;;      :my_type :dash,
-  ;;;       :case3 true,
-  ;;;        :pitch-counter 1,
-  ;;;         :pitch_to_use_for_tie {:pointer true},
-  ;;;          :dash_to_tie true}
-  ;;;
-  ;;;
-  ;;;
-  ;;;
-  ;;;
-  ;;;
-
-
-
-
-  ;;;     {:fraction_array [{:numerator 1, :denominator 1}],
-  ;;;      :numerator 1,
-  ;;;       :start_index 12,
-  ;;;        :denominator 1,
-  ;;;         :beat-counter 0,
-  ;;;          :my_type :dash,
-  ;;;           :case3 true,
-  ;;;            :pitch-counter 5,
-  ;;;             :pitch_to_use_for_tie
-  ;;;              {:syllable nil,
-  ;;;                :chord nil,
-  ;;;                  :fraction_array [{:numerator 1, :denominator 1}],
-  ;;;                    :pitch_source "S",
-  ;;;                      :normalized_pitch "C",
-  ;;;                        :numerator 1,
-  ;;;                          :start_index 8,
-  ;;;                            :denominator 1,
-  ;;;                              :pointer true,
-  ;;;                                :octave 0,
-  ;;;                                  :my_type :pitch,
-  ;;;                                    :attributes [],
-  ;;;                                      :pitch-counter 3,
-  ;;;                                        :column_offset 0,
-  ;;;                                          :tala nil,
-  ;;;                                            :value :S},
-  ;;;                                             :dash_to_tie true}
-  ;;;
-  ;;;
-  ;;;
-  ;;;
-  ;;; donot skip this one:
-  ;;; {:fraction_array [{:numerator 1, :denominator 2}],
-  ;;;  :numerator 1,
-  ;;;   :start_index 3,
-  ;;;    :denominator 2,
-  ;;;     :beat-counter 0,
-  ;;;      :my_type :dash,
-  ;;;       :case3 true,
-  ;;;        :pitch-counter 1,
-  ;;;         :pitch_to_use_for_tie {:pointer true},
-  ;;;          :dash_to_tie true}
-  ;;;
-  ;;;
-  ;;;
-  ;; aargh!!!!
   (cond (:ignore pitch)
         ""
         ;; (and  (:dash_to_tie pitch) (= :dash (:my_type pitch)))
@@ -394,7 +308,6 @@
            placement (:placement ornament)
            has-after-ornament (= :after placement)
            has-before-ornament (= :before placement)    
-           begin-slur (if (get-attribute pitch :begin_slur) "(" )
            lilypond-octave  (octave-number->lilypond-octave (:octave pitch))
 
            combined-fraction-array 
@@ -446,9 +359,8 @@
            _ (if debug (println "all-durations"))
            _ (if debug (pprint all-durations))
            extra-tied-durations ;;; durations within current beat!
+           ;; TODO:remove template
            (if (> (count all-durations) 0)
-             (str "" ;;;lilypond-symbol-for-tie
-                  (join " " ;;lilypond-symbol-for-tie
                         (map (fn[duration] 
                                (render tied-pitch-template
                                        {
@@ -461,9 +373,8 @@
                                         }
                                        ))
                              all-durations
-                             ))
-                  ;; (if (:tied pitch) (str lilypond-symbol-for-tie " ")) 
-                  ))
+                             )
+                  )
            ]
           (cond (:ignore pitch2)
                 ""
@@ -484,48 +395,46 @@
                 (or (= :pitch (:my_type pitch2))
                     (= :dash (:my_type pitch2)))
                 (do
-                  (reset! last-pitch-id (:pitch-counter pitch2))
                   ;; TODO: almost worked!!. ZZZZ 
                   ;; In this case add ~ to PREVIOUS
                   ;; item
+                  (println "pitch2 ****")
+                 (pprint pitch2)
                 (if (and 
                          (= :pitch (:my_type pitch2))
                               (:dash_to_tie pitch2))
-                    (swap! pitch-ids-to-add-tilde conj (:pitch-counter pitch))) 
-                  
-                       
-                (render pitch-template 
-                        {
-                         :before-ornament-snippet 
-                         (if has-before-ornament
+                    (swap! pitch-ids-to-add-tilde conj  @last-pitch-id)) 
+
+                 (reset! last-pitch-id 
+                         
+                         [(:measure-counter pitch2) (:pitch-counter pitch2)])
+                (into [] (concat [ (if has-before-ornament
                            (render before-ornament-template 
                                    {:grace-notes  
                                     (lilypond-grace-notes ornament) }))
-                         :after-ornament-directive
                          (if has-after-ornament 
                            lilypond-after-ornament-directive) 
-                         :lilypond-pitch lilypond-pitch
-                         :lilypond-octave lilypond-octave
-                         :duration duration
-                         :beam-start-or-end beam-start-or-end
-                         :lilypond-symbol-for-tie 
+                          (str
+                            lilypond-pitch
+                          lilypond-octave
+                          duration
+                          beam-start-or-end
                          (if (and needs-tie 
                                   ;;and (:tied pitch)
                                   (not has-after-ornament)) 
                            lilypond-symbol-for-tie )
-                         :mordent (if (get-attribute pitch2 :mordent) 
+                         (if (get-attribute pitch2 :mordent) 
                                     mordent-snippet)
-                         :begin-slur begin-slur
-                         :extra-end-slur "" ;;; TODO 
-                         :end-slur (if (get-attribute pitch2 :end_slur) ")" )
-                         :ending ending-snippet                  
-                         :chord chord
-                         :after-ornament-contents 
+                         (if (get-attribute pitch :begin_slur) "(" )
+                         (if (get-attribute pitch2 :end_slur) ")" )
+                         ending-snippet                  
+                         chord
                          (if has-after-ornament
                            (str " { " (lilypond-grace-notes ornament ) " }"))
-                         :extra-tied-durations extra-tied-durations
-                         }
-                        ))))))
+                         )]
+                         extra-tied-durations))
+                        )
+                  ))))
 (def lilypond-break  "\\break\n")
 
 (defn beat-is-all-dashes?[beat] 
@@ -608,7 +517,7 @@
                                    beam-start-or-end)
                        )))
              (:items beat))
-        beat-content (join " " beat-ary)
+        beat-content beat-ary
         ]
     (if (and (not (#{0 1 2 4 8 16 32 64 128} (:subdivisions beat)))
              (not (beat-is-all-dashes? beat)))
@@ -673,14 +582,22 @@
                          (draw-barline item)
                          )))
                my-items)
-        ;_ (println "rendered items")
-        ;_ (pprint rendered-items)
-        ;;_ (pprint @pitch-ids-to-add-tilde)
+        _ (if true (do
+        (println "rendered items")
+        (pprint rendered-items)
+                     (println "pitch-ids")
+        (pprint @pitch-ids-to-add-tilde)))
         ] 
     (if false (do (println "\n\n\ndraw-line, my-items") (pprint my-items) (println "------>")))
-    (join " " 
-         (flatten rendered-items )
-          )))
+    (println "z")
+    (println "before join")
+    (pprint (flatten rendered-items))
+    (join " "
+        (flatten (postwalk (fn[x] (if (map? x)
+                             (str (:val x)
+                                  (if (@pitch-ids-to-add-tilde (:id x))
+                                    lilypond-symbol-for-tie ))
+                            x)) (flatten rendered-items) )))))
 
 
 (defn is-abc-line[line]
@@ -835,7 +752,7 @@
     (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script " | S - - - | - - - - "))))
 
 ;;;;;;;;;;;; For testing ;;;;;
-(if nil ;;1 ;nil ;;1 ;nil 
+(if 1 ;nil ;;1 ;nil 
   (let [
 
         txt1 "| GP - -  - | GR - - - |\nGeo-rgia geo-rgia"

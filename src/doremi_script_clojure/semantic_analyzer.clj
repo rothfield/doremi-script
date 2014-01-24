@@ -1119,7 +1119,7 @@ node2
   )
 
 
-(if nil ;;1; nil ;nil ;nil ;;true ;;true ;;run-tests
+(if nil ;nil ;nil ;;true ;;true ;;run-tests
   (let [txt2 "S | - - "
         txt3 (-> "fixtures/yesterday.txt" resource slurp)
         txt4 "- S"
