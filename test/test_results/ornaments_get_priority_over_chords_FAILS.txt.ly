@@ -17,7 +17,8 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\acciaccatura { e'32[ d'32] }c'4 
+\acciaccatura { e'32[ d'32] }c'4  \break        
+
 }
 
 text = \lyricmode {

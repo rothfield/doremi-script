@@ -96,9 +96,6 @@
             "32"
             ))
  
- (def lilypond-beam-start "[")
- 
- (def lilypond-beam-end "]")
 
 (defn beam-beat[ary]
   ;; Manually beam beat as follows: SR -> c'[ d']  
@@ -116,6 +113,8 @@
         ]
     (if false (do
     (println "num is" my-num)))
+    (if (= 1 my-num)
+      flattened
    (map-indexed (fn[idx x]
                   (let [my-val (or (:val x)
                                 x)
@@ -132,16 +131,18 @@
                   ))
                
                 flattened)
-  ))
- (defn beam-notes[ary]
+  )))
+
+ (defn beam-ornaments[ary]
+   ;; simpler than beam-beat
    (if  (< (count ary) 2)
      ary
      (let [ary2 (into [] ary)]
        (assoc ary2 
               0
-              (str (first ary2) lilypond-beam-start)
+              (str (first ary2) "[")
               (dec (count ary2))  
-              (str (last ary2) lilypond-beam-end)))))
+              (str (last ary2) "]")))))
  
  (defn lilypond-grace-notes[ornament]
    ;;      #  c1 \afterGrace d1( { c16[ d]) } c1
@@ -149,7 +150,7 @@
    (->> ornament 
         :ornament_items 
         (map lilypond-grace-note-pitch)
-        beam-notes
+        beam-ornaments
         (join " ")))
  
  (defn get-ornament[pitch]
@@ -790,9 +791,10 @@
     (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script " | S - - - | - - - - "))))
 
 ;;;;;;;;;;;; For testing ;;;;;
-(if nil 
+(if nil ;1
   (let [
-        txt "S----S RGmP" ;; S S- -R"
+        txt10 "S----S RGmP" ;; S S- -R"
+        txt "(P m G R)"
         txt1 "| GP - -  - | GR - - - |\nGeo-rgia geo-rgia"
         txt2 "S - -R - | - G m-m"
         txt3 "SR" ;; - -R - | - G m-m"
