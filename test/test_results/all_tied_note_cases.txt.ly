@@ -32,15 +32,16 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-r4  c'8[  c'8]  \bar "|" \break        \grace s64 
-r4  r8 c'8]  \bar "|" \break        \grace s64 
-c'1~     \bar "|" \break        \grace s64 
-c'4~c'8   d'8]  \bar "|" \break        \grace s64 
-c'2~c'8     d'8]  \bar "|" \break        \grace s64 
-c'2.~    d'2.~    \bar "|" \break        \grace s64 
-c'1~     \bar "|" d'1~     \bar "|" \break        \grace s64 
-c'1~     \bar "|" c'1~     \bar "|" \break        \grace s64 
-r8 c'8]~c'4]    d'4~d'8    e'8]~  \bar "|" e'4   f'4~f'8    g'8]~g'4]    \bar "|"
+r4  c'8 c'8 \bar "|"  \break        \grace s64 
+ r4  r8 c'8 \bar "|"  \break        \grace s64 
+ c'1~    \bar "|"  \break        \grace s64 
+ c'4~ c'8  d'8 \bar "|"  \break        \grace s64 
+ c'2~ c'8    d'8 \bar "|"  \break        \grace s64 
+ c'2.~   d'2.   \bar "|"  \break        \grace s64 
+ c'1~    \bar "|" d'1    \bar "|"  \break        \grace s64 
+ c'1~    \bar "|" c'1    \bar "|"  \break        \grace s64 
+ r8 c'8 c'4   d'4 d'8   e'8~~ \bar "|" e'4  f'4 f'8   g'8 g'4   \bar "|"  \break        \grace s64 
+
 }
 
 text = \lyricmode {
