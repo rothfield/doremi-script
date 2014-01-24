@@ -417,6 +417,9 @@
 
 
 (defn measure-case-for-fix[measure]
+  ;;; TODO: Only set :tied for a pitch if there is a dash at
+  ;;; the beginning of the next measure.....
+  ;;; S - S S S tieing the first 2 sas
   {:pre [ (= :measure (:my_type measure))] }
   (if false (do
   (println "measure-case-for-fix")
@@ -445,6 +448,7 @@
                          :normalized_pitch (:normalized_pitch z)
                          :pitch_source (:pitch_source z)
                          :value (:value z)
+                         :syllable (:syllable z)
                          ) 
                      :pitch_to_use_for_tie))
                 (= my-type :pitch)
@@ -544,6 +548,19 @@
         ]
     line
     ))
+(defn add-measure-counters[line]
+  {:pre [(is-line? (:my_type line))]
+   :post [(is-line? (:my_type %))] }
+  "Add measure-counter to every significant item in the line"
+  (let [ measure-counter (atom 0)]
+    (postwalk (fn add-measure-counters[item-in-line] 
+                (if (= :measure (:my_type item-in-line))
+                    (swap! measure-counter inc))
+                (if-not (significant? item-in-line)
+                  item-in-line
+                  (do
+                    (assoc item-in-line :measure-counter @measure-counter))))
+              line)))
 
 (defn add-pitch-counters[line]
   {:pre [(is-line? (:my_type line))]
@@ -614,13 +631,18 @@
 ;                    { my_type: 'dash', source: '-', column: 3 },
 ;;
 (defn- tie-and-measure-pitches[line]
+  ;; SCRAP IT
+  ;;; Might have to do tieing after fix... TODO
+  ;;; ARGHHHH
   {:pre [(is-line? (:my_type line))]
    :post [(is-line? (:my_type %))] }
+;;  (pprint line)
   ;; Needs to be called from within collapse-sargam-section
   ;; TODO: not setting fraction_array and fraction_total properly
   ;; example | S -
   (let [
-        line2 (add-pitch-counters line)
+        line1 (add-measure-counters line)
+        line2 (add-pitch-counters line1)
         pitches (into []  (filter significant? (my-seq line2) ))
         line3 (postwalk 
                 (fn [node-in-line] (if (= :beat (:my_type node-in-line))
@@ -654,12 +676,19 @@
                              :dash_to_tie false
                              :rest true )
                       ;; Case 2: pitch and next item is a dash  
-                      (and (= :pitch my-key)   
+                      ;; TODO: should be next "unignored" dash
+                      ;; This causing a major problem with
+                      ;; S - S  !!!! It is tieing the 2 Sa's  ******
+                      (and 
+                           (= :pitch my-key)   
+                           (not= (:measure-counter node-in-line) 
+                                 (:measure-counter next-item))
                            (= :dash (:my_type next-item)))
-                      (do
-                        ;; and add to fraction-array of current note!
-                        (assoc node-in-line :tied true)   ;; tie to next dash
-                        )
+                        (assoc node-in-line :tie-to-next-measure true)   ;; tie to next dash
+                      (and 
+                           (= :pitch my-key)   
+                           (= :dash (:my_type next-item)))
+                        (assoc node-in-line :tied true )
                       ;; 
                       ;; )
                       ;; Case 3: dash at beginning of beat
@@ -1020,12 +1049,15 @@ my-map
         (merge (sorted-map :items (subvec node 1)) my-map)
         txt)
       ;; TODO: should this be moved into collapse-sargam-section ??
-      tied2a (tie-and-measure-pitches (some #(if (= (:my_type %) :sargam_line) %) (:items collapsed)))
-
+      line1 (some #(if (= (:my_type %) :sargam_line) %) (:items collapsed))
+      line2a (tie-and-measure-pitches line1)
+      ;;_ (println "line2a")
+      ;;_ (pprint line2a)
+      ;;_ (println "\n\n\n\n")
+      line2 (tied-over-barline-fix line2a)
       ;; should do it by measure, not line!! TODO  S - - - | - - - - | should result in tied wholes.
-      ;;tied2 tied2a ;;; (tied-over-barline-fix tied2a)
-      tied2 (tied-over-barline-fix tied2a)
-      tied-whole-notes-by-pitch-counter (combine-tied-whole-notes-by-pitch-counter tied2)
+      ;;line2a line2aa ;;; (tied-over-barline-fix line2aa)
+      tied-whole-notes-by-pitch-counter (combine-tied-whole-notes-by-pitch-counter line2)
       ;; experimental code
       ;; new-line (new-collect-tied-notes (some #(if (= (:my_type %) :sargam_line) %) (:items collapsed)))
       tied3 (postwalk (fn[node]
@@ -1036,7 +1068,7 @@ my-map
                                                   (get tied-whole-notes-by-pitch-counter (:pitch-counter node)))))
                           ;; else
                           node
-                          )) tied2)
+                          )) line2)
       ;;  _ (println "tied-whole-notes-by-pitch-counter")
       ;; _ (pprint tied-whole-notes-by-pitch-counter)
 
@@ -1087,11 +1119,15 @@ node2
   )
 
 
-(if nil ;;run-tests
+(if nil ;;1; nil ;nil ;nil ;;true ;;true ;;run-tests
   (let [txt2 "S | - - "
         txt3 (-> "fixtures/yesterday.txt" resource slurp)
         txt4 "- S"
-        txt "S | - "
+        txt5 "S | - "
+        ;;txt "S - R G | -  "
+        txt " S - R - | - G"
+        txt7 "-S | - "
+        txt8 "| GP - -  - | GR - - - |\nGeo-rgia geo-rgia"
 
         _ (println txt "\n\n")]
     

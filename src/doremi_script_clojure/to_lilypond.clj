@@ -289,6 +289,8 @@
         )
   )
 
+(def pitch-ids-to-add-tilde (atom []))
+(def last-pitch-id (atom nil))
 
 (defn draw-pitch[pitch beat-subdivisions beam-start-or-end]
   { :pre [  (#{:pitch :dash}  (:my_type pitch)) 
@@ -400,8 +402,14 @@
            _ (if debug (do 
                          (println "combined fraction array:")
                          (pprint combined-fraction-array)))
-           needs-tie (or (:tied pitch)
-                         (> (count combined-fraction-array) 1))
+           ;;
+                        ;;(assoc node-in-line :tied true :tie-to-next-measure true)   ;; tie to next dash
+           ;;
+           ;; _ (pprint pitch)
+           needs-tie (:tie-to-next-measure pitch)
+
+           ;;(or (:tie-to-next-measure)
+            ;;             (> (count combined-fraction-array) 1))
            _ (if debug (println "needs-tie" needs-tie))
            durations-for-first-note 
            (ratio-to-lilypond 
@@ -439,8 +447,8 @@
            _ (if debug (pprint all-durations))
            extra-tied-durations ;;; durations within current beat!
            (if (> (count all-durations) 0)
-             (str lilypond-symbol-for-tie
-                  (join lilypond-symbol-for-tie
+             (str "" ;;;lilypond-symbol-for-tie
+                  (join " " ;;lilypond-symbol-for-tie
                         (map (fn[duration] 
                                (render tied-pitch-template
                                        {
@@ -453,7 +461,9 @@
                                         }
                                        ))
                              all-durations
-                             ))))
+                             ))
+                  ;; (if (:tied pitch) (str lilypond-symbol-for-tie " ")) 
+                  ))
            ]
           (cond (:ignore pitch2)
                 ""
@@ -473,6 +483,17 @@
                                        })
                 (or (= :pitch (:my_type pitch2))
                     (= :dash (:my_type pitch2)))
+                (do
+                  (reset! last-pitch-id (:pitch-counter pitch2))
+                  ;; TODO: almost worked!!. ZZZZ 
+                  ;; In this case add ~ to PREVIOUS
+                  ;; item
+                (if (and 
+                         (= :pitch (:my_type pitch2))
+                              (:dash_to_tie pitch2))
+                    (swap! pitch-ids-to-add-tilde conj (:pitch-counter pitch))) 
+                  
+                       
                 (render pitch-template 
                         {
                          :before-ornament-snippet 
@@ -504,7 +525,7 @@
                            (str " { " (lilypond-grace-notes ornament ) " }"))
                          :extra-tied-durations extra-tied-durations
                          }
-                        )))))
+                        ))))))
 (def lilypond-break  "\\break\n")
 
 (defn beat-is-all-dashes?[beat] 
@@ -591,12 +612,14 @@
         ]
     (if (and (not (#{0 1 2 4 8 16 32 64 128} (:subdivisions beat)))
              (not (beat-is-all-dashes? beat)))
-      (render beat-tuplet-template {:beat-content  beat-content
-                                    :tuplet-numerator 
-                                    (tuplet-numerator-for-odd-subdivisions (:subdivisions beat))
-                                    :subdivisions (:subdivisions beat)
-                                    })
-      ;; else
+     (into [] (concat  
+      [ (str "\\times "
+       (tuplet-numerator-for-odd-subdivisions (:subdivisions beat))
+      "/" 
+       (:subdivisions beat)
+              "{")
+       ] beat-ary ["}"]))
+  ;;    {{tuplet-numerator}}/{{subdivisions}} { {{beat-content}} }
       beat-content)     
     ))
 
@@ -606,7 +629,6 @@
 (defn draw-measure[measure]
   (if false (do (println "\n\ndraw-measure") (pprint measure) (println "\n\n\n")))
   { :pre [(= :measure (:my_type measure))]} 
-  (join " "
         (map 
           (fn draw-measure-item[item]
             (let [my-type (:my_type item)]
@@ -615,7 +637,7 @@
                 (draw-beat item)
                 )))
           (:items measure)
-          )))
+          ))
 
 (def draw-line-break
   ;; Lilypond text for line break.
@@ -642,10 +664,7 @@
         my-items (if (= :line_number (:my_type first-item))
                    (rest (:items line))
                    (:items line))
-
-        ] 
-    (if false (do (println "\n\n\ndraw-line, my-items") (pprint my-items) (println "------>")))
-    (join " " 
+        rendered-items
           (map (fn draw-line-item[item]
                  (let [my-type (:my_type item)]
                    (cond (= :measure my-type)
@@ -653,7 +672,15 @@
                          (:is_barline item)
                          (draw-barline item)
                          )))
-               my-items))))
+               my-items)
+        ;_ (println "rendered items")
+        ;_ (pprint rendered-items)
+        ;;_ (pprint @pitch-ids-to-add-tilde)
+        ] 
+    (if false (do (println "\n\n\ndraw-line, my-items") (pprint my-items) (println "------>")))
+    (join " " 
+         (flatten rendered-items )
+          )))
 
 
 (defn is-abc-line[line]
@@ -808,14 +835,21 @@
     (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script " | S - - - | - - - - "))))
 
 ;;;;;;;;;;;; For testing ;;;;;
-(if nil 
+(if nil ;;1 ;nil ;;1 ;nil 
+  (let [
+
+        txt1 "| GP - -  - | GR - - - |\nGeo-rgia geo-rgia"
+        txt " S - R - | - G m-m"
+        ]
+(println txt)
   ;; (use 'clojure.stacktrace) 
   ;; (print-stack-trace *e)
   (println
     (to-lilypond 
       (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
       ;;  " S - - - | - - R - "
-        "S | -"
+      ;;  "-S | -"
+      txt
         ;;        "P - - - - - - - -"
         ;; (-> "fixtures/yesterday.txt" resource slurp)
         ;;  (-> "fixtures/aeolian_mode_without_key_specified.txt" resource slurp)
@@ -823,6 +857,6 @@
         ))
 
     )
-  )
+  ))
 
 
