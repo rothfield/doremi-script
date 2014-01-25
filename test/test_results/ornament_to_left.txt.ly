@@ -7,7 +7,7 @@ composer = ""
   tagline = ""  % removed 
 }
 %{
-  N
+  R 
 | S 
  %}
   
@@ -17,7 +17,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-\bar "|" \acciaccatura { b'32 }c'4  \break        
+\bar "|" \acciaccatura { d'32 }c'4  \break        
 
 }
 

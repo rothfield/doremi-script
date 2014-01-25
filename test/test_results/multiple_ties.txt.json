@@ -1,10 +1,12 @@
 {"lines":
  [{"kind":"latin_sargam",
+   "id":17,
    "start_index":0,
    "my_type":"sargam_line",
    "items":
    [{"items":
      [{"subdivisions":1,
+       "id":5,
        "start_index":0,
        "my_type":"beat",
        "items":
@@ -28,8 +30,10 @@
          "pitch-counter":0,
          "column_offset":0,
          "tala":null,
+         "id":2,
          "value":"S"}]},
       {"subdivisions":1,
+       "id":9,
        "start_index":2,
        "my_type":"beat",
        "items":
@@ -43,6 +47,7 @@
          "tied":true,
          "case3":true,
          "pitch-counter":1,
+         "id":6,
          "pitch_to_use_for_tie":
          {"syllable":null,
           "chord":null,
@@ -60,9 +65,11 @@
           "pitch-counter":0,
           "column_offset":0,
           "tala":null,
+          "id":2,
           "value":"S"},
          "dash_to_tie":true}]},
       {"subdivisions":1,
+       "id":13,
        "start_index":4,
        "my_type":"beat",
        "items":
@@ -75,6 +82,7 @@
          "my_type":"dash",
          "case3":true,
          "pitch-counter":2,
+         "id":10,
          "pitch_to_use_for_tie":
          {"syllable":null,
           "chord":null,
@@ -92,12 +100,14 @@
           "pitch-counter":0,
           "column_offset":0,
           "tala":null,
+          "id":2,
           "value":"S"},
          "dash_to_tie":true}]}],
      "is_partial":true,
      "beat_count":3,
      "my_type":"measure",
-     "start_index":0}]}],
+     "start_index":0,
+     "id":15}]}],
  "force_sargam_chars_hash":{},
  "notes_used":"",
  "time_signature":null,
@@ -111,4 +121,5 @@
  "warnings":[],
  "filename":"untitled",
  "mode":"major",
- "source":"S - - "}
+ "source":"S - - ",
+ "id":20}

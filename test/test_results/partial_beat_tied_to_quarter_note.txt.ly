@@ -17,7 +17,7 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-r8 c'8 c'4    \break        \grace s64 
+r8[ c'8~ c'4]  \break        
 
 }
 

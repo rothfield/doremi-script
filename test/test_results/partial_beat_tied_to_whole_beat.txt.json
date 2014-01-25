@@ -1,10 +1,12 @@
 {"lines":
  [{"kind":"latin_sargam",
+   "id":16,
    "start_index":0,
    "my_type":"sargam_line",
    "items":
    [{"items":
      [{"subdivisions":2,
+       "id":7,
        "start_index":0,
        "my_type":"beat",
        "items":
@@ -17,6 +19,7 @@
          "my_type":"dash",
          "rest":true,
          "pitch-counter":0,
+         "id":1,
          "dash_to_tie":false},
         {"syllable":null,
          "chord":null,
@@ -37,8 +40,10 @@
          "pitch-counter":1,
          "column_offset":0,
          "tala":null,
+         "id":4,
          "value":"S"}]},
       {"subdivisions":2,
+       "id":12,
        "start_index":3,
        "my_type":"beat",
        "items":
@@ -51,6 +56,7 @@
          "my_type":"dash",
          "case3":true,
          "pitch-counter":2,
+         "id":8,
          "pitch_to_use_for_tie":
          {"syllable":null,
           "chord":null,
@@ -68,13 +74,15 @@
           "pitch-counter":1,
           "column_offset":0,
           "tala":null,
+          "id":4,
           "value":"S"},
          "dash_to_tie":true},
-        {"ignore":true, "my_type":"dash", "start_index":4}]}],
+        {"ignore":true, "my_type":"dash", "start_index":4, "id":9}]}],
      "is_partial":true,
      "beat_count":2,
      "my_type":"measure",
-     "start_index":0}]}],
+     "start_index":0,
+     "id":14}]}],
  "force_sargam_chars_hash":{},
  "notes_used":"",
  "time_signature":null,
@@ -88,4 +96,5 @@
  "warnings":[],
  "filename":"untitled",
  "mode":"major",
- "source":"-S -- \n"}
+ "source":"-S -- \n",
+ "id":19}

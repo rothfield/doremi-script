@@ -1,10 +1,12 @@
 {"lines":
  [{"kind":"latin_sargam",
+   "id":11,
    "start_index":50,
    "my_type":"sargam_line",
    "items":
    [{"items":
      [{"subdivisions":1,
+       "id":7,
        "start_index":50,
        "my_type":"beat",
        "items":
@@ -13,6 +15,7 @@
          "fraction_array":[{"numerator":1, "denominator":1}],
          "pitch_source":"S",
          "normalized_pitch":"C",
+         "measure-counter":0,
          "numerator":1,
          "start_index":50,
          "denominator":1,
@@ -23,11 +26,13 @@
          "pitch-counter":0,
          "column_offset":0,
          "tala":null,
+         "id":4,
          "value":"S"}]}],
      "is_partial":true,
      "beat_count":1,
      "my_type":"measure",
-     "start_index":50}]}],
+     "start_index":50,
+     "id":9}]}],
  "force_sargam_chars_hash":{},
  "notes_used":"",
  "time_signature":null,
@@ -41,6 +46,7 @@
  {"items_map":
   {"Author":"John Rothfield", "Title":"my summer vacation"},
   "source":"TODO",
+  "id":2,
   "start_index":0,
   "my_type":"attributes",
   "items":
@@ -51,4 +57,5 @@
  "warnings":[],
  "filename":"untitled",
  "mode":"major",
- "source":"Author: John Rothfield\nTitle: my summer vacation\n\nS"}
+ "source":"Author: John Rothfield\nTitle: my summer vacation\n\nS",
+ "id":14}

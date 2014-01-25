@@ -27,7 +27,8 @@ melody = {
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-ef''''4\mordent^"Dm7" 
+ef''''4\mordent^"Dm7"  \break        
+
 }
 
 text = \lyricmode {
