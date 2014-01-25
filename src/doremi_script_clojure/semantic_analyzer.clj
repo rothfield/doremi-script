@@ -14,6 +14,8 @@
 ;;  vars are public ("exported") by default; putting ^:private on the var's name prevents this (but does not make it truly inaccessible.)
 
 (def id-ctr (atom 0))
+(def beat-id-ctr (atom -1))
+(def measure-id-ctr (atom -1))
 
 (defn is-barline?[item]
 (:is_barline item)
@@ -752,6 +754,7 @@
                                      :denominator (denominator my-ratio)))
                         ]
                     (assoc node-in-beat 
+                           :beat-id (swap! beat-id-ctr inc)
                            :denominator subdivisions
                            :fraction_array 
                            [ frac ]))
@@ -968,9 +971,19 @@
                 my-items2
                 )
               beat-count (count (filter #(= (:my_type %) :beat) my-items3))
+              my-measure-id (swap! measure-id-ctr inc)
+
               ]
           ;; TODO: review is_partial. It is not really needed if always set true
-          (assoc my-map :beat_count beat-count :is_partial true :items my-items3))
+          (postwalk (fn[x] (if (and (map? x)
+                                    (#{:pitch :dash :beat} (:my_type x)))
+                             (assoc x :measure-id my-measure-id)
+                             x))
+
+          (assoc my-map :beat_count beat-count 
+                 :is_partial true 
+                 :measure-id my-measure-id
+                 :items my-items3)))
         :TALA 
         (assoc my-map :source (get-source node txt))
         :CHORD_SYMBOL
@@ -1121,7 +1134,7 @@ node2
 
 
 (if nil ;nil ;nil ;;true ;;true ;;run-tests
-  (let [txt2 "S | - - "
+  (let [txt2 "S--- -- - S | - - "
         txt3 (-> "fixtures/yesterday.txt" resource slurp)
         txt4 "- S"
         txt5 "S | - "
@@ -1132,7 +1145,7 @@ node2
 
         _ (println txt "\n\n")]
     
-   ;; (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script txt))
+   (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script txt))
     )
   )
 
