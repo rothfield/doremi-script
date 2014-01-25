@@ -102,6 +102,8 @@
   ;; Only if more than one pitch in the beat of course
   ;; But don't beam if there is a quarter note which can be the
   ;; case with S-R
+  ;; Don't beam if you see an afterGrace
+  ;; Funky
   ;;   ([{:id 320, :val "c'8"}] [{:id 323, :val "c'8"}])
   (let [
         ;;flattened (flatten ary)
@@ -113,8 +115,14 @@
         ]
     (if false (do
     (println "num is" my-num)))
-    (if (= 1 my-num)
+    
+    (cond (= 1 my-num)
       flattened
+           (and (:val (first flattened)) 
+                      (re-matches #".*afterGrace.*" 
+                           (:val (first flattened))))
+          flattened
+          true
    (map-indexed (fn[idx x]
                   (let [my-val (or (:val x)
                                 x)
@@ -791,10 +799,12 @@
     (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script " | S - - - | - - - - "))))
 
 ;;;;;;;;;;;; For testing ;;;;;
-(if nil ;1
+(if nil 
   (let [
         txt10 "S----S RGmP" ;; S S- -R"
-        txt "(P m G R)"
+        txt11 "(P m G R)"
+        txt12 "  n\n<P d>" 
+          txt (-> "fixtures/yesterday.txt" resource slurp)
         txt1 "| GP - -  - | GR - - - |\nGeo-rgia geo-rgia"
         txt2 "S - -R - | - G m-m"
         txt3 "SR" ;; - -R - | - G m-m"
