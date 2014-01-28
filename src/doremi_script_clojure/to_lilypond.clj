@@ -98,6 +98,13 @@
  
 
 (defn beam-beat[ary]
+  ;; { :pre [ (vector? ary)]
+   ;; :post [ (vector? %)] 
+   ;; }
+
+  ;;(if true (do (println "Entering beam-beat, ary is") (pprint ary))) 
+  ;; TODO: redo. Erroneous algorithm. Problem is that ary may
+  ;; span more than one beat. Also ary may start with a dash
   ;; Manually beam beat as follows: SR -> c'[ d']  
   ;; Only if more than one pitch in the beat of course
   ;; But don't beam if there is a quarter note which can be the
@@ -105,6 +112,7 @@
   ;; Don't beam if you see an afterGrace
   ;; Funky
   ;;   ([{:id 320, :val "c'8"}] [{:id 323, :val "c'8"}])
+  
   (let [
         ;;flattened (flatten ary)
         flattened 
@@ -324,8 +332,10 @@
         ""
         ;; (and  (:dash_to_tie pitch) (= :dash (:my_type pitch)))
         ;; ""
+        ;; TODO: why
         (and  (:tied pitch) (not= :pitch (:my_type pitch)))
         ""
+        ;; TODO: why
         (and (:dash_to_tie pitch) (:octave (:pitch_to_use_for_tie pitch)))
         ""
         ;;(and  (:dash_to_tie pitch) (= :dash (:my_type pitch))))
@@ -334,6 +344,12 @@
         true
         (let
           [ 
+           _
+
+  (if false (do
+              (println "entering draw-pitch(after filtering out)- pitch is")
+              (pprint pitch)
+              (println "\n\n")))
            debug false ;;(= 1 (:start_index pitch)) 
            _ (if debug (pprint pitch))
            ornament (get-ornament pitch)
@@ -390,15 +406,18 @@
            all-extra-durations (concat (rest durations-for-first-note) durations2)   
            _ (if debug (println "all-extra-durations"))
            _ (if debug (pprint all-extra-durations))
+           _ (if false (do (println "count of all-extra-tied-durations=" (count all-extra-durations))))
            extra-tied-durations ;;; durations within current beat!
-           ;; TODO:remove template
+           ;; value of extra-tied-durations:
            (if (> (count all-extra-durations) 0)
              (map-indexed (fn[idx duration] 
+                            (if false (do (println "printing extra tied duration" duration " for " lilypond-pitch)))
                     (str lilypond-pitch
                          lilypond-octave
                          duration
-                         (if (and (> idx 0)
-                                  (< idx (inc (count all-extra-durations)))) "~") 
+                         ;; Add tilde to tie all but last one 
+                         (if (not= idx (dec (count all-extra-durations)))
+                              "~") 
                          ))
                   all-extra-durations
                   )
@@ -437,7 +456,10 @@
                   (reset! last-pitch-id (:id pitch2)) 
                   ;; a8[ ais] d[ ees r d] c16 b a8
                   (into [] (concat [ 
-                                    {:id (:id pitch2)
+                                    {
+                                     :beat-id (:beat-id pitch2)
+                                    :measure-id (:measure-id pitch2) 
+                                     :id (:id pitch2)
                                      :val       (str 
                                                   (if has-before-ornament
                                                     (render before-ornament-template 
@@ -449,13 +471,15 @@
                                                     lilypond-pitch
                                                     lilypond-octave
                                                     duration
+                         (if (pos? (count all-extra-durations))
+                              "~") 
+                                                    
                                                     (if (get-attribute pitch2 :mordent) 
                                                       mordent-snippet)
                                                     (if (get-attribute pitch :begin_slur) "(" )
                                                     (if (get-attribute pitch2 :end_slur) ")" )
                                                     ending-snippet                  
                                                     chord
-                                                    (if (> (count extra-tied-durations) 0) "~")
                                                     (if has-after-ornament
                                                       (str " { " (lilypond-grace-notes ornament ) " }"))
                                                     ))}
@@ -780,62 +804,3 @@
                     node)))
 
 (def runtest false)
-
-(if false
-  (pprint
-    (doremi_script_clojure.core/doremi-text->parse-tree
-      "GR\n  S |")))
-;;srruby turn your record into a map like this: (into {}  (->aaa 1 2))
-(if false
-  (let [txt "| SR"]
-    (println "txt is\n " txt)
-    (println (to-lilypond 
-               (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script txt)
-               ;; (-> "fixtures/yesterday.txt" resource slurp)
-
-               ))))
-(if false 
-  (pprint
-    (to-lilypond (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script " | S - - - | - - - - "))))
-
-;;;;;;;;;;;; For testing ;;;;;
-(if nil 
-  (let [
-        txt10 "S----S RGmP" ;; S S- -R"
-        txt11 "(P m G R)"
-        txt12 "  n\n<P d>" 
-          txt (-> "fixtures/yesterday.txt" resource slurp)
-        txt1 "| GP - -  - | GR - - - |\nGeo-rgia geo-rgia"
-        txt2 "S - -R - | - G m-m"
-        txt3 "SR" ;; - -R - | - G m-m"
-        txt4 "G\n RS S - - | -"
-        txt5 "| S - - - G -----R"
-        txt6 "P - - - | -- DD Pm GR |"
-txt7 (str " RS S -- --  | -- GM P#D NN | N DD -- -- |"
-"\n\n| -- DD Pm GR | m GG -- R- | S G R R | S GG - - ||")
-txt9
-
-(str                               
-"N DD -- -- |"
-  "\n\n"
-"| -- DD Pm GR |")
-        ]
-    (println txt)
-    ;; (use 'clojure.stacktrace) 
-    ;; (print-stack-trace *e)
-    (println
-      (to-lilypond 
-        (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
-          ;;  " S - - - | - - R - "
-          ;;  "-S | -"
-          txt
-          ;;        "P - - - - - - - -"
-          ;; (-> "fixtures/yesterday.txt" resource slurp)
-          ;;  (-> "fixtures/aeolian_mode_without_key_specified.txt" resource slurp)
-          ;;   " RGm\nS\n\n R\nS"
-          ))
-
-      )
-    (println "pitch-ids-to-add-tilde")
-    (pprint @pitch-ids-to-add-tilde)
-    ))

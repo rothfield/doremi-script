@@ -1145,7 +1145,7 @@ node2
 
         _ (println txt "\n\n")]
     
-   (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script txt))
+  ;; (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script txt))
     )
   )
 

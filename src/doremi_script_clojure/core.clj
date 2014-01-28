@@ -26,8 +26,8 @@
   (doremi-script-parser txt))
 
 (comment
-  (doremi-script-text->parsed-doremi-script 
-    (slurp (resource "fixtures/georgia.doremiscript.txt")))
+;;  (doremi-script-text->parsed-doremi-script 
+ ;;   (slurp (resource "fixtures/georgia.doremiscript.txt")))
   )
     
 (defn doremi-script-text->parsed-doremi-script[txt]
@@ -179,6 +179,6 @@
     ))
 ;; (println (doremi-text->lilypond "<S-R>"))
 ;;(pprint (doremi-text->parse-tree "<S-R>"))
-;;(pprint (doremi-text->parse-tree "S-R"))
+;; (pprint (doremi-text->parse-tree "-S-R"))
 ;; (pprint (doremi-text->parse-tree (slurp (resource "fixtures/bracketed_beat.txt"))))
 
