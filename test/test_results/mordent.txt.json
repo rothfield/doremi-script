@@ -5,7 +5,8 @@
    "my_type":"sargam_line",
    "items":
    [{"items":
-     [{"subdivisions":1,
+     [{"measure-id":0,
+       "subdivisions":1,
        "id":8,
        "start_index":2,
        "my_type":"beat",
@@ -15,6 +16,7 @@
          "fraction_array":[{"numerator":1, "denominator":1}],
          "pitch_source":"S",
          "normalized_pitch":"C",
+         "beat-id":0,
          "measure-counter":0,
          "numerator":1,
          "start_index":2,
@@ -24,11 +26,13 @@
          "my_type":"pitch",
          "attributes":
          [{"my_type":"mordent", "start_index":0, "id":1}],
+         "measure-id":0,
          "pitch-counter":0,
          "column_offset":0,
          "tala":null,
          "id":5,
          "value":"S"}]}],
+     "measure-id":0,
      "is_partial":true,
      "beat_count":1,
      "my_type":"measure",

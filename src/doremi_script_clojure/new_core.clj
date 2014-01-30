@@ -602,7 +602,7 @@
                      
 
 
-(def runtest true)
+(def runtest false)
 (def t "Title:test\n\n.\nS\n.\nHi\n\nSRG" )
 (def c (doremi-text->parse-tree 
          t         

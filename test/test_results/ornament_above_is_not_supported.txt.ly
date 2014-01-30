@@ -7,18 +7,17 @@ composer = ""
   tagline = ""  % removed 
 }
 %{
- TimeSignature:5/4
-
-S - - - - R - - - - 
+   N
+| S 
  %}
   
 melody = {
-\time 5/4
+\once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
 \autoBeamOn  
 \cadenzaOn
-c'4~[ c'4~ c'4~ c'4~ c'4] d'4~[ d'4~ d'4~ d'4~ d'4]  \break        
+\bar "|" c'4  \break        
 
 }
 
