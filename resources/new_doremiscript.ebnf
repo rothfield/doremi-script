@@ -1,6 +1,6 @@
 (*  EBNF grammar for doremi-script - this is for the clojure instaparse libarary *)
 (* grammar for aacm/bhatkande style sargam/letter notation  *)
-(* author: john rothfield 707 538-5133, cell 707 331-2700  rthfield@sonic.net *)
+(* author: john rothfield 707 538-5133, cell 415 317-5154  rthfield@sonic.net *)
 (* use syntax highlighting for ocaml or applescript in your text editor *)
 (* vim: set filetype=ocaml *)
 
@@ -8,23 +8,16 @@ composition (* a musical piece *)
      (* each section is separated by one or more 'empty' lines.
       the empty line can have spaces. section doesn't include the eol.
       that allows things like "s" to parse as a composition *)
-  = <empty-line*> composition-items <empty-line*> <white-space*> 
-
-
-
-<composition-items>=
- section (<newline> <empty-line+>  section)* 
+  = <empty-line*> section (<newline> <empty-line+>  section)*
+ <empty-line*> <white-space*> 
 
 <section> = (* 3 kinds of sections: attributes, lyrics and sargam.
    typically a composition will have attributes followed by lyrics, followed
    by lines of sargam. *)
 (sargam-section / attribute-section / lyrics-section) 
 
-(* todo: add support for abc number and devanagri notations
-    uppers:upper-octave-line*
+(* TODO: add support for abc number and devanagri notations
     sargam:(sargam:devanagri-sargam-line / sargam:sargam-line / sargam:abc-sargam-line/ sargam:number-sargam-line)
-    lowers:lower-octave-line*
-    lyrics:lyrics-line?
   *)
 
 
@@ -36,41 +29,20 @@ sargam-section
       lower octave line followed by lyrics *)
 
 (* original
-   uppers:upper-octave-line*
     sargam:(sargam:devanagri-sargam-line / sargam:sargam-line / sargam:abc-sargam-line/ sargam:number-sargam-line)
-    lowers:lower-octave-line*
-    lyrics:lyrics-line?
-
 *)
 
   =  (upper-octave-line <newline>)*  sargam-line (<newline> lower-octave-line)*
   (<newline> lyrics-line)*
 
-sargam-line (* consists of optional line# at beginning of line, followed by 1 or
-more measures followed  *) = line-number?
-(* consists of optional line# at beginning of line, followed by 1 or more measures followed  *)
-   <white-space?> barline? measure (barline measure)*  barline? <white-space?>
+sargam-line (* consists of optional line# at beginning of
+ line, followed by 1 or more measures *) 
+   = line-number?
+   <white-space?> barline? measure 
+   (barline measure)*  barline? <white-space?>
 
-
-
-(* old
-sargam-line-item  "an item in the main line"
-  = x:measure /
-    x:white-space /  
-    x:beat-delimited / 
-    x:beat-undelimited / 
-    x:sargam-pitch / 
-    x:rhythmical-dash / 
-    x:barline / 
-    x:repeat-symbol {
-            x.attributes=[];
-            return x;
-    }
- 
- *)
 attribute-section (* key value pairs *)
- = attribute-section-items
-<attribute-section-items> = attribute-line (<newline> attribute-line)* 
+    = attribute-line (<newline> attribute-line)* 
 
 lyrics-section (* lines of lyrics *)
   = lyrics-line (<newline> lyrics-line)*
@@ -79,7 +51,7 @@ lyrics-section (* lines of lyrics *)
 
 
 (************** barlines **********************)
-<barline>  (* a musical barline or repeat *)
+barline  (* a musical barline or repeat *)
   = 
   reverse-final-barline  |
   final-barline  |
@@ -112,50 +84,29 @@ right-repeat (* ie :| *)
 flat-or-sharp = '#' | 'b'
 
 (*  Letters SrRgGmMPdDnN in latin script  *)
-  Sb  = <"Sb">
-  Ssharp =    <"S#">  
-  Rsharp  =    <"R#">  
-  Gsharp  =    <"G#">   
-  Psharp  =    <"P#">   
-  Pb   =    <"Pb">   
-  Dsharp  =    <"D#">   
-  Nsharp   =   < "N#">  
-  Pb    =    <"Pb">   
-  S  =    <"S"> ! flat-or-sharp  
-  r =    <"r"> ! flat-or-sharp  
-  R  =   <"R"> ! flat-or-sharp  
-  g =    <"g"> ! flat-or-sharp  
-  G =    <"G"> ! flat-or-sharp  
-  m =    <"m"> ! flat-or-sharp  
-  M =    <"M"> ! flat-or-sharp  
-  P =    <"P"> ! flat-or-sharp  
-  d =    <"d"> ! flat-or-sharp  
-  D =    <"D"> ! flat-or-sharp  
-  n =    <"n"> ! flat-or-sharp  
-  N =    <"N"> ! flat-or-sharp  
 
-<pitch>  = 
-    Sb |
-    Ssharp |
-    Rsharp |
-    Gsharp |
-    Psharp |
-    Pb |
-    Dsharp |
-    Nsharp |
-    Pb |
-    S |
-    r |
-    R |
-    g |
-    G |
-    m |
-    M |
-    P |
-    d |
-    D |
-    n |
-    N 
+pitch  =  
+"Sb"|
+"S#"|
+"R#"|
+"G#"|
+"P#"|
+"Pb"|
+"D#"|
+"N#"|
+"Pb"|
+"S" ! flat-or-sharp|
+"r" ! flat-or-sharp|
+"R" ! flat-or-sharp|
+"g" ! flat-or-sharp|
+"G" ! flat-or-sharp|
+"m" ! flat-or-sharp|
+"M" ! flat-or-sharp|
+"P" ! flat-or-sharp|
+"d" ! flat-or-sharp|
+"D" ! flat-or-sharp|
+"n" ! flat-or-sharp|
+"N" ! flat-or-sharp
 
 end-slur = <')'>
 
@@ -163,11 +114,11 @@ end-slur = <')'>
 <newline>= "\r\n" | "\n"
 (***  end pitches *********************)
 		 
-space  (* space *)
-  = ' '
+space = ' '
 
 <white-space> (* one or more spaces *)
 =    #' +'   
+
 (***** beats and measures ****)
 <begin-beat-symbol>  (* symbol to use to indicate start of beat *)
   =   '<' 
@@ -192,10 +143,8 @@ end-slur = <")">
 
 <beat-delimited> (* ie <s r g m> . useful if lyrics wouldn't line up otherwise!. 
 use srgm> or s r g m> to group pithes into a single beat. the > delimiters correspond to the lower loop in the aacm notation system *)
-  = <begin-beat-symbol> beat-delimited-items <end-beat-symbol>
+  = <begin-beat-symbol> beat-delimited-item+ <end-beat-symbol>
 
-<beat-delimited-items> = (* inside of a delimited beat, ie <s--  r--  g-> *)
-    beat-delimited-item+
 
 <beat-delimited-item> =
     begin-slur /
@@ -205,8 +154,7 @@ use srgm> or s r g m> to group pithes into a single beat. the > delimiters corre
     <white-space>
 
 <beat-undelimited> (* beats can be indicated by a group of pitches that consist only of pitches and dashes such as 's--r--g-'   can't contain spaces *)
-  = beat-undelimited-items 
-<beat-undelimited-items> = beat-undelimited-item+
+  = beat-undelimited-item+
 
 
 <beat-undelimited-item> (* inside of a simple beat, ie s--r--g- note that undelimited beats cannot contain spaces *)
@@ -222,23 +170,8 @@ non-barline
     white-space /  
     beat 
 
-<measure-items> = beat (<white-space> beat)*
-measure 
-  = <white-space?> measure-items <white-space?>
-
-(* unused
-unused-sargam-line-item  
-an item in the main line 
-  = measure /
-    white-space /  
-    beat-delimited / 
-    beat-undelimited / 
-    sargam-pitch / 
-    dash / 
-    barline / 
-    repeat-symbol 
-*)
-
+measure = <white-space?> measure-item (<white-space> measure-item)* <white-space?>
+<measure-item> = begin-slur / end-slur / beat
 lyrics-line (* line of syllables *)
   = <white-space?> lyrics-line-items
 
@@ -246,35 +179,60 @@ lyrics-line (* line of syllables *)
 
 <lyrics-line-item> = syl | <white-space>
 
+<syl> = 
 (* items in lyrics line, ie a word or a syllable. ie he-llo john gives 3 items, 3 syllables *)
+    hyphenated-syl | non-hyphenated-syl
 
-<syl> =  hyphenated-syl | non-hyphenated-syl
 <hyphenated-syl> (* ends in a hyphen *)
   = #"[a-zA-Z'!]+-" 
 
 <non-hyphenated-syl> (* doesn't end in hyphen  *)
   = #"[a-zA-Z'!]+" !"-"
 
-upper-octave-line (* can put upper octave dots or semicolons for upper upper octave (. or :). also tala symbols +203   *)
-= <white-space?> upper-octave-line-items
+upper-octave-line (* Things above notes, including ornaments, 
+talas, mordents, octaves,chords, octave indicating dots,
+ and 1st and second ending symbols. TODO: add catchall for word?? *)
+= <white-space?> 
+  ( <white-space> /
+  upper-octave-dot /
+  tala /
+  ornament /
+  chord /
+  mordent /
+  upper-upper-octave-symbol /
+  alternate-ending-indicator )+
 
-<upper-octave-line-items>= upper-octave-line-item+
 
-ornament= undelimited-ornament | delimited-ornament
+(*
+TODO:
+note that there is controversy over whether something is a chord or an
+ornament! for now i've put ornaments before chords. perhaps we should have
+an ornament-or-chord item and let the semantic analyzer distinguish them.
+the semantic analyzer can decide whether something is an ornament or not
+by looking at the column.
+since ornaments are either before or after a note according to the current
+scheme, there should be little overlap!!
+another idea is to tag the lines as follows:
+
+chords:
+ornaments:
+tala:
+
+but that seems ugly
+
+another idea is to have a
+chord-upper-line = 3 or more chords ??? that could disambiguate it.
+
+another idea is to use [chord-symbol] vs <ornament> to disambiguate the 2.
+*)
+
+
+ornament= pitch+ | delimited-ornament
 
 <delimited-ornament> (* in upper line <nrsns> *)
-  =  <"<"> ornament-items  <">">
-
-ornament-items = ornament-item+
-
-<undelimited-ornament> (* in upper line nrsns *)
-  = !"<" ornament-items 
-
-<ornament-item>
-  = pitch 
+  =  <"<"> pitch+  <">">
 
 mordent = <"~"> 
-
 
 alternate-ending-indicator 
 (*   1.------- 2.--- etc. the period is optional. must have either dot or underscores. todo: accepts 1-.--- which is not exactly what i want.  *)
@@ -303,25 +261,16 @@ chord-upper-line = 3 or more chords ??? that could disambiguate it.
 
 another idea is to use [chord-symbol] vs <ornament> to disambiguate the 2.
  *)
-  = <white-space> /
+  = 
+ <white-space> /
  upper-octave-dot /
  tala /
-	   ornament /
-     chord /
+ ornament /
+ chord /
  mordent /
  upper-upper-octave-symbol /
-alternate-ending-indicator 
-	(*
-     delimited-ornament  / 
-     white-space / 
-     upper-octave-dot /
-     alternate-ending-indicator /
-     tala /
-     mordent /
-     upper-upper-octave-symbol /
-     chord /
-     ornament  
-   *)
+ alternate-ending-indicator 
+
 upper-octave-dot= <dot> 
 
 dot = (*  period and asterisk are allowed *)
@@ -335,17 +284,11 @@ tala (* tala markings. ie +203 for tintal. 012 for rupak *)
 forward-slash-char  (* note that putting forward slash in regex doesn't seem to work *)
   = "\\"
 
-(* chord-char  todo: review
-  = char:[a-ga-gmimaiivv0-9+] / char:forward-slash-char
-*)
-
-
 chord = #"[a-gA-GvViI][^\s]*"
 
 lower-octave-line (* can put lower octave dots or semicolons for lower-lower octave (. or :)   *)
-  = <white-space?> lower-octave-line-items <white-space?> 
+  = <white-space?> lower-octave-line-item+ <white-space?> 
 
-<lower-octave-line-items>= lower-octave-line-item+
 <lower-octave-line-item> =  <white-space> | lower-octave-dot |
           lower-lower-octave-symbol | kommal-indicator  
 

@@ -90,6 +90,53 @@
   (slurp (resource 
            (str "fixtures/" file-name))))
 
+(defn to-string[doremi-data]
+  (let [
+        default-formatter (fn default-formatter[x]
+                            (array-map       :type (:my_type x)
+                                       :source (:source x)
+                                       ))
+        postwalk-fn (fn to-string-postwalker[node]
+                      (let [ my-type (if (:is_barline node)
+                                       :barline
+                                       ;; else
+                                       (:my_type node))
+                            default-val (default-formatter node)
+                            ]
+                        ;; (println my-type)
+                        (case my-type
+                          :beat
+                          (array-map :type :beat :subdivisions (:subdivisions node) :items (:items node))
+                          :measure
+                          (array-map :type my-type 
+                                     :beat_count (:beat_count node) 
+                                     :items (:items node))
+                          :composition
+                          (array-map :type my-type 
+                                     :source (:source node)
+                                     :lines (:lines node))
+                          :sargam_line
+                          (array-map :type my-type 
+                                     :source (:source node)
+                                     :items (:items node))
+                          :pitch
+                          (array-map :type my-type 
+                                     :value (:value node)
+                                     :octave (:octave node)
+                                     :syllable (:syllable node)
+                                     )
+                          :dash
+                          :dash
+                          ;; (default-formatter node)
+                          :barline
+                          (array-map :type my-type 
+                                     :source (:source node)
+                                     )
+                          node
+                          )))
+        ]
+    (postwalk postwalk-fn doremi-data)
+    ))
 
 (defn pprint-results[x]
   (if (:my_type x)
@@ -235,9 +282,6 @@
 (defn is-beat?[x]
   (and (vector? x)
        (= :beat (first x))))
-(defn is-measure?[x]
-  (and (vector? x)
-       (= :measure (first x))))
 
 (defn is-pitch?[x]
   ;; (if false (println "is-pitch, x is " x);)
@@ -421,8 +465,6 @@
                                (is-end-slur? item)
                                nil
                                (is-beat? item)
-                               (into [] (remove nil? item))
-                               (is-measure? item)
                                (into [] (remove nil? item))
                                true
                                item))
@@ -688,8 +730,7 @@
           (vector obj)]}
   (let [token (first obj)
         cur-state (:state accum)
-        _ (if true (do  (pprint (dissoc accum :composition))
-                       (println cur-state token)))
+        _ (if true (do  (println cur-state token)))
         ]
 (case [cur-state token]
     [:start :composition]
@@ -698,35 +739,36 @@
        (assoc (print-headers accum (:composition accum))
               :state :in-sargam-line)
   [:in-sargam-line :measure]
-  (assoc accum :current-pitch nil)
-  [:in-sargam-line :beat]
-  (assoc accum :state :in-beat
-         :current-beat token)
-  [:in-sargam-line :eof]
   accum
-  [:in-beat :pitch]
-  (assoc accum :state :collecting-pitch-in-beat
-        :current-pitch  { :obj obj  :micro-beats 1}
-         )
-  [:collecting-pitch-in-beat :barline]
-  (assoc accum :state :in-sargam-line
-         :output (str (:output accum) "bar") 
-         )
-  [:collecting-pitch-in-beat :pitch]
-  (assoc accum :state :finishing-beat)
-  [:finishing-beat :pitch]
-  (assoc accum :state :finishing-beat)
-  [:finishing-beat :beat]
+  [:in-sargam-line :beat]
   (assoc accum :state :in-beat)
-  [:collecting-pitch-in-beat :dash]
-   ;; increment counter for current pitch
-   (update-in accum [:current-pitch :micro-beats] inc )
-
-  [:collecting-pitch-in-beat :beat]
-  ;; tie previous note if new one is a dash!!!
-  (assoc accum :state :in-beat)
+  [:in-sargam-line :pitch]
+  accum
   )))
 
+
+(comment
+           (fn[accum x] 
+                         (reset! started-pitch? true)
+                       (update-in accum [:output] str 
+                                  " "
+                                  (pitch->lilypond-pitch (second x))
+                            (->> x pitch->octave octave-number->lilypond-octave)                                     
+                                  ))
+                       :attribute-section
+                       accum
+                       :composition
+                       (update-in accum [:output] str 
+                                  (join "\n" [
+                                              "#(ly:set-option 'midi-extension \"mid\")"
+                                              "\\version \"2.12.3\""
+                                              "\\include \"english.ly\""
+                                              "\\header{" 
+                                              ] ) "\n" )
+                       ;; fallthrough
+                       accum
+                       )))
+  )
 
 
 
@@ -778,7 +820,7 @@
 (defn experiment[txt]
   ;; (println "parsing") 
   ;;(println txt)
-  ;;  (pprint (doremi-text->parse-tree "  S S"))
+  ;;  (pprint (doremi-text->parse-tree txt))
   ;;(println "\n\n\n")
   (let [
         parsed  (doremi-text->parse-tree txt)
@@ -798,14 +840,13 @@
         (println (:output (new-to-lilypond collapsed-parse-tree)
                           )))))) 
 ;;(println (experiment "Title:John\n\nS"))
-(if false
   (pprint (experiment ;;doremi-text->parse-tree 
                       (join "\n" [
                                   ;; " ..   ..." 
                                   " SR. .GmP"
-                                  "(  G m    ) m(P d)-  |"
+                                  "(  G m    )   |"
                                   ])
-                      )))
+                      ))
 
 
 

@@ -7,6 +7,7 @@
     [instaparse.core :as insta]
 
     [doremi_script_clojure.semantic_analyzer :refer [transform-parse-tree]]
+    [doremi_script_clojure.new_core :refer [experiment]]
     [doremi_script_clojure.to_lilypond :refer [to-lilypond]]
     [clojure.java.io :refer [input-stream resource]]
     [clojure.data.json :as json]
@@ -158,6 +159,8 @@
   "Command line params: --json returns doremi json data"
   "--ly returns lilypond data"
   "defaults to lilypond"
+  (if (= (first args) "--new")
+     (println (experiment (get-stdin)))
   (try
     (let [
           txt (get-stdin)
@@ -176,9 +179,13 @@
       )
       )
     (catch Exception e (println (str "Error:" (.getMessage e))))
-    ))
+    )))
+
+(defn transform-parse-tree2[x y]
+  (transform-parse-tree y x))
 ;; (println (doremi-text->lilypond "<S-R>"))
 ;;(pprint (doremi-text->parse-tree "<S-R>"))
+;; (-> "S" doremi-text->parse-tree (transform-parse-tree "S")  pprint)
 ;; (pprint (doremi-text->parse-tree "-S-R"))
 ;; (pprint (doremi-text->parse-tree (slurp (resource "fixtures/bracketed_beat.txt"))))
 

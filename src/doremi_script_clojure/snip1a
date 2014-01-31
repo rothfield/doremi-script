@@ -1,0 +1,68 @@
+           (fn[accum x] 
+                   (if false (println "processing" x))
+                   (let [my-type (first x)] 
+                     (case my-type
+                       :eof
+                       (update-in accum [:output] str  
+                                  (join "\n" [
+                                              "\n}\n\n"
+                                              "text = \\lyricmode {"
+                                              (join " "
+
+                                                    (->> composition  (tree-seq vector? identity)  (filter is-pitch?) (map last) (filter string?))
+                                                    ) 
+                                              "}\n"
+                                              "\\score{"
+                                              "\\transpose c' d'"
+                                              "<<"
+                                              "\\new Voice = \"one\" {"
+                                              "\\melody"
+                                              "}"
+                                              "\\new Lyrics \\lyricsto \"one\" \\text"
+                                              ">>"
+                                              "\\layout {"
+                                              "\\context {"
+                                              "\\Score"
+                                              "\\remove \"Bar_number_engraver\""
+                                              "}"
+                                              "}"
+                                              "\\midi {"
+                                              "\\context {"
+                                              "\\Score"
+                                              "tempoWholesPerMinute = #(ly:make-moment 200 4)"
+                                              "}"
+                                              "}"
+                                              "}"
+                                              ]))
+                       :sargam-line
+                       (if (not @headers-printed?) (do
+                                                     (reset! headers-printed? true)
+                                                     (print-headers accum composition))
+                         accum)
+                       :measure
+                       accum
+                       :beat
+                       accum
+                       :dash
+                       accum ;; # TODO
+                       (:pitch) 
+                       (do
+                         (reset! started-pitch? true)
+                       (update-in accum [:output] str 
+                                  " "
+                                  (pitch->lilypond-pitch (second x))
+                            (->> x pitch->octave octave-number->lilypond-octave)                                     
+                                  ))
+                       :attribute-section
+                       accum
+                       :composition
+                       (update-in accum [:output] str 
+                                  (join "\n" [
+                                              "#(ly:set-option 'midi-extension \"mid\")"
+                                              "\\version \"2.12.3\""
+                                              "\\include \"english.ly\""
+                                              "\\header{" 
+                                              ] ) "\n" )
+                       ;; fallthrough
+                       accum
+                       )))
