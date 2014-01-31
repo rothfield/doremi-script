@@ -662,23 +662,50 @@
    :pre [ (is-pitch? pitch)] 
    :post [ (if false (println "pitch->octave" %) true) ] }
   (->> pitch (filter vector?) (map first) {:upper_octave_dot 1
-                               :upper-upper-octave-symbol 2
-                               :lower_octave_dot -1
-                               :lower-lower-octave-symbol -2 }
-                         (remove nil?) (apply +))
+                                           :upper-upper-octave-symbol 2
+                                           :lower_octave_dot -1
+                                           :lower-lower-octave-symbol -2 }
+       (remove nil?) (apply +))
   )
 
+(defn beat->beat-divisions[beat]
+  {:pre [(is-beat? beat)]
+   :post [ (integer? %)]
+   }
+  (->> beat (filter vector?) (map first) (filter #{:pitch :dash}) count) ;; OMG
+  )
+(defn start-beat[accum beat]
+  (assoc accum :state :in-beat
+         :current-beat-divisions (beat->beat-divisions beat)
+         )
+  )
+
+ (defn barline->lilypond-barline[
+                                 [_ [barline-type] ] ;; destructuring fun
+                                 ]
+   " maps barline-type field for barlines"
+   (let [my-map
+         {
+          :reverse-final-barline "\\bar \".|\""
+          :final-barline "\\bar \"|.\" "
+          :double-barline "\\bar \"||\" " 
+          :single-barline "\\bar \"|\"" 
+          :left-repeat "\\bar \"|:\"" 
+          :right-repeat "\\bar \":|\"" 
+          } ]
+     (str (get my-map barline-type (:single-barline my-map)) " ")
+     ))
 
 (defn octave-number->lilypond-octave[num]
   (let [tick "'"
         comma ","]
-  ;; Middle c is c'
-  (cond (nil? num)
-        tick
-        (>= num 0)
-        (apply str (take (inc num) (repeat tick)))
-        true
-        (apply str (take (dec (- num)) (repeat comma))))))
+    ;; Middle c is c'
+    (cond (nil? num)
+          tick
+          (>= num 0)
+          (apply str (take (inc num) (repeat tick)))
+          true
+          (apply str (take (dec (- num)) (repeat comma))))))
 
 (defn lilypond-transition[accum obj]
   { :pre [ (map? accum)
@@ -691,41 +718,40 @@
         _ (if true (do  (pprint (dissoc accum :composition))
                        (println cur-state token)))
         ]
-(case [cur-state token]
-    [:start :composition]
-     (assoc accum :state :looking-for-attribute-section)
-   [:looking-for-attribute-section :sargam-line]
-       (assoc (print-headers accum (:composition accum))
-              :state :in-sargam-line)
-  [:in-sargam-line :measure]
-  (assoc accum :current-pitch nil)
-  [:in-sargam-line :beat]
-  (assoc accum :state :in-beat
-         :current-beat token)
-  [:in-sargam-line :eof]
-  accum
-  [:in-beat :pitch]
-  (assoc accum :state :collecting-pitch-in-beat
-        :current-pitch  { :obj obj  :micro-beats 1}
-         )
-  [:collecting-pitch-in-beat :barline]
-  (assoc accum :state :in-sargam-line
-         :output (str (:output accum) "bar") 
-         )
-  [:collecting-pitch-in-beat :pitch]
-  (assoc accum :state :finishing-beat)
-  [:finishing-beat :pitch]
-  (assoc accum :state :finishing-beat)
-  [:finishing-beat :beat]
-  (assoc accum :state :in-beat)
-  [:collecting-pitch-in-beat :dash]
-   ;; increment counter for current pitch
-   (update-in accum [:current-pitch :micro-beats] inc )
+    (case [cur-state token]
+      [:start :composition]
+      (assoc accum :state :looking-for-attribute-section)
+      [:looking-for-attribute-section :sargam-line]
+      (assoc (print-headers accum (:composition accum))
+             :state :in-sargam-line)
+      [:in-sargam-line :measure]
+      (assoc accum :current-pitch nil)
+      [:in-sargam-line :beat]
+      (start-beat accum obj)
+      [:in-sargam-line :eof]
+      accum
+      [:in-beat :pitch]
+      (assoc accum :state :collecting-pitch-in-beat
+             :current-pitch  { :obj obj  :micro-beats 1}
+             )
+      [:collecting-pitch-in-beat :barline]
+      (assoc accum :state :in-sargam-line
+             :output (str (:output accum)
+                         (barline->lilypond-barline obj)
+                              ))
+      [:collecting-pitch-in-beat :pitch]
+      ;; finish current pitch
+      (assoc accum :state :collecting-pitch-in-beat)
+      [:collecting-pitch-in-beat :dash]
+      ;; increment counter for current pitch
+      (update-in accum [:current-pitch :micro-beats] inc )
 
-  [:collecting-pitch-in-beat :beat]
-  ;; tie previous note if new one is a dash!!!
-  (assoc accum :state :in-beat)
-  )))
+      [:collecting-pitch-in-beat :beat]
+      ;; tie previous note if new one is a dash!!!
+      (do
+        (start-beat accum obj)
+        )
+      )))
 
 
 
@@ -735,10 +761,10 @@
         started-pitch? (atom false) 
         ]
     (->> (conj composition [:eof]) (tree-seq #(and (vector? %)
-                                                    (#{:composition :sargam-line :measure :beat} (first %)))
-                                                    identity)
+                                                   (#{:composition :sargam-line :measure :beat} (first %)))
+                                             identity)
 
-         
+
          (filter vector?)
          (reduce lilypond-transition
                  {:state :start 
@@ -798,12 +824,12 @@
         (println (:output (new-to-lilypond collapsed-parse-tree)
                           )))))) 
 ;;(println (experiment "Title:John\n\nS"))
-(if false
+(if true
   (pprint (experiment ;;doremi-text->parse-tree 
                       (join "\n" [
                                   ;; " ..   ..." 
                                   " SR. .GmP"
-                                  "(  G m    ) m(P d)-  |"
+                                  "(  G m    ) m(P d)-  | S :|"
                                   ])
                       )))
 
