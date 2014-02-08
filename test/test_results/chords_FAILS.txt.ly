@@ -22,7 +22,7 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  r4 r4  r8 b'8   c'8 cs'8 \bar "|"   d'4  c'4  a'4  f'4 \bar "|"   d'4  f'4  a'4  e'4 \bar "|"   e'4 r4 r4 r4 \bar "|"    d'8 c'8   af'8 f'8  d'4  d'4 \bar "|" 
+ \bar "|"  r4 r4  r8 b'8   c''8 cs''8 \bar "|"   d''4  c''4  a'4  f'4 \bar "|"   d'4  f'4  a'4  e''4 \bar "|"   e''4 r4 r4 r4 \bar "|"    d''8 c''8   af'8 f'8  d'4  d''4 \bar "|" 
 
 }
 

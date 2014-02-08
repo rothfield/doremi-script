@@ -671,32 +671,33 @@
   ;; includes dash (-) -> r "
   {
    "-" "r", "S" "c", "S#" "cs", "Sb" "cf", "r" "df", "R" "d", "R#" "ds",
-   "g" "ef", "G" "e", "G#" "es", "m" "f", "mb" "ff", "m#" "fs", "Pb" "gf",
+   "g" "ef", "G" "e", "G#" "es", "m" "f", "mb" "ff", "M" "fs", "Pb" "gf",
    "P" "g", "P#" "gs", "d" "af", "D" "a", "D#" "as", "n" "bf", "N" "b",
    "N#" "bs", })
-;;  (comment
-;;        upper-dots (count (filter #(= (:my_type %) :upper_octave_dot) nodes))
-;;        lower-dots (count (filter #(= (:my_type %) :lower_octave_dot) nodes))
-;;        upper-upper-dots (count (filter #(= (:my_type %) :upper_upper_octave_symbol) nodes))
-;;        lower-lower-dots (count (filter #(= (:my_type %) :lower_lower_octave_symbol) nodes))
-;;        octave (+ upper-dots (- lower-dots) (* -2 lower-lower-dots) (* 2 upper-upper-dots))
-;;         )
+
+
 (defn pitch->octave[pitch]
   {
    :pre [ (is-pitch? pitch)] 
    :post [ (do (when false (println "pitch->octave" %)) true) ] }
-  (->> pitch (filter vector?) (map first) {:upper_octave_dot 1
-                                           :upper-upper-octave-symbol 2
-                                           :lower_octave_dot -1
-                                           :lower-lower-octave-symbol -2 }
-       (remove nil?) (apply +))
+  ;; OMG
+  (->> pitch (filter vector?) 
+       (map first) 
+       (map {:upper-octave-dot 1
+             :upper-upper-octave-symbol 2
+             :lower-octave-dot -1
+             :lower-lower-octave-symbol -2 }
+            )
+       (remove nil?)
+       (apply +))
   )
 
 (defn beat->beat-divisions[beat]
   {:pre [(is-beat? beat)]
    :post [ (integer? %)]
    }
-  (->> beat (filter vector?) (map first) (filter #{:pitch :dash}) count) ;; OMG
+  ;; OMG
+  (->> beat (filter vector?) (map first) (filter #{:pitch :dash}) count) 
   )
 
 (defn start-beat[accum beat]
@@ -734,6 +735,7 @@
           (apply str (take (dec (- num)) (repeat comma))))))
 
 (defn start-pitch[accum pitch]
+  (when false (println "start-pitch, pitch is") (pprint pitch))
   (let [pitch-and-octave 
         (str (pitch->lilypond-pitch (second pitch))
              (->> pitch pitch->octave octave-number->lilypond-octave)                                     )
@@ -1220,7 +1222,7 @@
 (when nil 
   ;;(pprint (experiment (slurp (resource "fixtures//georgia.doremiscript.txt"))))
   (pprint (experiment (slurp (resource "fixtures/bansuriv3.txt"))))
-  (println (experiment "S\n")))
+  (println (experiment ".\nS\n")))
 ;; (join "\n" ["(Sr | n)"
 ;;        "      ."
 ;;       "HI"])

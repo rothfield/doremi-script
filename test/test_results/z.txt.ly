@@ -6,9 +6,7 @@ title = ""
 composer = ""
 }
 %{
-  .. . 
-.NRSNS   + 
-S       | N
+-- GM P#D  NS
 
 %}
 melody = {
@@ -19,7 +17,7 @@ melody = {
 \cadenzaOn
 
 
-  c''4 \bar "|"   b'4
+ r4   e'8 fs'8   gs'8 a'8   b'8 c'8
 
 }
 
