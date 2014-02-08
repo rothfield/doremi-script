@@ -15,12 +15,12 @@ G
 melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
-\key c \Minor
+\key c \minor
 \autoBeamOn
 \cadenzaOn
 
 
-  e'4
+ e'4
 
 }
 
@@ -30,7 +30,7 @@ text = \lyricmode {
 }
 
 \score{
-\transpose c' d'
+\transpose c' g'
 <<
 \new Voice = "one" {
 \melody

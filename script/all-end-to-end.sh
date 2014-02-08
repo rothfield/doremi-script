@@ -36,7 +36,7 @@ for ARG in "$@"; do
 		echo "<hr>" >> $report 
 		echo "<h2>$mybasename</h2>" >> $report
 		echo "<pre class="doremi-source">" >> $report
-		cat $ARG | sed -f $DIR/sed_snippet.txt >> $report	
+		cat $ARG | sed -f $DIR/sed_snippet.sed >> $report	
 		echo "</pre>" >> $report
 		rm -f $fname.json $fname.ly $fname.png $fname.mid $fname.ps
 		cat $fname | lein run --json > $fname.json
@@ -44,10 +44,10 @@ for ARG in "$@"; do
 		echo "<button  class="show_ly" data-which='$CTR'>Show Lilypond Source</button>" >> $report
 		echo "<button class="show_json" data-which='$CTR'>Show json</button>" >> $report
 		echo "<pre id='ly$CTR' class='ly-data'>" >> $report
-		cat $fname.ly | sed -f $DIR/sed_snippet.txt >> $report	
+		cat $fname.ly | sed -f $DIR/sed_snippet.sed >> $report	
 		echo "</pre>" >> $report
 		echo "<pre id='json$CTR' class='json-data'>" >> $report
-		cat $fname.json | sed -f $DIR/sed_snippet.txt >> $report	
+		cat $fname.json | sed -f $DIR/sed_snippet.sed >> $report	
 		echo "</pre>" >> $report
 		echo "WARNING: lily2image fails for long images"
 	 	lily2image -r=72 -f=png $fname 2>&1  

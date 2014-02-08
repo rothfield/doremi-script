@@ -17,7 +17,7 @@ melody = {
 \cadenzaOn
 
 
-   c'8 c'32 d'16.   \times 4/6{ e'4 e'16 f'16 }    g'8 g'64. a'16 a'64
+ c'8~c'32 d'16. \times 4/6{ e'4~e'16 f'16 }  g'8~g'64. a'16~a'64
 
 }
 
@@ -27,7 +27,7 @@ text = \lyricmode {
 }
 
 \score{
-\transpose c' d'
+
 <<
 \new Voice = "one" {
 \melody

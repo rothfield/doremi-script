@@ -3,7 +3,7 @@
     [instaparse.core :as insta]
 
     [doremi_script_clojure.semantic_analyzer :refer [transform-parse-tree]]
-    [clojure.string :refer [lower-case join]] 
+    [clojure.string :refer [upper-case lower-case join]] 
     [clojure.java.io :as io :refer [input-stream resource]]
     [clojure.data.json :as json]
     [clojure.pprint :refer [pprint]] 
@@ -640,16 +640,18 @@
 (defn print-headers[accum composition]
   (let [ atts (first (filter is-attribute-section? composition))
         ;; _ (pprint atts) 
-        my-map (apply array-map (map-even-items lower-case (rest atts)))
+        my-map (apply array-map 
+                      (map-even-items #(-> % lower-case keyword)
+                                      (rest atts)))
         source (second (first (filter #(= :source (first %)) (rest composition))))
-        _ (when false (println "Source is\n" source))
-        ;; _ (pprint my-map)
+        _ (when false (println "Source is\n" source)
+                      (pprint my-map))
         ] 
-    (update-in accum [:output] str 
+    (-> (update-in accum [:output] str 
                (join "\n"
                      [
-                      (str "title = \"" (get my-map "title" ) "\"")
-                      (str "composer = \"" (get my-map "composer" ) "\"")
+                      (str "title = \"" (:title my-map) "\"")
+                      (str "composer = \"" (:composer my-map) "\"")
                       "}" ;; see ....
                       "%{"
                       (lilypond-escape (:source accum))
@@ -657,12 +659,12 @@
                       "melody = {"
                       "\\once \\override Staff.TimeSignature #'stencil = ##f"
                       "\\clef treble"
-                      (str "\\key c " (str "\\" (get my-map "mode" "major")))
+                      (str "\\key c " (str "\\" (lower-case (:mode my-map "major"))))
                       "\\autoBeamOn"
                       "\\cadenzaOn"
                       "\n"
                       ] 
-                     ) "\n")))
+                     ) "\n") (assoc :my-map my-map))))
 
 
 
@@ -736,16 +738,11 @@
 
 (defn start-pitch[accum pitch]
   (when false (println "start-pitch, pitch is") (pprint pitch))
-  (let [pitch-and-octave 
-        (str (pitch->lilypond-pitch (second pitch))
-             (->> pitch pitch->octave octave-number->lilypond-octave)                                     )
-        ]
-    (update-in (assoc accum :state :collecting-pitch-in-beat
+    (-> accum (assoc :state :collecting-pitch-in-beat
                       :current-pitch  { :obj pitch  :micro-beats 1}
-                      :lilypond-pitch-and-octave pitch-and-octave
-
-                      ) [:output] str " " ) 
-    ))
+                      )) 
+    )
+;; (println (experiment "(Sr | n)"))
 
 (defn start-line[accum obj]
   ;; TODO
@@ -925,28 +922,75 @@
          :dash-microbeats 1
          ))
 
+;; (println (experiment "(Sr | n)"))
+       ;; first-pitch  
+       ;; (str begin-slur pitch-and-octave end-slur)
+;; (println (experiment "S----R--"))
 
 (defn finish-pitch[accum]
   (when false (println "finish-pitch"))
   (when false (pprint (remove :output accum)))
-  (let [divisions (accum :divisions)
+  (let [pitch (:obj (:current-pitch accum))
+        _ (when nil (println "pitch is\n\n" pitch))
+       begin-slur (if (some #(and (vector? %) (= :begin-slur (first %)))
+                            pitch)
+                      "(") 
+       end-slur (if (some #(and (vector? %) (= :end-slur (first %)))
+                            pitch)
+                      ")") 
+        pitch-and-octave 
+        (str  (pitch->lilypond-pitch (second pitch))
+             (->> pitch pitch->octave octave-number->lilypond-octave))
+        divisions (accum :divisions)
         micro-beats (get-in accum [:current-pitch :micro-beats])
         ary (ratio->lilypond-durations micro-beats divisions)
-        pitch-and-octave (:lilypond-pitch-and-octave accum)
-        pitches (join " " (map (partial str pitch-and-octave) ary))
+        first-pitch  
+        (str pitch-and-octave (first ary) end-slur begin-slur)
+        pitches  (if (= 1 (count ary))
+                   first-pitch
+                   (str first-pitch "~"
+                     (join "~" (map (partial str pitch-and-octave) 
+                                    (rest ary)))))
         ]
     (when false 
       (println "finish-pitch  divisions=" divisions "; micro-beats= " micro-beats)
       (pprint ary))
     (when false (println "leaving finish-pitch:" (update-in accum [:beat-pitches] conj pitches )))
-    (update-in accum [:beat-pitches] conj pitches )
+    (update-in accum [:beat-pitches] conj pitches)
     ))
 
 (defn finish-line[accum]
   (update-in accum [:output] str (join "\\break" "\n"))
   )
 
+(def normalized-pitch->lilypond-pitch
+  ;; TODO: double sharps and flats, half-flats ??"
+  ;; includes dash (-) -> r "
+  {
+   "-" "r", "C" "c", "C#" "cs", "Cb" "cf", "Db" "df", "D" "d", "D#" "ds",
+   "Eb" "ef", "E" "e", "E#" "es", "F" "f", "Fb" "ff", "F#" "fs", "Gb" "gf",
+   "G" "g", "G#" "gs", "Ab" "af", "A" "a", "A#" "as", "Bb" "bf", "B" "b",
+   "B#" "bs", })
+
+(defn transpose-snippet[my-key]
+  { :pre [(or (string? my-key) (nil? my-key))]
+   :post [(or (string? %) (nil? %))]
+   }
+  "return transpose snippet for lilypond"
+  "Don't transpose if notation is in abc(future)"
+    (cond 
+      (nil? my-key) 
+      ""
+      (= "c" (lower-case my-key))
+      ""
+      true
+     (str "\\transpose c' "
+             (normalized-pitch->lilypond-pitch (upper-case my-key))
+      "'")
+              ))
+
 (defn lilypond-at-eof[accum]
+                        (pprint (:my-map accum))
   (update-in accum [:output] str  
              (join "\n" [
                          "\n}\n\n" ;; end of melody
@@ -957,7 +1001,9 @@
                                ) 
                          "}\n"
                          "\\score{"
-                         "\\transpose c' d'"
+                          ;; TODO
+
+                        (transpose-snippet (:key (:my-map accum)))
                          "<<"
                          "\\new Voice = \"one\" {"
                          "\\melody"
@@ -1166,16 +1212,39 @@
   (.getName file-spec)) 
 
 
+  ;; (println (test-all3 "fixtures" "ban.*.txt"))
+  ;; (println (test-all3 "fixtures" "ban.*.txt"))
+  ;;(print-stack-trace *e)
 
 (defn test-all2-process-file[my-file]
   (let [ basename (.getName my-file) 
-        filename (str "test/test_results/" basename)
+        directory-path "test/test_results/"
+        filename (str directory-path "/" basename)
+        my-files (file-seq (clojure.java.io/file directory-path))
+        _ (when nil (pprint my-files))
+        to-delete (filter #(fn zz[x] (.startsWith (.getName x) basename))
+                          my-files)
         ]
+
+    (map clojure.java.io/delete-file to-delete)
     (io/copy my-file (io/file  filename))
     (->> my-file slurp 
          experiment (spit (str filename ".ly")))
+    basename
     ))
 
+(defn test-all3[dir-str match-str]
+  { :pre [(string? dir-str)
+          (string? match-str)]
+   :post [ (seq? %)]
+   }
+  ;; goes off resources. Example: 
+  ;; (println (test-all3 "fixtures" "ban.*.txt"))
+  (let [my-dir (-> dir-str io/resource io/file)]
+  (map test-all2-process-file 
+       (filter #(.matches (.getName %) match-str)(file-seq my-dir)))))
+;; (println (test-all3 "fixtures" "ban.*"))
+;;  (->
 
 (defn test-all2[resource-names]
   { :pre [(vector? resource-names)
@@ -1222,7 +1291,10 @@
 (when nil 
   ;;(pprint (experiment (slurp (resource "fixtures//georgia.doremiscript.txt"))))
   (pprint (experiment (slurp (resource "fixtures/bansuriv3.txt"))))
-  (println (experiment ".\nS\n")))
+  (println (experiment "Key: F#\nMode: Major\n\n.\nS\n")))
 ;; (join "\n" ["(Sr | n)"
+;; (println (experiment "(Sr | n)"))
 ;;        "      ."
 ;;       "HI"])
+;;  (println (experiment "Key: F#\nMode: minor\n\n.\nS\n"))
+

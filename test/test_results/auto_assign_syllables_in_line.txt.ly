@@ -18,7 +18,7 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"   c'4  d'4
+ \bar "|"  c'4 d'4
 
 }
 
@@ -28,7 +28,7 @@ he- llo
 }
 
 \score{
-\transpose c' d'
+
 <<
 \new Voice = "one" {
 \melody

@@ -50,11 +50,11 @@ for ARG in $1; do
 		echo "<hr>" >> $report 
 		echo "<h2>$mybasename</h2>" >> $report
 		echo "<pre class="doremi-source">" >> $report
-		cat $ARG | sed -f $DIR/sed_snippet.txt >> $report	
+		cat $ARG | sed -f $DIR/sed_snippet.sed >> $report	
 		echo "</pre>" >> $report
 		echo "<button  class="show_ly" data-which='$CTR'>Show Lilypond Source</button>" >> $report
 		echo "<pre id='ly$CTR' class='ly-data'>" >> $report
-		cat $fname.ly | sed -f $DIR/sed_snippet.txt >> $report	
+		cat $fname.ly | sed -f $DIR/sed_snippet.sed >> $report	
 		echo "</pre>" >> $report
 	 	lily2image -q -r=72 -f=png $fname 2>&1  
 		rm -f $fname.ps

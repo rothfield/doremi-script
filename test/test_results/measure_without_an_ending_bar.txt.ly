@@ -19,8 +19,8 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"   c'4 r4 r4 r4
- \bar "|"   d'4 r4 r4 r4
+ \bar "|"  c'4 r4 r4 r4
+ \bar "|"  d'4 r4 r4 r4
 }
 
 
@@ -29,7 +29,7 @@ text = \lyricmode {
 }
 
 \score{
-\transpose c' d'
+
 <<
 \new Voice = "one" {
 \melody

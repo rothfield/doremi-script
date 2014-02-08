@@ -23,7 +23,7 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"    e'8 g'8 r4 r4 r4 \bar "|"    e'8 d'8 r4 r4 r4 \bar "|" 
+ \bar "|"  e'8 g'8 r4 r4 r4 \bar "|"  e'8 d'8 r4 r4 r4 \bar "|" 
 }
 
 
@@ -32,7 +32,7 @@ Geor- gia geor- gia
 }
 
 \score{
-\transpose c' d'
+
 <<
 \new Voice = "one" {
 \melody

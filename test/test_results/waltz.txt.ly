@@ -21,7 +21,7 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"   c'4 r4 r4 \bar "|"   d'4 r4  c'4 \bar "|"   b4 r4 r4 \bar "|"  r4 r4 r4 \bar "|" 
+ \bar "|"  c'4 r4 r4 \bar "|"  d'4 r4 c'4 \bar "|"  b4 r4 r4 \bar "|"  r4 r4 r4 \bar "|" 
 }
 
 
@@ -30,7 +30,7 @@ i- rene good night
 }
 
 \score{
-\transpose c' d'
+
 <<
 \new Voice = "one" {
 \melody
