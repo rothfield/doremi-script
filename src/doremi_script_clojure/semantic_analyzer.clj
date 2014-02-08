@@ -1127,9 +1127,10 @@ node2
 
 (def run-tests false)
 (comment
-  (pprint (doremi_script_clojure.core/doremi-text->parse-tree 
+   (pprint (doremi_script_clojure.core/doremi-script-text->parsed-doremi-script 
+  ;;(pprint (doremi_script_clojure.core/doremi-text->parse-tree 
             ;;   (-> "fixtures/yesterday.txt" resource slurp)))
-            "<S-- R> -- -S"))
+            "<S-- R> -- -S\nHe-llo"))
   )
 
 

@@ -1,52 +1,54 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{ 
+\header{
 title = "hi"
 composer = ""
-  tagline = ""  % removed 
 }
 %{
- Title: hi
+Title: hi
 
    NRSNS
    .  .
 | S
- 
- %}
-  
+
+
+%}
 melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
-\autoBeamOn  
+\autoBeamOn
 \cadenzaOn
-\bar "|" \afterGrace c'4 { b32[ d'32 c'32 b32 c'32] }  \break        
+
+
+ \bar "|"   c'4
 
 }
 
+
 text = \lyricmode {
-  
+wtf wtf
 }
 
 \score{
-
+\transpose c' d'
 <<
-  \new Voice = "one" {
-    \melody
-  }
-  \new Lyrics \lyricsto "one" \text
+\new Voice = "one" {
+\melody
+}
+\new Lyrics \lyricsto "one" \text
 >>
 \layout {
-  \context {
-       \Score
-    \remove "Bar_number_engraver"
-  } 
-  }
-\midi { 
-  \context {
-    \Score
-    tempoWholesPerMinute = #(ly:make-moment 200 4)
-   }
- }
+\context {
+\Score
+\remove "Bar_number_engraver"
+}
+}
+\midi {
+\context {
+\Score
+tempoWholesPerMinute = #(ly:make-moment 200 4)
+}
+}
 }

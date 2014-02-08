@@ -1,47 +1,49 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{ 
+\header{
 title = ""
 composer = ""
-  tagline = ""  % removed 
 }
 %{
- <S> <S - >  <   S    R   G >  < - S > 
- %}
-  
+<S> <S - >  <   S    R   G >  < - S >
+
+%}
 melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
-\autoBeamOn  
+\autoBeamOn
 \cadenzaOn
-c'4 c'4 \times 2/3{ c'8 d'8 e'8~ e'8 } c'8  \break        
+
+
+  c'4  c'4    \times 2/3{ c'8 d'8 e'8 }   r8 c'8
 
 }
 
+
 text = \lyricmode {
-  
+
 }
 
 \score{
-
+\transpose c' d'
 <<
-  \new Voice = "one" {
-    \melody
-  }
-  \new Lyrics \lyricsto "one" \text
+\new Voice = "one" {
+\melody
+}
+\new Lyrics \lyricsto "one" \text
 >>
 \layout {
-  \context {
-       \Score
-    \remove "Bar_number_engraver"
-  } 
-  }
-\midi { 
-  \context {
-    \Score
-    tempoWholesPerMinute = #(ly:make-moment 200 4)
-   }
- }
+\context {
+\Score
+\remove "Bar_number_engraver"
+}
+}
+\midi {
+\context {
+\Score
+tempoWholesPerMinute = #(ly:make-moment 200 4)
+}
+}
 }

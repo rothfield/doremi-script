@@ -1,0 +1,196 @@
+<html><head>
+<link rel='stylesheet' href='report.css'>
+<title>doremi-script report: 1 files tested</title>
+</head>
+<body>
+<h2>doremi-script end to end test</h1>
+<h3>Fri Feb  7 22:23:50 PST 2014</h3>
+<hr>
+<h2>bansuri_line1.txt</h2>
+<pre class=doremi-source>
+Key: D
+Mode: phrygian          
+
+                                i            IV         . 
+         3              n       +            2         DSnDn
+1)|: (Sr | n) S   (gm &lt;P  d)&gt; | P - P  P   | P - D    n     |
+           .
+      ban-    su-  ri          ba- ja ra-   hi  dhu- na
+</pre>
+<button  class=show_ly data-which='1'>Show Lilypond Source</button>
+<pre id='ly1' class='ly-data'>
+#(ly:set-option 'midi-extension &quot;mid&quot;)
+\version &quot;2.12.3&quot;
+\include &quot;english.ly&quot;
+\header{
+title = &quot;&quot;
+composer = &quot;&quot;
+}
+%{
+Key: D
+Mode: phrygian          
+
+                                i            IV         . 
+         3              n       +            2         DSnDn
+1)|: (Sr | n) S   (gm &lt;P  d)&gt; | P - P  P   | P - D    n     |
+           .
+      ban-    su-  ri          ba- ja ra-   hi  dhu- na
+
+%}
+melody = {
+\once \override Staff.TimeSignature #'stencil = ##f
+\clef treble
+\key c \phrygian
+\autoBeamOn
+\cadenzaOn
+
+
+ \bar &quot;|:&quot;    c'8 df'8 \bar &quot;|&quot;   bf'4  c'4   ef'8 f'8   g'8 af'8 \bar &quot;|&quot;   g'4 r4  g'4  g'4 \bar &quot;|&quot;   g'4 r4  a'4  bf'4 \bar &quot;|&quot; 
+}
+
+
+text = \lyricmode {
+ban- su- ri ba- ja ra- hi dhu- na
+}
+
+\score{
+\transpose c' d'
+&lt;&lt;
+\new Voice = &quot;one&quot; {
+\melody
+}
+\new Lyrics \lyricsto &quot;one&quot; \text
+&gt;&gt;
+\layout {
+\context {
+\Score
+\remove &quot;Bar_number_engraver&quot;
+}
+}
+\midi {
+\context {
+\Score
+tempoWholesPerMinute = #(ly:make-moment 200 4)
+}
+}
+}</pre>
+<div><img src='bansuri_line1.txt.png'></div>
+<hr>
+<h2>bansuriv3.txt</h2>
+<pre class=doremi-source>
+Rag:Bhairavi
+Tal:Tintal
+Title:Bansuri
+Author:Traditional
+Source:AAK
+Mode: phrygian
+Filename: bansuriv3
+Time: 4/4
+Key: D
+
+
+          
+                               i            IV         . 
+         3S             n      +            2         DSnDn
+1)|: (Sr | n) S   (gm &lt;P d)&gt; | P - P  P   | P - D    n     |
+           .
+      ban-    su-  ri          ba- ja ra-   hi  dhu- na
+
+  0  ~                 3           mgm        +  .     *  *   
+| P  d   P    d    |  (Pm   PmnP)    (g m) | (PdnS) -- g  S |
+  ma-dhu-ra   kan-     nai-           ya      khe-     la-ta
+
+   2               0     
+                Pm ~
+| (d-Pm  g) P  m | r - S :|
+   ga-      wa-ta  ho- ri
+
+               .
+              &lt;g&gt;
+            .   . .
+| g m d n | S - r S |
+ji-na ja-u san-ga
+</pre>
+<button  class=show_ly data-which='2'>Show Lilypond Source</button>
+<pre id='ly2' class='ly-data'>
+#(ly:set-option 'midi-extension &quot;mid&quot;)
+\version &quot;2.12.3&quot;
+\include &quot;english.ly&quot;
+\header{
+title = &quot;Bansuri&quot;
+composer = &quot;&quot;
+}
+%{
+Rag:Bhairavi
+Tal:Tintal
+Title:Bansuri
+Author:Traditional
+Source:AAK
+Mode: phrygian
+Filename: bansuriv3
+Time: 4/4
+Key: D
+
+
+          
+                               i            IV         . 
+         3S             n      +            2         DSnDn
+1)|: (Sr | n) S   (gm &lt;P d)&gt; | P - P  P   | P - D    n     |
+           .
+      ban-    su-  ri          ba- ja ra-   hi  dhu- na
+
+  0  ~                 3           mgm        +  .     *  *   
+| P  d   P    d    |  (Pm   PmnP)    (g m) | (PdnS) -- g  S |
+  ma-dhu-ra   kan-     nai-           ya      khe-     la-ta
+
+   2               0     
+                Pm ~
+| (d-Pm  g) P  m | r - S :|
+   ga-      wa-ta  ho- ri
+
+               .
+              &lt;g&gt;
+            .   . .
+| g m d n | S - r S |
+ji-na ja-u san-ga
+
+%}
+melody = {
+\once \override Staff.TimeSignature #'stencil = ##f
+\clef treble
+\key c \phrygian
+\autoBeamOn
+\cadenzaOn
+
+
+ \bar &quot;|:&quot;    c'8 df'8 \bar &quot;|&quot;   bf'4  c'4   ef'8 f'8   g'8 af'8 \bar &quot;|&quot;   g'4 r4  g'4  g'4 \bar &quot;|&quot;   g'4 r4  a'4  bf'4 \bar &quot;|&quot;  \bar &quot;|&quot;   g'4  af'4  g'4  af'4 \bar &quot;|&quot;    g'8 f'8     g'16 f'16 bf'16 g'16  ef'4  f'4 \bar &quot;|&quot;      g'16 af'16 bf'16 c'16 r4  ef'4  c'4 \bar &quot;|&quot;  \bar &quot;|&quot;     af'8 g'16 f'16  ef'4  g'4  f'4 \bar &quot;|&quot;   df'4 r4  c'4 \bar &quot;:|&quot;  \bar &quot;|&quot;   ef'4  f'4  af'4  bf'4 \bar &quot;|&quot;   c'4 r4  df'4  c'4 \bar &quot;|&quot; 
+}
+
+
+text = \lyricmode {
+ban- su- ri ba- ja ra- hi dhu- na ma- dhu- ra kan- nai- ta ya khe- la- ga- wa- ri ta ho- ji- na ja- u san- ga
+}
+
+\score{
+\transpose c' d'
+&lt;&lt;
+\new Voice = &quot;one&quot; {
+\melody
+}
+\new Lyrics \lyricsto &quot;one&quot; \text
+&gt;&gt;
+\layout {
+\context {
+\Score
+\remove &quot;Bar_number_engraver&quot;
+}
+}
+\midi {
+\context {
+\Score
+tempoWholesPerMinute = #(ly:make-moment 200 4)
+}
+}
+}</pre>
+<div><img src='bansuriv3.txt.png'></div>
+<script src='zepto.min.js'></script><script src='report.js'></script></body></html>

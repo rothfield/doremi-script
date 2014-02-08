@@ -1,51 +1,52 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{ 
+\header{
 title = ""
 composer = ""
-  tagline = ""  % removed 
 }
 %{
- TimeSignature: 3/4
+TimeSignature: 3/4
 
 | S - - | R - S | N - - | - - - |
                   .
-  i-      rene good night 
- %}
-  
+  i-      rene good night
+
+%}
 melody = {
-\time 3/4
+\once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
-\autoBeamOn  
+\autoBeamOn
 \cadenzaOn
-\bar "|" c'2. \bar "|" d'2 c'4 \bar "|" b2.~ \bar "|" b2. \bar "|"  \break        
 
+
+ \bar "|"   c'4 r4 r4 \bar "|"   d'4 r4  c'4 \bar "|"   b'4 r4 r4 \bar "|"  r4 r4 r4 \bar "|" 
 }
 
+
 text = \lyricmode {
-  i- rene good night
+i- rene good night
 }
 
 \score{
-
+\transpose c' d'
 <<
-  \new Voice = "one" {
-    \melody
-  }
-  \new Lyrics \lyricsto "one" \text
+\new Voice = "one" {
+\melody
+}
+\new Lyrics \lyricsto "one" \text
 >>
 \layout {
-  \context {
-       \Score
-    \remove "Bar_number_engraver"
-  } 
-  }
-\midi { 
-  \context {
-    \Score
-    tempoWholesPerMinute = #(ly:make-moment 200 4)
-   }
- }
+\context {
+\Score
+\remove "Bar_number_engraver"
+}
+}
+\midi {
+\context {
+\Score
+tempoWholesPerMinute = #(ly:make-moment 200 4)
+}
+}
 }

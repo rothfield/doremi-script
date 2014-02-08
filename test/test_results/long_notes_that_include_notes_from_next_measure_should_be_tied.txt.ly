@@ -1,54 +1,55 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{ 
+\header{
 title = ""
 composer = ""
-  tagline = ""  % removed 
 }
 %{
-   +         2  
+  +         2  
 | GP - -  - | GR - - - | - G D G | R - - SR |
   Geor-gia geor-gia no peace I find      just an   
 
  
   
   
- 
- %}
-  
+
+
+%}
 melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
-\autoBeamOn  
+\autoBeamOn
 \cadenzaOn
-\bar "|" e'8[ g'8~ g'2.] \bar "|" e'8[ d'8~~~ d'2.] \bar "|" d'4 e'4 a'4 e'4 \bar "|" d'2. c'8[ d'8] \bar "|"  \break        
 
+
+ \bar "|"    e'8 g'8 r4 r4 r4 \bar "|"    e'8 d'8 r4 r4 r4 \bar "|"  r4  e'4  a'4  e'4 \bar "|"   d'4 r4 r4   c'8 d'8 \bar "|" 
 }
 
+
 text = \lyricmode {
-  Geor- gia geor- gia no peace I find just an
+Geor- gia geor- gia no peace I find just an
 }
 
 \score{
-
+\transpose c' d'
 <<
-  \new Voice = "one" {
-    \melody
-  }
-  \new Lyrics \lyricsto "one" \text
+\new Voice = "one" {
+\melody
+}
+\new Lyrics \lyricsto "one" \text
 >>
 \layout {
-  \context {
-       \Score
-    \remove "Bar_number_engraver"
-  } 
-  }
-\midi { 
-  \context {
-    \Score
-    tempoWholesPerMinute = #(ly:make-moment 200 4)
-   }
- }
+\context {
+\Score
+\remove "Bar_number_engraver"
+}
+}
+\midi {
+\context {
+\Score
+tempoWholesPerMinute = #(ly:make-moment 200 4)
+}
+}
 }

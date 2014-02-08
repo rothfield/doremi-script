@@ -1,13 +1,12 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{ 
+\header{
 title = "test semantic analyzer"
 composer = ""
-  tagline = ""  % removed 
 }
 %{
- Title: test semantic analyzer
+Title: test semantic analyzer
 
 ~
 +    *
@@ -18,41 +17,44 @@ Dm7
 <gRg>
 g
 .
-hi- 
- %}
-  
+hi-
+
+%}
 melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
-\autoBeamOn  
+\autoBeamOn
 \cadenzaOn
-ef''''4\mordent^"Dm7"  \break        
+
+
+  ef'4
 
 }
 
+
 text = \lyricmode {
-  hi-
+hi-
 }
 
 \score{
-
+\transpose c' d'
 <<
-  \new Voice = "one" {
-    \melody
-  }
-  \new Lyrics \lyricsto "one" \text
+\new Voice = "one" {
+\melody
+}
+\new Lyrics \lyricsto "one" \text
 >>
 \layout {
-  \context {
-       \Score
-    \remove "Bar_number_engraver"
-  } 
-  }
-\midi { 
-  \context {
-    \Score
-    tempoWholesPerMinute = #(ly:make-moment 200 4)
-   }
- }
+\context {
+\Score
+\remove "Bar_number_engraver"
+}
+}
+\midi {
+\context {
+\Score
+tempoWholesPerMinute = #(ly:make-moment 200 4)
+}
+}
 }

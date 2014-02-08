@@ -4,7 +4,7 @@
 
     [doremi_script_clojure.semantic_analyzer :refer [transform-parse-tree]]
     [clojure.string :refer [lower-case join]] 
-    [clojure.java.io :refer [input-stream resource]]
+    [clojure.java.io :as io :refer [input-stream resource]]
     [clojure.data.json :as json]
     [clojure.pprint :refer [pprint]] 
     [clojure.walk :refer [postwalk]]
@@ -61,7 +61,7 @@
                                     memo 
                                     )) {} (tree-seq vector? identity parse-tree2)
                                 )
-        _ (if false (do (println "saved-meta-data") (pprint saved-meta-data)))
+        _ (when false (println "saved-meta-data" (pprint saved-meta-data)))
         ]
     [saved-meta-data parse-tree2]))
 
@@ -182,7 +182,7 @@
 
 
 (defn line-column-map[my-map my-line]
-  (if false (do (println "entering line-column-map, my-map=" my-map)))
+  (when false (println "entering line-column-map, my-map=" my-map))
   (let [line-start (start-index my-line) 
         ]
     (reduce (fn[accum obj]
@@ -217,7 +217,7 @@
                         )
                       true
                       (let [ column (- start-index line-start)
-                            _ (if false ( println "true case, column is" column " obj is" obj)) ]
+                            _ (when false ( println "true case, column is" column " obj is" obj)) ]
                         (assoc accum 
                                column 
                                (conj (get accum column [])
@@ -240,7 +240,7 @@
        (= :measure (first x))))
 
 (defn is-pitch?[x]
-  ;; (if false (println "is-pitch, x is " x);)
+  ;; (when false (println "is-pitch, x is " x);)
   (and (vector? x)
        (= :pitch (first x))))
 
@@ -249,7 +249,7 @@
              x))
 
 (defn is-upper-dot?[x]
-  (if false (do (println "is-upper-dot?, x is") (pprint x)))
+  (when false (println "is-upper-dot?, x is") (pprint x))
   (and (vector? x)
        (contains? #{:upper-octave-dot :upper-upper-octave-symbol } 
                   (first x))))
@@ -282,7 +282,7 @@
 
 ;;(use 'clojure.stacktrace) 
 (defn lines->column-map[lines]
-  (if false (do (println "entering lines->column-map, ") (pprint lines) (println "lines->column-map")))
+  (when false (println "entering lines->column-map, ") (pprint lines) (println "lines->column-map"))
   (reduce (fn[accum item] 
             (line-column-map accum item)) {}
           (remove keyword? (remove #(or (is-sargam-line? %) (is-lyrics-line? %)) lines))))
@@ -292,12 +292,12 @@
 (defn assign-ornament-octaves[my-section]
   {;; :pre [(is-sargam-section? my-section)] 
    :post [(is-sargam-section? %)] }
-  (if false (do (println "entering assign-ornament-octaves:")
-                (pprint my-section)))
+  (when false (println "entering assign-ornament-octaves:")
+    (pprint my-section))
   (let [column-map (lines->column-map 
                      (filter is-upper-line? (items my-section)))
-        _ (if false (do (println "****assign-ornament-octaves: column-map is")(pprint column-map)))
-        _ (if false (do (println "****Entering assign-ornament-octaves: my-section is")(pprint my-section)))
+        _ (when false (println "****assign-ornament-octaves: column-map is")(pprint column-map))
+        _ (when false (println "****Entering assign-ornament-octaves: my-section is")(pprint my-section))
         ]
     (into [] 
           (map 
@@ -305,19 +305,19 @@
               (cond (is-upper-line? line)
                     (postwalk 
                       (fn assign-dots-postwalk-fn[item] 
-                        (if false (println "assign-dots-postwalk-fn*** item is" item))
+                        (when false (println "assign-dots-postwalk-fn*** item is" item))
                         (cond 
                           (is-pitch? item)
                           ;; Look for dot in this column from lines above and below this one. But not in the lower lines
                           (let [column (- (start-index item) (start-index line))
-                                _ (if false (println "column is:" column))
-                                _ (if false (do (println "column-map is ")
-                                                (pprint column-map)))
-                                _ (if false (do (println "column-map column:") (pprint (column-map column))))
+                                _ (when false (println "column is:" column))
+                                _ (when false (do (println "column-map is ")
+                                                  (pprint column-map)))
+                                _ (when false (println "column-map column:") (pprint (column-map column)))
                                 dots-from-upper-lines (remove (partial in-assigned? @assigned)
                                                               (filter is-upper-dot?
                                                                       (column-map column [])))
-                                ;;     _ (if false (do (println "dots-from-upper-lines") (pprint dots-from-upper-lines)))
+                                ;;     _ (when false (println "dots-from-upper-lines") (pprint dots-from-upper-lines)))
                                 ]
                             (if debug (println "is-pitch case"))
                             (if (empty? dots-from-upper-lines)
@@ -345,9 +345,9 @@
 
 
 (defn assign-syllables[section]
-  (if false (do (println "assign-syllables") (pprint section)))
+  (when false (println "assign-syllables") (pprint section))
   (let [ syls-to-apply (atom (mapcat items (filter is-lyrics-line? section)))
-        _ (if false (println @syls-to-apply))
+        _ (when false (println @syls-to-apply))
         in-slur (atom false)
         ]
     (map (fn[line] (if-not (is-sargam-line? line) line
@@ -398,12 +398,12 @@
                                    (last (filter 
                                            (partial > slur-position) pitch-positions)))
                                  end-slur-positions))
-                 _ (if false (do
-                               (pprint line) 
-                               (println "pitch-positions" pitch-positions)
-                               (println "begin-slur-positions" begin-slur-positions)
-                               (println "end-slurs" end-slur-positions)
-                               (println "pitches-needing-end-slurs" pitches-needing-end-slurs)))
+                 _ (when false
+                     (pprint line) 
+                     (println "pitch-positions" pitch-positions)
+                     (println "begin-slur-positions" begin-slur-positions)
+                     (println "end-slurs" end-slur-positions)
+                     (println "pitches-needing-end-slurs" pitches-needing-end-slurs))
                  ]
              (postwalk (fn walk-line[item] 
                          (cond (is-pitch? item)
@@ -438,15 +438,15 @@
           ;; (do (println (start-index %)) (pprint %) true) 
           ]
    }
-  (if false (do (println "assign-to-main-line") (pprint section)))
+  (when false (println "assign-to-main-line") (pprint section))
   "collapse"
   (let [ column-map (lines->column-map (items section))
-        _ (if false (println "column-map:\n" column-map))
+        _ (when false (println "column-map:\n" column-map))
         main-line (first (filter is-main-line? (items section)))     
         main-line-start-index (start-index main-line)
         _ (if debug (println "main-line is" main-line))
         line-starts (map start-index (items section))
-        _ (if false (do (println "line-starts=") (pprint line-starts)))
+        _ (when false (println "line-starts=") (pprint line-starts))
         line-start-for-position  (fn line-start-for-position-fn[position] 
                                    (last (filter (fn[x] (>= position x)) line-starts)))
         line-start-for-node (fn line-start-for-node[node]
@@ -458,8 +458,8 @@
                     (if-not (is-sargam-line? line)
                       line
                       (postwalk (fn[item] 
-                                  (if false (println "**** item" item))
-                                  (if false (println "**** start-index item" (start-index item)))
+                                  (when false (println "**** item" item))
+                                  (when false (println "**** start-index item" (start-index item)))
                                   (cond 
                                     (and (vector? item) (is-pitch? item) (< (start-index item) main-line-start-index))
                                     item
@@ -476,11 +476,11 @@
                                                             :mordent} (first x))) 
 
                                                   (remove (partial in-assigned? @assigned) (column-map column [])))
-                                          _ (if false (println "nodes-in-this-column" nodes-in-this-column))
+                                          _ (when false (println "nodes-in-this-column" nodes-in-this-column))
                                           ]
                                       (if (not-empty nodes-in-this-column)
                                         (do
-                                          (if false (println "*********conjing"))
+                                          (when false (println "*********conjing"))
                                           (reset! assigned (apply conj @assigned (map unique-for-assigned nodes-in-this-column)))
                                           (apply conj item nodes-in-this-column) 
                                           )
@@ -492,17 +492,21 @@
                   ))))
 
 (defn collapse-section[section]
-  {:post [(if false (do (println "leaving collapse-section, returns")
-                        (pprint %))
-            true)]}
-  (if false (do (println "collapse-section, section=") (pprint section)))
+  {:post [(do (when false (println "leaving collapse-section, returns")
+                (pprint %))
+              true)]}
+  (when false (println "collapse-section, section=") (pprint section))
   (reset! assigned #{})
-  (first (filter is-main-line?
-                 (-> section 
-                     handle-slurs
-                     assign-ornament-octaves
-                     assign-to-main-line
-                     assign-syllables))))
+  ;;  (first (filter is-main-line?
+  (into [] (->> section 
+                handle-slurs
+                assign-ornament-octaves
+                assign-to-main-line
+                assign-syllables
+                (remove (fn[x] (and (vector? x) (#{:upper-octave-line :lower-octave-line} (first x)))))
+                )))
+
+;;))
 
 (defn remove-ids[obj saved]
   {
@@ -531,7 +535,7 @@
   (pprint composition)
   )
 
-;;(-> "S- -R" experiment zip-test)
+;;(-> "S- -R\nHi" experiment)
 
 
 
@@ -620,10 +624,25 @@
 (defn map-even-items [f coll]
   (map-indexed #(if (zero? (mod %1 2)) (f %2) %2) coll))
 
+(defn handle-source[accum source]
+  (assoc accum :source (last source))
+  )
+
+(defn lilypond-escape[x]
+  ;; (println "x is " x)
+  ;;      # Anything that is enclosed in %{ and %} is ignored  by lilypond
+  ;;      composition-data.source="" if !composition-data.source?
+  ;;      src1= composition-data.source.replace /%\{/gi, "% {"
+  ;;      src= src1.replace /\{%/gi, "% }"
+  (clojure.string/replace x #"\{%" "% {")
+  ) 
+
 (defn print-headers[accum composition]
   (let [ atts (first (filter is-attribute-section? composition))
         ;; _ (pprint atts) 
         my-map (apply array-map (map-even-items lower-case (rest atts)))
+        source (second (first (filter #(= :source (first %)) (rest composition))))
+        _ (when false (println "Source is\n" source))
         ;; _ (pprint my-map)
         ] 
     (update-in accum [:output] str 
@@ -631,15 +650,20 @@
                      [
                       (str "title = \"" (get my-map "title" ) "\"")
                       (str "composer = \"" (get my-map "composer" ) "\"")
+                      "}" ;; see ....
+                      "%{"
+                      (lilypond-escape (:source accum))
+                      "%}"
                       "melody = {"
                       "\\once \\override Staff.TimeSignature #'stencil = ##f"
                       "\\clef treble"
-                      (str "\\key c " (get my-map "mode" "\\major"))
+                      (str "\\key c " (str "\\" (get my-map "mode" "major")))
                       "\\autoBeamOn"
                       "\\cadenzaOn"
                       "\n"
                       ] 
                      ) "\n")))
+
 
 
 (def pitch->lilypond-pitch
@@ -660,7 +684,7 @@
 (defn pitch->octave[pitch]
   {
    :pre [ (is-pitch? pitch)] 
-   :post [ (if false (println "pitch->octave" %) true) ] }
+   :post [ (do (when false (println "pitch->octave" %)) true) ] }
   (->> pitch (filter vector?) (map first) {:upper_octave_dot 1
                                            :upper-upper-octave-symbol 2
                                            :lower_octave_dot -1
@@ -674,27 +698,29 @@
    }
   (->> beat (filter vector?) (map first) (filter #{:pitch :dash}) count) ;; OMG
   )
+
 (defn start-beat[accum beat]
-  (assoc accum :state :in-beat
-         :current-beat-divisions (beat->beat-divisions beat)
+  (assoc accum 
+         :divisions (beat->beat-divisions beat)
+         :beat-pitches []
          )
   )
 
- (defn barline->lilypond-barline[
-                                 [_ [barline-type] ] ;; destructuring fun
-                                 ]
-   " maps barline-type field for barlines"
-   (let [my-map
-         {
-          :reverse-final-barline "\\bar \".|\""
-          :final-barline "\\bar \"|.\" "
-          :double-barline "\\bar \"||\" " 
-          :single-barline "\\bar \"|\"" 
-          :left-repeat "\\bar \"|:\"" 
-          :right-repeat "\\bar \":|\"" 
-          } ]
-     (str (get my-map barline-type (:single-barline my-map)) " ")
-     ))
+(defn barline->lilypond-barline[
+                                [_ [barline-type] ] ;; destructuring fun
+                                ]
+  " maps barline-type field for barlines"
+  (let [my-map
+        {
+         :reverse-final-barline "\\bar \".|\""
+         :final-barline "\\bar \"|.\" "
+         :double-barline "\\bar \"||\" " 
+         :single-barline "\\bar \"|\"" 
+         :left-repeat "\\bar \"|:\"" 
+         :right-repeat "\\bar \":|\"" 
+         } ]
+    (str (get my-map barline-type (:single-barline my-map)) " ")
+    ))
 
 (defn octave-number->lilypond-octave[num]
   (let [tick "'"
@@ -707,108 +733,393 @@
           true
           (apply str (take (dec (- num)) (repeat comma))))))
 
+(defn start-pitch[accum pitch]
+  (let [pitch-and-octave 
+        (str (pitch->lilypond-pitch (second pitch))
+             (->> pitch pitch->octave octave-number->lilypond-octave)                                     )
+        ]
+    (update-in (assoc accum :state :collecting-pitch-in-beat
+                      :current-pitch  { :obj pitch  :micro-beats 1}
+                      :lilypond-pitch-and-octave pitch-and-octave
+
+                      ) [:output] str " " ) 
+    ))
+
+(defn start-line[accum obj]
+  ;; TODO
+  accum
+  )
+
+(defn emit-barline[accum barline]
+  (update-in accum [:output] str  " "
+             (barline->lilypond-barline barline)
+             )
+  )
+(defn lilypond-headers[accum composition]
+  (update-in accum [:output] str 
+             (join "\n" [
+                         "#(ly:set-option 'midi-extension \"mid\")"
+                         "\\version \"2.12.3\""
+                         "\\include \"english.ly\""
+                         "\\header{" 
+                         ] ) "\n" ))
+
+
+(defn ratio->lilypond-durations[my-numerator subdivisions-in-beat]
+  { :pre [ (integer? my-numerator)
+          (integer? subdivisions-in-beat)]
+   :post [ (vector? %)] 
+   }
+  " ratio->lilypond-durations(3 4) => ["8."]   Ratio is ratio of "
+  "quarter note" 
+
+  (let [my-ratio (/ my-numerator subdivisions-in-beat)]
+    ;; In the case of beats whose subdivisions aren't powers of 2, we will
+    ;; use a tuplet, which displays, for example, ---3---  above the beat
+    ;; if the beat has 3 microbeats.
+    ;; Take the case of  S---R. beat is subdivided into 5.  Use sixteenth notes. 4 for S and 1 for R. 5/16 total.  
+    ;; For subdivision of 3, use 3 1/8 notes.
+    ;; For subdivision of 5 use 5 1/16th notes.
+    ;; For 6 use   16th notes
+    ;; etc
+    ;; For over 32 use 32nd notes, I guess.
+    ;; confusing, but works
+    ;; Things like S---r should map to quarter note plus sixteenth note in a 5-tuple
+    ;; Take the case of S----R--   
+    ;; S is 5 microbeats amounting to 5/32nds. To get 5 we have to tie either
+    ;; 4/8th of a beat plus 1/32nd  or there are other approaches.
+    (if (not (ratio? my-ratio))
+      ({ 1 ["4"]
+        2 ["2"]
+        3 ["2."]
+        4 ["1"]  ;; review
+        8 ["1" "1"]
+        } my-ratio
+       (into [] (repeat my-numerator "4"))
+       )
+      ;; else
+      (let [ 
+            my-table
+            { 1 ["4"] ;; a whole beat is a quarter note
+             (/ 1 2) ["8"] ;; 1/4 of a beat is 16th
+             (/ 1 4) ["16"] ;; 1/4 of a beat is 16th
+             (/ 1 8) ["32"] ;; 1/8th of a beat is a 32nd. 
+             (/ 1 16) ["64"] ;; 1/16th of a beat is 64th. 16/64ths=beat
+             (/ 1 32) ["128"] ;; 32nd of a beat is 128th note
+             (/ 3 4) ["8."] ;; 3/4 of a beat is  dotted eighth
+             (/ 3 8) ["16."] ;; 
+             (/ 3 16) ["32."] ;;  1/32 + 1/64 = 3/64 =3/16th of beat = 3/64 dotted 32nd
+             (/ 3 32) ["64."]
+             (/ 3 64) ["128."]
+             (/ 5 4) ["4" "16"] ;; 1 1/4 beats= quarter tied to 16th
+             (/ 5 8) ["8" "32"]
+             (/ 5 16) ["16" "64"];;
+             (/ 5 32) ["32" "128"];;
+             (/ 5 64) ["64" "256"];;
+             (/ 5 128) ["128" "512"];;
+             (/ 7 4) ["4" "8."] ;;
+             (/ 7 8) ["8.."] ;; 1/2 + 1/4 + 1/8  
+             (/ 7 16) ["16" "32."] ;; 1/4+ 3/16   
+             (/ 7 32) ["64" "128."] ;;   
+             (/ 11 16) ["8" "64."] ;; 1/2 + 
+
+             } 
+            ;;  
+            new-denominator 
+            (cond (#{1 2 4 8 16 32 64 128 256 512} subdivisions-in-beat)
+                  subdivisions-in-beat
+                  (= 3 subdivisions-in-beat) 
+                  2 
+                  (<  subdivisions-in-beat 8)
+                  4 
+                  (< subdivisions-in-beat 16)
+                  8 
+                  (< subdivisions-in-beat 32)
+                  16 
+                  (< subdivisions-in-beat 64)
+                  32 
+                  true
+                  32 
+                  )
+            new-ratio (/ my-numerator new-denominator)
+            ]
+        (get my-table new-ratio 
+             [
+              (str "unsupported: " my-numerator "/" new-denominator)
+              ]) 
+        ))))
+
+(defn tuplet-numerator-for-odd-subdivisions[subdivisions-in-beat]
+  ;; fills in numerator for times. For example
+  ;; \times ???/5 {d'16 e'8 d'16 e'16 }
+  ;; The ??? should be such that 5/16 *  ???/5 =  1/4
+  ;; So ??? = 4
+  ;; TODO: dry with duration code
+  (cond (= 3 subdivisions-in-beat) 
+        2 
+        (<  subdivisions-in-beat 8)
+        4 
+        (< subdivisions-in-beat 16)
+        8 
+        (< subdivisions-in-beat 32)
+        16 
+        (< subdivisions-in-beat 64)
+        32 
+        true
+        32 
+        )
+  )
+
+(defn enclose-beat-in-times[beat-str subdivisions]
+  {
+   :pre [(string? beat-str)
+         (integer? subdivisions)]
+   :post [(string? %)]
+   }
+  (if (not (#{0 1 2 4 8 16 32 64 128} subdivisions))
+    (str "\\times "
+         (tuplet-numerator-for-odd-subdivisions 
+           subdivisions)
+         "/" 
+         subdivisions
+         "{ "
+         beat-str " } ")
+    beat-str))
+
+
+(defn finish-beat[accum]
+  (when false (println "finish-beat"))
+  (assoc accum
+         :output (str  (:output accum) " " 
+                      (enclose-beat-in-times (join " " (:beat-pitches accum))
+                                             (:divisions accum)))
+         :beat-pitches []
+         :divisions 0))
+
+
+
+(defn finish-dashes[accum]
+  (when false
+    (println "finish-dashes")
+    (pprint (remove :output accum)))
+
+  (let [divisions (accum :divisions)
+        _ (when false (println "divisions=" divisions))
+        micro-beats (get-in accum [:dash-microbeats])
+        _ (when false (println ":dash-microbeats=" micro-beats))
+        ary (ratio->lilypond-durations micro-beats divisions)
+        pitch-and-octave (:lilypond-pitch-and-octave accum)
+        rests (join " " (map (partial str "r") ary))
+        ]
+    (when false  
+      (println "finish-dashes  divisions=" divisions "; micro-beats= " micro-beats)
+      (pprint ary))
+    (update-in accum [:beat-pitches] conj rests )
+    ))
+
+
+(defn start-dash[accum dash]
+  (assoc accum :state :collecting-dashes-in-beat
+         :dash-microbeats 1
+         ))
+
+
+(defn finish-pitch[accum]
+  (when false (println "finish-pitch"))
+  (when false (pprint (remove :output accum)))
+  (let [divisions (accum :divisions)
+        micro-beats (get-in accum [:current-pitch :micro-beats])
+        ary (ratio->lilypond-durations micro-beats divisions)
+        pitch-and-octave (:lilypond-pitch-and-octave accum)
+        pitches (join " " (map (partial str pitch-and-octave) ary))
+        ]
+    (when false 
+      (println "finish-pitch  divisions=" divisions "; micro-beats= " micro-beats)
+      (pprint ary))
+    (when false (println "leaving finish-pitch:" (update-in accum [:beat-pitches] conj pitches )))
+    (update-in accum [:beat-pitches] conj pitches )
+    ))
+
+(defn finish-line[accum]
+  (update-in accum [:output] str (join "\\break" "\n"))
+  )
+
+(defn lilypond-at-eof[accum]
+  (update-in accum [:output] str  
+             (join "\n" [
+                         "\n}\n\n" ;; end of melody
+                         "text = \\lyricmode {"
+                         (join " "
+
+                               (->> (:composition accum)  (tree-seq vector? identity)  (filter is-pitch?) (filter #(> (count %) 2)) (map last) (filter string?))
+                               ) 
+                         "}\n"
+                         "\\score{"
+                         "\\transpose c' d'"
+                         "<<"
+                         "\\new Voice = \"one\" {"
+                         "\\melody"
+                         "}"
+                         "\\new Lyrics \\lyricsto \"one\" \\text"
+                         ">>"
+                         "\\layout {"
+                         "\\context {"
+                         "\\Score"
+                         "\\remove \"Bar_number_engraver\""
+                         "}"
+                         "}"
+                         "\\midi {"
+                         "\\context {"
+                         "\\Score"
+                         "tempoWholesPerMinute = #(ly:make-moment 200 4)"
+                         "}"
+                         "}"
+                         "}"
+                         ]))
+
+  )
+
 (defn lilypond-transition[accum obj]
-  { :pre [ (map? accum)
+  { :pre [ (do (when false (println "first obj=" (first obj))) true)
+          (map? accum)
+          (#{:lyrics-section :lyrics-line :sargam-section :pitch :barline :measure :sargam-line :line-number :composition
+             :beat :dash :output :eof :attribute-section :source} (first obj))
           (:output accum)
           (:state accum)
           (keyword? (:state accum))
           (vector obj)]}
   (let [token (first obj)
         cur-state (:state accum)
-        _ (if true (do  (pprint (dissoc accum :composition))
-                       (println cur-state token)))
+        _ (when false (println "Entering lilypond-transition\n" "state,token=" cur-state token))
         ]
     (case [cur-state token]
       [:start :composition]
-      (assoc accum :state :looking-for-attribute-section)
-      [:looking-for-attribute-section :sargam-line]
-      (assoc (print-headers accum (:composition accum))
-             :state :in-sargam-line)
-      [:in-sargam-line :measure]
-      (assoc accum :current-pitch nil)
-      [:in-sargam-line :beat]
-      (start-beat accum obj)
-      [:in-sargam-line :eof]
+      (-> accum (lilypond-headers obj) (assoc :state :looking-for-source))
+
+      [:looking-for-source :source]
+      (-> accum (handle-source obj) (assoc :state :looking-for-attribute-section))
+
+      [:in-sargam-section :sargam-line]
+      (-> accum (assoc  :state :in-sargam-line)) ;; review:lyrics (rest (last obj)))
+
+      [:looking-for-attribute-section :lyrics-section]
       accum
+
+      [:looking-for-attribute-section :sargam-section]
+      (-> accum (print-headers (:composition accum)) (assoc
+                                                       :state :in-sargam-section))
+
+      [:looking-for-attribute-section :attribute-section]
+      (assoc accum :state :looking-for-attribute-section) ;; support multiple attribute sections 
+
+      [:in-sargam-line :measure]
+      (assoc accum :current-pitch nil) ;; maybe need to save current pitch
+
+      [:in-sargam-line :beat]
+      (-> accum (start-beat obj) (assoc :state :in-beat))
+
+      [:in-sargam-line :barline]
+      (-> accum (emit-barline obj) (assoc :state :in-sargam-line))
+
+      [:in-sargam-line :line-number]
+      accum ;; no lilypond mapping yet
+
+      [:in-sargam-line :sargam-section]
+      (-> accum finish-line (assoc :state :in-sargam-section))
+
+      [:looking-for-sargam-section :eof]
+      (-> accum lilypond-at-eof  (assoc :state :eof))
+
+      [:looking-for-sargam-section :sargam-section]
+      (-> accum (assoc :state :in-sargam-section))
+
+      [:in-sargam-line :lyrics-line]
+      (assoc accum :state :looking-for-sargam-section)
+
+      [:collecting-pitch-in-beat :lyrics-line] ;; needed?
+      accum
+
+      [:collecting-pitch-in-beat :eof]
+      (-> accum finish-pitch finish-beat finish-line lilypond-at-eof)
+
+      [:in-sargam-line :eof]
+      (-> accum finish-line lilypond-at-eof (assoc :state :eof))
+
+      [:in-beat :eof]
+      (-> accum finish-beat  (assoc :state :eof))
+
       [:in-beat :pitch]
-      (assoc accum :state :collecting-pitch-in-beat
-             :current-pitch  { :obj obj  :micro-beats 1}
-             )
+      (start-pitch accum obj)
+
+      [:in-beat :dash]  ;; dash at beginning of beat
+      (start-dash accum obj)
+
+      [:collecting-dashes-in-beat :eof]
+      (-> accum finish-dashes finish-beat lilypond-at-eof)
+
+      [:collecting-dashes-in-beat :beat]
+      (-> accum finish-dashes finish-beat (start-beat obj) (assoc :state :in-beat))
+
+      [:collecting-dashes-in-beat :dash]
+      (-> accum (update-in [:dash-microbeats] inc))
+
+      [:collecting-dashes-in-beat :pitch]
+      (-> accum finish-dashes (start-pitch obj) (assoc :state :collecting-pitch-in-beat)) 
+
+
+
+      [:collecting-dashes-in-beat :sargam-section]
+      (-> accum finish-dashes finish-beat finish-line (assoc :state :in-sargam-section)) 
+
+
+
+      [:collecting-dashes-in-beat :barline]
+      (-> accum finish-dashes finish-beat (emit-barline obj) (assoc :state :in-sargam-line))
+
       [:collecting-pitch-in-beat :barline]
-      (assoc accum :state :in-sargam-line
-             :output (str (:output accum)
-                         (barline->lilypond-barline obj)
-                              ))
+      (-> accum finish-pitch finish-beat (emit-barline obj)
+          (assoc :state :in-sargam-line))
+
       [:collecting-pitch-in-beat :pitch]
-      ;; finish current pitch
-      (assoc accum :state :collecting-pitch-in-beat)
+      (-> accum finish-pitch (start-pitch obj)
+          (assoc :state :collecting-pitch-in-beat))
+
       [:collecting-pitch-in-beat :dash]
-      ;; increment counter for current pitch
-      (update-in accum [:current-pitch :micro-beats] inc )
+      (-> accum (update-in [:current-pitch :micro-beats] inc))
 
       [:collecting-pitch-in-beat :beat]
+      (-> accum finish-pitch finish-beat (start-beat obj) (assoc :state :in-beat))
       ;; tie previous note if new one is a dash!!!
-      (do
-        (start-beat accum obj)
-        )
       )))
 
 
 
-
 (defn new-to-lilypond[composition]
+  (when false (println "new-to-lilypond") (pprint composition))
   (let [headers-printed? (atom false)
         started-pitch? (atom false) 
         ]
-    (->> (conj composition [:eof]) (tree-seq #(and (vector? %)
-                                                   (#{:composition :sargam-line :measure :beat} (first %)))
+    (->> (conj composition [:eof]) (tree-seq  #(and (vector? %)
+                                                    (#{:sargam-section :lyrics-line :composition :sargam-line :measure :beat} (first %)))
                                              identity)
-
-
          (filter vector?)
          (reduce lilypond-transition
                  {:state :start 
                   :output ""
                   :composition composition}
                  ))))
-;;;;    \header{ 
-;;;;    #(ly:set-option 'midi-extension "mid")
-;;;;    \version "2.12.3"
-;;;;    \include "english.ly"
-;;;;    \header{ 
-;;;;    title = ""
-;;;;    composer = ""
-;;;;      tagline = ""  % removed 
-;;;;    }
-;;;;    %{
-;;;;     Key: D
-;;;;    Mode: phrygian          
-;;;;    
-;;;;                                    i            IV         . 
-;;;;             3              n       +            2         DSnDn
-;;;;    1)|: (Sr | n) S   (gm <P  d)> | P - P  P   | P - D    n     |
-;;;;               .
-;;;;          ban-    su-  ri          ba- ja ra-   hi  dhu- na 
-;;;;     %}
-;;;;      
-;;;;    melody = {
-;;;;    \once \override Staff.TimeSignature #'stencil = ##f
-
-
-
-;;  (-> "title:Hi\n\nS- -R" experiment new-to-lilypond :output println)
-
-
 
 
 (defn experiment[txt]
-  ;; (println "parsing") 
-  ;;(println txt)
-  ;;  (pprint (doremi-text->parse-tree "  S S"))
+  (when false 
+    (println "parsing") 
+    (println txt)
+    )
+  ;;  (pprint (doremi-text->parse-tree "  S S\nHello john"))
   ;;(println "\n\n\n")
   (let [
         parsed  (doremi-text->parse-tree txt)
-        _ (if false (do (println "parsed:") (pprint parsed)))
+        _ (if nil (do (println "parsed:") (pprint parsed)))
         ]
     (if (map? parsed)  ;; error
       (pprint parsed)
@@ -819,21 +1130,97 @@
                                          (collapse-section %)
                                          %)
                                       parse-tree)) saved)
-            _ (if true (do (pprint collapsed-parse-tree)))
+            collapsed2 (into [] (concat (subvec collapsed-parse-tree 0 1)
+                                        [[:source txt]]
+                                        (subvec collapsed-parse-tree 1)))
+            _ (when false;; (pprint )
+                (println "****collapsed-parse-tree")
+                (pprint collapsed2) (println "\n\n"))
             ]
-        (println (:output (new-to-lilypond collapsed-parse-tree)
-                          )))))) 
+        nil 
+        (:output (new-to-lilypond collapsed2))
+        )))) 
+
+;;(->  "fixtures/bansuriv3.txt" resource slurp experiment)
+
+
+;;  (println (:output (new-to-lilypond collapsed-parse-tree))))))) 
 ;;(println (experiment "Title:John\n\nS"))
-(if true
+(when false
   (pprint (experiment ;;doremi-text->parse-tree 
                       (join "\n" [
                                   ;; " ..   ..." 
                                   " SR. .GmP"
-                                  "(  G m    ) m(P d)-  | S :|"
+                                  "(  G m    ) m-(P d)-  | S :|"
+                                  "\n"
+                                  "1) SS"
                                   ])
                       )))
 
 
 
-;;(pprint (experiment (slurp (resource "fixtures/yesterday.txt"))))
+(defn test-aux[file-spec]
+  (->> file-spec slurp experiment (spit (str "./test/test_results/" (.getName file-spec) ".ly")))
+  (.getName file-spec)) 
 
+
+
+(defn test-all2-process-file[my-file]
+  (let [ basename (.getName my-file) 
+        filename (str "test/test_results/" basename)
+        ]
+    (io/copy my-file (io/file  filename))
+    (->> my-file slurp 
+         experiment (spit (str filename ".ly")))
+    ))
+
+
+(defn test-all2[resource-names]
+  { :pre [(vector? resource-names)
+          (every? string? resource-names) ]
+   }
+  "Takes a list of resource names, as in "
+  ;; ["resources/fixtures/foo.txt" "resources/fixtures/bar.txt"]
+  ;; Will try and correct the paths to find the resource.
+  (let [resource-paths
+        (map (fn get-fixture-resource-path[my-str]
+               (if (.contains my-str "fixtures")
+                 (clojure.string/replace my-str #".*fixtures" "fixtures")
+                 (str "fixtures/"
+                      (last  (clojure.string/split my-str #"\/")))))
+             resource-names) 
+        _ (when false (pprint resource-paths))
+        file-specs (map 
+                     #(-> % io/resource io/file) resource-paths)
+        _ (when false pprint file-specs)
+        ]
+    (dorun (map test-all2-process-file file-specs))
+    resource-paths
+    ))
+
+;; (test-all2 ["bansuriv3.txt"])
+(defn test-all[dir-str match-str]
+  (println "test-all " dir-str " " match-str)
+  (map  test-aux
+       (filter #(.matches (.getName %) match-str)(file-seq (clojure.java.io/file dir-str)))))
+
+
+(when false (pprint  (test-all "resources/fixtures" ".*.txt")))
+(when false (pprint  (test-all "resources/fixtures" "you_can_add.*.txt")))
+
+
+;;(pprint (experiment (slurp (resource "fixtures/no_syls_yesterday.txt"))))
+(when nil (pprint (experiment (slurp (resource "fixtures/aeolian_mode_in_specific_key.txt")))))
+;;no_syls_yesterday.txt"))))
+;;(pprint (experiment (slurp (resource "fixtures/bansuriv3.txt"))))
+;;;
+;;(->  "fixtures/bansuriv3.txt" resource slurp doremi-text->parse-tree pprint)
+;;
+
+(when nil 
+  ;;(pprint (experiment (slurp (resource "fixtures//georgia.doremiscript.txt"))))
+  (pprint (experiment (slurp (resource "fixtures/bansuriv3.txt"))))
+  (println (experiment "S\n")))
+;; (join "\n" ["(Sr | n)"
+;;        "      ."
+;;       "HI"])
