@@ -21,7 +21,7 @@ Key: D
 
 %}
 melody = {
-\once \override Staff.TimeSignature #'stencil = ##f
+\time 3/4
 \clef treble
 \key c \phrygian
 \autoBeamOn

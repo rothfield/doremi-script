@@ -19,7 +19,7 @@ melody = {
 \cadenzaOn
 
 
- ef'4( f'4 g'4 af'4) \bar "|"  g'4
+ ef'4) f'4 g'4 af'4) \bar "|"  g'4
 
 }
 

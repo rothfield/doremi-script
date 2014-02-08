@@ -14,7 +14,7 @@ TimeSignature: 3/4
 
 %}
 melody = {
-\once \override Staff.TimeSignature #'stencil = ##f
+\time 3/4
 \clef treble
 \key c \major
 \autoBeamOn

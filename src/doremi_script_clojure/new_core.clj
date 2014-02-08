@@ -637,6 +637,17 @@
   (clojure.string/replace x #"\{%" "% {")
   ) 
 
+
+(def omit-time-signature-snippet
+"\\once \\override Staff.TimeSignature #'stencil = ##f"
+  )
+
+(defn time-signature-snippet[x]
+  (if x
+(str "\\time " x)
+  omit-time-signature-snippet))
+
+
 (defn print-headers[accum composition]
   (let [ atts (first (filter is-attribute-section? composition))
         ;; _ (pprint atts) 
@@ -644,7 +655,7 @@
                       (map-even-items #(-> % lower-case keyword)
                                       (rest atts)))
         source (second (first (filter #(= :source (first %)) (rest composition))))
-        _ (when false (println "Source is\n" source)
+        _ (when true (println "Source, my-map is\n" source)
                       (pprint my-map))
         ] 
     (-> (update-in accum [:output] str 
@@ -657,7 +668,7 @@
                       (lilypond-escape (:source accum))
                       "%}"
                       "melody = {"
-                      "\\once \\override Staff.TimeSignature #'stencil = ##f"
+                      (time-signature-snippet (:timesignature my-map))
                       "\\clef treble"
                       (str "\\key c " (str "\\" (lower-case (:mode my-map "major"))))
                       "\\autoBeamOn"
@@ -895,6 +906,13 @@
          :beat-pitches []
          :divisions 0))
 
+(defn chord-snippet[obj]
+   { :pre [ (vector? obj)   ] }
+  (let [
+        chord (last (first (filter #(and (vector? %) (= :chord (first %))) obj)))
+        ]
+       (when chord (str "^\"" chord "\""))
+  ))
 
 
 (defn finish-dashes[accum]
@@ -902,13 +920,15 @@
     (println "finish-dashes")
     (pprint (remove :output accum)))
 
-  (let [divisions (accum :divisions)
+  (let [dash (:current-dash accum)
+        divisions (accum :divisions)
         _ (when false (println "divisions=" divisions))
         micro-beats (get-in accum [:dash-microbeats])
         _ (when false (println ":dash-microbeats=" micro-beats))
         ary (ratio->lilypond-durations micro-beats divisions)
-        pitch-and-octave (:lilypond-pitch-and-octave accum)
-        rests (join " " (map (partial str "r") ary))
+        first-duration (first ary)
+        first-rest (str "r" first-duration (chord-snippet dash))
+        rests (str first-rest (join " " (map (partial str "r") (rest ary))))
         ]
     (when false  
       (println "finish-dashes  divisions=" divisions "; micro-beats= " micro-beats)
@@ -920,6 +940,7 @@
 (defn start-dash[accum dash]
   (assoc accum :state :collecting-dashes-in-beat
          :dash-microbeats 1
+         :current-dash dash
          ))
 
 ;; (println (experiment "(Sr | n)"))
@@ -934,7 +955,7 @@
         _ (when nil (println "pitch is\n\n" pitch))
        begin-slur (if (some #(and (vector? %) (= :begin-slur (first %)))
                             pitch)
-                      "(") 
+                      ")") 
        end-slur (if (some #(and (vector? %) (= :end-slur (first %)))
                             pitch)
                       ")") 
@@ -945,7 +966,11 @@
         micro-beats (get-in accum [:current-pitch :micro-beats])
         ary (ratio->lilypond-durations micro-beats divisions)
         first-pitch  
-        (str pitch-and-octave (first ary) end-slur begin-slur)
+        (str pitch-and-octave (first ary) 
+             end-slur
+             begin-slur
+             (chord-snippet pitch)
+             )
         pitches  (if (= 1 (count ary))
                    first-pitch
                    (str first-pitch "~"
@@ -988,6 +1013,7 @@
              (normalized-pitch->lilypond-pitch (upper-case my-key))
       "'")
               ))
+
 
 (defn lilypond-at-eof[accum]
                         (pprint (:my-map accum))
@@ -1297,4 +1323,5 @@
 ;;        "      ."
 ;;       "HI"])
 ;;  (println (experiment "Key: F#\nMode: minor\n\n.\nS\n"))
+;;(println (experiment "TimeSignature: 4/4\n\nF#m7\n-----R"))
 

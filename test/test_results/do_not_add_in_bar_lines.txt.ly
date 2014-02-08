@@ -12,7 +12,7 @@ S R G m P D N
 
 %}
 melody = {
-\once \override Staff.TimeSignature #'stencil = ##f
+\time 5/4
 \clef treble
 \key c \major
 \autoBeamOn
