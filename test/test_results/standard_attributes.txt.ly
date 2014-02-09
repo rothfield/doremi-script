@@ -6,18 +6,6 @@ title = "Sargam"
 composer = "Traditional"
 }
 %{
-Rag:Bhairavi
-Tal:Dadra
-Title:Sargam
-Author:Traditional
-Source:AAK
-Mode: phrygian
-Filename: bhairavi sargam 
-TimeSignature: 3/4
-Key: D
-
-   0             +       0    RmgRg    g+
-|: -- Rg -S R- | g - - | - - g       |  r S - | - :|
 
 %}
 melody = {

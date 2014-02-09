@@ -6,10 +6,6 @@
 
 }
 %{
-Key: G
-Mode: Minor
-
-G
 
 %}
 melody = {

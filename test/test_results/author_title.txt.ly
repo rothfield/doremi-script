@@ -6,10 +6,6 @@ title = "my summer vacation"
 composer = "John Rothfield"
 }
 %{
-Author: John Rothfield
-Title: my summer vacation
-
-S
 
 %}
 melody = {

@@ -63,7 +63,8 @@
           (if (map? parsed) ;; error
           (draw val (with-out-str (pprint parsed)) nil)
           (do
-          (when-not (.exists (io/as-file fname))
+         (when true
+          ;; (when-not (.exists (io/as-file fname))
             (->> val doremi-text->lilypond (spit fname)))
           ;(str md5 ".ly")
           (draw val (doremi-text->lilypond val)

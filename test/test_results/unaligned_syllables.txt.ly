@@ -6,9 +6,6 @@
 
 }
 %{
-|  SS
-hello
-
 
 %}
 melody = {

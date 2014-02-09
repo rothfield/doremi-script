@@ -6,9 +6,6 @@
 
 }
 %{
-    Pm
- P m | r - S
- wa-ta ho-ri
 
 %}
 melody = {

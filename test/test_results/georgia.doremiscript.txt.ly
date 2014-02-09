@@ -6,20 +6,6 @@ title = "Georgia"
 composer = "Hoargy Carmichael"
 }
 %{
-Title:Georgia
-Author:Hoargy Carmichael
-
-     Georgia Georgia
-     No peace I find
-
-  +         2  
-| GP - -  - | GR - - - | - G D G | R - - SR |
-  Geor-gia geor-gia no peace I find      just an   
-
- 
-  
-  
-
 
 %}
 melody = {

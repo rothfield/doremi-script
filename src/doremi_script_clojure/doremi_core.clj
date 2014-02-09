@@ -16,7 +16,7 @@
 
 (defn unique-for-assigned[x]
   "Make a unique key using meta-data"
-  [ (meta x) x]) 
+  [ (meta x) (first x)]) 
 
 (defn in-assigned?[my-set x]
   (contains? my-set (unique-for-assigned x)))
@@ -97,11 +97,13 @@
   (let [line-start (start-index my-line) 
         ]
     (reduce (fn[accum obj]
-              (when false (println "line-column-map:, obj =" obj))
+              (when nil (println "line-column-map:, obj =" obj)
+                 (println "start-index obj=" (start-index obj)) 
+                )
               (let [start-index (start-index obj)
                     column (if start-index 
                              (- start-index line-start))
-                    _ (when false (println "obj"))
+                    _ (when nil (println "obj" obj))
                     ]
                 (cond (not start-index)
                       accum
@@ -110,7 +112,9 @@
                       ;; Add the ornament twice in the column map.
                       ;; ;;  [:ornament [:G] [:m] [:P] [:D]]
                       (let [
+                            _ (when nil (println "**** ornament case"))
                             span (insta/span obj) 
+                            _ (when nil (println "*** span=" span))
                             ornament-string-length (apply - (reverse span))
                             column-for-after-ornament (dec column)
                             column-for-before-ornament (+ column  ornament-string-length)
@@ -119,10 +123,10 @@
                         (assoc accum
                                column-for-after-ornament
                                (conj (get accum column-for-after-ornament [])
-                                     obj)
+                                     (conj obj :after))
                                column-for-before-ornament
                                (conj (get accum column-for-before-ornament [])
-                                     obj)
+                                     (conj obj :before))
                                )
                         )
                       true
@@ -353,7 +357,7 @@
   (when false (println "assign-to-main-line") (pprint section))
   "collapse"
   (let [ column-map (lines->column-map (items section))
-        _ (when false (println "column-map:\n" column-map))
+        _ (when nil (println "column-map:\n" column-map))
         main-line (first (filter is-main-line? (items section)))     
         main-line-start-index (start-index main-line)
         _ (when false (println "main-line is" main-line))
@@ -374,10 +378,12 @@
                                   (when false (println "**** start-index item" (start-index item)))
                                   (cond 
                                     (and (vector? item) (is-pitch? item) (< (start-index item) main-line-start-index))
-                                    item
+                                    item  ;; skips ornaments
                                     (and (vector? item) 
                                          (takes-values-from-column? (first item)))
                                     (let [column (column-for-node item)
+                                          start-index (start-index item)
+                                          _ (when nil (println "assign postwalk: start-index" start-index))
                                           nodes-in-this-column 
                                           (filter (fn[x] (#{:upper-octave-dot :upper-upper-octave-symbol
                                                             :lower-octave-dot 
@@ -390,6 +396,7 @@
                                                   (remove (partial in-assigned? @assigned) (column-map column [])))
                                           _ (when false (println "nodes-in-this-column" nodes-in-this-column))
                                           ]
+
                                       (if (not-empty nodes-in-this-column)
                                         (do
                                           (when false (println "*********conjing"))
@@ -404,7 +411,7 @@
                   ))))
 
 (defn collapse-section[section]
-  {:post [(do (when false (println "leaving collapse-section, returns")
+  {:post [(do (when nil (println "leaving collapse-section, returns")
                 (pprint %))
               true)]}
   (when false (println "**collapse-section, section=") (pprint section))
@@ -508,7 +515,7 @@
 
 (defn pitch->octave[pitch]
   {
-   :pre [ (is-pitch? pitch)] 
+   :pre [ (or (= :ornament-pitch (first pitch)) (is-pitch? pitch))] 
    :post [ (do (when false (println "pitch->octave" %)) true) ] }
   ;; OMG
   (->> pitch (filter vector?) 
@@ -776,43 +783,69 @@
     (str "^\"" ending "\"")
     ))
 
+
+
+;;; \acciaccatura { {{grace-notes}} }
+  ;;      #  c1 \afterGrace d1( { c16[ d]) } c1
+
+
+(defn pitch-and-octave[pitch]
+        (str  (pitch->lilypond-pitch (second pitch))
+             (->> pitch pitch->octave octave-number->lilypond-octave))
+  )
+
 (defn finish-pitch[accum]
   (when false (println "finish-pitch"))
   (when false (pprint (remove :output accum)))
   (let [pitch (:obj (:current-pitch accum))
-        _ (when nil (println "pitch is\n\n" pitch))
+        _ (when false (println "pitch is\n\n") (pprint  pitch))
         syl  (get-syl pitch)
+        
         begin-slur (if (some #(and (vector? %) (= :begin-slur (first %)))
                              pitch)
                      "(") 
         end-slur (if (some #(and (vector? %) (= :end-slur (first %)))
                            pitch)
                    ")") 
-        pitch-and-octave 
-        (str  (pitch->lilypond-pitch (second pitch))
-             (->> pitch pitch->octave octave-number->lilypond-octave))
+        my-pitch-and-octave  (pitch-and-octave pitch)
         divisions (accum :divisions)
+        after-ornament  (->> pitch (filter is-ornament?) (filter #(= :after (last %))) first)
+        before-ornament  (->> pitch (filter is-ornament?) (filter #(= :before (last %))) first)
+        after-ornament-pitches (->> after-ornament rest drop-last)
+        _ (when false (println "*******before,after ornaments" before-ornament after-ornament ))
+        _ (when false (println "after-ornament-pitches" after-ornament-pitches))
         micro-beats (get-in accum [:current-pitch :micro-beats])
-        ary (ratio->lilypond-durations micro-beats divisions)
+        durations (ratio->lilypond-durations micro-beats divisions)
         first-pitch  
-        (str pitch-and-octave (first ary) 
+        (str 
+             (when after-ornament "\\afterGrace ")
+             my-pitch-and-octave
+             (first durations) 
              end-slur
              begin-slur
              (chord-snippet pitch)
              (ending-snippet pitch)
              (when (get-attribute pitch :mordent)
                "\\mordent") 
+  ;;      #  c1 \afterGrace d1( { c16[ d]) } c1
+             (when after-ornament ;; ornament
+               (str "( { "
+                      (join " " (map (fn[x] (str (pitch-and-octave x) "16"))  after-ornament-pitches ))
+                     ")"
+                   " } "
+                  ))
+                      ;;;"({ c'16[ d'16])}" ;; TODO
 
              )
-        pitches  (if (= 1 (count ary))
+        pitches  (if (= 1 (count durations))
                    first-pitch
                    (str first-pitch "~"
                         (join "~" (map (partial str pitch-and-octave) 
-                                       (rest ary)))))
+                                       (rest durations)))))
         ]
     (when false 
       (println "finish-pitch  divisions=" divisions "; micro-beats= " micro-beats)
-      (pprint ary))
+      (pprint durations))
     (when false (println "leaving finish-pitch:" (update-in accum [:beat-pitches] conj pitches )))
     (-> accum  (update-in [:beat-pitches] conj pitches) (update-in [:syllables] str syl " "))
     ))
@@ -960,6 +993,10 @@
       [:in-beat :dash]  ;; dash at beginning of beat
       (start-dash accum obj)
 
+      [:collecting-dashes-in-beat :lyrics-line]
+      (-> accum finish-dashes finish-beat finish-line 
+          (assoc :state :looking-for-sargam-section))
+
       [:collecting-dashes-in-beat :eof]
       (-> accum finish-dashes finish-beat lilypond-at-eof)
 
@@ -1031,7 +1068,7 @@
     (println "parsing") 
     (println txt)
     )
-  ;;  (pprint (doremi-text->parse-tree "  S S\nHello john"))
+  ;;  (pprint (doremi-text->lilypond ".\nS\n.\nHello john"))
   ;;(println "\n\n\n")
   (let [
         parsed  (doremi-text->parse-tree txt)
@@ -1058,10 +1095,11 @@
               doremi-text->lilypond)))
 (when false
     (-> ".\nS\n\nS\nhi" doremi-text->lilypond println))
-(when false
- (println (doremi-text->lilypond (join "\n"
- [ "Srrrrr\n\n" "| PPP PPddddddddddddddddddddddd" "jo-"]))))
+ ;; (println (doremi-text->lilypond (join " R\nS")))
+ ;;[ "Srrrrr\n\n" "| PPP PPddddddddddddddddddddddd" "jo-"]))))
 
+ (when false (println (doremi-text->lilypond (str  "G G RGGGG" "\n"
+                                                  " m S"))))
 
 (defn -doremi_text_to_lilypond[txt]
       (->> txt doremi-text->lilypond))

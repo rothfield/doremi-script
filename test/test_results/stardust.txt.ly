@@ -6,12 +6,6 @@ title = "Stardust"
 
 }
 %{
-Title: Stardust
-Key: C
-
-  C   C7       F                   Fm        Bb7
-         ..    . .             .   .         ..      .
-| - - -N SS# | R S D m | R m D G | G - - - | RS dm R R |
 
 %}
 melody = {

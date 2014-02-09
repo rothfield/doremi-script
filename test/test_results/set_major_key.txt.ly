@@ -6,9 +6,6 @@
 
 }
 %{
-Key: D
-
-S
 
 %}
 melody = {

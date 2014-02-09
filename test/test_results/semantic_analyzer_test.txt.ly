@@ -6,18 +6,6 @@ title = "test semantic analyzer"
 
 }
 %{
-Title: test semantic analyzer
-
-~
-+    *
-:
-.     S
-*
-Dm7
-<gRg>
-g
-.
-hi-
 
 %}
 melody = {

@@ -6,10 +6,6 @@ title = "Hapy Birthday"
 
 }
 %{
-Title: Hapy Birthday
-
-1) |: SS | R S m | G - :| 
-ha-ppy birth-day to you
 
 %}
 melody = {

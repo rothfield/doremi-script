@@ -6,11 +6,6 @@
 
 }
 %{
-Mode: aeolian
-Key: E
-
-| gm Pg -S -- |
-el-ean-or rig-by
 
 %}
 melody = {

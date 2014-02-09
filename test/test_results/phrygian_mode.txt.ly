@@ -6,9 +6,6 @@
 
 }
 %{
-Mode: phrygian
-
-| S d P d | m P g m | n d - r | - g m P |
 
 %}
 melody = {

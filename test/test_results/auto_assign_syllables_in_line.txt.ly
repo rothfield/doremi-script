@@ -6,8 +6,6 @@
 
 }
 %{
-| S R
-he-llo
 
 %}
 melody = {

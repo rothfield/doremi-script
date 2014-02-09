@@ -6,7 +6,6 @@
 
 }
 %{
-S S- S-S SSS SSSS S--R--G -SRG  -S-RGmP-
 
 %}
 melody = {

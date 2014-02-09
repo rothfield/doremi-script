@@ -6,7 +6,6 @@
 
 }
 %{
-| -- DD Pm GR |
 
 %}
 melody = {

@@ -6,15 +6,6 @@ title = "Yesterday"
 composer = "McCartney"
 }
 %{
-Filename: yesterday
-Key: F
-Mode: major
-Title: Yesterday
-Author: McCartney
-Time: 4/4
-EnteredBy: John Rothfield
-
-1) |  RS S -- --  | 
 
 %}
 melody = {

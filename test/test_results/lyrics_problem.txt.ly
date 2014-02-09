@@ -6,13 +6,6 @@
 
 }
 %{
-| GP - -  - | GR - - - | 
-  Geor-gia geor-gia 
-
- 
-  
-  
-
 
 %}
 melody = {

@@ -7,8 +7,6 @@
 }
 %{
 
-S R G m P D N R G m P D N R 
-
 %}
 melody = {
 \once \override Staff.TimeSignature #'stencil = ##f

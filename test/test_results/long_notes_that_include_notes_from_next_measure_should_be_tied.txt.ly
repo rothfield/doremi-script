@@ -6,14 +6,6 @@
 
 }
 %{
-  +         2  
-| GP - -  - | GR - - - | - G D G | R - - SR |
-  Geor-gia geor-gia no peace I find      just an   
-
- 
-  
-  
-
 
 %}
 melody = {

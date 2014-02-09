@@ -6,9 +6,6 @@
 
 }
 %{
-TimeSignature:5/4
-
-S - - - - R - - - -
 
 %}
 melody = {

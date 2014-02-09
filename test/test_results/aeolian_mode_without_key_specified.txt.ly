@@ -6,10 +6,6 @@
 
 }
 %{
-Mode: aeolian
-
-| gm Pg -S -- |
-el-ean-or rig-by
 
 %}
 melody = {

@@ -6,10 +6,6 @@
 
 }
 %{
-foo:bar
-hi:john
-
-|S
 
 %}
 melody = {

@@ -6,11 +6,6 @@
 
 }
 %{
-TimeSignature: 3/4
-
-| S - - | R - S | N - - | - - - |
-                  .
-  i-      rene good night
 
 %}
 melody = {

@@ -6,9 +6,6 @@
 
 }
 %{
-                 .   ..
-| (PG) | S G P | S - GR  |
-Oh say can you see by the
 
 %}
 melody = {

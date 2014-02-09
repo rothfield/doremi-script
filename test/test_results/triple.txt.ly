@@ -6,7 +6,6 @@
 
 }
 %{
-SRG GRS
 
 %}
 melody = {

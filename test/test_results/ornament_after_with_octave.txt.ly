@@ -6,12 +6,6 @@ title = "hi"
 
 }
 %{
-Title: hi
-
-   NRSNS
-   .  .
-| S
-
 
 %}
 melody = {

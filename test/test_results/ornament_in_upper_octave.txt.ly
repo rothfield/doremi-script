@@ -6,9 +6,6 @@
 
 }
 %{
-  .. . 
-.NRSNS   + 
-S       | N
 
 %}
 melody = {

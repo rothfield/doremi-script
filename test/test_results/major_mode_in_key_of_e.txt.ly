@@ -6,11 +6,6 @@
 
 }
 %{
-Key: E
-Mode: Major
-
-| P G G RS | R m m - | PG mR P-RG mR |
-  .                          .
 
 %}
 melody = {

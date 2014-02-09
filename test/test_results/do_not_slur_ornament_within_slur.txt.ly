@@ -6,9 +6,6 @@
 
 }
 %{
-      n
-(g m P d) | P
-ri        ba-
 
 %}
 melody = {
