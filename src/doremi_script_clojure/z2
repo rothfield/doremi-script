@@ -1,3 +1,0 @@
-(def lilypond-invisible-grace-note 
-  ;; s is short for spacer  
-  (str "\\" "grace s64"))

@@ -17,7 +17,7 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  \times 2/3{ r4 c'8 } \break
+ \bar "|"  \times 2/3{ r4 c'8 }  \break
 
 }
 

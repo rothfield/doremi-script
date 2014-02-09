@@ -17,7 +17,7 @@ melody = {
 \cadenzaOn
 
 
- \times 2/3{ c'8 d'8 e'8 }  \times 2/3{ e'8 d'8 c'8 } \break
+ \times 2/3{ c'8 d'8 e'8 }  \times 2/3{ e'8 d'8 c'8 }  \break
 
 }
 

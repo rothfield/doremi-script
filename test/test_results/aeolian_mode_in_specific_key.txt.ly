@@ -21,7 +21,7 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  ef'8 f'8 g'8 ef'8 r8 c'8 r4 \bar "|" \break
+ \bar "|"  ef'8 f'8 g'8 ef'8 r8 c'8 r4 \bar "|"  \break
 
 }
 

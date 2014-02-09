@@ -17,7 +17,7 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  \times 4/5{ c'4 d'16 } \break
+ \bar "|"  \times 4/5{ c'4 d'16 }  \break
 
 }
 

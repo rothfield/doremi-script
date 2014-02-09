@@ -19,8 +19,8 @@ melody = {
 \cadenzaOn
 
 
- \bar "|:"  c'4 r4 r4 r4 \bar "|"  e'4 r4 r4 r4 \bar ":|" \break
-\grace s64 \bar "|:"  d'4 r4 r4 r4 \bar "|"  f'4 r4 r4 r4 \bar ":|" \break
+ \bar "|:"  c'4 r4 r4 r4 \bar "|"  e'4 r4 r4 r4 \bar ":|"  \break
+\grace s64 \bar "|:"  d'4 r4 r4 r4 \bar "|"  f'4 r4 r4 r4 \bar ":|"  \break
 
 }
 

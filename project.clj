@@ -1,17 +1,15 @@
-(defproject doremi-script-clojure "0.1.0-SNAPSHOT"
+(defproject doremi-server "0.1.0-SNAPSHOT"
   :description "Parser for doremi-script written in Clojure using instaparse - see http://github.com/rothfield/doremi-script-base"
   :url "http://github.com/rothfield/doremi-script-clojure"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/data.json "0.2.3"]
+                 [org.clojars.mikejs/ring-etag-middleware "0.1.0-SNAPSHOT"]
                  [instaparse "1.2.2"] 
                  [com.googlecode.texhyphj/texhyphj "1.2"]
-                 [clabango "0.5"]
-                 ]
-  :main doremi_script_clojure.core
-  :profiles {:uberjar {:aot :all}}
-  ;; lein uberjar creates jar file. Run it using java -jar
+                 [compojure "1.1.6"]]
+  :plugins [[lein-ring "0.8.10"]]
   :jar-name "doremi-script.jar"
   :uberjar-name "doremi-script-standalone.jar"
-  )
+  :ring {:handler doremi_script_clojure.handler/app}
+  :profiles
+  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
+                        [ring-mock "0.1.5"]]}})

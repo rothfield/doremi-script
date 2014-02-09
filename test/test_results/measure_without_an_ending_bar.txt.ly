@@ -19,7 +19,7 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  c'4 r4 r4 r4\break
+ \bar "|"  c'4 r4 r4 r4 \break
 \grace s64 \bar "|"  d'4 r4 r4 r4
 }
 

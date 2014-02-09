@@ -18,7 +18,7 @@ melody = {
 \cadenzaOn
 
 
- bf'8 g'8\break
+ bf'8 g'8 \break
 
 }
 

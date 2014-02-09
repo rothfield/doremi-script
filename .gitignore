@@ -2,6 +2,7 @@
 /target
 /lib
 /classes
+/resources/public/compositions/*
 /resources/fixtures/tmp
 /checkouts
 /attic
