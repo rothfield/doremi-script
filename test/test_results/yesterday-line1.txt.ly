@@ -3,7 +3,7 @@
 \include "english.ly"
 \header{
 title = "Yesterday"
-composer = ""
+composer = "McCartney"
 }
 %{
 Filename: yesterday
@@ -25,13 +25,13 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  d'8 c'8 c'4 r4 r4 \bar "|" 
+ \bar "|"  d'8 c'8 c'4 r4 r4 \bar "|" \break
 
 }
 
 
 text = \lyricmode {
-
+   
 }
 
 \score{

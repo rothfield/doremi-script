@@ -2,8 +2,8 @@
 \version "2.12.3"
 \include "english.ly"
 \header{
-title = ""
-composer = ""
+
+
 }
 %{
                  .   ..
@@ -19,12 +19,13 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  g'8) e'8) \bar "|"  c'4 e'4 g'4 \bar "|"  c''4 r4 e''8 d''8 \bar "|" 
+ \bar "|"  g'8( e'8) \bar "|"  c'4 e'4 g'4 \bar "|"  c''4 r4 e''8 d''8 \bar "|" \break
+
 }
 
 
 text = \lyricmode {
-Oh say can you see by the
+Oh  say can you see by the 
 }
 
 \score{

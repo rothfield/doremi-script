@@ -2,8 +2,8 @@
 \version "2.12.3"
 \include "english.ly"
 \header{
-title = ""
-composer = ""
+
+
 }
 %{
 Mode: aeolian
@@ -20,12 +20,13 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  ef'8 f'8 g'8 ef'8 r8 c'8 r4 \bar "|" 
+ \bar "|"  ef'8 f'8 g'8 ef'8 r8 c'8 r4 \bar "|" \break
+
 }
 
 
 text = \lyricmode {
-el- ean- or rig- by
+el- ean- or rig- by 
 }
 
 \score{

@@ -3,7 +3,7 @@
 \include "english.ly"
 \header{
 title = "hi"
-composer = ""
+
 }
 %{
 Title: hi
@@ -22,13 +22,13 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  c'4
+ \bar "|"  c'4\break
 
 }
 
 
 text = \lyricmode {
-wtf wtf
+ 
 }
 
 \score{

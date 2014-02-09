@@ -2,8 +2,8 @@
 \version "2.12.3"
 \include "english.ly"
 \header{
-title = ""
-composer = ""
+
+
 }
 %{
 Key: D
@@ -24,12 +24,13 @@ melody = {
 \cadenzaOn
 
 
- \bar "|:"  c'8) df'8 \bar "|"  bf4) c'4 ef'8) f'8 g'8 af'8) \bar "|"  g'4^"i" r4 g'4 g'4 \bar "|"  g'4^"IV" r4 a'4 bf'4 \bar "|" 
+ \bar "|:"  c'8( df'8 \bar "|"  bf4) c'4 ef'8( f'8 g'8 af'8) \bar "|"  g'4^"i" r4 g'4 g'4 \bar "|"  g'4^"IV" r4 a'4 bf'4 \bar "|" \break
+
 }
 
 
 text = \lyricmode {
-ban- su- ri ba- ja ra- hi dhu- na
+ban-   su- ri    ba- ja ra- hi dhu- na 
 }
 
 \score{

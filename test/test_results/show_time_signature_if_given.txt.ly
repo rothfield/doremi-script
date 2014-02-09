@@ -2,8 +2,8 @@
 \version "2.12.3"
 \include "english.ly"
 \header{
-title = ""
-composer = ""
+
+
 }
 %{
 TimeSignature:5/4
@@ -24,7 +24,7 @@ melody = {
 
 
 text = \lyricmode {
-
+  
 }
 
 \score{

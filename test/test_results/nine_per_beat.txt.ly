@@ -2,8 +2,8 @@
 \version "2.12.3"
 \include "english.ly"
 \header{
-title = ""
-composer = ""
+
+
 }
 %{
 P-Sg-SR--
@@ -17,13 +17,13 @@ melody = {
 \cadenzaOn
 
 
- \times 8/9{ g'16 c'32 ef'16 c'32 d'16. } 
+ \times 8/9{ g'16 c'32 ef'16 c'32 d'16. } \break
 
 }
 
 
 text = \lyricmode {
-
+     
 }
 
 \score{

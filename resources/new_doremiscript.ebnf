@@ -84,6 +84,28 @@ right-repeat (* ie :| *)
 flat-or-sharp = '#' | 'b'
 
 (*  Letters SrRgGmMPdDnN in latin script  *)
+ornament-pitch  =  
+"Sb"|
+"S#"|
+"R#"|
+"G#"|
+"P#"|
+"Pb"|
+"D#"|
+"N#"|
+"Pb"|
+"S" ! flat-or-sharp|
+"r" ! flat-or-sharp|
+"R" ! flat-or-sharp|
+"g" ! flat-or-sharp|
+"G" ! flat-or-sharp|
+"m" ! flat-or-sharp|
+"M" ! flat-or-sharp|
+"P" ! flat-or-sharp|
+"d" ! flat-or-sharp|
+"D" ! flat-or-sharp|
+"n" ! flat-or-sharp|
+"N" ! flat-or-sharp
 
 pitch  =  
 "Sb"|
@@ -200,7 +222,7 @@ talas, mordents, octaves,chords, octave indicating dots,
   chord /
   mordent /
   upper-upper-octave-symbol /
-  alternate-ending-indicator )+
+ending )+
 
 
 (*
@@ -227,14 +249,14 @@ another idea is to use [chord-symbol] vs <ornament> to disambiguate the 2.
 *)
 
 
-ornament= pitch+ | delimited-ornament
+ornament= ornament-pitch+ | delimited-ornament
 
 <delimited-ornament> (* in upper line <nrsns> *)
-  =  <"<"> pitch+  <">">
+  =  <"<"> ornament-pitch+  <">">
 
 mordent = <"~"> 
 
-alternate-ending-indicator 
+ending 
 (*   1.------- 2.--- etc. the period is optional. must have either dot or underscores. todo: accepts 1-.--- which is not exactly what i want.  *)
 
 = #"[1-3]"  #"[\._]+" 
@@ -269,7 +291,7 @@ another idea is to use [chord-symbol] vs <ornament> to disambiguate the 2.
  chord /
  mordent /
  upper-upper-octave-symbol /
- alternate-ending-indicator 
+ ending
 
 upper-octave-dot= <dot> 
 

@@ -2,8 +2,8 @@
 \version "2.12.3"
 \include "english.ly"
 \header{
-title = ""
-composer = ""
+
+
 }
 %{
 -S -- 
@@ -23,7 +23,7 @@ melody = {
 
 
 text = \lyricmode {
-
+ 
 }
 
 \score{

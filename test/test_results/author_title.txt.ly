@@ -3,7 +3,7 @@
 \include "english.ly"
 \header{
 title = "my summer vacation"
-composer = ""
+composer = "John Rothfield"
 }
 %{
 Author: John Rothfield
@@ -20,13 +20,13 @@ melody = {
 \cadenzaOn
 
 
- c'4
+ c'4\break
 
 }
 
 
 text = \lyricmode {
-
+ 
 }
 
 \score{

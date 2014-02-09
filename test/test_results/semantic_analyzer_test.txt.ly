@@ -3,7 +3,7 @@
 \include "english.ly"
 \header{
 title = "test semantic analyzer"
-composer = ""
+
 }
 %{
 Title: test semantic analyzer
@@ -28,13 +28,13 @@ melody = {
 \cadenzaOn
 
 
- ef''''4^"Dm7"
+ ef''''4^"Dm7"\mordent\break
 
 }
 
 
 text = \lyricmode {
-hi-
+hi- 
 }
 
 \score{

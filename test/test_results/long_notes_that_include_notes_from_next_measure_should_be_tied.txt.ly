@@ -2,8 +2,8 @@
 \version "2.12.3"
 \include "english.ly"
 \header{
-title = ""
-composer = ""
+
+
 }
 %{
   +         2  
@@ -24,12 +24,13 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  e'8 g'8 r4 r4 r4 \bar "|"  e'8 d'8 r4 r4 r4 \bar "|"  r4 e'4 a'4 e'4 \bar "|"  d'4 r4 r4 c'8 d'8 \bar "|" 
+ \bar "|"  e'8 g'8 r4 r4 r4 \bar "|"  e'8 d'8 r4 r4 r4 \bar "|"  r4 e'4 a'4 e'4 \bar "|"  d'4 r4 r4 c'8 d'8 \bar "|" \break
+
 }
 
 
 text = \lyricmode {
-Geor- gia geor- gia no peace I find just an
+Geor- gia geor- gia no peace I find just an 
 }
 
 \score{

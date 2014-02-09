@@ -2,8 +2,8 @@
 \version "2.12.3"
 \include "english.ly"
 \header{
-title = ""
-composer = ""
+
+
 }
 %{
 TimeSignature: 3/4
@@ -21,12 +21,13 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  c'4 r4 r4 \bar "|"  d'4 r4 c'4 \bar "|"  b4 r4 r4 \bar "|"  r4 r4 r4 \bar "|" 
+ \bar "|"  c'4 r4 r4 \bar "|"  d'4 r4 c'4 \bar "|"  b4 r4 r4 \bar "|"  r4 r4 r4 \bar "|" \break
+
 }
 
 
 text = \lyricmode {
-i- rene good night
+i- rene good night 
 }
 
 \score{

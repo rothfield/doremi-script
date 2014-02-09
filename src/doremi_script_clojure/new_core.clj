@@ -347,7 +347,7 @@
 (defn assign-syllables[section]
   (when false (println "assign-syllables") (pprint section))
   (let [ syls-to-apply (atom (mapcat items (filter is-lyrics-line? section)))
-        _ (when false (println @syls-to-apply))
+        _ (when nil (println "****syls-to-apply=" @syls-to-apply))
         in-slur (atom false)
         ]
     (map (fn[line] (if-not (is-sargam-line? line) line
@@ -357,7 +357,7 @@
                                        item
                                        (is-pitch? item)
                                        (let [syl (if (not @in-slur) (first @syls-to-apply))
-                                             ret-val (if syl (conj item syl) item)
+                                             ret-val (if syl (conj item [:syl syl]) item)
                                              has-begin-slur (some is-begin-slur? item)
                                              has-end-slur (some is-end-slur? item)
                                              ]
@@ -373,6 +373,7 @@
                                        item
                                        ))     line)
                      )) section)
+   ;; (first (filter is-sargam-line?  section)
     ))
 
 ;; (print-stack-trace *e)
@@ -472,7 +473,7 @@
                                                             :lower-lower-octave-symbol :ornament 
                                                             :chord
                                                             :tala
-                                                            :alternate-ending-indicator 
+                                                            :ending 
                                                             :mordent} (first x))) 
 
                                                   (remove (partial in-assigned? @assigned) (column-map column [])))
@@ -495,15 +496,16 @@
   {:post [(do (when false (println "leaving collapse-section, returns")
                 (pprint %))
               true)]}
-  (when false (println "collapse-section, section=") (pprint section))
+  (when false (println "**collapse-section, section=") (pprint section))
   (reset! assigned #{})
   ;;  (first (filter is-main-line?
   (into [] (->> section 
                 handle-slurs
                 assign-ornament-octaves
                 assign-to-main-line
-                assign-syllables
                 (remove (fn[x] (and (vector? x) (#{:upper-octave-line :lower-octave-line} (first x)))))
+                (into [])
+                assign-syllables
                 )))
 
 ;;))
@@ -655,14 +657,18 @@
                       (map-even-items #(-> % lower-case keyword)
                                       (rest atts)))
         source (second (first (filter #(= :source (first %)) (rest composition))))
-        _ (when true (println "Source, my-map is\n" source)
+        _ (when false (println "Source, my-map is\n" source)
                       (pprint my-map))
         ] 
     (-> (update-in accum [:output] str 
                (join "\n"
                      [
-                      (str "title = \"" (:title my-map) "\"")
-                      (str "composer = \"" (:composer my-map) "\"")
+                      (when-let [title (:title my-map)]
+                      (str "title = \"" title "\""))
+
+                      (when-let [author (:author my-map)]
+                      (str "composer = \"" author "\""))
+
                       "}" ;; see ....
                       "%{"
                       (lilypond-escape (:source accum))
@@ -753,12 +759,14 @@
                       :current-pitch  { :obj pitch  :micro-beats 1}
                       )) 
     )
-;; (println (experiment "(Sr | n)"))
 
 (defn start-line[accum obj]
-  ;; TODO
-  accum
-  )
+  ;; add grace note to start of line if not on first line. This fixes
+  ;; repeat sign bug.
+  (if (:finished-first-line accum)
+  (update-in accum [:output] str "\\grace s64")
+  (assoc accum :finished-first-line true)
+  ))
 
 (defn emit-barline[accum barline]
   (update-in accum [:output] str  " "
@@ -947,15 +955,29 @@
        ;; first-pitch  
        ;; (str begin-slur pitch-and-octave end-slur)
 ;; (println (experiment "S----R--"))
+(defn get-attribute[pitch my-key]
+       (some #(if (when (vector? %) (= my-key(first %))) %)
+                            pitch))
 
+(defn get-ending[obj]
+   (last (get-attribute obj :ending)))
+(defn get-syl[pitch]
+   (last (get-attribute pitch :syl)))
+
+(defn ending-snippet[obj]
+  (when-let [ending (get-ending obj)]
+(str "^\"" ending "\"")
+  ))
+  
 (defn finish-pitch[accum]
   (when false (println "finish-pitch"))
   (when false (pprint (remove :output accum)))
   (let [pitch (:obj (:current-pitch accum))
         _ (when nil (println "pitch is\n\n" pitch))
+       syl  (get-syl pitch)
        begin-slur (if (some #(and (vector? %) (= :begin-slur (first %)))
                             pitch)
-                      ")") 
+                      "(") 
        end-slur (if (some #(and (vector? %) (= :end-slur (first %)))
                             pitch)
                       ")") 
@@ -970,6 +992,10 @@
              end-slur
              begin-slur
              (chord-snippet pitch)
+             (ending-snippet pitch)
+             (when (get-attribute pitch :mordent)
+                    "\\mordent") 
+
              )
         pitches  (if (= 1 (count ary))
                    first-pitch
@@ -981,12 +1007,21 @@
       (println "finish-pitch  divisions=" divisions "; micro-beats= " micro-beats)
       (pprint ary))
     (when false (println "leaving finish-pitch:" (update-in accum [:beat-pitches] conj pitches )))
-    (update-in accum [:beat-pitches] conj pitches)
+     (-> accum  (update-in [:beat-pitches] conj pitches) (update-in [:syllables] str syl " "))
     ))
 
+  ;; Lilypond text for line break.
+  ;; Lilypond doesn't like  left-repeat break barline
+  ;; That is why I insert an invisible grace note spacer after the
+  ;; break. Otherwise lilypond will combine the left-repeat and barline
+  ;; and you lose the left repeat.
+  ;; Probably better to examine bars at end of line and beginning of next
+  ;; line and combine them into one.
+  ;;(str " \\break        " lilypond-invisible-grace-note " \n"))
+  ;; s is short for spacer  
+  ;;(str "\\" "grace s64"))
 (defn finish-line[accum]
-  (update-in accum [:output] str (join "\\break" "\n"))
-  )
+  (update-in accum [:output] str (str "\\break" "\n")))
 
 (def normalized-pitch->lilypond-pitch
   ;; TODO: double sharps and flats, half-flats ??"
@@ -996,6 +1031,8 @@
    "Eb" "ef", "E" "e", "E#" "es", "F" "f", "Fb" "ff", "F#" "fs", "Gb" "gf",
    "G" "g", "G#" "gs", "Ab" "af", "A" "a", "A#" "as", "Bb" "bf", "B" "b",
    "B#" "bs", })
+
+
 
 (defn transpose-snippet[my-key]
   { :pre [(or (string? my-key) (nil? my-key))]
@@ -1016,19 +1053,14 @@
 
 
 (defn lilypond-at-eof[accum]
-                        (pprint (:my-map accum))
+              (when true (pprint (:my-map accum)))
   (update-in accum [:output] str  
              (join "\n" [
                          "\n}\n\n" ;; end of melody
                          "text = \\lyricmode {"
-                         (join " "
-
-                               (->> (:composition accum)  (tree-seq vector? identity)  (filter is-pitch?) (filter #(> (count %) 2)) (map last) (filter string?))
-                               ) 
+                         (:syllables accum)
                          "}\n"
                          "\\score{"
-                          ;; TODO
-
                         (transpose-snippet (:key (:my-map accum)))
                          "<<"
                          "\\new Voice = \"one\" {"
@@ -1049,12 +1081,11 @@
                          "}"
                          "}"
                          "}"
-                         ]))
+                         ])))
 
-  )
 
 (defn lilypond-transition[accum obj]
-  { :pre [ (do (when false (println "first obj=" (first obj))) true)
+  { :pre [ (do (when false (pprint obj) (println "first obj=" (first obj))) true)
           (map? accum)
           (#{:lyrics-section :lyrics-line :sargam-section :pitch :barline :measure :sargam-line :line-number :composition
              :beat :dash :output :eof :attribute-section :source} (first obj))
@@ -1074,7 +1105,7 @@
       (-> accum (handle-source obj) (assoc :state :looking-for-attribute-section))
 
       [:in-sargam-section :sargam-line]
-      (-> accum (assoc  :state :in-sargam-line)) ;; review:lyrics (rest (last obj)))
+      (-> accum (start-line obj) (assoc  :state :in-sargam-line)) ;; review:lyrics (rest (last obj)))
 
       [:looking-for-attribute-section :lyrics-section]
       accum
@@ -1108,10 +1139,13 @@
       (-> accum (assoc :state :in-sargam-section))
 
       [:in-sargam-line :lyrics-line]
-      (assoc accum :state :looking-for-sargam-section)
+      (-> accum finish-line
+      (assoc :state :looking-for-sargam-section))
 
       [:collecting-pitch-in-beat :lyrics-line] ;; needed?
-      accum
+      (-> accum finish-pitch finish-beat finish-line
+      (assoc :state :looking-for-sargam-section))
+          
 
       [:collecting-pitch-in-beat :eof]
       (-> accum finish-pitch finish-beat finish-line lilypond-at-eof)
@@ -1179,6 +1213,8 @@
          (filter vector?)
          (reduce lilypond-transition
                  {:state :start 
+                  :finished-first-line false
+                  :syllables ""
                   :output ""
                   :composition composition}
                  ))))
@@ -1193,10 +1229,10 @@
   ;;(println "\n\n\n")
   (let [
         parsed  (doremi-text->parse-tree txt)
-        _ (if nil (do (println "parsed:") (pprint parsed)))
+        _ (if false (do (println "parse-tree:") (pprint parsed)))
         ]
     (if (map? parsed)  ;; error
-      (pprint parsed)
+      (do (println "ERROR") (pprint parsed))
       (let [
             [saved parse-tree] (add-ids-and-create-map parsed)
             collapsed-parse-tree
@@ -1207,7 +1243,7 @@
             collapsed2 (into [] (concat (subvec collapsed-parse-tree 0 1)
                                         [[:source txt]]
                                         (subvec collapsed-parse-tree 1)))
-            _ (when false;; (pprint )
+            _ (when nil;; (pprint )
                 (println "****collapsed-parse-tree")
                 (pprint collapsed2) (println "\n\n"))
             ]
@@ -1242,7 +1278,7 @@
   ;; (println (test-all3 "fixtures" "ban.*.txt"))
   ;;(print-stack-trace *e)
 
-(defn test-all2-process-file[my-file]
+(defn test-all-process-file[my-file]
   (let [ basename (.getName my-file) 
         directory-path "test/test_results/"
         filename (str directory-path "/" basename)
@@ -1259,7 +1295,7 @@
     basename
     ))
 
-(defn test-all3[dir-str match-str]
+(defn test-all[dir-str match-str]
   { :pre [(string? dir-str)
           (string? match-str)]
    :post [ (seq? %)]
@@ -1267,12 +1303,12 @@
   ;; goes off resources. Example: 
   ;; (println (test-all3 "fixtures" "ban.*.txt"))
   (let [my-dir (-> dir-str io/resource io/file)]
-  (map test-all2-process-file 
+  (map test-all-process-file 
        (filter #(.matches (.getName %) match-str)(file-seq my-dir)))))
 ;; (println (test-all3 "fixtures" "ban.*"))
 ;;  (->
 
-(defn test-all2[resource-names]
+(defn old-test-all[resource-names]
   { :pre [(vector? resource-names)
           (every? string? resource-names) ]
    }
@@ -1296,32 +1332,39 @@
     ))
 
 ;; (test-all2 ["bansuriv3.txt"])
-(defn test-all[dir-str match-str]
+(defn old-test-all[dir-str match-str]
   (println "test-all " dir-str " " match-str)
-  (map  test-aux
+  (map  identity ;;test-aux
        (filter #(.matches (.getName %) match-str)(file-seq (clojure.java.io/file dir-str)))))
 
 
-(when false (pprint  (test-all "resources/fixtures" ".*.txt")))
-(when false (pprint  (test-all "resources/fixtures" "you_can_add.*.txt")))
-
-
-;;(pprint (experiment (slurp (resource "fixtures/no_syls_yesterday.txt"))))
+;;(println (experiment (slurp (resource "fixtures/no_syls_yesterday.txt"))))
 (when nil (pprint (experiment (slurp (resource "fixtures/aeolian_mode_in_specific_key.txt")))))
 ;;no_syls_yesterday.txt"))))
-;;(pprint (experiment (slurp (resource "fixtures/bansuriv3.txt"))))
+;;(println (experiment (slurp (resource "fixtures/bansuriv3.txt"))))
 ;;;
 ;;(->  "fixtures/bansuriv3.txt" resource slurp doremi-text->parse-tree pprint)
 ;;
+;;
+;;
+;;
+
+
+;(println (experiment (slurp (resource "fixtures/bansuriv3.txt"))))
+;;(println (experiment (slurp (resource "fixtures/yesterday.txt"))))
+
+;;(println (experiment (join "\n" ["." "1.____" "~" "S-R-"  "words too"])))
+
+
+;;(println (experiment (slurp (resource "fixtures/bansuriv3.txt"))))
 
 (when nil 
-  ;;(pprint (experiment (slurp (resource "fixtures//georgia.doremiscript.txt"))))
-  (pprint (experiment (slurp (resource "fixtures/bansuriv3.txt"))))
+   (pprint (experiment (slurp (resource "fixtures//georgia.doremiscript.txt"))))
+  (println (experiment (slurp (resource "fixtures/bansuriv3.txt"))))
   (println (experiment "Key: F#\nMode: Major\n\n.\nS\n")))
-;; (join "\n" ["(Sr | n)"
-;; (println (experiment "(Sr | n)"))
+;; (println (experiment " 1.___\n(Sr | n)"))
 ;;        "      ."
 ;;       "HI"])
 ;;  (println (experiment "Key: F#\nMode: minor\n\n.\nS\n"))
-;;(println (experiment "TimeSignature: 4/4\n\nF#m7\n-----R"))
+;;(println (experiment "Author: John\nTitle: Hi\nTimeSignature: 4/4\n\nF#m7\n-----R"))
 

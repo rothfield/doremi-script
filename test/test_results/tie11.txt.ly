@@ -2,8 +2,8 @@
 \version "2.12.3"
 \include "english.ly"
 \header{
-title = ""
-composer = ""
+
+
 }
 %{
 S - R - | - G
@@ -18,13 +18,13 @@ melody = {
 \cadenzaOn
 
 
- c'4 r4 d'4 r4 \bar "|"  r4 e'4
+ c'4 r4 d'4 r4 \bar "|"  r4 e'4\break
 
 }
 
 
 text = \lyricmode {
-
+   
 }
 
 \score{
