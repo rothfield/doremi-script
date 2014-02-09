@@ -62,7 +62,7 @@
 (comment
   ;; to use in repl:
   ;; cpr runs current file in vim
-  (use 'doremi_script_clojure.core :reload) (ns doremi_script_clojure.core) 
+  (use 'doremi_script_clojure.doremi_core :reload) (ns doremi_script_clojure.doremi_core) 
   (use 'clojure.stacktrace) 
   (print-stack-trace *e)
   (use 'doremi_script_clojure.test-helper :reload)  ;; to reload the grammar
@@ -790,9 +790,25 @@
 
 
 (defn pitch-and-octave[pitch]
+  (println "pitch is" pitch)
         (str  (pitch->lilypond-pitch (second pitch))
              (->> pitch pitch->octave octave-number->lilypond-octave))
   )
+
+(defn grace-note-pitches[ornament]
+    ;; returns a string of grace note pitches.
+  ;; Use 16 as duration and beam them if there is more than one.
+  ;; Beamed notes look like this e'16[ d'16]
+  (let [pitches (-> ornament rest drop-last)
+        my-count (count pitches)
+        items (into [] (map (fn[x] (str (pitch-and-octave x) "16")) pitches))
+        ;; Update 1st and last items to add beams
+        items2 (if (> my-count 1)
+                 (assoc items 0 (str (get items 0) "[")
+                              (dec my-count) (str (last items) "]"))
+                 items)
+        ]
+      (join " " items2)))
 
 (defn finish-pitch[accum]
   (when false (println "finish-pitch"))
@@ -811,13 +827,16 @@
         divisions (accum :divisions)
         after-ornament  (->> pitch (filter is-ornament?) (filter #(= :after (last %))) first)
         before-ornament  (->> pitch (filter is-ornament?) (filter #(= :before (last %))) first)
-        after-ornament-pitches (->> after-ornament rest drop-last)
+;;        after-ornament-pitches (->> after-ornament rest drop-last)
+ ;;       before-ornament-pitches (->> before-ornament rest drop-last)
         _ (when false (println "*******before,after ornaments" before-ornament after-ornament ))
-        _ (when false (println "after-ornament-pitches" after-ornament-pitches))
+  ;;      _ (when false (println "after-ornament-pitches" after-ornament-pitches))
         micro-beats (get-in accum [:current-pitch :micro-beats])
         durations (ratio->lilypond-durations micro-beats divisions)
         first-pitch  
         (str 
+             (when before-ornament
+               (str "\\grace {" (grace-note-pitches before-ornament) "}"))
              (when after-ornament "\\afterGrace ")
              my-pitch-and-octave
              (first durations) 
@@ -827,15 +846,11 @@
              (ending-snippet pitch)
              (when (get-attribute pitch :mordent)
                "\\mordent") 
-  ;;      #  c1 \afterGrace d1( { c16[ d]) } c1
+  ;; after ornament:     #  c1 \afterGrace d1( { c16[ d]) } c1
+          ;; before-ornament 
+             ;;\acciaccatura { {{grace-notes}} }
              (when after-ornament ;; ornament
-               (str "( { "
-                      (join " " (map (fn[x] (str (pitch-and-octave x) "16"))  after-ornament-pitches ))
-                     ")"
-                   " } "
-                  ))
-                      ;;;"({ c'16[ d'16])}" ;; TODO
-
+               (str  "{" (grace-note-pitches after-ornament) "}"))
              )
         pitches  (if (= 1 (count durations))
                    first-pitch
@@ -1093,8 +1108,10 @@
 (when false 
   (pprint (-> "fixtures/blows_up_FAILS.txt" resource slurp
               doremi-text->lilypond)))
-(when false
-    (-> ".\nS\n\nS\nhi" doremi-text->lilypond println))
+(when true 
+   (println "1111")
+    (-> "GS\n  G|" doremi-text->lilypond println))
+   ;; (-> ".\nS\n\nS\nhi" doremi-text->lilypond println))
  ;; (println (doremi-text->lilypond (join " R\nS")))
  ;;[ "Srrrrr\n\n" "| PPP PPddddddddddddddddddddddd" "jo-"]))))
 
