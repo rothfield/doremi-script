@@ -1,2 +1,2 @@
-echo "Starting compojure/ring"
-lein ring server-headless
+echo "Starting compojure/ring in background"
+nohup lein ring server-headless &

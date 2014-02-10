@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>doremi-server</groupId>
   <artifactId>doremi-server</artifactId>
@@ -10,7 +11,7 @@
   <scm>
     <connection>scm:git:git://github.com//.git</connection>
     <developerConnection>scm:git:ssh://git@github.com//.git</developerConnection>
-    <tag>dc43f78591ad8fd465e8e3ac149f50e30f9ed941
+    <tag>0ac5d46cfccdc33c86b925108ee5f07b765fe40a
 </tag>
     <url>https://github.com//</url>
   </scm>
@@ -32,6 +33,7 @@
     </testResources>
     <directory>target</directory>
     <outputDirectory>target/classes</outputDirectory>
+    <plugins/>
   </build>
   <repositories>
     <repository>
