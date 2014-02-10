@@ -27,3 +27,4 @@ doremiparse
 to_lilypond
 tmp*
 .nrepl-port
+nohup.out
