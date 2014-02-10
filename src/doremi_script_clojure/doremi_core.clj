@@ -964,7 +964,8 @@
 
       [:collecting-pitch-in-beat :eof]
       (-> accum finish-pitch finish-beat finish-line lilypond-at-eof)
-
+ [:in-sargam-line :lyrics-section]
+      (-> accum finish-line (assoc :state :looking-for-sargam-section))
       [:in-sargam-line :eof]
       (-> accum finish-line lilypond-at-eof (assoc :state :eof))
 
@@ -981,6 +982,8 @@
       (-> accum finish-dashes finish-beat finish-line 
           (assoc :state :looking-for-sargam-section))
 
+      [:collecting-dashes-in-beat :lyrics-section]
+      (-> accum finish-dashes finish-beat finish-line (assoc :state :looking-for-sargam-section))
       [:collecting-dashes-in-beat :eof]
       (-> accum finish-dashes finish-beat lilypond-at-eof)
 
