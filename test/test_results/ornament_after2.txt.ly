@@ -16,7 +16,7 @@ melody = {
 \cadenzaOn
 
 
- g'4 f'4 \bar "|"  df'4 r4 c'4 \break
+ g'4 \afterGrace f'4{g'16[ f'16]} \bar "|"  df'4 r4 c'4 \break
 
 }
 

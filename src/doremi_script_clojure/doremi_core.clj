@@ -12,7 +12,6 @@
     ))
 
 
-(def assigned (atom {}))
 
 (defn unique-for-assigned[x]
   "Make a unique key using meta-data"
@@ -46,19 +45,6 @@
 
 (defn items[x] (next x))
 
-(defn add-ids-and-create-map[parse-tree]
-  ;;; BROKEN BADLY
-  (let [ctr (atom  0)]
-        (postwalk (fn[x] (if (and (vector? x) (insta/span x))
-                                  (do
-                                       (with-meta (into [] (concat [(first x)]
-                                                                   [(swap! ctr inc)] (rest x)))
-                                                  (meta x))) 
-                                       x))
-                              parse-tree)))
-
-
-
 (comment
   ;; to use in repl:
   ;; cpr runs current file in vim
@@ -71,24 +57,22 @@
   )
 
 
-
-
 (defn is-ornament?[x]
   {:pre [(vector? x)]}
-  (contains? #{:ornament} (first x)))
+  (= :ornament (first x)))
 
 
 (defn is-sargam-line?[x]
   (and (vector? x)
-       (contains? #{:sargam-line} (first x))))
+       (= :sargam-line (first x))))
 
 (defn is-sargam-section?[x]
   (and (vector? x)
-       (contains? #{:sargam-section} (first x))))
+       (= :sargam-section (first x))))
 
 (defn start-index[x]
   (let [x (insta/span x)]
-    (if x
+    (when x
       (first x))))
 
 
@@ -98,7 +82,7 @@
         ]
     (reduce (fn[accum obj]
               (when nil (println "line-column-map:, obj =" obj)
-                 (println "start-index obj=" (start-index obj)) 
+                (println "start-index obj=" (start-index obj)) 
                 )
               (let [start-index (start-index obj)
                     column (if start-index 
@@ -148,20 +132,16 @@
   (and (vector? x) (= :begin-slur (first x))))
 
 (defn is-beat?[x]
-  (and (vector? x)
-       (= :beat (first x))))
+  (and (vector? x) (= :beat (first x))))
 
 (defn is-measure?[x]
-  (and (vector? x)
-       (= :measure (first x))))
+  (and (vector? x) (= :measure (first x))))
 
-(defn is-pitch?[x]
-  (and (vector? x)
+(defn is-pitch?[x] (and (vector? x)
        (= :pitch (first x))))
 
 (defn is-ornament-pitch?[x]
-  (and (vector? x)
-       (= :ornament-pitch (first x))))
+  (and (vector? x) (= :ornament-pitch (first x))))
 
 (defn takes-values-from-column?[x]
   (contains? #{:pitch :dash  } 
@@ -169,13 +149,11 @@
 
 (defn is-upper-dot?[x]
   (when false (println "is-upper-dot?, x is") (pprint x))
-  (and (vector? x)
-       (contains? #{:upper-octave-dot :upper-upper-octave-symbol } 
+  (and (vector? x) (contains? #{:upper-octave-dot :upper-upper-octave-symbol } 
                   (first x))))
 
 (defn is-ornament?[x]
-  (and (vector? x)
-       (contains? #{:ornament }  (first x))))
+  (and (vector? x) (= :ornament (first x))))
 
 (defn is-dot?[x]
   (contains? #{:upper-octave-dot :upper-upper-octave-symbol 
@@ -184,7 +162,7 @@
 
 (defn is-upper-line?[x]
   (and (vector? x)
-       (contains? #{:upper-octave-line } (first x))))
+       (= :upper-octave-line (first x))))
 
 (defn is-lower-line?[x]
   (and (vector? x)
@@ -192,11 +170,11 @@
 
 (defn is-lyrics-line?[x]
   (and (vector? x)
-       (contains? #{:lyrics-line} (first x))))
+       (= :lyrics-line (first x))))
 
 (defn is-main-line?[x]
   (and (vector? x)
-       (contains? #{:sargam-line} (first x))))
+       (= :sargam-line (first x))))
 
 
 (defn lines->column-map[lines]
@@ -207,7 +185,7 @@
 
 
 
-(defn assign-ornament-octaves[my-section]
+(defn assign-ornament-octaves[assigned my-section]
   {;; :pre [(is-sargam-section? my-section)] 
    :post [(is-sargam-section? %)] }
   (when false (println "entering assign-ornament-octaves:")
@@ -262,7 +240,9 @@
                     )) my-section)))) 
 
 
-(defn assign-syllables[section]
+(defn assign-syllables[assigned section]
+  (when false (println "**assigned" @assigned)
+  (println "**section" section))
   (when false (println "assign-syllables") (pprint section))
   (let [ syls-to-apply (atom (mapcat items (filter is-lyrics-line? section)))
         _ (when nil (println "****syls-to-apply=" @syls-to-apply))
@@ -294,7 +274,7 @@
     ))
 
 
-(defn handle-slurs[section]
+(defn handle-slurs[assigned section ]
   (map (fn[line]
          (if-not (is-sargam-line? line) 
            line
@@ -347,7 +327,7 @@
        section)
   )
 
-(defn assign-to-main-line[section]
+(defn assign-to-main-line[assigned section ]
   {
    :pre [(is-sargam-section? section)]
    :post [(is-sargam-section? %)
@@ -410,40 +390,21 @@
                   section 
                   ))))
 
+
 (defn collapse-section[section]
   {:post [(do (when nil (println "leaving collapse-section, returns")
                 (pprint %))
               true)]}
   (when false (println "**collapse-section, section=") (pprint section))
-  (reset! assigned #{})
-  ;;  (first (filter is-main-line?
+  (let [my-assigned (atom {})]
   (into [] (->> section 
-                handle-slurs
-                assign-ornament-octaves
-                assign-to-main-line
+                (handle-slurs my-assigned)
+                (assign-ornament-octaves my-assigned)
+                (assign-to-main-line my-assigned)
                 (remove (fn[x] (and (vector? x) (#{:upper-octave-line :lower-octave-line} (first x)))))
                 (into [])
-                assign-syllables
-                )))
-
-(defn remove-ids[obj]
-  {
-  ;; :pre [(is-composition? obj)]
-  ;; :post [ (is-composition? %) ]
-   }
-  (when nil (println "remove-ids, obj=") (pprint obj))
-  (postwalk (fn[x] 
-              (cond (and (vector? x) (keyword? (first x)) (number? (second x)) (> (count x) 2))
-                    (into [] (concat [(first x)] (rest (rest x))))
-                    (and (vector? x) (keyword? (first x)) (number? (second x)) (= (count x) 2))
-                    [(first x)]
-                    ;;  (list? x)
-                    ;; (into [] x)
-                    true                    
-                    x
-                    )) obj))
-
-(def runtest false)
+                (assign-syllables my-assigned)
+                ))))
 
 (defn map-even-items [f coll]
   (map-indexed #(if (zero? (mod %1 2)) (f %2) %2) coll))
@@ -504,7 +465,6 @@
 
 
 (def pitch->lilypond-pitch
-  ;; TODO: double sharps and flats, half-flats ??"
   ;; includes dash (-) -> r "
   {
    "-" "r", "S" "c", "S#" "cs", "Sb" "cf", "r" "df", "R" "d", "R#" "ds",
@@ -541,8 +501,7 @@
   (assoc accum 
          :divisions (beat->beat-divisions beat)
          :beat-pitches []
-         )
-  )
+         ))
 
 (defn barline->lilypond-barline[
                                 [_ [barline-type] ] ;; destructuring fun
@@ -591,6 +550,7 @@
              (barline->lilypond-barline barline)
              )
   )
+
 (defn lilypond-headers[accum composition]
   (update-in accum [:output] str 
              (join "\n" [
@@ -775,6 +735,7 @@
 
 (defn get-ending[obj]
   (last (get-attribute obj :ending)))
+
 (defn get-syl[pitch]
   (last (get-attribute pitch :syl)))
 
@@ -784,19 +745,14 @@
     ))
 
 
-
-;;; \acciaccatura { {{grace-notes}} }
-  ;;      #  c1 \afterGrace d1( { c16[ d]) } c1
-
-
 (defn pitch-and-octave[pitch]
-  (println "pitch is" pitch)
-        (str  (pitch->lilypond-pitch (second pitch))
-             (->> pitch pitch->octave octave-number->lilypond-octave))
+  (when false (println "pitch is" pitch))
+  (str  (pitch->lilypond-pitch (second pitch))
+       (->> pitch pitch->octave octave-number->lilypond-octave))
   )
 
 (defn grace-note-pitches[ornament]
-    ;; returns a string of grace note pitches.
+  ;; returns a string of grace note pitches.
   ;; Use 16 as duration and beam them if there is more than one.
   ;; Beamed notes look like this e'16[ d'16]
   (let [pitches (-> ornament rest drop-last)
@@ -805,10 +761,10 @@
         ;; Update 1st and last items to add beams
         items2 (if (> my-count 1)
                  (assoc items 0 (str (get items 0) "[")
-                              (dec my-count) (str (last items) "]"))
+                        (dec my-count) (str (last items) "]"))
                  items)
         ]
-      (join " " items2)))
+    (join " " items2)))
 
 (defn finish-pitch[accum]
   (when false (println "finish-pitch"))
@@ -816,7 +772,7 @@
   (let [pitch (:obj (:current-pitch accum))
         _ (when false (println "pitch is\n\n") (pprint  pitch))
         syl  (get-syl pitch)
-        
+
         begin-slur (if (some #(and (vector? %) (= :begin-slur (first %)))
                              pitch)
                      "(") 
@@ -827,35 +783,35 @@
         divisions (accum :divisions)
         after-ornament  (->> pitch (filter is-ornament?) (filter #(= :after (last %))) first)
         before-ornament  (->> pitch (filter is-ornament?) (filter #(= :before (last %))) first)
-;;        after-ornament-pitches (->> after-ornament rest drop-last)
- ;;       before-ornament-pitches (->> before-ornament rest drop-last)
+        ;;        after-ornament-pitches (->> after-ornament rest drop-last)
+        ;;       before-ornament-pitches (->> before-ornament rest drop-last)
         _ (when false (println "*******before,after ornaments" before-ornament after-ornament ))
-  ;;      _ (when false (println "after-ornament-pitches" after-ornament-pitches))
+        ;;      _ (when false (println "after-ornament-pitches" after-ornament-pitches))
         micro-beats (get-in accum [:current-pitch :micro-beats])
         durations (ratio->lilypond-durations micro-beats divisions)
         first-pitch  
         (str 
-             (when before-ornament
-               (str "\\grace {" (grace-note-pitches before-ornament) "}"))
-             (when after-ornament "\\afterGrace ")
-             my-pitch-and-octave
-             (first durations) 
-             end-slur
-             begin-slur
-             (chord-snippet pitch)
-             (ending-snippet pitch)
-             (when (get-attribute pitch :mordent)
-               "\\mordent") 
-  ;; after ornament:     #  c1 \afterGrace d1( { c16[ d]) } c1
+          (when before-ornament
+            (str "\\grace {" (grace-note-pitches before-ornament) "}"))
+          (when after-ornament "\\afterGrace ")
+          my-pitch-and-octave
+          (first durations) 
+          end-slur
+          begin-slur
+          (chord-snippet pitch)
+          (ending-snippet pitch)
+          (when (get-attribute pitch :mordent)
+            "\\mordent") 
+          ;; after ornament:     #  c1 \afterGrace d1( { c16[ d]) } c1
           ;; before-ornament 
-             ;;\acciaccatura { {{grace-notes}} }
-             (when after-ornament ;; ornament
-               (str  "{" (grace-note-pitches after-ornament) "}"))
-             )
+          ;;\acciaccatura { {{grace-notes}} }
+          (when after-ornament ;; ornament
+            (str  "{" (grace-note-pitches after-ornament) "}"))
+          )
         pitches  (if (= 1 (count durations))
                    first-pitch
                    (str first-pitch "~"
-                        (join "~" (map (partial str pitch-and-octave) 
+                        (join "~" (map (partial str my-pitch-and-octave) 
                                        (rest durations)))))
         ]
     (when false 
@@ -948,7 +904,7 @@
       (-> accum (handle-source obj) (assoc :state :looking-for-attribute-section))
 
       [:in-sargam-section :sargam-line]
-      (-> accum (start-line obj) (assoc  :state :in-sargam-line)) ;; review:lyrics (rest (last obj)))
+      (-> accum (start-line obj) (assoc  :state :in-sargam-line-beginning)) ;; review:lyrics (rest (last obj)))
 
       [:looking-for-attribute-section :lyrics-section]
       accum
@@ -960,17 +916,27 @@
       [:looking-for-attribute-section :attribute-section]
       (assoc accum :state :looking-for-attribute-section) ;; support multiple attribute sections 
 
+      [:in-sargam-line-beginning :measure]
+       (assoc accum :current-pitch nil :state :in-sargam-line) ;; maybe need to save current pitch
+
       [:in-sargam-line :measure]
       (assoc accum :current-pitch nil) ;; maybe need to save current pitch
 
       [:in-sargam-line :beat]
       (-> accum (start-beat obj) (assoc :state :in-beat))
 
+      [:in-sargam-line-beginning :barline]
+      (if (= :single-barline (first (second obj)))
+        (-> accum (assoc :state :in-sargam-line))  ;;; SKIP FIRST BARLINE IN LINE IF single barline
+        (-> accum (emit-barline obj) (assoc :state :in-sargam-line)))
+
       [:in-sargam-line :barline]
       (-> accum (emit-barline obj) (assoc :state :in-sargam-line))
 
       [:in-sargam-line :line-number]
-      accum ;; no lilypond mapping yet
+      accum
+      [:in-sargam-line-beginning :line-number]
+      (-> accum (assoc :state :in-sargam-line-beginning))
 
       [:in-sargam-line :sargam-section]
       (-> accum finish-line (assoc :state :in-sargam-section))
@@ -985,6 +951,9 @@
       (-> accum finish-line
           (assoc :state :looking-for-sargam-section))
 
+      [:collecting-pitch-in-beat :lyrics-section] ;; needed?
+      (-> accum finish-pitch finish-beat finish-line
+          (assoc :state :looking-for-sargam-section))
       [:collecting-pitch-in-beat :lyrics-line] ;; needed?
       (-> accum finish-pitch finish-beat finish-line
           (assoc :state :looking-for-sargam-section))
@@ -1042,18 +1011,18 @@
       (-> accum finish-pitch (start-pitch obj)
           (assoc :state :collecting-pitch-in-beat))
 
-      [:collecting-pitch-in-beat :dash]
-      (-> accum (update-in [:current-pitch :micro-beats] inc))
+[:collecting-pitch-in-beat :dash]
+(-> accum (update-in [:current-pitch :micro-beats] inc))
 
-      [:collecting-pitch-in-beat :beat]
-      (-> accum finish-pitch finish-beat (start-beat obj) (assoc :state :in-beat))
-      ;; tie previous note if new one is a dash!!!
+[:collecting-pitch-in-beat :beat]
+(-> accum finish-pitch finish-beat (start-beat obj) (assoc :state :in-beat))
+;; tie previous note if new one is a dash!!!
 )))
 
 
 
-(defn new-to-lilypond[composition]
-  (when false (println "new-to-lilypond") (pprint composition))
+(defn to-lilypond[composition]
+  (when false (println "to-lilypond") (pprint composition))
   (let [headers-printed? (atom false)
         started-pitch? (atom false) 
         ]
@@ -1094,32 +1063,32 @@
       (let [
             collapsed-parse-tree
             (into [] (map (fn[z] (if (is-sargam-section? z)
-                                         (collapse-section z)
-                                         z))
-                                      parsed))
+                                   (collapse-section z)
+                                   z))
+                          parsed))
             _ (when nil;; (pprint )
                 (println "****collapsed-parse-tree")
                 (pprint collapsed-parse-tree) (println "\n\n"))
             ]
         nil 
-        (:output (new-to-lilypond collapsed-parse-tree))
+        (:output (to-lilypond collapsed-parse-tree))
         )))) 
 
 (when false 
   (pprint (-> "fixtures/blows_up_FAILS.txt" resource slurp
               doremi-text->lilypond)))
-(when true 
-   (println "1111")
-    (-> "GS\n  G|" doremi-text->lilypond println))
-   ;; (-> ".\nS\n\nS\nhi" doremi-text->lilypond println))
- ;; (println (doremi-text->lilypond (join " R\nS")))
- ;;[ "Srrrrr\n\n" "| PPP PPddddddddddddddddddddddd" "jo-"]))))
+(when false 
+  (println "1111")
+  (-> "| S S S\n\n| - - -" doremi-text->lilypond println))
+;; (-> ".\nS\n\nS\nhi" doremi-text->lilypond println))
+;; (println (doremi-text->lilypond (join " R\nS")))
+;;[ "Srrrrr\n\n" "| PPP PPddddddddddddddddddddddd" "jo-"]))))
 
- (when false (println (doremi-text->lilypond (str  "G G RGGGG" "\n"
-                                                  " m S"))))
+(when false (println (doremi-text->lilypond (str  "G G RGGGG" "\n"
+                                                 " m S"))))
 
 (defn -doremi_text_to_lilypond[txt]
-      (->> txt doremi-text->lilypond))
+  (->> txt doremi-text->lilypond))
 
 
 (defn get-stdin[]
@@ -1136,17 +1105,6 @@
     ))
 
 
-
-
-(defn test-aux[file-spec]
-  (->> file-spec slurp doremi-text->lilypond (spit (str "./test/test_results/" (.getName file-spec) ".ly")))
-  (.getName file-spec)) 
-
-
-;; (println (test-all3 "fixtures" "ban.*.txt"))
-;; (println (test-all3 "fixtures" "ban.*.txt"))
-;;(print-stack-trace *e)
-
 (defn test-all-process-file[my-file]
   (let [ basename (.getName my-file) 
         directory-path "test/test_results/"
@@ -1156,7 +1114,6 @@
         to-delete (filter #(fn zz[x] (.startsWith (.getName x) basename))
                           my-files)
         ]
-
     (map clojure.java.io/delete-file to-delete)
     (io/copy my-file (io/file  filename))
     (->> my-file slurp 
@@ -1164,27 +1121,29 @@
     basename
     ))
 
+;;(print-stack-trace *e)
+
 (defn test-all[dir-str match-str]
   { :pre [(string? dir-str)
           (string? match-str)]
-   :post [ (seq? %)]
+  ;; :post [ (seq? %)]
    }
-  ;; goes off resources. Examples: 
   ;; (println (test-all "fixtures" ".*.txt"))
   ;; (println (test-all "fixtures" "ban.*.txt"))
   (let [my-dir (-> dir-str io/resource io/file)]
-    (map test-all-process-file 
-         (filter #(.matches (.getName %) match-str)(file-seq my-dir)))))
+    (time (str "Processed "
+             (->> my-dir 
+                  file-seq 
+                  (filter #(.matches (.getName %) match-str)) 
+                  (pmap test-all-process-file) 
+                  count)
+             " files"))
+    ))
 
+    (comment (pmap test-all-process-file 
+         (filter #(.matches (.getName %) match-str)(file-seq my-dir))
+          nil
+                ))
 
-;;doremi-text->parse-tree 
-;;                                 (join "\n" [
-;;                                             ;; " ..   ..." 
-;;                                             " SR. .GmP"
-;;                                             "(  G m    ) m-(P d)-  | S :|"
-;;                                             "\n"
-;;                                             "1) SS"
-;;                                             ])
-;;                                 )))
 
 
