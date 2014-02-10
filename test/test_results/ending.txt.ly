@@ -16,7 +16,7 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  c'4^"1.____" r4 r4 r4 \bar "||"   d'4^"2.____" r4 r4 r4
+ c'4^"1.____" r4 r4 r4 \bar "||"   d'4^"2.____" r4 r4 r4
 }
 
 

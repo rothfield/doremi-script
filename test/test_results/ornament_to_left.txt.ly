@@ -16,7 +16,7 @@ melody = {
 \cadenzaOn
 
 
- \bar "|"  \grace {d'16}c'4 \break
+ \grace {d'16}c'4 \break
 
 }
 

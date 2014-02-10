@@ -14,7 +14,7 @@ composition (* a musical piece *)
 <section> = (* 3 kinds of sections: attributes, lyrics and sargam.
    typically a composition will have attributes followed by lyrics, followed
    by lines of sargam. *)
-(sargam-section / attribute-section / lyrics-section) 
+sargam-section / abc-section / attribute-section / lyrics-section  
 
 (* TODO: add support for abc number and devanagri notations
     sargam:(sargam:devanagri-sargam-line / sargam:sargam-line / sargam:abc-sargam-line/ sargam:number-sargam-line)
@@ -35,11 +35,23 @@ sargam-section
   =  (upper-octave-line <newline>)*  sargam-line (<newline> lower-octave-line)*
   (<newline> lyrics-line)*
 
+abc-section
+  =  (abc-upper-octave-line <newline>)*  abc-line (<newline> lower-octave-line)*
+  (<newline> lyrics-line)*
+
+
+
 sargam-line (* consists of optional line# at beginning of
  line, followed by 1 or more measures *) 
    = line-number?
    <white-space?> barline? measure 
    (barline measure)*  barline? <white-space?>
+
+abc-line (* consists of optional line# at beginning of
+ line, followed by 1 or more measures *) 
+   = line-number?
+   <white-space?> barline? abc-measure 
+   (barline abc-measure)*  barline? <white-space?>
 
 attribute-section (* key value pairs *)
     = attribute-line (<newline> attribute-line)* 
@@ -131,6 +143,31 @@ pitch  =
 "n" ! flat-or-sharp|
 "N" ! flat-or-sharp
 
+abc-pitch  =  
+"Cb"| "C#"| "Db" | "D#" | "D#" | "Eb" | "E#" | "F#" | "Gb" |
+"G#" | "Ab" | "A#" | "Bb" | 
+"C" ! flat-or-sharp|
+"D" ! flat-or-sharp|
+"E" ! flat-or-sharp|
+"F" ! flat-or-sharp|
+"G" ! flat-or-sharp|
+"A" ! flat-or-sharp|
+"B" ! flat-or-sharp
+
+abc-ornament-pitch  =  
+"Cb"| "C#"| "Db" | "D#" | "D#" | "Eb" | "E#" | "F#" | "Gb" |
+"G#" | "Ab" | "A#" | "Bb" | 
+"C" ! flat-or-sharp|
+"D" ! flat-or-sharp|
+"E" ! flat-or-sharp|
+"F" ! flat-or-sharp|
+"G" ! flat-or-sharp|
+"A" ! flat-or-sharp|
+"B" ! flat-or-sharp
+
+
+
+
 end-slur = <')'>
 
 
@@ -151,6 +188,7 @@ space = ' '
 (* beats are sequences of pitches or dashes. spaces separate beats. beats can also be
 delimited by angle brackets, in which case white space can be used in the beat *)
 beat = beat-delimited | !begin-beat-symbol beat-undelimited 
+abc-beat = abc-beat-delimited | !begin-beat-symbol abc-beat-undelimited 
 dash =  (* ie a -, used as a rhythmical placeholder. ie s--r--g- *) 
    <'-'>
 
@@ -168,6 +206,9 @@ end-slur = <")">
 use srgm> or s r g m> to group pithes into a single beat. the > delimiters correspond to the lower loop in the aacm notation system *)
   = <begin-beat-symbol> beat-delimited-item+ <end-beat-symbol>
 
+<abc-beat-delimited>
+  = <begin-beat-symbol> abc-beat-delimited-item+ <end-beat-symbol>
+
 
 <beat-delimited-item> =
     begin-slur /
@@ -176,13 +217,28 @@ use srgm> or s r g m> to group pithes into a single beat. the > delimiters corre
     dash /
     <white-space>
 
+<abc-beat-delimited-item> =
+    begin-slur /
+    end-slur /
+    abc-pitch / 
+    dash /
+    <white-space>
+
 <beat-undelimited> (* beats can be indicated by a group of pitches that consist only of pitches and dashes such as 's--r--g-'   can't contain spaces *)
   = beat-undelimited-item+
 
+<abc-beat-undelimited> (* beats can be indicated by a group of pitches that consist only of pitches and dashes such as 's--r--g-'   can't contain spaces *)
+  = abc-beat-undelimited-item+
 
 <beat-undelimited-item> (* inside of a simple beat, ie s--r--g- note that undelimited beats cannot contain spaces *)
   = 
     pitch / 
+    dash /
+    begin-slur /
+    end-slur
+<abc-beat-undelimited-item>
+  = 
+    abc-pitch / 
     dash /
     begin-slur /
     end-slur
@@ -194,7 +250,13 @@ non-barline
     beat 
 
 measure = <white-space?> measure-item (<white-space> measure-item)* <white-space?>
+
+abc-measure = <white-space?> abc-measure-item (<white-space> abc-measure-item)* <white-space?>
+
 <measure-item> = begin-slur / end-slur / beat
+
+<abc-measure-item> = begin-slur / end-slur / abc-beat
+
 lyrics-line (* line of syllables *)
   = <white-space?> lyrics-line-items
 
@@ -225,6 +287,16 @@ talas, mordents, octaves,chords, octave indicating dots,
   upper-upper-octave-symbol /
 ending )+
 
+abc-upper-octave-line
+= <white-space?> 
+  ( <white-space> /
+  upper-octave-dot /
+  tala /
+  abc-ornament /
+  chord /
+  mordent /
+  upper-upper-octave-symbol /
+ending )+
 
 (*
 TODO:
@@ -252,8 +324,13 @@ another idea is to use [chord-symbol] vs <ornament> to disambiguate the 2.
 
 ornament= ornament-pitch+ | delimited-ornament
 
+abc-ornament= abc-ornament-pitch+ | abc-delimited-ornament
+
 <delimited-ornament> (* in upper line <nrsns> *)
   =  <"<"> ornament-pitch+  <">">
+
+<abc-delimited-ornament> (* in upper line <nrsns> *)
+  =  <"<"> abc-ornament-pitch+  <">">
 
 mordent = <"~"> 
 
@@ -261,38 +338,7 @@ ending
 (*   1.------- 2.--- etc. the period is optional. must have either dot or underscores. todo: accepts 1-.--- which is not exactly what i want.  *)
 
 = #"[1-3][\._]+" 
-<upper-octave-line-item> (* things above notes, including talas, octaves,chords,
-and 1st and second ending symbols. 
-todo:
-note that there is controversy over whether something is a chord or an
-ornament! for now i've put ornaments before chords. perhaps we should have
-an ornament-or-chord item and let the semantic analyzer distinguish them.
-the semantic analyzer can decide whether something is an ornament or not
-by looking at the column.
-since ornaments are either before or after a note according to the current
-scheme, there should be little overlap!!
-another idea is to tag the lines as follows:
 
-chords:
-ornaments:
-tala:
-
-but that seems ugly
-
-another idea is to have a
-chord-upper-line = 3 or more chords ??? that could disambiguate it.
-
-another idea is to use [chord-symbol] vs <ornament> to disambiguate the 2.
- *)
-  = 
- <white-space> /
- upper-octave-dot /
- tala /
- ornament /
- chord /
- mordent /
- upper-upper-octave-symbol /
- ending
 
 upper-octave-dot= <dot> 
 

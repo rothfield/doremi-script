@@ -34,13 +34,72 @@
   (and (vector? x)
        (contains? #{:composition} (first x))))
 
+
+(defn fix-keyword[vec]
+  (if (keyword? (first vec))
+  (assoc vec 0 (-> (first vec)
+      name 
+      (clojure.string/replace-first "abc-" "")
+      keyword
+      ))
+    vec
+  )
+  )
+
+(defn sargam-pitch->normalized-pitch[x]
+ (get {"S" "C"
+   "r" "Db"
+   "R" "D"
+   "g" "Eb"
+   "G" "E"
+   "m" "F"
+   "M" "F#"
+   "P" "G"
+   "d" "Ab"
+   "D" "A"
+   "n" "Bb" ;; more TODO here
+   "N" "B"
+    "R#" "D#"
+    "G#" "E#"
+    "mb" "Fb"
+    "Pb" "Gb"
+    "P#" "G#"
+    "D#" "A#"
+    "N#" "B#"   
+       } x "oops"))
+
+(defn normalize-pitches[parse-tree]
+(postwalk (fn[z]
+            (if (vector? z)
+              (case (first z)
+                (:pitch :ornament-pitch)
+                (update-in z [1] sargam-pitch->normalized-pitch)
+              z
+              )
+              z))
+          parse-tree)
+  )
+
+(defn fix-keywords[parse-tree]
+  ;(when true (println "normalize-pitches"))
+  (when false (println "fix-keywords"))
+(postwalk (fn[z]
+            (if (vector? z)
+              (fix-keyword z)
+              z
+              ))
+          parse-tree)
+  )
+
 (defn doremi-text->parse-tree[txt]
   {
    :pre [(string? txt)]
    :post [ (or (is-composition? %)
                (map? %)) ]
    }
-  (doremi-script-parser txt))
+  ;;;can specify start rule like:
+  ;;;(doremi-script-parser txt :start :composition))
+  (-> txt doremi-script-parser normalize-pitches fix-keywords))
 
 
 (defn items[x] (next x))
@@ -138,7 +197,7 @@
   (and (vector? x) (= :measure (first x))))
 
 (defn is-pitch?[x] (and (vector? x)
-       (= :pitch (first x))))
+                        (= :pitch (first x))))
 
 (defn is-ornament-pitch?[x]
   (and (vector? x) (= :ornament-pitch (first x))))
@@ -150,7 +209,7 @@
 (defn is-upper-dot?[x]
   (when false (println "is-upper-dot?, x is") (pprint x))
   (and (vector? x) (contains? #{:upper-octave-dot :upper-upper-octave-symbol } 
-                  (first x))))
+                              (first x))))
 
 (defn is-ornament?[x]
   (and (vector? x) (= :ornament (first x))))
@@ -242,7 +301,7 @@
 
 (defn assign-syllables[assigned section]
   (when false (println "**assigned" @assigned)
-  (println "**section" section))
+    (println "**section" section))
   (when false (println "assign-syllables") (pprint section))
   (let [ syls-to-apply (atom (mapcat items (filter is-lyrics-line? section)))
         _ (when nil (println "****syls-to-apply=" @syls-to-apply))
@@ -397,14 +456,14 @@
               true)]}
   (when false (println "**collapse-section, section=") (pprint section))
   (let [my-assigned (atom {})]
-  (into [] (->> section 
-                (handle-slurs my-assigned)
-                (assign-ornament-octaves my-assigned)
-                (assign-to-main-line my-assigned)
-                (remove (fn[x] (and (vector? x) (#{:upper-octave-line :lower-octave-line} (first x)))))
-                (into [])
-                (assign-syllables my-assigned)
-                ))))
+    (into [] (->> section 
+                  (handle-slurs my-assigned)
+                  (assign-ornament-octaves my-assigned)
+                  (assign-to-main-line my-assigned)
+                  (remove (fn[x] (and (vector? x) (#{:upper-octave-line :lower-octave-line} (first x)))))
+                  (into [])
+                  (assign-syllables my-assigned)
+                  ))))
 
 (defn map-even-items [f coll]
   (map-indexed #(if (zero? (mod %1 2)) (f %2) %2) coll))
@@ -749,7 +808,7 @@
 
 (defn pitch-and-octave[pitch]
   (when false (println "pitch is" pitch))
-  (str  (pitch->lilypond-pitch (second pitch))
+  (str  (normalized-pitch->lilypond-pitch (second pitch))
        (->> pitch pitch->octave octave-number->lilypond-octave))
   )
 
@@ -886,7 +945,7 @@
 
 
 (defn lilypond-transition[accum obj]
-  { :pre [ (do (when nil (pprint obj) (println "first obj=" (first obj))) true)
+  { :pre [ (do (when false (println "first obj=" (first obj))) true)
           (map? accum)
           (#{:lyrics-section :lyrics-line :sargam-section :pitch :barline :measure :sargam-line :line-number :composition
              :beat :dash :output :eof :attribute-section :source} (first obj))
@@ -913,13 +972,13 @@
 
       [:looking-for-attribute-section :sargam-section]
       (-> accum print-headers  (assoc
-                                                       :state :in-sargam-section))
+                                 :state :in-sargam-section))
 
       [:looking-for-attribute-section :attribute-section]
       (assoc accum :state :looking-for-attribute-section) ;; support multiple attribute sections 
 
       [:in-sargam-line-beginning :measure]
-       (assoc accum :current-pitch nil :state :in-sargam-line) ;; maybe need to save current pitch
+      (assoc accum :current-pitch nil :state :in-sargam-line) ;; maybe need to save current pitch
 
       [:in-sargam-line :measure]
       (assoc accum :current-pitch nil) ;; maybe need to save current pitch
@@ -929,7 +988,8 @@
 
       [:in-sargam-line-beginning :barline]
       (if (= :single-barline (first (second obj)))
-        (-> accum (assoc :state :in-sargam-line))  ;;; SKIP FIRST BARLINE IN LINE IF single barline
+        ;;; SKIP FIRST BARLINE IN LINE IF single barline
+        (-> accum (assoc :state :in-sargam-line))  
         (-> accum (emit-barline obj) (assoc :state :in-sargam-line)))
 
       [:in-sargam-line :barline]
@@ -945,8 +1005,8 @@
 
       [:looking-for-sargam-section :eof]
       (-> accum lilypond-at-eof  (assoc :state :eof))
- [:looking-for-sargam-section :attribute-section]
-accum
+      [:looking-for-sargam-section :attribute-section]
+      accum
       [:looking-for-sargam-section :sargam-section]
       (-> accum (assoc :state :in-sargam-section))
 
@@ -964,12 +1024,12 @@ accum
       (-> accum finish-pitch finish-beat finish-line
           (assoc :state :in-sargam-section))
 
- [:looking-for-attribute-section :eof]
+      [:looking-for-attribute-section :eof]
       (-> accum (assoc :output "No music entered" :state :eof))
-      
+
       [:collecting-pitch-in-beat :eof]
       (-> accum finish-pitch finish-beat finish-line lilypond-at-eof)
- [:in-sargam-line :lyrics-section]
+      [:in-sargam-line :lyrics-section]
       (-> accum finish-line (assoc :state :looking-for-sargam-section))
       [:in-sargam-line :eof]
       (-> accum finish-line lilypond-at-eof (assoc :state :eof))
@@ -999,25 +1059,25 @@ accum
       (-> accum (update-in [:dash-microbeats] inc))
 
       [:collecting-dashes-in-beat :pitch]
-      (-> accum finish-dashes (start-pitch obj) (assoc :state :collecting-pitch-in-beat)) 
+(-> accum finish-dashes (start-pitch obj) (assoc :state :collecting-pitch-in-beat)) 
 
 
 
-      [:collecting-dashes-in-beat :sargam-section]
-      (-> accum finish-dashes finish-beat finish-line (assoc :state :in-sargam-section)) 
+[:collecting-dashes-in-beat :sargam-section]
+(-> accum finish-dashes finish-beat finish-line (assoc :state :in-sargam-section)) 
 
 
 
-      [:collecting-dashes-in-beat :barline]
-      (-> accum finish-dashes finish-beat (emit-barline obj) (assoc :state :in-sargam-line))
+[:collecting-dashes-in-beat :barline]
+(-> accum finish-dashes finish-beat (emit-barline obj) (assoc :state :in-sargam-line))
 
-      [:collecting-pitch-in-beat :barline]
-      (-> accum finish-pitch finish-beat (emit-barline obj)
-          (assoc :state :in-sargam-line))
+[:collecting-pitch-in-beat :barline]
+(-> accum finish-pitch finish-beat (emit-barline obj)
+    (assoc :state :in-sargam-line))
 
-      [:collecting-pitch-in-beat :pitch]
-      (-> accum finish-pitch (start-pitch obj)
-          (assoc :state :collecting-pitch-in-beat))
+[:collecting-pitch-in-beat :pitch]
+(-> accum finish-pitch (start-pitch obj)
+    (assoc :state :collecting-pitch-in-beat))
 
 [:collecting-pitch-in-beat :dash]
 (-> accum (update-in [:current-pitch :micro-beats] inc))
@@ -1082,6 +1142,16 @@ accum
         (:output (to-lilypond collapsed-parse-tree))
         )))) 
 
+
+;;(when true (-> (str "D.\n" "|CDEF# GG|") doremi-text->parse-tree pprint))
+;;(when true (-> (str "R.\n"" |SRGM PP#|") doremi-text->parse-tree pprint))
+(when true (-> (str "R.\n"" |SRGM PP#|") doremi-text->lilypond println))
+
+  (println (time (test-all "fixtures" "part.*.txt")))
+
+
+;;(when true (-> "|CDEF# GG|" doremi-text->lilypond pprint))
+
 (when false 
   (pprint (-> "fixtures/blows_up_FAILS.txt" resource slurp
               doremi-text->lilypond)))
@@ -1091,6 +1161,10 @@ accum
 ;; (-> ".\nS\n\nS\nhi" doremi-text->lilypond println))
 ;; (println (doremi-text->lilypond (join " R\nS")))
 ;;[ "Srrrrr\n\n" "| PPP PPddddddddddddddddddddddd" "jo-"]))))
+
+
+
+
 
 (when false (println (doremi-text->lilypond (str  "G G RGGGG" "\n"
                                                  " m S"))))
@@ -1115,6 +1189,7 @@ accum
 
 (defn test-all-process-file[my-file]
   (let [ basename (.getName my-file) 
+        _ (println "processing " basename)
         directory-path "test/test_results/"
         filename (str directory-path "/" basename)
         my-files (file-seq (clojure.java.io/file directory-path))
@@ -1134,24 +1209,24 @@ accum
 (defn test-all[dir-str match-str]
   { :pre [(string? dir-str)
           (string? match-str)]
-  ;; :post [ (seq? %)]
+   ;; :post [ (seq? %)]
    }
-  ;; (println (test-all "fixtures" ".*.txt"))
+  ;; (println (time (test-all "fixtures" ".*.txt")))
   ;; (println (test-all "fixtures" "ban.*.txt"))
   (let [my-dir (-> dir-str io/resource io/file)]
     (time (str "Processed "
-             (->> my-dir 
-                  file-seq 
-                  (filter #(.matches (.getName %) match-str)) 
-                  (pmap test-all-process-file) 
-                  count)
-             " files"))
+               (->> my-dir 
+                    file-seq 
+                    (filter #(.matches (.getName %) match-str)) 
+                    (pmap test-all-process-file) 
+                    count)
+               " files"))
     ))
 
-    (comment (pmap test-all-process-file 
-         (filter #(.matches (.getName %) match-str)(file-seq my-dir))
-          nil
-                ))
+(comment (pmap test-all-process-file 
+               (filter #(.matches (.getName %) match-str)(file-seq my-dir))
+               nil
+               ))
 
 
 
