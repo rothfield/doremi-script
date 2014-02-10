@@ -4,6 +4,7 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojars.mikejs/ring-etag-middleware "0.1.0-SNAPSHOT"]
                  [instaparse "1.2.2"] 
+					;;			   [ring/ring-jetty-adapter "1.1.6"] 
                  [com.googlecode.texhyphj/texhyphj "1.2"]
                  [compojure "1.1.6"]]
   :plugins [[lein-ring "0.8.10"]]
