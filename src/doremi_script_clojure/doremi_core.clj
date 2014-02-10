@@ -945,7 +945,8 @@
 
       [:looking-for-sargam-section :eof]
       (-> accum lilypond-at-eof  (assoc :state :eof))
-
+ [:looking-for-sargam-section :attribute-section]
+accum
       [:looking-for-sargam-section :sargam-section]
       (-> accum (assoc :state :in-sargam-section))
 
