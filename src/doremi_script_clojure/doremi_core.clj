@@ -429,8 +429,10 @@
     omit-time-signature-snippet))
 
 
-(defn print-headers[accum composition]
-  (let [ atts (first (filter is-attribute-section? composition))
+(defn print-headers[accum]
+  (let [
+        composition (:composition accum)
+        atts (first (filter is-attribute-section? composition))
         ;; _ (pprint atts) 
         my-map (apply array-map 
                       (map-even-items #(-> % lower-case keyword)
@@ -910,7 +912,7 @@
       accum
 
       [:looking-for-attribute-section :sargam-section]
-      (-> accum (print-headers (:composition accum)) (assoc
+      (-> accum print-headers  (assoc
                                                        :state :in-sargam-section))
 
       [:looking-for-attribute-section :attribute-section]
@@ -961,7 +963,9 @@
       (-> accum finish-pitch finish-beat finish-line
           (assoc :state :in-sargam-section))
 
-
+ [:looking-for-attribute-section :eof]
+      (-> accum (assoc :output "No music entered" :state :eof))
+      
       [:collecting-pitch-in-beat :eof]
       (-> accum finish-pitch finish-beat finish-line lilypond-at-eof)
  [:in-sargam-line :lyrics-section]
