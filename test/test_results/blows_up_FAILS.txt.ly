@@ -19,87 +19,13 @@ melody = {
  c'4 \break
 \grace s64 c'4 \break
 \grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
-\grace s64 c'4 \break
 \grace s64 df'4 \break
 
 }
 
 
 text = \lyricmode {
-                                                                              
+    
 }
 
 \score{
