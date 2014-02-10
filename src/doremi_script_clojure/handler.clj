@@ -7,6 +7,7 @@
             [ring.middleware.etag   :refer [wrap-etag]]
             [ring.middleware.params         :only [wrap-params]]
             [compojure.route :as route]))
+  ;; (wrap-file "compositions")
 
 (defn my-md5[txt]
   (apply str
@@ -74,5 +75,6 @@
   (route/resources "/")
   (route/not-found "Not Found"))
 
+
 (def app
-  (handler/site app-routes))
+ (->  (handler/site app-routes)))
