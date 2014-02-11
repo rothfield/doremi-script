@@ -10,7 +10,7 @@
   :plugins [[lein-ring "0.8.10"]]
   :jar-name "doremi-script.jar"
   :uberjar-name "doremi-script-standalone.jar"
-  :ring {:handler doremi_script_clojure.handler/app}
+  :ring {:handler doremi_script.handler/app}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring-mock "0.1.5"]]}})

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>doremi-server</groupId>
   <artifactId>doremi-server</artifactId>
@@ -8,11 +9,11 @@
   <description>doremi-script: Easy to use textual music notation supporting multiple dialects (ABC 123 AACM and Hindi/Bhatkande. http://ragapedia.com </description>
   <url>http://github.com/rothfield/doremi-script</url>
   <scm>
-    <connection>scm:git:git://github.com/rothfield/doremi-script.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/rothfield/doremi-script.git</developerConnection>
-    <tag>6c05fb01dcee3ef720e26df48ec37770fb2ef03c
+    <connection>scm:git:git://github.com//.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com//.git</developerConnection>
+    <tag>a8a286abbe268caada130a3451b776ac85d2617a
 </tag>
-    <url>https://github.com/rothfield/doremi-script</url>
+    <url>https://github.com//</url>
   </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -32,6 +33,7 @@
     </testResources>
     <directory>target</directory>
     <outputDirectory>target/classes</outputDirectory>
+    <plugins/>
   </build>
   <repositories>
     <repository>
