@@ -83,10 +83,18 @@
 
 
 (defn unique-for-assigned[x]
+  { :pre [(vector? x)]
+   :post [(vector? %)]
+   }
+
   "Make a unique key using meta-data"
   [ (meta x) (first x)]) 
 
 (defn in-assigned?[my-set x]
+  { :pre [(set? my-set)
+          (vector? x)]
+   :post [(contains? #{true false} %)]
+   }
   (contains? my-set (unique-for-assigned x)))
 
 (def debug false)
@@ -130,38 +138,38 @@
 
 (defn hindi-pitch->normalized-pitch[x]
   (get
-  {
-  "\u0938" "C"
-  "\u0930" "D"
-  "\u095A" "E"
-  "\u092E" "F"
-  "\u092a" "G"
-  "\u0927" "A"
-  "\u0929" "B"
-  "\u092E'" "F#"  ;; note the tick(
-   }
- x "oops"))
-   
-   
+    {
+     "\u0938" "C"
+     "\u0930" "D"
+     "\u095A" "E"
+     "\u092E" "F"
+     "\u092a" "G"
+     "\u0927" "A"
+     "\u0929" "B"
+     "\u092E'" "F#"  ;; note the tick(
+     }
+    x "oops"))
+
+
 (defn normalize-pitches[parse-tree]
   { :pre [(vector? parse-tree)]
    :post [(vector? %)]
    }
   (when false (pprint parse-tree))
   (into [] (postwalk (fn[z]
-             ;; (println "in normalize-pitches postwalk")
-              (if (vector? z)
-                (case (first z)
-                  (:sargam-pitch :sargam-ornament-pitch)
-                  (update-in z [1] sargam-pitch->normalized-pitch)
-                  (:hindi-pitch :hindi-ornament-pitch)
-                  (update-in z [1] hindi-pitch->normalized-pitch)
-                  ;; else
-                  z
-                  )
-                z
-                ))
-            parse-tree))
+                       ;; (println "in normalize-pitches postwalk")
+                       (if (vector? z)
+                         (case (first z)
+                           (:sargam-pitch :sargam-ornament-pitch)
+                           (update-in z [1] sargam-pitch->normalized-pitch)
+                           (:hindi-pitch :hindi-ornament-pitch)
+                           (update-in z [1] hindi-pitch->normalized-pitch)
+                           ;; else
+                           z
+                           )
+                         z
+                         ))
+                     parse-tree))
   )
 
 (defn pprint-and-return[x msg]
@@ -173,19 +181,17 @@
 (defn doremi-text->parse-tree[txt]
   {
    :pre [(string? txt)]
-  ;; :post [ (or (is-composition? %)
-   ;;            (map? %)) ]
+    :post [ (or (is-composition? %)
+               (map? %)) ]
    }
-  (let [ ;;raw-parsed (doall (doremi-script-parser txt))
-        ;; _ (println "raw-parsed" raw-parsed)
-        ;; with-pitches-normalized (normalize-pitches raw-parsed)
-         ;;_ (println "with-pitches-normalized" with-pitches-normalized)
+  (let [ parsed (doremi-script-parser txt)
         ]
-  (-> txt
-      doremi-script-parser
-      normalize-pitches
-      fix-keywords
-      ))) ; ;; screwed up
+    (if (map? parsed)
+      parsed ;; error
+    (->  parsed
+        normalize-pitches
+        fix-keywords
+        )))) ; ;; screwed up
 
 
 (defn items[x] (next x))
@@ -330,15 +336,15 @@
 
 
 
-(defn assign-ornament-octaves[assigned my-section]
-  {;; :pre [(is-stave? my-section)] 
+(defn assign-ornament-octaves[assigned my-stave]
+  {;; :pre [(is-stave? my-stave)] 
    :post [(is-stave? %)] }
   (when false (println "entering assign-ornament-octaves:")
-    (pprint my-section))
+    (pprint my-stave))
   (let [column-map (lines->column-map 
-                     (filter is-upper-line? (items my-section)))
+                     (filter is-upper-line? (items my-stave)))
         _ (when false (println "****assign-ornament-octaves: column-map is")(pprint column-map))
-        _ (when false (println "****Entering assign-ornament-octaves: my-section is")(pprint my-section))
+        _ (when false (println "****Entering assign-ornament-octaves: my-stave is")(pprint my-stave))
         ]
     (into [] 
           (map 
@@ -382,14 +388,14 @@
                           item)) line)
                     true
                     line 
-                    )) my-section)))) 
+                    )) my-stave)))) 
 
 
-(defn assign-syllables[assigned section]
+(defn assign-syllables[assigned stave]
   (when false (println "**assigned" @assigned)
-    (println "**section" section))
-  (when false (println "assign-syllables") (pprint section))
-  (let [ syls-to-apply (atom (mapcat items (filter is-lyrics-line? section)))
+    (println "**stave" stave))
+  (when false (println "assign-syllables") (pprint stave))
+  (let [ syls-to-apply (atom (mapcat items (filter is-lyrics-line? stave)))
         _ (when nil (println "****syls-to-apply=" @syls-to-apply))
         in-slur (atom false)
         ]
@@ -415,11 +421,11 @@
                                        true
                                        item
                                        ))     line)
-                     )) section)
+                     )) stave)
     ))
 
 
-(defn handle-slurs[assigned section ]
+(defn handle-slurs[assigned stave ]
   (map (fn[line]
          (if-not (is-notes-line? line) 
            line
@@ -469,24 +475,24 @@
                                item))
                        line 
                        ))))
-       section)
+       stave)
   )
 
-(defn assign-to-main-line[assigned section ]
+(defn assign-to-notes-line[assigned stave ]
   {
-   :pre [(is-stave? section)]
+   :pre [(is-stave? stave)]
    :post [(is-stave? %)
           ;; (do (println (start-index %)) (pprint %) true) 
           ]
    }
-  (when false (println "assign-to-main-line") (pprint section))
+  (when false (println "assign-to-notes-line") (pprint stave))
   "collapse"
-  (let [ column-map (lines->column-map (items section))
+  (let [ column-map (lines->column-map (items stave))
         _ (when nil (println "column-map:\n" column-map))
-        main-line (first (filter is-main-line? (items section)))     
+        main-line (first (filter is-main-line? (items stave)))     
         main-line-start-index (start-index main-line)
         _ (when false (println "main-line is" main-line))
-        line-starts (map start-index (items section))
+        line-starts (map start-index (items stave))
         _ (when false (println "line-starts=") (pprint line-starts))
         line-start-for-position  (fn line-start-for-position-fn[position] 
                                    (last (filter (fn[x] (>= position x)) line-starts)))
@@ -509,23 +515,29 @@
                                     (let [column (column-for-node item)
                                           start-index (start-index item)
                                           _ (when nil (println "assign postwalk: start-index" start-index))
-                                          nodes-in-this-column 
+                                          nodes-in-this-column1 
                                           (filter (fn[x] (#{:upper-octave-dot :upper-upper-octave-symbol
                                                             :lower-octave-dot 
                                                             :lower-lower-octave-symbol :ornament 
                                                             :chord
-                                                          :kommal-indicator 
+                                                            :kommal-indicator 
                                                             :tala
                                                             :ending 
                                                             :mordent} (first x))) 
 
                                                   (remove (partial in-assigned? @assigned) (column-map column [])))
+                                          ;; remove ornaments from nodes-in-this-column when item is
+                                          ;; not pitch
+                                           nodes-in-this-column (if-not (is-pitch? item) 
+                                                                 (remove is-ornament? nodes-in-this-column1)
+                                                                 nodes-in-this-column1)
                                           _ (when false (println "nodes-in-this-column" nodes-in-this-column))
                                           ]
 
                                       (if (not-empty nodes-in-this-column)
                                         (do
                                           (when false (println "*********conjing"))
+                                          ;; not a pitch
                                           (reset! assigned (apply conj @assigned (map unique-for-assigned nodes-in-this-column)))
                                           (apply conj item nodes-in-this-column) 
                                           )
@@ -533,20 +545,20 @@
                                     true
                                     item
                                     )) line)))
-                  section 
+                  stave 
                   ))))
 
 
-(defn collapse-section[section]
-  {:post [(do (when nil (println "leaving collapse-section, returns")
+(defn collapse-stave[stave]
+  {:post [(do (when nil (println "leaving collapse-stave, returns")
                 (pprint %))
               true)]}
-  (when false (println "**collapse-section, section=") (pprint section))
-  (let [my-assigned (atom {})]
-    (into [] (->> section 
+  (when false (println "**collapse-stave, stave=") (pprint stave))
+  (let [my-assigned (atom (hash-set))]
+    (into [] (->> stave 
                   (handle-slurs my-assigned)
                   (assign-ornament-octaves my-assigned)
-                  (assign-to-main-line my-assigned)
+                  (assign-to-notes-line my-assigned)
                   (remove (fn[x] (and (vector? x) (#{:upper-octave-line :lower-octave-line} (first x)))))
                   (into [])
                   (assign-syllables my-assigned)
@@ -902,26 +914,31 @@
 
 
 (defn normalized-pitch->kommal[x]
-    (get {"D" "Db"
-          "E" "Eb"
-          "A" "Ab"
-          "B" "Bb"} x x))
+  (get {"D" "Db"
+        "E" "Eb"
+        "A" "Ab"
+        "B" "Bb"} x x))
 
 (defn pitch-and-octave[pitch]
-  (when true (println "pitch is" pitch))
+  (when false (println "pitch is" pitch))
   (let [pitch2 
-  (if (get-attribute pitch :kommal-indicator)
-     (normalized-pitch->kommal (second pitch))
-    (second pitch))]
-  (str  (normalized-pitch->lilypond-pitch pitch2)
-       (->> pitch pitch->octave octave-number->lilypond-octave))
-  ))
+        (if (get-attribute pitch :kommal-indicator)
+          (normalized-pitch->kommal (second pitch))
+          (second pitch))]
+    (str  (normalized-pitch->lilypond-pitch pitch2)
+         (->> pitch pitch->octave octave-number->lilypond-octave))
+    ))
+
+
+(defn get-ornament-pitches[ornament]
+  (-> ornament rest drop-last)
+  )
 
 (defn grace-note-pitches[ornament]
   ;; returns a string of grace note pitches.
   ;; Use 16 as duration and beam them if there is more than one.
   ;; Beamed notes look like this e'16[ d'16]
-  (let [pitches (-> ornament rest drop-last)
+  (let [pitches (get-ornament-pitches ornament)
         my-count (count pitches)
         items (into [] (map (fn[x] (str (pitch-and-octave x) "16")) pitches))
         ;; Update 1st and last items to add beams
@@ -942,9 +959,13 @@
         begin-slur (if (some #(and (vector? %) (= :begin-slur (first %)))
                              pitch)
                      "(") 
+        _ (when begin-slur
+            (reset! (:in-slur accum) true))
         end-slur (if (some #(and (vector? %) (= :end-slur (first %)))
                            pitch)
                    ")") 
+        _ (when end-slur
+            (reset! (:in-slur accum) false))
         my-pitch-and-octave  (pitch-and-octave pitch)
         divisions (accum :divisions)
         after-ornament  (->> pitch (filter is-ornament?) (filter #(= :after (last %))) first)
@@ -971,9 +992,14 @@
           ;; after ornament:     #  c1 \afterGrace d1( { c16[ d]) } c1
           ;; before-ornament 
           ;;\acciaccatura { {{grace-notes}} }
+          (when (and after-ornament  (not @(:in-slur accum)))
+            "(")
           (when after-ornament ;; ornament
-            (str  "{" (grace-note-pitches after-ornament) "}"))
-          )
+            (str  "{" (grace-note-pitches after-ornament) 
+          (when (and after-ornament  (not @(:in-slur accum)))
+            ")")
+                 "}"))
+          ) ;; end str
         pitches  (if (= 1 (count durations))
                    first-pitch
                    (str first-pitch "~"
@@ -984,7 +1010,8 @@
       (println "finish-pitch  divisions=" divisions "; micro-beats= " micro-beats)
       (pprint durations))
     (when false (println "leaving finish-pitch:" (update-in accum [:beat-pitches] conj pitches )))
-    (-> accum  (update-in [:beat-pitches] conj pitches) (update-in [:syllables] str syl " "))
+    (-> accum  (update-in [:beat-pitches] conj pitches) (update-in [:syllables] str syl " ")
+        )
     ))
 
 (defn finish-line[accum]
@@ -1198,6 +1225,7 @@
          (reduce lilypond-transition
                  {:state :start 
                   :finished-first-line false
+                  :in-slur (atom false)
                   :syllables ""
                   :output ""
                   :composition composition}
@@ -1216,7 +1244,7 @@
       (let [
             collapsed-parse-tree
             (into [] (map (fn[z] (if (is-stave? z)
-                                   (collapse-section z)
+                                   (collapse-stave z)
                                    z))
                           parsed))
             ]
@@ -1246,7 +1274,7 @@
       (let [
             collapsed-parse-tree
             (into [] (map (fn[z] (if (is-stave? z)
-                                   (collapse-section z)
+                                   (collapse-stave z)
                                    z))
                           parsed))
             _ (when nil;; (pprint )
@@ -1272,23 +1300,23 @@
     (println "hindi to collapsed")
     (-> hindi-str  doremi-text->collapsed  println)
     (when false
-    (println abc-str)
-    (println "abc raw parse results")
-    (-> abc-str  doremi-script-parser pprint)
-    (println "abc normalized")
-    (-> abc-str  doremi-text->parse-tree pprint)
-    (println "abc to-lilypond")
-    (-> abc-str  doremi-text->lilypond println)
-    (println "sargam raw parse results")
-    (-> sargam-str  doremi-script-parser pprint)
-    (println "sargam normalized")
-    (-> sargam-str  doremi-text->parse-tree pprint)
-    (println "sargam to-lilypond")
-    (-> sargam-str  doremi-text->lilypond println)
+      (println abc-str)
+      (println "abc raw parse results")
+      (-> abc-str  doremi-script-parser pprint)
+      (println "abc normalized")
+      (-> abc-str  doremi-text->parse-tree pprint)
+      (println "abc to-lilypond")
+      (-> abc-str  doremi-text->lilypond println)
+      (println "sargam raw parse results")
+      (-> sargam-str  doremi-script-parser pprint)
+      (println "sargam normalized")
+      (-> sargam-str  doremi-text->parse-tree pprint)
+      (println "sargam to-lilypond")
+      (-> sargam-str  doremi-text->lilypond println)
       )
     ))
 
-(when true (test-dialect-normalization))
+(when false (test-dialect-normalization))
 
 ;;(when true (-> (str "R.\n"" |SRGM PP#|") doremi-text->lilypond println))
 
@@ -1298,10 +1326,10 @@
 ;;(when true (-> "|CDEF# GG|\n\nDDD" doremi-text->lilypond pprint))
 
 (when  false
- ;; (pprint (-> "fixtures/fails.txt" resource slurp
+  ;; (pprint (-> "fixtures/fails.txt" resource slurp
   ;;            doremi-text->lilypond)))
   (println (-> "fixtures/fails.txt" resource slurp
-              doremi-text->parse-tree)))
+               doremi-text->parse-tree)))
 (when false 
   (println "1111")
   (-> "| S S S\n\n| - - -" doremi-text->lilypond println))
@@ -1373,9 +1401,11 @@
     ))
 
 ;;  (println (test-all "fixtures" "ban.*.txt"))
- ;; (println (test-all "fixtures" ".*.txt"))
+;; (println (test-all "fixtures" ".*.txt"))
 ;;(when true  (println (test-all "fixtures" "fails.*.txt")))
 
 (when false (println (-> "SSSS|" doremi-text->lilypond)))
 
-
+(when false (-> " d\nP n" doremi-text->collapsed pprint))
+(when false (-> "fixtures/bansuriv3.txt" resource slurp  doremi-text->parse-tree pprint))
+(when false (-> "fixtures/bansuriv3.txt" resource slurp  doremi-text->collapsed pprint))
