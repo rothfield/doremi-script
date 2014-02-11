@@ -16,6 +16,20 @@
   "replace keywords like :COMPOSITION_ITEMS with :items"  
   (let [ my-keys
         [ 
+         :hindi-measure 
+         :hindi-beat 
+         :hindi-composition
+         :hindi-section
+         :hindi-stave
+         :hindi-upper-octave-line
+         :hindi-notes-line
+         :hindi-beat-delimited
+         :hindi-beat-undelimited-item
+         :hindi-ornament-pitch
+         :hindi-ornament
+         :hindi-pitch
+         :hindi-measure-item
+         :hindi-delimited-ornament
          :abc-measure 
          :abc-beat 
          :abc-composition
@@ -61,7 +75,7 @@
                  :measure-item
                  :delimited-ornament
                  ]
-        my-vals2 (take (* (count my-vals) 2) (cycle my-vals))
+        my-vals2 (take (* (count my-vals) 3) (cycle my-vals))
         my-map (zipmap my-keys my-vals2)
         ]
     (postwalk-replace my-map parse-tree)
@@ -114,6 +128,21 @@
         "N#" "B#"   
         } x "oops"))
 
+(defn hindi-pitch->normalized-pitch[x]
+  (get
+  {
+  "\u0938" "C"
+  "\u0930" "D"
+  "\u095A" "E"
+  "\u092E" "F"
+  "\u092a" "G"
+  "\u0927" "A"
+  "\u0929" "B"
+  "\u092E'" "F#"  ;; note the tick(
+   }
+ x "oops"))
+   
+   
 (defn normalize-pitches[parse-tree]
   { :pre [(vector? parse-tree)]
    :post [(vector? %)]
@@ -125,6 +154,9 @@
                 (case (first z)
                   (:sargam-pitch :sargam-ornament-pitch)
                   (update-in z [1] sargam-pitch->normalized-pitch)
+                  (:hindi-pitch :hindi-ornament-pitch)
+                  (update-in z [1] hindi-pitch->normalized-pitch)
+                  ;; else
                   z
                   )
                 z
@@ -482,6 +514,7 @@
                                                             :lower-octave-dot 
                                                             :lower-lower-octave-symbol :ornament 
                                                             :chord
+                                                          :kommal-indicator 
                                                             :tala
                                                             :ending 
                                                             :mordent} (first x))) 
@@ -868,12 +901,21 @@
    "B#" "bs", })
 
 
+(defn normalized-pitch->kommal[x]
+    (get {"D" "Db"
+          "E" "Eb"
+          "A" "Ab"
+          "B" "Bb"} x x))
 
 (defn pitch-and-octave[pitch]
-  (when false (println "pitch is" pitch))
-  (str  (normalized-pitch->lilypond-pitch (second pitch))
+  (when true (println "pitch is" pitch))
+  (let [pitch2 
+  (if (get-attribute pitch :kommal-indicator)
+     (normalized-pitch->kommal (second pitch))
+    (second pitch))]
+  (str  (normalized-pitch->lilypond-pitch pitch2)
        (->> pitch pitch->octave octave-number->lilypond-octave))
-  )
+  ))
 
 (defn grace-note-pitches[ornament]
   ;; returns a string of grace note pitches.
@@ -1162,6 +1204,24 @@
                  ))))
 
 
+(defn doremi-text->collapsed[txt] 
+  {
+   :pre [(string? txt)]
+   :post [(or (map? %) (vector? %))]
+   }
+  (let [ parsed  (doremi-text->parse-tree txt)
+        ]
+    (if (map? parsed)  ;; error
+      parsed
+      (let [
+            collapsed-parse-tree
+            (into [] (map (fn[z] (if (is-stave? z)
+                                   (collapse-section z)
+                                   z))
+                          parsed))
+            ]
+        collapsed-parse-tree
+        )))) 
 
 
 
@@ -1201,7 +1261,17 @@
 (defn test-dialect-normalization[]
   (let [abc-str (str "D\n" "|CDEF# GG#|")
         sargam-str (str "R.\n"" |SRGM PP#|")
+        hindi-str (str "सर" "|\n" " _")
         ]
+    (println "hindi raw parse results")
+    (-> hindi-str  doremi-script-parser pprint)
+    (println "hindi normalized")
+    (-> hindi-str  doremi-text->parse-tree pprint)
+    (println "hindi to lilypond")
+    (-> hindi-str  doremi-text->lilypond  println)
+    (println "hindi to collapsed")
+    (-> hindi-str  doremi-text->collapsed  println)
+    (when false
     (println abc-str)
     (println "abc raw parse results")
     (-> abc-str  doremi-script-parser pprint)
@@ -1215,9 +1285,10 @@
     (-> sargam-str  doremi-text->parse-tree pprint)
     (println "sargam to-lilypond")
     (-> sargam-str  doremi-text->lilypond println)
+      )
     ))
 
-(when false (test-dialect-normalization))
+(when true (test-dialect-normalization))
 
 ;;(when true (-> (str "R.\n"" |SRGM PP#|") doremi-text->lilypond println))
 

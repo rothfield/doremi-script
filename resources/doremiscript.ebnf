@@ -7,7 +7,7 @@
 
 composition = 
 (* Support different script systems. IE SRGmPDN and CDEFGAB *)
-sargam-composition | abc-composition
+sargam-composition | abc-composition | hindi-composition
 
 <sargam-composition> (* a musical piece *)
 (* each section is separated by one or more 'empty' lines.
@@ -33,6 +33,16 @@ abc-section)*
 <empty-line*>
 <white-space*> 
 
+<hindi-composition>
+=
+<empty-line*>
+hindi-section
+(<newline>
+<empty-line+>
+hindi-section)*
+<empty-line*>
+<white-space*> 
+
 <sargam-section> = (* 3 kinds of sections: attributes, lyrics and music.
 typically a composition will have attributes followed by lyrics, followed
 by lines of music. *)
@@ -40,6 +50,7 @@ sargam-stave / attribute-section / lyrics-section
 
 <abc-section> = abc-stave / attribute-section / lyrics-section  
 
+<hindi-section> = hindi-stave / attribute-section / lyrics-section  
 sargam-stave  (* Spans multiple lines. *)
 =
 (sargam-upper-octave-line <newline>)*
@@ -53,6 +64,15 @@ abc-notes-line
 (<newline> lower-octave-line)*
 (<newline> lyrics-line)*
 
+hindi-stave =  
+(hindi-upper-octave-line <newline>)*  
+hindi-notes-line 
+(<newline> lower-octave-line)*
+(<newline> lyrics-line)*
+
+
+
+
 sargam-notes-line (* consists of optional line# at beginning of
 line, followed by 1 or more measures *) 
 = line-number?
@@ -60,6 +80,15 @@ line, followed by 1 or more measures *)
 barline? 
 sargam-measure 
 (barline sargam-measure)*  
+barline?
+<white-space?>
+
+hindi-notes-line
+= line-number?
+<white-space?>
+barline?
+hindi-measure 
+(barline hindi-measure)*
 barline?
 <white-space?>
 
@@ -71,6 +100,9 @@ abc-measure
 (barline abc-measure)*
 barline?
 <white-space?>
+
+
+
 
 attribute-section (* key value pairs *)
 = attribute-line (<newline> attribute-line)* 
@@ -108,7 +140,7 @@ right-repeat = <":|">
 (***********pitches, sharps and flats ************)	
 
 flat-or-sharp = '#' | 'b'
-
+tick ="'"
 (*  Letters SrRgGmMPdDnN in latin script  *)
 (* todo: dry *)
 sargam-ornament-pitch  =  
@@ -156,6 +188,29 @@ sargam-pitch  =
 "D" ! flat-or-sharp|
 "n" ! flat-or-sharp|
 "N" ! flat-or-sharp
+
+hindi-pitch =
+    (* TODO: support hindi sharps and flats. *)
+  "\u0938" ! flat-or-sharp |   (* sa *)
+  "\u0930" ! flat-or-sharp |  (* re *)
+  "\u095A" ! flat-or-sharp |  (* ga *)
+  "\u092E" ! (flat-or-sharp | tick) |  (* ma *)
+  "\u092a" ! flat-or-sharp |  (* pa *)
+  "\u0927" ! flat-or-sharp |  (* dha *)
+  "\u0929" ! flat-or-sharp |  (* ni *)
+  "\u092E'" (* ma sharp, note the tick *)
+
+hindi-ornament-pitch =
+    (* TODO: support hindi sharps and flats. *)
+  "\u0938" ! flat-or-sharp (* sa *)
+  "\u0930" ! flat-or-sharp (* re *)
+  "\u095A" ! flat-or-sharp (* ga *)
+  "\u092E" ! (flat-or-sharp | tick)  (* ma *)
+  "\u092a" ! flat-or-sharp (* pa *)
+  "\u0927" ! flat-or-sharp (* dha *)
+  "\u0929" ! flat-or-sharp (* ni *)
+  "\u092E'" (* ma sharp, note the tick *)
+
 
 abc-pitch  =  
 "Cb"| "C#"| "Db" | "D#" | "D#" | "Eb" | "E#" | "F#" | "Gb" |
@@ -205,6 +260,8 @@ sargam-beat-delimited |
 
 abc-beat = abc-beat-delimited | !begin-beat-symbol abc-beat-undelimited 
 
+hindi-beat = hindi-beat-delimited | !begin-beat-symbol hindi-beat-undelimited 
+
 dash =  (* ie a -, used as a rhythmical placeholder. ie s--r--g- *) 
 <'-'>
 
@@ -230,6 +287,10 @@ sargam-beat-delimited-item+
 abc-beat-delimited-item+ 
 <end-beat-symbol>
 
+<hindi-beat-delimited> = 
+<begin-beat-symbol>
+hindi-beat-delimited-item+ 
+<end-beat-symbol>
 
 <sargam-beat-delimited-item> =
 begin-slur /
@@ -245,10 +306,22 @@ abc-pitch /
 dash /
 <white-space>
 
+<hindi-beat-delimited-item> =
+begin-slur /
+end-slur /
+hindi-pitch / 
+dash /
+<white-space>
+
+
+
+
 <sargam-beat-undelimited> (* beats can be indicated by a group of pitches that consist only of pitches and dashes such as 's--r--g-'   can't contain spaces *)
 = sargam-beat-undelimited-item+
 
 <abc-beat-undelimited> = abc-beat-undelimited-item+
+
+<hindi-beat-undelimited> = hindi-beat-undelimited-item+
 
 <sargam-beat-undelimited-item> (* inside of a simple beat, ie s--r--g- note that undelimited beats cannot contain spaces *)
 = sargam-pitch / 
@@ -262,6 +335,11 @@ dash /
 begin-slur /
 end-slur
 
+<hindi-beat-undelimited-item> = 
+hindi-pitch / 
+dash /
+begin-slur /
+end-slur
 
 sargam-measure = 
 <white-space?>
@@ -277,9 +355,21 @@ abc-measure-item
 abc-measure-item)*
 <white-space?>
 
+hindi-measure =
+<white-space?>
+hindi-measure-item
+(<white-space>
+hindi-measure-item)*
+<white-space?>
+
+
+
+
 <sargam-measure-item> = begin-slur / end-slur / sargam-beat
 
 <abc-measure-item> = begin-slur / end-slur / abc-beat
+
+<hindi-measure-item> = begin-slur / end-slur / hindi-beat
 
 lyrics-line (* line of syllables *)
 = <white-space?> lyrics-line-items
@@ -321,6 +411,19 @@ mordent /
 upper-upper-octave-symbol /
 ending )+
 
+hindi-upper-octave-line
+= <white-space?> 
+( <white-space> /
+upper-octave-dot /
+tala /
+hindi-ornament /
+chord /
+mordent /
+upper-upper-octave-symbol /
+ending )+
+
+
+
 (*
 TODO:
 note that there is controversy over whether something is a chord or an
@@ -353,11 +456,21 @@ abc-ornament=
 abc-ornament-pitch+ |
 abc-delimited-ornament
 
+hindi-ornament=
+hindi-ornament-pitch+ |
+hindi-delimited-ornament
+
+
+
 <delimited-sargam-ornament> (* in upper line <nrsns> *)
 =  <"<"> sargam-ornament-pitch+  <">">
 
 <abc-delimited-ornament> 
 =  <"<"> abc-ornament-pitch+  <">">
+
+<hindi-delimited-ornament> 
+=  <"<"> hindi-ornament-pitch+  <">">
+
 
 mordent = <"~"> 
 
@@ -390,7 +503,8 @@ lower-lower-octave-symbol | kommal-indicator
 
 lower-octave-dot= <dot>
 lower-lower-octave-symbol=":"
-kommal-indicator (* an underscore for flat. for the traditional bhatkande notation - devanagri, indicates a flatted note, since devanagri seems not to have lowercase *)
+
+kommal-indicator (* an underscore for flat. for the traditional bhatkande notation - hindi, indicates a flatted note, since hindi seems not to have lowercase *)
 = "_"
 
 
