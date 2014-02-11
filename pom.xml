@@ -1,19 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>doremi-server</groupId>
   <artifactId>doremi-server</artifactId>
   <packaging>jar</packaging>
   <version>0.1.0-SNAPSHOT</version>
   <name>doremi-server</name>
-  <description>Parser for doremi-script written in Clojure using instaparse - see http://github.com/rothfield/doremi-script-base</description>
-  <url>http://github.com/rothfield/doremi-script-clojure</url>
+  <description>doremi-script: Easy to use textual music notation supporting multiple dialects (ABC 123 AACM and Hindi/Bhatkande. http://ragapedia.com </description>
+  <url>http://github.com/rothfield/doremi-script</url>
   <scm>
-    <connection>scm:git:git://github.com//.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com//.git</developerConnection>
-    <tag>0ac5d46cfccdc33c86b925108ee5f07b765fe40a
+    <connection>scm:git:git://github.com/rothfield/doremi-script.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/rothfield/doremi-script.git</developerConnection>
+    <tag>6c05fb01dcee3ef720e26df48ec37770fb2ef03c
 </tag>
-    <url>https://github.com//</url>
+    <url>https://github.com/rothfield/doremi-script</url>
   </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -33,7 +32,6 @@
     </testResources>
     <directory>target</directory>
     <outputDirectory>target/classes</outputDirectory>
-    <plugins/>
   </build>
   <repositories>
     <repository>
@@ -72,11 +70,6 @@
       <groupId>instaparse</groupId>
       <artifactId>instaparse</artifactId>
       <version>1.2.2</version>
-    </dependency>
-    <dependency>
-      <groupId>com.googlecode.texhyphj</groupId>
-      <artifactId>texhyphj</artifactId>
-      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>compojure</groupId>

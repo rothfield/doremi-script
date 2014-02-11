@@ -39,11 +39,11 @@ Sample Input in AACM Sargam Style
     
 DoremiScript HTML Output(screen snapshot)
 ------------------
-![Screenshot of DoremiScript rendered in html](https://github.com/rothfield/doremi-script-base/raw/master/docs/bansuri_in_html_screenshot.png "Sargam Screenshot")
+![Screenshot of DoremiScript rendered in html](https://github.com/rothfield/doremi-script/raw/master/doc/bansuri_in_html_screenshot.png "Sargam Screenshot")
 
 Generated Western Staff Notation
 --------------------------------
-![Converted to western notation](https://github.com/rothfield/doremi-script-base/raw/master/docs/bansuri_in_western_notation.png "")
+![Converted to western notation](https://github.com/rothfield/doremi-script/raw/master/doc/bansuri_in_western_notation.png "")
 
 
 
