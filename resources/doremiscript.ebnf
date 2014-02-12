@@ -143,25 +143,62 @@ kommal-indicator (* an underscore for flat. for the traditional bhatkande notati
 #"[^\n\r ](( *)[^\n\r ])*"
 
 
-
 <abc-composition> (* a musical piece *)
 (* each section is separated by one or more 'empty' lines.
 the empty line can have spaces. section doesn't include the eol.
 that allows things like "s" to parse as a composition *)
-=
-<empty-line*>
-abc-section
-(<newline>
-<empty-line+>
-abc-section)*
+= abc-staves-only  | attributes-only | abc-attributes-and-staves |
+abc-one-lyrics-and-staves
+| abc-many-lyrics-and-staves | abc-attributes-lyrics-and-staves
+
+<attributes-only>= 
+<empty-line*> attribute-section 
 <empty-line*>
 <white-space*> 
 
+<abc-attributes-and-staves>= 
+<empty-line*> attribute-section 
+(<newline>
+<empty-line+>
+abc-stave)*
+<empty-line*>
+<white-space*> 
 
-<abc-section> = (* 3 kinds of sections: attributes, lyrics and music.
-typically a composition will have attributes followed by lyrics, followed
-by lines of music. *)
-abc-stave / attribute-section / lyrics-section  
+<abc-staves-only> =
+<empty-line*>
+abc-stave
+(<newline>
+<empty-line+>
+abc-stave)*
+<empty-line*>
+<white-space*> 
+
+<abc-many-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline> <empty-line+> lyrics-section)*
+(<newline>
+<empty-line+>
+abc-stave)*
+<empty-line*>
+<white-space*> 
+
+<abc-one-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline>
+<empty-line+>
+abc-stave)*
+<empty-line*>
+<white-space*> 
+
+<abc-attributes-lyrics-and-staves> =
+    <empty-line*> attribute-section 
+(<newline> <empty-line+> lyrics-section)+
+(<newline>
+<empty-line+>
+abc-stave)*
+<empty-line*>
+<white-space*> 
+
 
 abc-stave  (* Spans multiple lines. *)
 =
@@ -254,25 +291,62 @@ delimited-abc-ornament
 =  <"<"> hindi-ornament-pitch+  <">">
 
 
-(** Generated from template.ebnf. Do not edit **)
-<hindi-composition> (* a musical piece *)
+(** Generated from template.ebnf. Do not edit **)<hindi-composition> (* a musical piece *)
 (* each section is separated by one or more 'empty' lines.
 the empty line can have spaces. section doesn't include the eol.
 that allows things like "s" to parse as a composition *)
-=
-<empty-line*>
-hindi-section
-(<newline>
-<empty-line+>
-hindi-section)*
+= hindi-staves-only  | attributes-only | hindi-attributes-and-staves |
+hindi-one-lyrics-and-staves
+| hindi-many-lyrics-and-staves | hindi-attributes-lyrics-and-staves
+
+<attributes-only>= 
+<empty-line*> attribute-section 
 <empty-line*>
 <white-space*> 
 
+<hindi-attributes-and-staves>= 
+<empty-line*> attribute-section 
+(<newline>
+<empty-line+>
+hindi-stave)*
+<empty-line*>
+<white-space*> 
 
-<hindi-section> = (* 3 kinds of sections: attributes, lyrics and music.
-typically a composition will have attributes followed by lyrics, followed
-by lines of music. *)
-hindi-stave / attribute-section / lyrics-section  
+<hindi-staves-only> =
+<empty-line*>
+hindi-stave
+(<newline>
+<empty-line+>
+hindi-stave)*
+<empty-line*>
+<white-space*> 
+
+<hindi-many-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline> <empty-line+> lyrics-section)*
+(<newline>
+<empty-line+>
+hindi-stave)*
+<empty-line*>
+<white-space*> 
+
+<hindi-one-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline>
+<empty-line+>
+hindi-stave)*
+<empty-line*>
+<white-space*> 
+
+<hindi-attributes-lyrics-and-staves> =
+    <empty-line*> attribute-section 
+(<newline> <empty-line+> lyrics-section)+
+(<newline>
+<empty-line+>
+hindi-stave)*
+<empty-line*>
+<white-space*> 
+
 
 hindi-stave  (* Spans multiple lines. *)
 =
@@ -365,25 +439,62 @@ delimited-hindi-ornament
 =  <"<"> hindi-ornament-pitch+  <">">
 
 
-(** Generated from template.ebnf. Do not edit **)
-<number-composition> (* a musical piece *)
+(** Generated from template.ebnf. Do not edit **)<number-composition> (* a musical piece *)
 (* each section is separated by one or more 'empty' lines.
 the empty line can have spaces. section doesn't include the eol.
 that allows things like "s" to parse as a composition *)
-=
-<empty-line*>
-number-section
-(<newline>
-<empty-line+>
-number-section)*
+= number-staves-only  | attributes-only | number-attributes-and-staves |
+number-one-lyrics-and-staves
+| number-many-lyrics-and-staves | number-attributes-lyrics-and-staves
+
+<attributes-only>= 
+<empty-line*> attribute-section 
 <empty-line*>
 <white-space*> 
 
+<number-attributes-and-staves>= 
+<empty-line*> attribute-section 
+(<newline>
+<empty-line+>
+number-stave)*
+<empty-line*>
+<white-space*> 
 
-<number-section> = (* 3 kinds of sections: attributes, lyrics and music.
-typically a composition will have attributes followed by lyrics, followed
-by lines of music. *)
-number-stave / attribute-section / lyrics-section  
+<number-staves-only> =
+<empty-line*>
+number-stave
+(<newline>
+<empty-line+>
+number-stave)*
+<empty-line*>
+<white-space*> 
+
+<number-many-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline> <empty-line+> lyrics-section)*
+(<newline>
+<empty-line+>
+number-stave)*
+<empty-line*>
+<white-space*> 
+
+<number-one-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline>
+<empty-line+>
+number-stave)*
+<empty-line*>
+<white-space*> 
+
+<number-attributes-lyrics-and-staves> =
+    <empty-line*> attribute-section 
+(<newline> <empty-line+> lyrics-section)+
+(<newline>
+<empty-line+>
+number-stave)*
+<empty-line*>
+<white-space*> 
+
 
 number-stave  (* Spans multiple lines. *)
 =
@@ -476,25 +587,62 @@ delimited-number-ornament
 =  <"<"> hindi-ornament-pitch+  <">">
 
 
-(** Generated from template.ebnf. Do not edit **)
-<sargam-composition> (* a musical piece *)
+(** Generated from template.ebnf. Do not edit **)<sargam-composition> (* a musical piece *)
 (* each section is separated by one or more 'empty' lines.
 the empty line can have spaces. section doesn't include the eol.
 that allows things like "s" to parse as a composition *)
-=
-<empty-line*>
-sargam-section
-(<newline>
-<empty-line+>
-sargam-section)*
+= sargam-staves-only  | attributes-only | sargam-attributes-and-staves |
+sargam-one-lyrics-and-staves
+| sargam-many-lyrics-and-staves | sargam-attributes-lyrics-and-staves
+
+<attributes-only>= 
+<empty-line*> attribute-section 
 <empty-line*>
 <white-space*> 
 
+<sargam-attributes-and-staves>= 
+<empty-line*> attribute-section 
+(<newline>
+<empty-line+>
+sargam-stave)*
+<empty-line*>
+<white-space*> 
 
-<sargam-section> = (* 3 kinds of sections: attributes, lyrics and music.
-typically a composition will have attributes followed by lyrics, followed
-by lines of music. *)
-sargam-stave / attribute-section / lyrics-section  
+<sargam-staves-only> =
+<empty-line*>
+sargam-stave
+(<newline>
+<empty-line+>
+sargam-stave)*
+<empty-line*>
+<white-space*> 
+
+<sargam-many-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline> <empty-line+> lyrics-section)*
+(<newline>
+<empty-line+>
+sargam-stave)*
+<empty-line*>
+<white-space*> 
+
+<sargam-one-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline>
+<empty-line+>
+sargam-stave)*
+<empty-line*>
+<white-space*> 
+
+<sargam-attributes-lyrics-and-staves> =
+    <empty-line*> attribute-section 
+(<newline> <empty-line+> lyrics-section)+
+(<newline>
+<empty-line+>
+sargam-stave)*
+<empty-line*>
+<white-space*> 
+
 
 sargam-stave  (* Spans multiple lines. *)
 =

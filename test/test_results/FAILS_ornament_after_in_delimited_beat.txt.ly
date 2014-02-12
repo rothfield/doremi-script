@@ -12,11 +12,10 @@ melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
-\autoBeamOn
 \cadenzaOn
 
 
- \afterGrace bf'8({a'16[ g'16])} g'8 \break
+ \afterGrace bf'8[({a'16[ g'16])} g'8] \break
 
 }
 

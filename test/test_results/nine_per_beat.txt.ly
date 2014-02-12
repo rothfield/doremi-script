@@ -12,11 +12,10 @@ melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
-\autoBeamOn
 \cadenzaOn
 
 
- \times 8/9{ g'16 c'32 ef'16 c'32 d'16. }  \break
+ \times 8/9{ g'16[ c'32 ef'16 c'32 d'16.] }  \break
 
 }
 

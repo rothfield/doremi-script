@@ -1,22 +1,59 @@
-
 <doremi-composition> (* a musical piece *)
 (* each section is separated by one or more 'empty' lines.
 the empty line can have spaces. section doesn't include the eol.
 that allows things like "s" to parse as a composition *)
-=
-<empty-line*>
-doremi-section
-(<newline>
-<empty-line+>
-doremi-section)*
+= doremi-staves-only  | attributes-only | doremi-attributes-and-staves |
+doremi-one-lyrics-and-staves
+| doremi-many-lyrics-and-staves | doremi-attributes-lyrics-and-staves
+
+<attributes-only>= 
+<empty-line*> attribute-section 
 <empty-line*>
 <white-space*> 
 
+<doremi-attributes-and-staves>= 
+<empty-line*> attribute-section 
+(<newline>
+<empty-line+>
+doremi-stave)*
+<empty-line*>
+<white-space*> 
 
-<doremi-section> = (* 3 kinds of sections: attributes, lyrics and music.
-typically a composition will have attributes followed by lyrics, followed
-by lines of music. *)
-doremi-stave / attribute-section / lyrics-section  
+<doremi-staves-only> =
+<empty-line*>
+doremi-stave
+(<newline>
+<empty-line+>
+doremi-stave)*
+<empty-line*>
+<white-space*> 
+
+<doremi-many-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline> <empty-line+> lyrics-section)*
+(<newline>
+<empty-line+>
+doremi-stave)*
+<empty-line*>
+<white-space*> 
+
+<doremi-one-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline>
+<empty-line+>
+doremi-stave)*
+<empty-line*>
+<white-space*> 
+
+<doremi-attributes-lyrics-and-staves> =
+    <empty-line*> attribute-section 
+(<newline> <empty-line+> lyrics-section)+
+(<newline>
+<empty-line+>
+doremi-stave)*
+<empty-line*>
+<white-space*> 
+
 
 doremi-stave  (* Spans multiple lines. *)
 =
