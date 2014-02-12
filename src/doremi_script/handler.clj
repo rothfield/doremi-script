@@ -19,10 +19,14 @@
                                     )))))))
 
 (defn draw[txt parse-result img-url]
-  (str "<!DOCTYPE html> <html> <body><h1>doremi-script parser</h1><form method='post'> Enter doremi-script data<br/><textarea rows='10' cols='80' name='val'>" 
+  (str "<!DOCTYPE html> <html>"
+       "<title>Doremi-Script by John Rothfield</title> <body><h1>Doremi-Script Letter music system</h1>"
+       "<a href='https://github.com/rothfield/doremi-script#readme'>Doremi-Script project home</a>"
+       "<form method='post'> <div>Enter music in letter format. (examples:) <ul><li><b>ABC</b>: | CDbDEb EFF#G AbABbB </li><li><b>Sargam</b>:  SrRg GmMP dDnN | -</li><li><b>Hindi</b>: सर ग़म  म'प धऩ (Use underscores for flat notes) </li></ul></div>
+       <br/><textarea rows='10' cols='80' name='val'>" 
        txt
        "</textarea><br/>" 
-       "<input type='submit'><br/>"
+       "<input type='submit' value='Generate staff notation'><br/>"
        "<textarea rows='10' cols='80'>" 
        parse-result  "</textarea><br/>" 
        " </form></body>"

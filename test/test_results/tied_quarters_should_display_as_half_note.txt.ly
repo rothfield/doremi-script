@@ -16,7 +16,7 @@ melody = {
 \cadenzaOn
 
 
- g'4 r4 g'4 r4
+ e'4 r4 e'4 r4
 }
 
 

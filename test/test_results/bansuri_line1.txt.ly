@@ -16,7 +16,7 @@ melody = {
 \cadenzaOn
 
 
- \bar "|:"  c'8( df'8 \bar "|"  bf4) c'4 ef'8( f'8 \afterGrace g'8{bf'16} af'8) \bar "|"  g'4^"i" r4 g'4 g'4 \bar "|"  g'4^"IV" r4 a'4 \afterGrace bf'4{a'16[ c''16 bf'16 a'16 bf'16]} \bar "|"  \break
+ \bar "|:"  c'8( df'8 \bar "|"  bf4) c'4 ef'8( f'8 \afterGrace g'8{bf'16} af'8) \bar "|"  g'4^"i" r4 g'4 g'4 \bar "|"  g'4^"IV" r4 a'4 \afterGrace bf'4({a'16[ c''16 bf'16 a'16 bf'16])} \bar "|"  \break
 
 }
 

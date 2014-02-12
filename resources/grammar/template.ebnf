@@ -1,0 +1,110 @@
+
+<doremi-composition> (* a musical piece *)
+(* each section is separated by one or more 'empty' lines.
+the empty line can have spaces. section doesn't include the eol.
+that allows things like "s" to parse as a composition *)
+=
+<empty-line*>
+doremi-section
+(<newline>
+<empty-line+>
+doremi-section)*
+<empty-line*>
+<white-space*> 
+
+
+<doremi-section> = (* 3 kinds of sections: attributes, lyrics and music.
+typically a composition will have attributes followed by lyrics, followed
+by lines of music. *)
+doremi-stave / attribute-section / lyrics-section  
+
+doremi-stave  (* Spans multiple lines. *)
+=
+(doremi-upper-octave-line <newline>)*
+doremi-notes-line 
+(<newline> lower-octave-line)*
+(<newline> lyrics-line)*
+
+
+doremi-notes-line (* consists of optional line# at beginning of
+line, followed by 1 or more measures *) 
+= line-number?
+<white-space?> 
+barline? 
+doremi-measure 
+(barline doremi-measure)*  
+barline?
+<white-space?>
+
+doremi-beat = 
+doremi-beat-delimited |
+!begin-beat-symbol doremi-beat-undelimited 
+
+
+<doremi-beat-delimited> 
+(* ie <s r g m> . useful if ornaments wouldn't line up otherwise!. 
+use srgm> or s r g m> to group pithes into a single beat. the > delimiters correspond to the lower loop in the aacm notation system *)
+= <begin-beat-symbol> 
+doremi-beat-delimited-item+ 
+<end-beat-symbol>
+
+
+<doremi-beat-delimited-item> =
+begin-slur /
+end-slur /
+doremi-pitch / 
+dash /
+<white-space>
+
+
+<doremi-beat-undelimited> (* beats can be indicated by a group of pitches that consist only of pitches and dashes such as 's--r--g-'   can't contain spaces *)
+= doremi-beat-undelimited-item+
+
+
+<doremi-beat-undelimited-item> (* inside of a simple beat, ie s--r--g- note that undelimited beats cannot contain spaces *)
+= doremi-pitch / 
+dash /
+begin-slur /
+end-slur
+
+
+doremi-measure = 
+<white-space?>
+doremi-measure-item
+(<white-space>
+doremi-measure-item)*
+<white-space?>
+
+
+<doremi-measure-item> = begin-slur / end-slur / doremi-beat
+
+
+doremi-upper-octave-line (* Things above notes, including ornaments, 
+talas, mordents, octaves,chords, octave indicating dots,
+and 1st and second ending symbols. TODO: add catchall for word?? *)
+= <white-space?> 
+( <white-space> /
+upper-octave-dot /
+tala /
+doremi-ornament /
+chord /
+mordent /
+upper-upper-octave-symbol /
+ending )+
+
+
+
+doremi-ornament= 
+doremi-ornament-pitch+ |
+delimited-doremi-ornament
+
+
+<delimited-doremi-ornament> (* in upper line <nrsns> *)
+=  <"<"> doremi-ornament-pitch+  <">">
+
+<abc-delimited-ornament> 
+=  <"<"> abc-ornament-pitch+  <">">
+
+<hindi-delimited-ornament> 
+=  <"<"> hindi-ornament-pitch+  <">">
+

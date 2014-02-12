@@ -1,0 +1,46 @@
+sargam-ornament-pitch  =  
+"Sb"|
+"S#"|
+"R#"|
+"G#"|
+"P#"|
+"Pb"|
+"D#"|
+"N#"|
+"Pb"|
+"S" ! flat-or-sharp|
+"r" ! flat-or-sharp|
+"R" ! flat-or-sharp|
+"g" ! flat-or-sharp|
+"G" ! flat-or-sharp|
+"m" ! flat-or-sharp|
+"M" ! flat-or-sharp|
+"P" ! flat-or-sharp|
+"d" ! flat-or-sharp|
+"D" ! flat-or-sharp|
+"n" ! flat-or-sharp|
+"N" ! flat-or-sharp
+
+sargam-pitch  =  
+"Sb"|
+"S#"|
+"R#"|
+"G#"|
+"P#"|
+"Pb"|
+"D#"|
+"N#"|
+"Pb"|
+"S" ! flat-or-sharp|
+"r" ! flat-or-sharp|
+"R" ! flat-or-sharp|
+"g" ! flat-or-sharp|
+"G" ! flat-or-sharp|
+"m" ! flat-or-sharp|
+"M" ! flat-or-sharp|
+"P" ! flat-or-sharp|
+"d" ! flat-or-sharp|
+"D" ! flat-or-sharp|
+"n" ! flat-or-sharp|
+"N" ! flat-or-sharp
+

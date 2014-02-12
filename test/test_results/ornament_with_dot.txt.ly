@@ -16,7 +16,7 @@ melody = {
 \cadenzaOn
 
 
- \afterGrace c''4{b'16[ c''16]} \grace {b'16[ c''16]}b'4 \break
+ \afterGrace c''4({b'16[ c''16])} b'4 \break
 
 }
 
