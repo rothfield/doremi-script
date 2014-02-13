@@ -42,7 +42,7 @@ Sample Input in AACM Sargam Style
     | (d-Pm  g) P  m | r - S :|
        ga-      wa-ta  ho- ri
     
-DoremiScript HTML Output(screen snapshot)
+DoremiScript HTML Output(screen snapshot) (NOT YET IMPLEMENTED IN CURRENT VERSION)
 ------------------
 ![Screenshot of DoremiScript rendered in html](https://github.com/rothfield/doremi-script/raw/master/doc/bansuri_in_html_screenshot.png "Sargam Screenshot")
 
