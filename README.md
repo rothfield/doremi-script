@@ -10,9 +10,6 @@ DoremiScript
    DoremiScript is implented in Clojure and uses Instaparse for parsing
 
 
-Run doremi-script from the command line to create and open a png file with staff notation
-for "12 34# 5 -"
-echo "12 34# 5 - |" | java -jar target/doremi-script-standalone.jar | lilypond --png -o tmp - ; chromium tmp.png
 **DoremiScript** is a small language for creating [letter based musical notation](http://en.wikipedia.org/wiki/Letter_notation). It currently supports western ABC style notation, [Numbered notation](http://en.wikipedia.org/wiki/Numbered_musical_notation) using 1234567, [Sargam](http://en.wikipedia.org/wiki/Swara) notation using english letters SrRgGmMPdnN as used at the AACM for notating Ragas, and [Devanagri notation in Bhatkande style](http://en.wikipedia.org/wiki/Musical_notation#India) [(See also)](http://www.omenad.net/page.php?goPage=http%3A%2F%2Fwww.omenad.net%2Farticles%2Fomeswarlipi.htm) using Devanagri letters for the sargam letters. **DoremiScript** lets you write letter music notation using an easy-to-read, easy-to-write plain text format, then nicely formats it using css and html. DoremiScript can also generate standard western notation via a [Lilypond](http://lilypond.org) converter. 
 
 Try the [online version](http://ragapedia.com)
@@ -95,7 +92,10 @@ should be used to indicate the melismas
   - Code base is written in Clojure. Parser is written using Instaparse
 	- Since doremi-script is written in Clojure, you can use it from the command line.
     - Command line usage: 
-      - To generate lilypond: (TODO)
+      - To generate lilypond: 
+			  - Run doremi-script from the command line to create and open a png file with staff notation
+        - Example:
+        - echo "12 34# 5 - |" | java -jar target/doremi-script-standalone.jar | lilypond --png -o tmp - ; chromium tmp.png
       - To parse the composition, returning the parsed json:
         - (TODO)
       - Run lilypond on composition.txt
