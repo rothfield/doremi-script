@@ -3,6 +3,11 @@ DoremiScript
 
 [Integration test results](https://rawgithub.com/rothfield/doremi-script/master/test/good_test_results/report.html?https://raw.github.com/user/repo/master/)
 
+   MILESTONE RELEASE Feb 12,2014 - Tests look good
+   
+	 Status: Lilypond conversion is working. TODO: MusicXML output and 
+	 generation of gui output for doremi-script. 
+   DoremiScript is implented in Clojure and uses Instaparse for parsing
 
 **DoremiScript** is a small language for creating [letter based musical notation](http://en.wikipedia.org/wiki/Letter_notation). It currently supports western ABC style notation, [Numbered notation](http://http://en.wikipedia.org/wiki/Numbered_musical_notation) using 1234567, [Sargam](http://en.wikipedia.org/wiki/Swara) notation using english letters SrRgGmMPdnN as used at the AACM for notating Ragas, and [Devanagri notation in Bhatkande style](http://en.wikipedia.org/wiki/Musical_notation#India) [(See also)](http://www.omenad.net/page.php?goPage=http%3A%2F%2Fwww.omenad.net%2Farticles%2Fomeswarlipi.htm) using Devanagri letters for the sargam letters. **DoremiScript** lets you write letter music notation using an easy-to-read, easy-to-write plain text format, then nicely formats it using css and html. DoremiScript can also generate standard western notation via a [Lilypond](http://lilypond.org) converter. 
 
@@ -84,25 +89,20 @@ should be used to indicate the melismas
   - Supports ornaments (Sargam only for now). Ornaments can be entered either to RIGHT or LEFT of the note to be ornamented(on one of the lines above the note). You can put dots above/below the ornament pitch to indicate the octave. Lilypond renderer displays the (right hand) ornaments as looped 32th grace notes. **Important note**: Support for ornaments to the 'right' of a note seems to be very poor among software vendors, probably because the 'standard' way to right ornaments is *before* a note. Therefore it is probably advisable to not use the right hand ornaments as it may cause data interchange problems down the line. 
   - For best results it is best to start each main line of music with the barline character ("|")
   - Since DoReMiScript also supports chords such as G, G7, this may cause problems for ornaments that start with an ABC letter. In this case you can delimit the ornament with angle brackets **<>**. Chord symbols take precedence, so that Dm above the main line is interpreted as the chord Dm rather than a Dm ornament.
-  - Code base is written in coffeescript
-  - Command line tools are available via npm:
-    - First install [npm](http://npmjs.org)
-    - Then install the **doremi-script** package:
-    - npm install doremi-script
+  - Code base is written in Clojure. Parser is written using Instaparse
+	- Since doremi-script is written in Clojure, you can use it from the command line.
     - Command line usage: 
-      - To generate lilypond:
-        - cat composition.txt | doremi2ly
+      - To generate lilypond: (TODO)
       - To parse the composition, returning the parsed json:
-        - cat composition.txt | doremiparse
+        - (TODO)
       - Run lilypond on composition.txt
-        - cat composition.txt | doremi2ly | lilypond -o composition -
+        - (TODO) lilypond -o composition -
       - Create a standalone html page composition.html from composition.txt:
-        - cat composition.txt | doremi2htmldoc > composition.html
+        - (Not implemented)
       - Open DoremiScript file in musescore:
-        - cat composition.txt | doremi2musicxml  > composition.xml ; mscore composition.xml
+        - (Not implemented) cat composition.txt | doremi2musicxml  > composition.xml ; mscore composition.xml
   - This project borrows ideas from [ABC musical notation](http://en.wikipedia.org/wiki/ABC_notation), [lilypond](http://lilypond.org), and [markdown](http://en.wikipedia.org/wiki/Markdown).
-  - Special thanks to George Ruckert, Ali Akbar Khan and the authors of peg.js, lilypond, and coffeescript.
-  - The online version is best used with Firefox.
+  - Special thanks to George Ruckert, Ali Akbar Khan and the authors of Clojure, Instaprse, and lilypond.
 
 
  
