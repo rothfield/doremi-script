@@ -9,13 +9,12 @@
 
 %}
 melody = {
-\once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
 \cadenzaOn
 
 
- r8 c'8 r4
+  r8 c'8 r4 
 }
 
 
@@ -34,7 +33,6 @@ text = \lyricmode {
 \layout {
 \context {
 \Score
-\remove "Bar_number_engraver"
 }
 }
 \midi {

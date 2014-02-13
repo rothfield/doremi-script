@@ -140,7 +140,7 @@ kommal-indicator (* an underscore for flat. for the traditional bhatkande notati
 
 <value>=  (* attribute value can have embedded spaces.  *)
 (* non-space followed by (spaces | non-space)   *)
-#"[^\n\r ](( *)[^\n\r ])*"
+#"[^\n\r| ](( *)[^|\n\r ])*"
 
 
 <abc-composition> (* a musical piece *)
@@ -737,7 +737,7 @@ delimited-sargam-ornament
 (**abc.ebnf**)
 abc-pitch  =  
 "Cb"| "C#"| "Db" | "D#" | "D#" | "Eb" | "E#" | "F#" | "Gb" |
-"G#" | "Ab" | "A#" | "Bb" | 
+"G#" | "Ab" | "A#" | "Bb" | "B#" |
 "C" ! flat-or-sharp|
 "D" ! flat-or-sharp|
 "E" ! flat-or-sharp|
@@ -747,8 +747,8 @@ abc-pitch  =
 "B" !  flat-or-sharp
 
 abc-ornament-pitch  =  
-"Cb"| "C#"| "Db" | "D#" | "D#" | "Eb" | "E#" | "F#" | "Gb" |
-"G#" | "Ab" | "A#" | "Bb" | 
+"Cb"| "C#"| "Db" | "D#" | "D#" | "Eb" | "E#" | "Fb" | "F#" | "Gb" |
+"G#" | "Ab" | "A#" | "Bb" | "B#"
 "C" ! flat-or-sharp|
 "D" ! flat-or-sharp|
 "E" ! flat-or-sharp|

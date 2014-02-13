@@ -140,6 +140,6 @@ kommal-indicator (* an underscore for flat. for the traditional bhatkande notati
 
 <value>=  (* attribute value can have embedded spaces.  *)
 (* non-space followed by (spaces | non-space)   *)
-#"[^\n\r ](( *)[^\n\r ])*"
+#"[^\n\r| ](( *)[^|\n\r ])*"
 
 

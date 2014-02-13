@@ -7,6 +7,8 @@
 echo "WARNING: lily2image fails for long images"
 DIR=`dirname $0`  # directory of this script
 target_directory=$DIR/../test/test_results
+echo "Removing all .mid and .png  files from $target_directory"
+rm $target_directory/{*.mid,*png} 
 mkdir -p $target_directory
 echo "Writing test results to  $target_directory"
 CTR=1

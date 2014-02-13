@@ -18,17 +18,39 @@
                                     txt
                                     )))))))
 
+
+(defn format-parse-result[x]
+    (if (map? x) (do
+      (str
+      "Error: Line " (:line x) " Column: " (:column x) 
+        " Text: " (:text x)
+        "\n"
+    (with-out-str (pprint (:reason x))))
+        )
+    (with-out-str (println x))))
+
 (defn draw[txt parse-result img-url]
   (str "<!DOCTYPE html> <html>"
-       "<title>Doremi-Script by John Rothfield</title> <body><h1>Doremi-Script Letter music system</h1>"
+       "<head><style>
+       .hidden{display:none}
+           textarea {font-size:14px;}
+                    </style>"
+       "<title>Doremi-Script by John Rothfield</title></head> <body><h1>Doremi-Script Letter music system</h1>"
        "<a href='https://github.com/rothfield/doremi-script#readme'>Doremi-Script project home</a>"
        "<form method='post'> <div>Enter music in letter format. (examples:) <ul><li><b>ABC</b>: | CDbDEb EFF#G AbABbB </li><li><b>Sargam</b>:  SrRg GmMP dDnN | -</li><li><b>Hindi</b>: सर ग़म  म'प धऩ (Use underscores for flat notes) </li></ul></div>
        <br/><textarea rows='10' cols='80' name='val'>" 
        txt
        "</textarea><br/>" 
-       "<input type='submit' value='Generate staff notation'><br/>"
-       "<textarea rows='10' cols='80'>" 
-       parse-result  "</textarea><br/>" 
+       "<input type='submit' value='Generate staff notation'>"
+       "<button  onclick=\"document.getElementById('result').style.display='block'; return(false);\" ' value='Show Lilypond Output'>Show Lilypond Output</button><br/>"
+       "<textarea id='result'"
+       (if (map? parse-result) ;; error
+         ""
+         "class='hidden'" ;; hide if no error
+         )
+      " rows='10' cols='80'>" 
+       (format-parse-result parse-result)
+       "</textarea><br/>" 
        " </form></body>"
        (when img-url (str
       "<img onerror='reload_later()' id='staff_notation'  src='" img-url "'"
@@ -47,7 +69,7 @@
                          document.images['staff_notation'].src = image+tmp 
                          setTimeout('reload_later()', t*1000) 
                          } 
-       start(); 
+      
        </script>"))
 
 
@@ -66,7 +88,7 @@
     ;;[clojure.data.json :as json]
     ;;(with-out-str (pprint x))))
           (if (map? parsed) ;; error
-          (draw val (with-out-str (pprint parsed)) nil)
+          (draw val parsed nil) ;;(with-out-str (pprint parsed)) nil)
           (do
          (when true
           ;; (when-not (.exists (io/as-file fname))
@@ -78,7 +100,7 @@
         ))
   (route/resources "/")
   (route/not-found "Not Found"))
-
+  
 
 (def app
  (->  (handler/site app-routes)))
