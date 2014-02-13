@@ -1,1 +1,0 @@
-r{{duration}}{{chord}}{{ending}}

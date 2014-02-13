@@ -81,8 +81,7 @@ should be used to indicate the melismas
   - Supports tala markings +023456 for notating classical North Indian rhythmical cycles such as teental. The **+** indicates (usually) the first beat of the rhythmical cycle. The tala markings indicate the claps(taali) and non-claps(kaali) that delimit the rhythmic cycle.  
   - Generates [lilypond](http://lilypond.org) as a high quality interchange format, which can be used to generate western staff notation and midi.
   - TODO: Generates [musicxml](http://en.wikipedia.org/wiki/MusicXML) as a common music notation format. MusicXML can be imported into hundreds of notation packages. Note that the lilypond export is of higher quality. Currently supports the following: lyrics, before grace notes,title.
-  - Parser is easy to modify and is generated from a PEG grammar using a parsing expression grammar [peg.js])https://github.com/dmajda/pegjs)
-  - Parser is easy to modify and is generated from a PEG grammar using a parsing expression grammar [peg.js])https://github.com/dmajda/pegjs)
+  - Parser is easy to modify and is generated from an Instaparse grammar.
   - DoremiScript grammar is [here](https://raw.github.com/rothfield/doremi-script/master/src/grammars/doremiscript.peg.js)
   - Endings are entered as follows: 1.________ or 2._____ Current lilypond support for endings is poor.
   - It is possible to mix ABC, Devanagri, and AACM notations in the same composition, but each line of notation must be in only one style.
