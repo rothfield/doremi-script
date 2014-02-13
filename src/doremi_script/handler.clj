@@ -2,12 +2,16 @@
   (:use compojure.core)
   (:require [compojure.handler :as handler]
             [clojure.java.io :as io :refer [input-stream resource]]
-            [doremi_script.doremi_core :refer [doremi-text->lilypond] ]
+            [doremi_script.doremi_core :refer [doremi-text->lilypond parse-failed? format-instaparse-errors] ]
             [clojure.pprint :refer [pprint]] 
             [ring.middleware.etag   :refer [wrap-etag]]
             [ring.middleware.params         :only [wrap-params]]
             [compojure.route :as route]))
   ;; (wrap-file "compositions")
+;;
+(defn parse-succeeded[txt]
+  (and (string? txt)
+       (> (.indexOf txt "#(ly") -1)))
 
 (defn my-md5[txt]
   (apply str
@@ -19,20 +23,11 @@
                                     )))))))
 
 
-(defn format-parse-result[x]
-    (if (map? x) (do
-      (str
-      "Error: Line " (:line x) " Column: " (:column x) 
-        " Text: " (:text x)
-        "\n"
-    (with-out-str (pprint (:reason x))))
-        )
-    (with-out-str (println x))))
 
 (defn draw[txt parse-result img-url]
   (str "<!DOCTYPE html> <html>"
        "<head><style>
-       .hidden{display:none}
+       textarea.hidden{display:none}
            textarea {font-size:14px;}
                     </style>"
        "<title>Doremi-Script by John Rothfield</title></head> <body><h1>Doremi-Script Letter music system</h1>"
@@ -44,12 +39,12 @@
        "<input type='submit' value='Generate staff notation'>"
        "<button  onclick=\"document.getElementById('result').style.display='block'; return(false);\" ' value='Show Lilypond Output'>Show Lilypond Output</button><br/>"
        "<textarea id='result'"
-       (if (map? parse-result) ;; error
-         ""
+       (if (parse-succeeded parse-result)
          "class='hidden'" ;; hide if no error
          )
       " rows='10' cols='80'>" 
-       (format-parse-result parse-result)
+         (format-instaparse-errors parse-result)
+         
        "</textarea><br/>" 
        " </form></body>"
        (when img-url (str
@@ -77,6 +72,8 @@
       " </html>")
 
   )
+
+
 (defroutes app-routes
   (GET "/" [] (draw " " "" nil))
   (POST "/" [val] 
@@ -87,7 +84,7 @@
               ]
     ;;[clojure.data.json :as json]
     ;;(with-out-str (pprint x))))
-          (if (map? parsed) ;; error
+          (if-not (parse-succeeded parsed) ;; error
           (draw val parsed nil) ;;(with-out-str (pprint parsed)) nil)
           (do
          (when true

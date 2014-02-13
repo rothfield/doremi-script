@@ -9,7 +9,10 @@
                  ;;                 [com.googlecode.texhyphj/texhyphj "1.2"]
                  [compojure "1.1.6"]]
   :plugins [[lein-ring "0.8.10"]]
-  :main doremi_script.doremi_core
+  ;; You can run the standalone jar as follows
+  ;; java -jar target/doremi-script-standalone.jar
+  ;; It will run the main function in doremi_core
+  :main doremi_script.doremi_core 
   :jar-name "doremi-script.jar"
   :uberjar-name "doremi-script-standalone.jar"
   :ring {:handler doremi_script.handler/app}
