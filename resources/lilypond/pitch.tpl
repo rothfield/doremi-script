@@ -1,1 +1,0 @@
-{{before-ornament-snippet}}{{after-ornament-directive}}{{lilypond-pitch}}{{lilypond-octave}}{{duration}}{{beam-start-or-end}}{{lilypond-symbol-for-tie}}{{mordent}}{{begin-slur}}{{extra-end-slur}}{{end-slur}}{{ending}}{{chord}}{{after-ornament-contents}}{{extra-tied-durations}} {{extra-whole-notes}}

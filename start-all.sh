@@ -1,2 +1,2 @@
-./start-server.sh
-./start-watcher.sh
+./start-web-server.sh
+./start-lilypond-watcher.sh
