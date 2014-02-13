@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>doremi-server</groupId>
   <artifactId>doremi-server</artifactId>
@@ -9,11 +8,11 @@
   <description>doremi-script: Easy to use textual music notation supporting multiple dialects (ABC 123 AACM and Hindi/Bhatkande. http://ragapedia.com </description>
   <url>http://github.com/rothfield/doremi-script</url>
   <scm>
-    <connection>scm:git:git://github.com//.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com//.git</developerConnection>
-    <tag>a8a286abbe268caada130a3451b776ac85d2617a
+    <connection>scm:git:git://github.com/rothfield/doremi-script.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/rothfield/doremi-script.git</developerConnection>
+    <tag>6d47204569e96cbbc8d0b70dee0417cf2e3e0b17
 </tag>
-    <url>https://github.com//</url>
+    <url>https://github.com/rothfield/doremi-script</url>
   </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -33,7 +32,6 @@
     </testResources>
     <directory>target</directory>
     <outputDirectory>target/classes</outputDirectory>
-    <plugins/>
   </build>
   <repositories>
     <repository>
@@ -74,6 +72,11 @@
       <version>1.2.2</version>
     </dependency>
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+    </dependency>
+    <dependency>
       <groupId>compojure</groupId>
       <artifactId>compojure</artifactId>
       <version>1.1.6</version>
@@ -100,12 +103,6 @@
           <artifactId>clojure</artifactId>
         </exclusion>
       </exclusions>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
