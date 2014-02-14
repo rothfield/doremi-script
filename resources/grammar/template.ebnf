@@ -1,4 +1,4 @@
-<doremi-composition> (* a musical piece *)
+doremi-composition (* a musical piece *)
 (* each section is separated by one or more 'empty' lines.
 the empty line can have spaces. section doesn't include the eol.
 that allows things like "s" to parse as a composition *)

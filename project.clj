@@ -4,13 +4,19 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojars.mikejs/ring-etag-middleware "0.1.0-SNAPSHOT"]
                  [instaparse "1.2.2"] 
-					;;			   [ring/ring-jetty-adapter "1.1.6"] 
-;;                 [com.googlecode.texhyphj/texhyphj "1.2"]
+                  [javax.servlet/servlet-api "2.5"]
+                 ;;			   [ring/ring-jetty-adapter "1.1.6"] 
+                 ;;                 [com.googlecode.texhyphj/texhyphj "1.2"]
                  [compojure "1.1.6"]]
   :plugins [[lein-ring "0.8.10"]]
+  ;; You can run the standalone jar as follows
+  ;; java -jar target/doremi-script-standalone.jar
+  ;; It will run the main function in doremi_core
+  :main doremi_script.doremi_core 
   :jar-name "doremi-script.jar"
   :uberjar-name "doremi-script-standalone.jar"
   :ring {:handler doremi_script.handler/app}
-  :profiles
-  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring-mock "0.1.5"]]}})
+  :profiles { :uberjar {:aot :all}
+             :dev {:dependencies [
+                                  [javax.servlet/servlet-api "2.5"]
+                                  [ring-mock "0.1.5"]]}})
