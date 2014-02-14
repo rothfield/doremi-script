@@ -144,7 +144,7 @@ kommal-indicator (* an underscore for flat. for the traditional bhatkande notati
 #"[^\n\r| ](( *)[^|\n\r ])*"
 
 
-<abc-composition> (* a musical piece *)
+abc-composition (* a musical piece *)
 (* each section is separated by one or more 'empty' lines.
 the empty line can have spaces. section doesn't include the eol.
 that allows things like "s" to parse as a composition *)
@@ -292,7 +292,7 @@ delimited-abc-ornament
 =  <"<"> hindi-ornament-pitch+  <">">
 
 
-(** Generated from template.ebnf. Do not edit **)<hindi-composition> (* a musical piece *)
+(** Generated from template.ebnf. Do not edit **)hindi-composition (* a musical piece *)
 (* each section is separated by one or more 'empty' lines.
 the empty line can have spaces. section doesn't include the eol.
 that allows things like "s" to parse as a composition *)
@@ -440,7 +440,7 @@ delimited-hindi-ornament
 =  <"<"> hindi-ornament-pitch+  <">">
 
 
-(** Generated from template.ebnf. Do not edit **)<number-composition> (* a musical piece *)
+(** Generated from template.ebnf. Do not edit **)number-composition (* a musical piece *)
 (* each section is separated by one or more 'empty' lines.
 the empty line can have spaces. section doesn't include the eol.
 that allows things like "s" to parse as a composition *)
@@ -588,7 +588,7 @@ delimited-number-ornament
 =  <"<"> hindi-ornament-pitch+  <">">
 
 
-(** Generated from template.ebnf. Do not edit **)<sargam-composition> (* a musical piece *)
+(** Generated from template.ebnf. Do not edit **)sargam-composition (* a musical piece *)
 (* each section is separated by one or more 'empty' lines.
 the empty line can have spaces. section doesn't include the eol.
 that allows things like "s" to parse as a composition *)
