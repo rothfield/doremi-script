@@ -1,13 +1,16 @@
 (defproject doremi-server "0.1.0-SNAPSHOT"
   :description "doremi-script: Easy to use textual music notation supporting multiple dialects (ABC 123 AACM and Hindi/Bhatkande. http://ragapedia.com "
   :url "http://github.com/rothfield/doremi-script"
-  :dependencies [[org.clojure/clojure "1.5.1"]
+  :dependencies [
+                 [org.clojure/clojure "1.5.1"]
+                 [compojure "1.1.6"]
+                [ring/ring-json "0.2.0"]
+                 [ring/ring-jetty-adapter "1.2.0"] 
                  [org.clojars.mikejs/ring-etag-middleware "0.1.0-SNAPSHOT"]
                  [instaparse "1.2.2"] 
-                  [javax.servlet/servlet-api "2.5"]
-                 ;;			   [ring/ring-jetty-adapter "1.1.6"] 
+                 ]
+                ;;  [javax.servlet/servlet-api "2.5"]
                  ;;                 [com.googlecode.texhyphj/texhyphj "1.2"]
-                 [compojure "1.1.6"]]
   :plugins [[lein-ring "0.8.10"]]
   ;; You can run the standalone jar as follows
   ;; java -jar target/doremi-script-standalone.jar

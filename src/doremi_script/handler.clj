@@ -4,6 +4,7 @@
             [clojure.java.io :as io :refer [input-stream resource]]
             [doremi_script.doremi_core :refer [doremi-text->lilypond parse-failed? format-instaparse-errors] ]
             [clojure.pprint :refer [pprint]] 
+            [ring.middleware.json :as middleware]
             [ring.middleware.etag   :refer [wrap-etag]]
             [ring.middleware.params         :only [wrap-params]]
             [compojure.route :as route]))
@@ -73,8 +74,19 @@
 
   )
 
+(def  comments
+  (atom [{:author "Pete Hunt", :text "Hey there!"}]))
 
 (defroutes app-routes
+  (GET "/comments.json" [] 
+       ;; GET . Return json data
+     ;;  {:body @comments })
+       {:body (-> "S" doremi-text->lilypond)})
+
+  (POST "/comments.json" [author text]
+        ;; Posted as a form submission, return json
+        (swap! comments conj {:author author :text text})
+       {:body @comments })
   (GET "/" [] (draw " " "" nil))
   (POST "/" [val] 
         (let [md5 (my-md5 val)
@@ -100,4 +112,7 @@
   
 
 (def app
- (->  (handler/site app-routes)))
+ (->  app-routes
+     ;; handler/site 
+    middleware/wrap-json-response  ;; Converts responses that are clojure objects to json
+     ))

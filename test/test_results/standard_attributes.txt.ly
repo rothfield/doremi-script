@@ -9,6 +9,7 @@ composer = "Traditional"
 
 %}
 melody = {
+\time 3/4
 \clef treble
 \key c \phrygian
 \cadenzaOn

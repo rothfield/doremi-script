@@ -9,13 +9,14 @@
 
 %}
 melody = {
+\once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
 \cadenzaOn
 
 
  \bar "|:"  c'4 r4 r4 r4 \bar "|"  e'4 r4 r4 r4 \bar ":|"  
- \grace s64  \bar "|:"  d'4 r4 r4 r4 \bar "|"  f'4 r4 r4 r4 \bar ":|"  
+ \bar "|:"  d'4 r4 r4 r4 \bar "|"  f'4 r4 r4 r4 \bar ":|"  
  
 }
 

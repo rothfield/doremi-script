@@ -9,6 +9,7 @@
 
 %}
 melody = {
+\time 5/4
 \clef treble
 \key c \major
 \cadenzaOn

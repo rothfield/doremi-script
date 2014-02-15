@@ -9,6 +9,7 @@ composer = "Hoargy Carmichael"
 
 %}
 melody = {
+\once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
 \cadenzaOn
