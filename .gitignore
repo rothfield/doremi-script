@@ -1,4 +1,6 @@
 *.log
+comp.pid
+watcher.pid
 *.pid
 /tmp
 /target
