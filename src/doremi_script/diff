@@ -1,0 +1,65 @@
+diff --git a/src/doremi_script/handler.clj b/src/doremi_script/handler.clj
+index 17cd260..b8ec2cc 100644
+--- a/src/doremi_script/handler.clj
++++ b/src/doremi_script/handler.clj
+@@ -77,42 +77,41 @@
+ (def  comments
+   (atom [{:author "Pete Hunt", :text "Hey there!"}]))
+ 
++(def get-comments[]
++       {:body @comments })
++ 
++(defn post-comment[]
++
++  (defn doremi-post[val]
++        (let [md5 (my-md5 val)
++              fname (str "resources/public/compositions/" md5 ".ly") 
++              url (str "compositions/" md5 ".png")
++              parsed (doremi-text->lilypond val)
++              ]
++    ))
++
+ (defroutes app-routes
+   (GET "/comments.json" [] 
+        ;; GET . Return json data
+-     ;;  {:body @comments })
+-       {:body (-> "S" doremi-text->lilypond)})
++       get-comments)
+ 
+   (POST "/comments.json" [author text]
+         ;; Posted as a form submission, return json
+         (swap! comments conj {:author author :text text})
+        {:body @comments })
+   (GET "/" [] (draw " " "" nil))
++
+   (POST "/" [val] 
+-        (let [md5 (my-md5 val)
+-              fname (str "resources/public/compositions/" md5 ".ly") 
+-              url (str "compositions/" md5 ".png")
+-              parsed (doremi-text->lilypond val)
+-              ]
++        (doremi-post val))
+     ;;[clojure.data.json :as json]
+     ;;(with-out-str (pprint x))))
+-          (if-not (parse-succeeded parsed) ;; error
+-          (draw val parsed nil) ;;(with-out-str (pprint parsed)) nil)
+-          (do
+-         (when true
+-          ;; (when-not (.exists (io/as-file fname))
+-            (->> val doremi-text->lilypond (spit fname)))
+-          ;(str md5 ".ly")
+-          (draw val (doremi-text->lilypond val)
+-                url
+-                ))) 
+-        ))
++        
+   (route/resources "/")
+   (route/not-found "Not Found"))
+   
+ 
+ (def app
+  (->  app-routes
+-     ;; handler/site 
++      handler/site 
+     middleware/wrap-json-response  ;; Converts responses that are clojure objects to json
+      ))

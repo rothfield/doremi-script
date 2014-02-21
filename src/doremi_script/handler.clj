@@ -2,13 +2,13 @@
   (:use compojure.core)
   (:require [compojure.handler :as handler]
             [clojure.java.io :as io :refer [input-stream resource]]
-            [doremi_script.doremi_core :refer [doremi-text->lilypond parse-failed? format-instaparse-errors] ]
+            [doremi_script.doremi_core :refer [doremi-text->parsed doremi-text->lilypond parse-failed? format-instaparse-errors] ]
             [clojure.pprint :refer [pprint]] 
             [ring.middleware.json :as middleware]
             [ring.middleware.etag   :refer [wrap-etag]]
             [ring.middleware.params         :only [wrap-params]]
             [compojure.route :as route]))
-  ;; (wrap-file "compositions")
+;; (wrap-file "compositions")
 ;;
 (defn parse-succeeded[txt]
   (and (string? txt)
@@ -29,8 +29,8 @@
   (str "<!DOCTYPE html> <html>"
        "<head><style>
        textarea.hidden{display:none}
-           textarea {font-size:14px;}
-                    </style>"
+       textarea {font-size:14px;}
+       </style>"
        "<title>Doremi-Script by John Rothfield</title></head> <body><h1>Doremi-Script Letter music system</h1>"
        "<a href='https://github.com/rothfield/doremi-script#readme'>Doremi-Script project home</a>"
        "<form method='post'> <div>Enter music in letter format. (examples:) <ul><li><b>ABC</b>: | CDbDEb EFF#G AbABbB </li><li><b>Sargam</b>:  SrRg GmMP dDnN | -</li><li><b>Hindi</b>: सर ग़म  म'प धऩ (Use underscores for flat notes) </li></ul></div>
@@ -43,76 +43,89 @@
        (if (parse-succeeded parse-result)
          "class='hidden'" ;; hide if no error
          )
-      " rows='10' cols='80'>" 
-         (format-instaparse-errors parse-result)
-         
+       " rows='10' cols='80'>" 
+       (format-instaparse-errors parse-result)
+
        "</textarea><br/>" 
        " </form></body>"
        (when img-url (str
-      "<img onerror='reload_later()' id='staff_notation'  src='" img-url "'"
-       "' >"))
-        (when img-url (str 
-      " 
-<script language='JavaScript' type='text/javascript'> 
-       var t = 5; // Interval in Seconds
-       image = '"
-      img-url 
-       "' //URL of the Image 
-       function reload_later() { 
-                         var tmp = new Date(); 
-                         var tmp = '?'+tmp.getTime();
-                         var tmp =''; 
-                         document.images['staff_notation'].src = image+tmp 
-                         setTimeout('reload_later()', t*1000) 
-                         } 
-      
-       </script>"))
+                       "<img onerror='reload_later()' id='staff_notation'  src='" img-url "'"
+                       "' >"))
+       (when img-url (str 
+                       " 
+                       <script language='JavaScript' type='text/javascript'> 
+                       var t = 5; // Interval in Seconds
+                       image = '"
+                       img-url 
+                       "' //URL of the Image 
+                       function reload_later() { 
+                       var tmp = new Date(); 
+                       var tmp = '?'+tmp.getTime();
+                       var tmp =''; 
+                       document.images['staff_notation'].src = image+tmp 
+                       setTimeout('reload_later()', t*1000) 
+                       } 
+
+                       </script>"))
 
 
-       
-      " </html>")
+
+       " </html>")
 
   )
 
 (def  comments
   (atom [{:author "Pete Hunt", :text "Hey there!"}]))
 
+(defn get-comments[]
+  {:body @comments })
+
+(defn post-comment[author text]
+  (swap! comments conj {:author author :text text})
+  {:body @comments })
+
+(defn doremi-post[val]
+  (let [md5 (my-md5 val)
+        fname (str "resources/public/compositions/" md5 ".ly") 
+        url (str "compositions/" md5 ".png")
+        parsed (doremi-text->lilypond val)
+        ]
+    (if-not (parse-succeeded parsed) ;; error
+      (draw val parsed nil) ;;(with-out-str (pprint parsed)) nil)
+      (do
+        (when true
+          ;; (when-not (.exists (io/as-file fname))
+          (->> val doremi-text->lilypond (spit fname)))
+        ;(str md5 ".ly")
+        (draw val (doremi-text->lilypond val)
+              url
+              ))) 
+    ))
+ ;; (-> "public/compositions/yesterday.txt" resource slurp)
+
 (defroutes app-routes
   (GET "/comments.json" [] 
        ;; GET . Return json data
-     ;;  {:body @comments })
-       {:body (-> "S" doremi-text->lilypond)})
-
+       (get-comments))
+  (GET "/load/yesterday.txt"[]
+  {:body (-> "public/compositions/yesterday.txt" resource slurp doremi-text->parsed)}
+       )
+      
   (POST "/comments.json" [author text]
         ;; Posted as a form submission, return json
-        (swap! comments conj {:author author :text text})
-       {:body @comments })
-  (GET "/" [] (draw " " "" nil))
+        (post-comment author text))
+  (GET "/" []
+       (draw " " "" nil))
+
   (POST "/" [val] 
-        (let [md5 (my-md5 val)
-              fname (str "resources/public/compositions/" md5 ".ly") 
-              url (str "compositions/" md5 ".png")
-              parsed (doremi-text->lilypond val)
-              ]
-    ;;[clojure.data.json :as json]
-    ;;(with-out-str (pprint x))))
-          (if-not (parse-succeeded parsed) ;; error
-          (draw val parsed nil) ;;(with-out-str (pprint parsed)) nil)
-          (do
-         (when true
-          ;; (when-not (.exists (io/as-file fname))
-            (->> val doremi-text->lilypond (spit fname)))
-          ;(str md5 ".ly")
-          (draw val (doremi-text->lilypond val)
-                url
-                ))) 
-        ))
+        (doremi-post val))
+
   (route/resources "/")
   (route/not-found "Not Found"))
-  
+
 
 (def app
- (->  app-routes
-     ;; handler/site 
-    middleware/wrap-json-response  ;; Converts responses that are clojure objects to json
-     ))
+  (->  app-routes
+      handler/site 
+      middleware/wrap-json-response  ;; Converts responses that are clojure objects to json
+      ))
