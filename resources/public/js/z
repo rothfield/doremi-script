@@ -1,0 +1,4 @@
+			 var oldState=this.state;
+			 oldState.data.staffNotationPath=data.staffNotationPath;
+        this.setState(oldState);
+        };

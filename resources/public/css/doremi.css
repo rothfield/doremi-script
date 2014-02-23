@@ -1,0 +1,469 @@
+h4,ul,menu,dir {
+  margin:0px;  
+  padding:0px;  
+  -webkit-margin-before: 0em;
+  -webkit-margin-after: 0em;
+  -webkit-margin-start: 0px;
+  -webkit-margin-end: 0px;
+}
+div#help {
+  margin-left: 3em;
+}
+div.commented_out {
+  display:none;
+}
+span.required {
+  color: red;  
+}
+fieldset#composition_info label {
+  width: 100px;
+  display: inline-block;
+}
+
+div.edit_line_wrapper.line_has_warnings, div.line_has_warnings,span.show_warnings {
+  border:2px solid orange;
+}
+div.edit_line_wrapper.line_parse_failed, div.line_parse_failed, div.composition_parse_failed {
+  border: 2px solid red;
+}
+div.lyrics_section {
+   font-family: serif;
+   font-size: 1.6em;
+   white-space: pre; 
+   /* border: 2px dotted #CCCCCC; */
+   margin-top: 0.5em;
+   margin-bottom: 0.5em;
+   text-align:center;
+   width:30em;
+}
+.like_pre {
+   font-family: monospace;
+   white-space: pre; 
+   border: 2px dotted #CCCCCC;
+}
+
+button.toggle_line_parse_tree {
+  margin-left: 10em;
+}
+button.button_on {
+  background-color: black;
+  color: white;
+}
+.controls li
+{
+        display: inline;
+        list-style-type: none;
+        padding-right: 20px;
+}
+
+h2.step {
+  width:600px;
+  font-size: 14px;
+  background-color: lavender;
+  border: 1px solid black;
+}
+div.staff_notation_div {
+}
+div#open_div {
+  display:none
+}
+div#reopen  a {
+  margin-right:10px;
+}
+div#reopen {
+  padding:4px;
+  background-color:DarkOrange;
+  border:1px solid black;
+}
+
+input#url_to_reopen {
+  padding:10px;
+  width:500px;
+}
+
+div.rendered_html.editing:hover
+{ 
+  background-color:normal; 
+}
+
+
+div.rendered_html.editing:hover {
+  cursor:normal;
+}
+
+div.rendered_html.not_editing:hover { 
+  cursor:pointer;
+  /* border: 2px solid black; */
+}
+
+div#rendered_doremi_script, div.rendered_doremi_script, div.parse_tree_div {
+  border: 2px dotted #CCCCCC;
+}
+
+span.note_wrapper {
+    position: relative;
+}
+
+.show_sargam_source {
+    border: 1px solid black;
+    font-family: monospace; 
+    font-size: 18px;
+    padding-left: 10px;
+}
+
+div.edit_line_wrapper {
+  background-color: AntiqueWhite;
+  border: 3px solid black;
+}
+
+div.edit_line_wrapper textarea.entry_area {
+ border:none;
+}
+textarea#entry_area, textarea.entry_area {
+    /* don't try nowrap or overflow: auto. Causes problems in chrome */
+    font-family: monospace; 
+    font-size: 18px;
+    padding-left: 10px;
+
+}
+#parse_tree,#warnings_div {
+    border: 1px solid black;
+    width: 70%;
+    height:550px;
+    overflow:scroll;
+    margin-left: 20px;
+    padding:4px;
+    display:none;
+}
+#warnings_div {
+  height:auto;
+}
+div.line {
+    position: relative;
+    font-family: sans-serif;
+}
+
+span.beat.looped {
+    border-top: 0px;
+    border-bottom: .1em solid;
+    padding-bottom: .75em;
+    border-top-left-radius: 0em;
+    border-top-right-radius: 0em;
+    border-bottom-left-radius: .8em;
+    border-bottom-right-radius: .8em;
+    border-style: solid;
+    border-color:black;
+    border-left-width: 0px;
+    border-top-width: 0px;
+    border-bottom-width:1px;
+    border-right-width: 0px;
+}
+
+
+span.beat {
+    margin-right: 0em;
+    margin-left: 0em;
+}
+
+span.slur {
+    position:absolute;
+    margin-top: 1.5em;
+    border-top: .1em solid;
+    padding-top: 3.2em;
+    border-radius: .5em;
+    border-style: solid;
+    border-color: black;
+    border-top-width: 2px;
+    border-bottom-width: 0em;
+    border-bottom:none;
+    border-left-width: 0em;;
+    border-right-width: 0em;
+}
+
+span.beat.looped,span.slur {
+  /* TODO: review Funky fix for chrome to avoid hairline on right and left */
+  border-right-color:white;
+  border-left-color:white;
+  border-left-width:1px;
+  border-right-width:1px;
+}
+
+span.ornament_item {
+  position: static;
+  display:inline;
+}
+span.ornament_item.octave_2, span.ornament_item.octave_2 {
+  /* octave of -2 or 2 */
+}
+span.upper_attribute.ornament {
+    position: absolute;
+    bottom: 1.6em;
+    font-size: .5em;
+    margin-left: 2.2em;
+}
+
+span.ornament span.note {
+    padding-right: .2em;
+}
+
+div.sargam_line {
+    /* font-size: 1em; */
+   /*  font-family: sans-serif; */
+    /* border: 1px black dotted; */
+    border: none;
+    height: auto;
+    padding-top: 0em;
+    padding-left:1em;
+    line-height: 10em; /* don't change this */
+    margin-bottom:0em;
+    padding-top:0em;
+}
+
+span.note.dash {
+  margin-left: 0.09em;
+  margin-right: 0.09em;
+}
+
+span.note.barline {
+    letter-spacing: -0.2em;
+    margin-right: .2em;
+    margin-left: .2em;
+    padding:.2em;
+}
+
+span.testing_utf_support {
+  display:none;
+}
+/* displayed as || */
+span.note.double_barline.dont_use_utf8_chars {
+    font-weight:normal;
+    letter-spacing: -0.2em;
+}
+
+div.composition {
+  /*
+  border-left: 1px solid black;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  border-right: 1px highlight dotted;
+  */
+  padding-left: 10px;
+  padding-top:4px;
+  white-space:nowrap;
+}
+
+div.rendered_wrapper {
+  border:1px solid black;
+}
+span.line_number {
+  display:none;
+}
+div.composition_headers.hide_title, div.hide_hyphenated_lyrics {
+  display:none;
+}
+@media print {
+    div.composition_headers.hide_title {
+      /* This seems to be the opposite of display:none */
+      display:block !important;
+    }
+    h1.title, .controls,span.line_number,button {
+      display:none;
+    }
+    div.lyrics_section.hyphenated {
+      display:none;
+    }
+    div.composition, div.rendered_wrapper,div.rendered_html,div.stave_wrapper {
+      border:none;
+  }
+}
+
+span.ornament {
+    font-size: 1em;
+}
+span.mordent {
+/* TODO: use background image like ornaments bullet */
+    font-size: 1.5em;
+    left:0.13em;
+}
+span.upper_attribute + span.upper_attribute {
+            margin-top: -0.7em;
+}
+span.upper_attribute span.ornament {
+  font-size: .5em;
+}
+
+span.ornament span.note_wrapper span.note {
+    font-size: .5em;
+}
+
+
+span.ornament_item.upper_octave_1 {
+  padding-top: 0.6em;
+  padding-bottom: .5em;
+  /* Embed the bullet in the css file, that will make it easier to create standalone html pages that don't need image files travelling along with them */
+  background: url(data:image/gif;base64,R0lGODlhCQAHAID/AAAAAMDAwCH5BAEAAAEALAAAAAAJAAcAQAINjI8Bu8idomHpgQpDAQA7);
+  background-repeat: no-repeat;
+}
+
+span.ornament_item.lower_octave_1 {
+  padding-top: .5em;
+  padding-bottom: .5em;
+  /* Embed the bullet in the css file, that will make it easier to create standalone html pages that don't need image files travelling along with them */
+  background: url(data:image/gif;base64,R0lGODlhCQAHAID/AAAAAMDAwCH5BAEAAAEALAAAAAAJAAcAQAINjI8Bu8idomHpgQpDAQA7);
+  background-repeat: no-repeat;
+}
+
+span.ornament_item.lower_octave_1 {
+  background-position:bottom;
+}
+
+/******
+ *
+ *  Note that ornament dots are implemented differently than regular notes
+ */
+span.ornament span.upper_octave_1, 
+span.ornament span.lower_octave_1 {
+    position: static;
+    display:inline;
+}
+div.composition_headers {
+  width: 600px;
+}
+h1.composition_title {
+  text-align:center;
+}
+h2.composition_author {
+  text-align:right;
+}
+span.ornament_item.upper_octave_1, span.ornament_itme.lower_octave_1 {
+  font-size: 1.0em;
+}
+span.ornament span.upper_octave_1  {
+    top: 1.2em;
+    left: .45em;
+}
+span.ornament span.lower_octave_1  {
+    top: -1.2em;
+    left: .45em;
+}
+
+span.ornament span.ornament_item.upper_octave_1
+{
+  background-position:top;
+}
+
+span.lower_octave_2 {
+    bottom: -.79em;
+}
+
+span.lower_octave_1 {
+    left: 0.2em;
+    bottom: 2.0em;
+}
+
+span.upper_octave_1, span.upper_octave_2, span.mordent{
+    top: 0.4em;
+}
+span.upper_octave_1{
+    left: 0.2em;
+}
+span.note.whitespace {
+}
+span.upper_octave_indicator {
+    top: -1em;
+}
+span.tala {
+  font-family: serif;
+  font-size: 0.5em;
+  top: 0.7em;
+}
+span.chord_symbol, span.ending {
+  font-family:"Times New Roman",Georgia,Serif;
+  font-size: 1em;
+  top: -2em;
+  left:.2em;
+}
+
+span.ending {
+  font-family:"Times New Roman",Georgia,Serif;
+  font-size: .8em;
+  top: -2.75em;
+  left:.2em;
+}
+
+
+span.lower_octave_2,span.upper_octave_2 {
+  left:.3em;
+}
+span.lower_octave_1, span.upper_octave_2, span.lower_octave_2,span.upper_octave_1,span.mordent, span.upper_attribute {
+    z-index: 2;
+    position: absolute;
+
+}
+
+span.kommal_indicator {
+ left: 0.2em;
+ bottom: 0.05em;
+}
+
+span.attribute_key,span.attribute_value {
+    font-family: sans-serif;
+    font-size: 1.6em; 
+}
+span.attribute_key {
+    font-weight: bold;
+}
+
+span.note, span.note_wrapper {
+    font-family: sans-serif;
+    font-size: 1.6em; 
+    position: relative;
+    margin-right: -.75px;
+    margin-left: -.75px;
+    display: inline-block;
+}
+
+span.flat, span.sharp {
+  position: absolute;
+  bottom: 0.7em;
+  left: 1em;
+}
+span.breath_mark {
+    /*bottom: .75em;*/
+}
+
+
+span.whitespace {
+    margin-right: 0em;
+    margin-left: 0em;
+}
+
+/* unicode chars need this */
+span.note.left_repeat, 
+span.note.right_repeat,
+span.note.repeat_symbol,
+span.note.barline,
+span.note.final_barline,
+span.note.reverse_final_barline,
+span.note.double_barline
+{
+    margin-right: 0.4em;
+    margin-left: 0.4em;
+}
+
+span.tala,
+span.slur,
+span.mordent,
+div.sargam_line span.syllable, 
+div.sargam_line span.lower_octave_1 {
+  line-height:normal;
+}
+
+span.syllable {
+    position: absolute;
+    bottom: 1.0em;
+    margin-left: 0.03em;
+    font-size: 1.01em; 
+    font-family: serif;
+}
+

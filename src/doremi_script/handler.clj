@@ -3,6 +3,8 @@
   (:require [compojure.handler :as handler]
             [clojure.java.io :as io :refer [input-stream resource]]
             [doremi_script.doremi_core :refer [doremi-text->parsed doremi-text->lilypond parse-failed? format-instaparse-errors] ]
+            [clojure.string :refer 
+             [split replace-first upper-case lower-case join] :as string] 
             [clojure.pprint :refer [pprint]] 
             [ring.middleware.json :as middleware]
             [ring.middleware.etag   :refer [wrap-etag]]
@@ -80,45 +82,62 @@
 (defn get-comments[]
   {:body @comments })
 
+;; (pprint (sanitize nil))
+;; (pprint (sanitize "/root/H--'"))
+(defn sanitize[x]
+  (if x
+    (-> x (string/replace  #"[^0-9A-Za-z\.]" "_") string/lower-case)))
+
 (defn post-comment[author text]
   (swap! comments conj {:author author :text text})
   {:body @comments })
 
-(defn doremi-post[val]
+;; (pprint (-> "SSS" doremi-text->parsed))
+;; (pprint (-> "Title: john\n\n|SSS" doremi-text->parsed))
+;;(-> "Title: hi\n\nSSS|" (doremi-post true))
+(defn doremi-post[val generate-staff-notation]
   (let [md5 (my-md5 val)
-        fname (str "resources/public/compositions/" md5 ".ly") 
-        url (str "compositions/" md5 ".png")
-        parsed (doremi-text->lilypond val)
+        results (doremi-text->parsed val)
         ]
-    (if-not (parse-succeeded parsed) ;; error
-      (draw val parsed nil) ;;(with-out-str (pprint parsed)) nil)
-      (do
-        (when true
-          ;; (when-not (.exists (io/as-file fname))
-          (->> val doremi-text->lilypond (spit fname)))
-        ;(str md5 ".ly")
-        (draw val (doremi-text->lilypond val)
-              url
-              ))) 
-    ))
- ;; (-> "public/compositions/yesterday.txt" resource slurp)
+    (if (:error results) ;; error
+      results
+      (let [
+            title (get-in results [:attributes :title])
+            file-id (str
+                      (if title
+                        (str (sanitize title) "-"))
+                      md5) 
+            lilypond-fname (str "resources/public/compositions/" file-id ".ly")
+            url (str "compositions/" file-id ".png")
+            ]
+        (if generate-staff-notation
+          (do
+        (->> (:lilypond results)(spit lilypond-fname))
+        (assoc results :staffNotationPath (str "/compositions/" file-id ".png")))
+         results 
+          )
+      ))))
+
+;; (-> "public/compositions/yesterday.txt" resource slurp)
+        ;; (when-not (.exists (io/as-file fname))
 
 (defroutes app-routes
   (GET "/comments.json" [] 
        ;; GET . Return json data
        (get-comments))
   (GET "/load/yesterday.txt"[]
-  {:body (-> "public/compositions/yesterday.txt" resource slurp doremi-text->parsed)}
+       {:body (-> "public/compositions/yesterday.txt" resource slurp doremi-text->parsed)}
        )
-      
+
   (POST "/comments.json" [author text]
         ;; Posted as a form submission, return json
         (post-comment author text))
   (GET "/" []
        (draw " " "" nil))
 
-  (POST "/" [val] 
-        (doremi-post val))
+  (POST "/" [src generateStaffNotation] 
+        {:body  (doremi-post src (= "true" generateStaffNotation)) }
+        )
 
   (route/resources "/")
   (route/not-found "Not Found"))

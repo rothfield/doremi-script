@@ -1,0 +1,58 @@
+/* Tripoli overrides */
+.content { font-size: 1.1em !important; }
+.content p + ul { margin-top: -0.8em; }
+.sticker .content h1 { font-size: 1.6em; margin: 0.4em 0 0.4em 0; }
+.sticker .content h2 { font-size: 1.4em ;}
+.sticker .content h3 { font-size: 1.2em ;}
+.sticker .content a, .sticker a { color: #A71500; text-decoration: underline; }
+.sticker .content form { margin: 0; padding: 0; }
+
+/* Basics */
+a { text-decoration: none; }
+
+li ul, li ol  { margin-bottom: 1em !important ; }
+
+.center { text-align: center }
+.left { text-align: left }
+.right { text-align: right }
+.justify { text-align: justify }
+
+.floatLeft { float: left !important; }
+.floatRight { float: right !important; }
+.floatNone { float: none !important; }
+
+.clear { clear: both}
+.clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden }
+
+.relative { position: relative !important }
+.absolute { position: absolute }
+
+.inline { display: inline; }
+.cursor { cursor: pointer }
+
+
+li p.smallprint { margin-top: -0.25em; line-height: 1.4em; font-size: 0.9em; margin-bottom: 0.9em; font-style: italic; color: #444; }
+
+
+body { 
+  font-family: arial;
+  font-size: 14px; }
+
+.bodyArea input { font-family: Arial; }
+.bodyArea b { font-weight: bold; }
+.bodyArea p { margin-top: 0.9em; margin-bottom: 0.9em; }
+.bodyArea select[multiple] { width: 100%; height: 8em; }
+.bodyArea h2 { margin-top: 0.4em; }
+
+
+
+.liveExample TR { vertical-align: top; }
+.liveExample TABLE, .liveExample TD, .liveExample TH { padding: 0.2em; border-width: 0; margin: 0; }
+.liveExample TD A { font-size: 0.8em; text-decoration: none; }
+.liveExample table.linesEditor > tbody > TR { 
+  border-bottom: 1px solid silver; 
+}
+.liveExample td input { width: 8em; }
+.liveExample table {
+  border-collapse: collapse;
+}
