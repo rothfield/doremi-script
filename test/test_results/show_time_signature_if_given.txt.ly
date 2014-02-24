@@ -1,28 +1,23 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{
-
-
+\header{ 
 }
 %{
+TimeSignature:5/4
+
+S - - - - R - - - -
 
 %}
 melody = {
 \time 5/4
 \clef treble
-\key c \major
-\cadenzaOn
-
-
-  c'4 r4 r4 r4 r4 d'4 r4 r4 r4 r4 
-}
-
-
+\key c 
+\major
+  c'4 r4 r4 r4 r4 d'4 r4 r4 r4 r4 }
 text = \lyricmode {
   
 }
-
 \score{
 
 <<

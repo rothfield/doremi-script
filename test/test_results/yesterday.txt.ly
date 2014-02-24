@@ -1,34 +1,69 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{
+\header{ 
+
 title = "Yesterday"
-composer = "McCartney"
-}
+composer = " author "}
 %{
+Filename: yesterday
+Key: F
+Mode: major
+Title: Yesterday
+Author: McCartney
+Time: 4/4
+EnteredBy: John Rothfield
+
+      F             Em7   A7   *   Dmi  Dmi/C 
+1) |  RS S -- --  | -- GM P#D NS | N DD -- -- |
+      yes-ter day      all my trou-bles seemed so far a- way
+
+  Bb    C7      F       C/E  Dmi G     Bb   F 
+| -- DD Pm GR | m GG -- R- | S G R D | S GG - - ||
+                                   * 
+now it looks as though they're here to stay oh I be-lieve in  Yes-ter-day
+
+      F              Em7   A7    *   Dmi  Dmi/C 
+2) |  RS S- -- --  | -- GM P#D  NS | N DD -- -- |
+      sudd- en- ly   I'm  not half the  man I  used  to be
+
+     Bb    C7      F       C/E  Dmi G     Bb   F 
+   | -- DD Pm GR | m GG -- R- | S G R D | S GG - - :|
+                                      *
+        theres a sha-  dow hang-ing o-ver  me Oh I be-lieve in  Yes-ter-day
+
+
+      A11  A7     Dmi
+                    C Bb  Dmi/A      C        F
+          R           *        G 
+3) || G -  G - |  D N S-  ND | N- -D P   DG | - - - - |
+      why she     had  to  go  I  don't   know  she would- n't   say
+
+     A11 A7    Dmi Bb Dmi/A      C      F           F
+                 C         Gm           1_____      2______
+                   *                    *           *           
+   | G - G - | D N S- ND | N- -D P N | (S P m G) :| S - - -     ||
+     I said some-thing wrong now I long for  yes-ter-day day 
+
+ 
+
 
 %}
 melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
-\key c \major
-\cadenzaOn
-
-
-  d'8[^"F" c'8] c'4 r4 r4 \bar "|"  r4^"Em7" e'8[ fs'8] gs'8[^"A7" a'8] b'8[ c''8] \bar "|"  b'4 \grace {a'16[[ f'16]}a'8^"i" a'8] r4 r4 \bar "|"  
-  r4^"Bb" a'8[ a'8] g'8[^"C7" f'8] e'8[ d'8] \bar "|"  f'4^"F" e'8[ e'8] r4 d'4^"C/E" \bar "|"  c'4 \grace {a'16[ f'16]}e'4^"i" d'4 a4 \bar "|"  c'4^"Bb" e'8[ e'8] r4^"F" r4 \bar "||"   
-  d'8[^"F" c'8] c'4 r4 r4 \bar "|"  r4^"Em7" e'8[ fs'8] gs'8[^"A7" a'8] b'8[ c''8] \bar "|"  b'4 \grace {a'16[[ f'16]}a'8^"i" a'8] r4 r4 \bar "|"  
-  r4^"Bb" a'8[ a'8] g'8[^"C7" f'8] e'8[ d'8] \bar "|"  f'4^"F" e'8[ e'8] r4 d'4^"C/E" \bar "|"  c'4 \grace {a'16[ f'16]}e'4^"i" d'4 a4 \bar "|"  c'4^"Bb" e'8[ e'8] r4^"F" r4 \bar ":|"  
- \bar "||"   e'4^"A11" r4 \grace {d'16}e'4^"A7" r4 \bar "|"  a'4 \grace {a'16[ f'16]}b'4^"i" c''4^"Bb" b'8[ a'8] \bar "|"  b'4 r8 a'8 g'4^"C" a'8[ e'8] \bar "|"  r4^"F" r4 r4 r4 \bar "|"  
-  e'4^"A11" r4 e'4^"A7" r4 \bar "|"  a'4 \grace {a'16[ f'16]}b'4^"i" c''4^"Bb" b'8[ a'8] \bar "|"  b'4 r8 a'8 g'4^"C" b'4 \bar "|"  c''4(^"F"^"1_____" g'4 f'4 e'4) \bar ":|"  c''4^"F"^"2______" r4 r4 r4 \bar "||"   
- 
-}
-
-
+\key c 
+\major
+  d'8[^"F" c'8] c'4 r4 r4 \bar "|"  r4^"Em7" e'8[ fs'8] gs'8[^"A7" a'8] b'8[ c''8] \bar "|"  b'4 \grace {a'16[[ f'16]}a'8^"i" a'8] r4 r4 \bar "|" \bar "" \break 
+  r4^"Bb" a'8[ a'8] g'8[^"C7" f'8] e'8[ d'8] \bar "|"  f'4^"F" e'8[ e'8] r4 d'4^"C/E" \bar "|"  c'4 \grace {a'16[ f'16]}e'4^"i" d'4 a4 \bar "|"  c'4^"Bb" e'8[ e'8] r4^"F" r4 \bar "||"  \bar "" \break 
+  d'8[^"F" c'8] c'4 r4 r4 \bar "|"  r4^"Em7" e'8[ fs'8] gs'8[^"A7" a'8] b'8[ c''8] \bar "|"  b'4 \grace {a'16[[ f'16]}a'8^"i" a'8] r4 r4 \bar "|" \bar "" \break 
+  r4^"Bb" a'8[ a'8] g'8[^"C7" f'8] e'8[ d'8] \bar "|"  f'4^"F" e'8[ e'8] r4 d'4^"C/E" \bar "|"  c'4 \grace {a'16[ f'16]}e'4^"i" d'4 a4 \bar "|"  c'4^"Bb" e'8[ e'8] r4^"F" r4 \bar ":|" \bar "" \break 
+ \bar "||"   e'4^"A11" r4 \grace {d'16}e'4^"A7" r4 \bar "|"  a'4 \grace {a'16[ f'16]}b'4^"i" c''4^"Bb" b'8[ a'8] \bar "|"  b'4 r8 a'8 g'4^"C" a'8[ e'8] \bar "|"  r4^"F" r4 r4 r4 \bar "|" \bar "" \break 
+  e'4^"A11" r4 e'4^"A7" r4 \bar "|"  a'4 \grace {a'16[ f'16]}b'4^"i" c''4^"Bb" b'8[ a'8] \bar "|"  b'4 r8 a'8 g'4^"C" b'4 \bar "|"  c''4(^"F"^"1_____" g'4 f'4 e'4) \bar ":|"  c''4^"F"^"2______" r4 r4 r4 \bar "||"  \bar "" \break 
+ }
 text = \lyricmode {
 yes- ter day all my trou- bles seemed so far a- way now it looks as though they're here to stay oh I be- lieve in Yes- ter- day sudd- en- ly I'm not half the man I used to be theres a sha- dow hang- ing o- ver me Oh I be- lieve in Yes- ter- day why she had to go I don't know she would- n't say I said some- thing wrong now I long for yes- ter- day    day 
 }
-
 \score{
 \transpose c' f'
 <<

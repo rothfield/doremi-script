@@ -1,29 +1,22 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{
-
-
+\header{ 
 }
 %{
+P#
 
 %}
 melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
-\key c \major
-\cadenzaOn
-
-
-  gs'4  
- 
-}
-
-
+\key c 
+\major
+  gs'4 \bar "" \break 
+ }
 text = \lyricmode {
  
 }
-
 \score{
 
 <<

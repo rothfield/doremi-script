@@ -1,29 +1,26 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{
-
-
+\header{ 
 }
 %{
+TimeSignature: 3/4
+
+| S - - | R - S | N - - | - - - |
+                  .
+  i-      rene good night
 
 %}
 melody = {
 \time 3/4
 \clef treble
-\key c \major
-\cadenzaOn
-
-
-  c'4 r4 r4 \bar "|"  d'4 r4 c'4 \bar "|"  b4 r4 r4 \bar "|"  r4 r4 r4 \bar "|"  
- 
-}
-
-
+\key c 
+\major
+  c'4 r4 r4 \bar "|"  d'4 r4 c'4 \bar "|"  b4 r4 r4 \bar "|"  r4 r4 r4 \bar "|" \bar "" \break 
+ }
 text = \lyricmode {
 i- rene good night 
 }
-
 \score{
 
 <<

@@ -4,19 +4,21 @@
 \header{ 
 }
 %{
-Pm
-| G
+Key: F#
+Mode: Minor
+
+   .  .
+A# C# F#
 
 %}
 melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
-\key c 
-\major
-  \grace {g'16[ f'16]}e'4 \bar "" \break 
+\key fs \minor
+  as'4 cs''4 fs''4 \bar "" \break 
  }
 text = \lyricmode {
- 
+   
 }
 \score{
 

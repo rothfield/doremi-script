@@ -119,7 +119,11 @@ tala (* tala markings. ie +203 for tintal. 012 for rupak *)
 forward-slash-char  (* note that putting forward slash in regex doesn't seem to work *)
 = "\\"
 
-chord = #"[a-gA-GvViI][^\s]*"
+(* OLD chord = #"[a-gA-GvViI][^\s]*"  *) 
+
+(* 3/24/2014 Chords now are entered in brackets [Dm7] *)
+chord =<"[">  #"[a-gA-GvViI][^\s\]]*" <"]"> 
+
 
 lower-octave-line (* can put lower octave dots or semicolons for lower-lower octave (. or :)   *)
 = <white-space?> lower-octave-line-item+ <white-space?> 

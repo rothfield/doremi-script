@@ -1,29 +1,24 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{
-
-
+\header{ 
 }
 %{
+    Pm
+ P m | r - S
+ wa-ta ho-ri
 
 %}
 melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
-\key c \major
-\cadenzaOn
-
-
-  g'4 \afterGrace f'4({g'16[ f'16])} \bar "|"  df'4 r4 c'4  
- 
-}
-
-
+\key c 
+\major
+  g'4 \afterGrace f'4({g'16[ f'16])} \bar "|"  df'4 r4 c'4 \bar "" \break 
+ }
 text = \lyricmode {
 wa- ta ho- ri 
 }
-
 \score{
 
 <<

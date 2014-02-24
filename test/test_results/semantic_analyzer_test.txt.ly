@@ -1,29 +1,34 @@
 #(ly:set-option 'midi-extension "mid")
 \version "2.12.3"
 \include "english.ly"
-\header{
-title = "test semantic analyzer"
+\header{ 
 
-}
+title = "test semantic analyzer"}
 %{
+Title: test semantic analyzer
+
+~
++    *
+:
+.     S
+*
+Dm7
+<gRg>
+g
+.
+hi-
 
 %}
 melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
-\key c \major
-\cadenzaOn
-
-
-  ef''''4^"Dm7"\mordent  
- 
-}
-
-
+\key c 
+\major
+  ef''''4^"Dm7"\mordent \bar "" \break 
+ }
 text = \lyricmode {
 hi- 
 }
-
 \score{
 
 <<
