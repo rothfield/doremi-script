@@ -28,6 +28,7 @@ melody = {
 \clef treble
 \key c 
 \major
+\cadenzaOn
   r4 c'8[ c'8] \bar "|" \bar "" \break 
   r4 r8 c'8 \bar "|" \bar "" \break 
   c'4 r4 r4 r4 \bar "|" \bar "" \break 

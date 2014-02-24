@@ -4,7 +4,7 @@
 \header{ 
 
 title = "my summer vacation"
-composer = " author "}
+composer = "John Rothfield"}
 %{
 Author: John Rothfield
 Title: my summer vacation
@@ -17,6 +17,7 @@ melody = {
 \clef treble
 \key c 
 \major
+\cadenzaOn
   c'4 \bar "" \break 
  }
 text = \lyricmode {

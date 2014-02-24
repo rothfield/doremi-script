@@ -11,6 +11,7 @@ melody = {
 \once \override Staff.TimeSignature #'stencil = ##f
 \clef treble
 \key c \major
+\cadenzaOn
   c'4 \bar ":|" \bar "" \break 
  }
 text = \lyricmode {

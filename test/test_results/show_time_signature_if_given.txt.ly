@@ -14,6 +14,7 @@ melody = {
 \clef treble
 \key c 
 \major
+\cadenzaOn
   c'4 r4 r4 r4 r4 d'4 r4 r4 r4 r4 }
 text = \lyricmode {
   

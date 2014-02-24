@@ -13,6 +13,7 @@ melody = {
 \clef treble
 \key c 
 \major
+\cadenzaOn
   \afterGrace bf'8[({a'16[ g'16])} g'8] \bar "" \break 
  }
 text = \lyricmode {

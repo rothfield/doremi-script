@@ -4,7 +4,7 @@
 \header{ 
 
 title = "Yesterday"
-composer = " author "}
+composer = "McCartney"}
 %{
 Filename: yesterday
 Key: F
@@ -22,6 +22,7 @@ melody = {
 \clef treble
 \key c 
 \major
+\cadenzaOn
   d'8[ c'8] c'4 r4 r4 \bar "|" \bar "" \break 
  }
 text = \lyricmode {

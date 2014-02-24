@@ -12,6 +12,7 @@ melody = {
 \clef treble
 \key c 
 \major
+\cadenzaOn
   r4 g'8[ g'8] \bar "" \break 
  }
 text = \lyricmode {

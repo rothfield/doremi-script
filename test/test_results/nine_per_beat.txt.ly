@@ -12,6 +12,7 @@ melody = {
 \clef treble
 \key c 
 \major
+\cadenzaOn
   \times 8/9{ g'16[ c'32 ef'16 c'32 d'16.] }  \bar "" \break 
  }
 text = \lyricmode {

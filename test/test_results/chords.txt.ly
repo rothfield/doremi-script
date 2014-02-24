@@ -4,7 +4,8 @@
 \header{ 
 }
 %{
-S :|
+[I]       [V7]      [iii]
+S - - - | R - - - | G - - - | m - - - |
 
 %}
 melody = {
@@ -13,10 +14,10 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  c'4 \bar ":|" \bar "" \break 
+  c'4^"I" r4 r4 r4 \bar "|"  d'4^"V7" r4 r4 r4 \bar "|"  e'4^"iii" r4 r4 r4 \bar "|"  f'4 r4 r4 r4 \bar "|" \bar "" \break 
  }
 text = \lyricmode {
- 
+    
 }
 \score{
 

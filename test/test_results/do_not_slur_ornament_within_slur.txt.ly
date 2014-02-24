@@ -14,6 +14,7 @@ melody = {
 \clef treble
 \key c 
 \major
+\cadenzaOn
   ef'4( f'4 \afterGrace g'4{bf'16} af'4) \bar "|"  g'4 \bar "" \break 
  }
 text = \lyricmode {

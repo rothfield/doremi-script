@@ -2,7 +2,8 @@
   (:use compojure.core)
   (:require [compojure.handler :as handler]
             [clojure.java.io :as io :refer [input-stream resource]]
-            [doremi_script.doremi_core :refer [doremi-text->parsed doremi-text->lilypond parse-failed? format-instaparse-errors] ]
+            [doremi_script.doremi_core :refer 
+             [doremi-text->collapsed-parse-tree doremi-text->parsed doremi-text->lilypond parse-failed? format-instaparse-errors] ]
             [clojure.string :refer 
              [split replace-first upper-case lower-case join] :as string] 
             [clojure.pprint :refer [pprint]] 
@@ -35,42 +36,47 @@
 ;; (pprint (-> "SSS" doremi-text->parsed))
 ;; (pprint (-> "Title: john\n\n|SSS" doremi-text->parsed))
 ;;(-> "Title: hi\n\nSSS|" (doremi-post true))
-(defn doremi-post[val generate-staff-notation]
-  (if (= "" val)
+(defn doremi-generate-staff-notation[x]
+  (if (= "" x)
     {}
-  (let [md5 (my-md5 val)
-        results (doremi-text->parsed val)
-        ]
-    (if (:error results) ;; error
-      results
-      (let [
-            title (get-in results [:attributes :title])
-            file-id (str
-                      (if title
-                        (str (sanitize title) "-"))
-                      md5) 
-            lilypond-fname (str "resources/public/compositions/" file-id ".ly")
-            url (str "compositions/" file-id ".png")
-            ]
-        (if generate-staff-notation
-          (do
-            (->> (:lilypond results)(spit lilypond-fname))
-            (assoc results :staffNotationPath (str "/compositions/" file-id ".png")))
+    (let [md5 (my-md5 x)
+          results (doremi-text->parsed x)
+          ]
+      (if (:error results) ;; error
+        results
+        (let [
+              title (get-in results [:attributes :title])
+              file-id (str
+                        (if title
+                          (str (sanitize title) "-"))
+                        md5) 
+              lilypond-fname (str "resources/public/compositions/" file-id ".ly")
+              url (str "compositions/" file-id ".png")
+              ]
+          (->> (:lilypond results)(spit lilypond-fname))
+          (assoc results :staffNotationPath (str "/compositions/" file-id ".png"))
           results 
           )
-        )))))
+        ))))
 
 ;; (-> "public/compositions/yesterday.txt" resource slurp)
 ;; (when-not (.exists (io/as-file fname))
 
+
+(defn doremi-parse[src]
+
+  )
 (defroutes app-routes
   (GET "/load/yesterday.txt"[]
        {:body (-> "public/compositions/yesterday.txt" resource slurp doremi-text->parsed)}
        )
 
   (POST "/parse" [src generateStaffNotation] 
-        {:body  (doremi-post src (= "true" generateStaffNotation)) }
-        )
+        (if (= "true" generateStaffNotation)
+          {:body (doremi-generate-staff-notation src) }
+          ;;
+          {:body  (doremi-text->collapsed-parse-tree src) }
+          ))
 
   (route/resources "/")
   (route/not-found "Not Found"))
