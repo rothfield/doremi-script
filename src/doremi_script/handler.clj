@@ -27,70 +27,10 @@
 
 
 
-(defn draw[txt parse-result img-url]
-  (str "<!DOCTYPE html> <html>"
-       "<head><style>
-       textarea.hidden{display:none}
-       textarea {font-size:14px;}
-       </style>"
-       "<title>Doremi-Script by John Rothfield</title></head> <body><h1>Doremi-Script Letter music system</h1>"
-       "<a href='https://github.com/rothfield/doremi-script#readme'>Doremi-Script project home</a>"
-       "<form method='post'> <div>Enter music in letter format. (examples:) <ul><li><b>ABC</b>: | CDbDEb EFF#G AbABbB </li><li><b>Sargam</b>:  SrRg GmMP dDnN | -</li><li><b>Hindi</b>: सर ग़म  म'प धऩ (Use underscores for flat notes) </li></ul></div>
-       <br/><textarea rows='10' cols='80' name='val'>" 
-       txt
-       "</textarea><br/>" 
-       "<input type='submit' value='Generate staff notation'>"
-       "<button  onclick=\"document.getElementById('result').style.display='block'; return(false);\" ' value='Show Lilypond Output'>Show Lilypond Output</button><br/>"
-       "<textarea id='result'"
-       (if (parse-succeeded parse-result)
-         "class='hidden'" ;; hide if no error
-         )
-       " rows='10' cols='80'>" 
-       (format-instaparse-errors parse-result)
 
-       "</textarea><br/>" 
-       " </form></body>"
-       (when img-url (str
-                       "<img onerror='reload_later()' id='staff_notation'  src='" img-url "'"
-                       "' >"))
-       (when img-url (str 
-                       " 
-                       <script language='JavaScript' type='text/javascript'> 
-                       var t = 5; // Interval in Seconds
-                       image = '"
-                       img-url 
-                       "' //URL of the Image 
-                       function reload_later() { 
-                       var tmp = new Date(); 
-                       var tmp = '?'+tmp.getTime();
-                       var tmp =''; 
-                       document.images['staff_notation'].src = image+tmp 
-                       setTimeout('reload_later()', t*1000) 
-                       } 
-
-                       </script>"))
-
-
-
-       " </html>")
-
-  )
-
-(def  comments
-  (atom [{:author "Pete Hunt", :text "Hey there!"}]))
-
-(defn get-comments[]
-  {:body @comments })
-
-;; (pprint (sanitize nil))
-;; (pprint (sanitize "/root/H--'"))
 (defn sanitize[x]
   (if x
     (-> x (string/replace  #"[^0-9A-Za-z\.]" "_") string/lower-case)))
-
-(defn post-comment[author text]
-  (swap! comments conj {:author author :text text})
-  {:body @comments })
 
 ;; (pprint (-> "SSS" doremi-text->parsed))
 ;; (pprint (-> "Title: john\n\n|SSS" doremi-text->parsed))
@@ -112,39 +52,36 @@
             ]
         (if generate-staff-notation
           (do
-        (->> (:lilypond results)(spit lilypond-fname))
-        (assoc results :staffNotationPath (str "/compositions/" file-id ".png")))
-         results 
+            (->> (:lilypond results)(spit lilypond-fname))
+            (assoc results :staffNotationPath (str "/compositions/" file-id ".png")))
+          results 
           )
-      ))))
+        ))))
 
 ;; (-> "public/compositions/yesterday.txt" resource slurp)
-        ;; (when-not (.exists (io/as-file fname))
+;; (when-not (.exists (io/as-file fname))
 
 (defroutes app-routes
-  (GET "/comments.json" [] 
-       ;; GET . Return json data
-       (get-comments))
   (GET "/load/yesterday.txt"[]
        {:body (-> "public/compositions/yesterday.txt" resource slurp doremi-text->parsed)}
        )
 
-  (POST "/comments.json" [author text]
-        ;; Posted as a form submission, return json
-        (post-comment author text))
-  (GET "/" []
-       (draw " " "" nil))
-
-  (POST "/" [src generateStaffNotation] 
+  (POST "/parse" [src generateStaffNotation] 
         {:body  (doremi-post src (= "true" generateStaffNotation)) }
         )
 
   (route/resources "/")
   (route/not-found "Not Found"))
 
+(defn wrap-dir-index [handler]
+  (fn [req]
+    (handler
+      (update-in req [:uri]
+                 #(if (= "/" %) "/index.html" %)))))
 
 (def app
   (->  app-routes
       handler/site 
       middleware/wrap-json-response  ;; Converts responses that are clojure objects to json
+      wrap-dir-index
       ))

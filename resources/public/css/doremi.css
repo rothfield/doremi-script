@@ -413,7 +413,9 @@ span.attribute_key,span.attribute_value {
 span.attribute_key {
     font-weight: bold;
 }
-
+span.note.line_number {
+   margin-right: .75em;
+}
 span.note, span.note_wrapper {
     font-family: sans-serif;
     font-size: 1.6em; 
