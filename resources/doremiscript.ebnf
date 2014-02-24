@@ -278,18 +278,12 @@ ending )+
 
 
 abc-ornament= 
-abc-ornament-pitch+ |
-delimited-abc-ornament
-
+abc-ornament-pitch+  !abc-ornament-pitch |
+<delimited-abc-ornament> (* in upper line <nrsns> *)
 
 <delimited-abc-ornament> (* in upper line <nrsns> *)
-=  <"<"> abc-ornament-pitch+  <">">
+=  <"<"> abc-ornament-pitch+ !abc-ornament-pitch <">">
 
-<abc-delimited-ornament> 
-=  <"<"> abc-ornament-pitch+  <">">
-
-<hindi-delimited-ornament> 
-=  <"<"> hindi-ornament-pitch+  <">">
 
 
 (** Generated from template.ebnf. Do not edit **)hindi-composition (* a musical piece *)
@@ -426,18 +420,12 @@ ending )+
 
 
 hindi-ornament= 
-hindi-ornament-pitch+ |
-delimited-hindi-ornament
-
+hindi-ornament-pitch+  !hindi-ornament-pitch |
+<delimited-hindi-ornament> (* in upper line <nrsns> *)
 
 <delimited-hindi-ornament> (* in upper line <nrsns> *)
-=  <"<"> hindi-ornament-pitch+  <">">
+=  <"<"> hindi-ornament-pitch+ !hindi-ornament-pitch <">">
 
-<abc-delimited-ornament> 
-=  <"<"> abc-ornament-pitch+  <">">
-
-<hindi-delimited-ornament> 
-=  <"<"> hindi-ornament-pitch+  <">">
 
 
 (** Generated from template.ebnf. Do not edit **)number-composition (* a musical piece *)
@@ -574,18 +562,12 @@ ending )+
 
 
 number-ornament= 
-number-ornament-pitch+ |
-delimited-number-ornament
-
+number-ornament-pitch+  !number-ornament-pitch |
+<delimited-number-ornament> (* in upper line <nrsns> *)
 
 <delimited-number-ornament> (* in upper line <nrsns> *)
-=  <"<"> number-ornament-pitch+  <">">
+=  <"<"> number-ornament-pitch+ !number-ornament-pitch <">">
 
-<abc-delimited-ornament> 
-=  <"<"> abc-ornament-pitch+  <">">
-
-<hindi-delimited-ornament> 
-=  <"<"> hindi-ornament-pitch+  <">">
 
 
 (** Generated from template.ebnf. Do not edit **)sargam-composition (* a musical piece *)
@@ -722,18 +704,12 @@ ending )+
 
 
 sargam-ornament= 
-sargam-ornament-pitch+ |
-delimited-sargam-ornament
-
+sargam-ornament-pitch+  !sargam-ornament-pitch |
+<delimited-sargam-ornament> (* in upper line <nrsns> *)
 
 <delimited-sargam-ornament> (* in upper line <nrsns> *)
-=  <"<"> sargam-ornament-pitch+  <">">
+=  <"<"> sargam-ornament-pitch+ !sargam-ornament-pitch <">">
 
-<abc-delimited-ornament> 
-=  <"<"> abc-ornament-pitch+  <">">
-
-<hindi-delimited-ornament> 
-=  <"<"> hindi-ornament-pitch+  <">">
 
 (**abc.ebnf**)
 abc-pitch  =  

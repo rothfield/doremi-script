@@ -132,16 +132,10 @@ ending )+
 
 
 doremi-ornament= 
-doremi-ornament-pitch+ |
-delimited-doremi-ornament
-
+doremi-ornament-pitch+  !doremi-ornament-pitch |
+<delimited-doremi-ornament> (* in upper line <nrsns> *)
 
 <delimited-doremi-ornament> (* in upper line <nrsns> *)
-=  <"<"> doremi-ornament-pitch+  <">">
+=  <"<"> doremi-ornament-pitch+ !doremi-ornament-pitch <">">
 
-<abc-delimited-ornament> 
-=  <"<"> abc-ornament-pitch+  <">">
-
-<hindi-delimited-ornament> 
-=  <"<"> hindi-ornament-pitch+  <">">
 

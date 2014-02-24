@@ -36,6 +36,8 @@
 ;; (pprint (-> "Title: john\n\n|SSS" doremi-text->parsed))
 ;;(-> "Title: hi\n\nSSS|" (doremi-post true))
 (defn doremi-post[val generate-staff-notation]
+  (if (= "" val)
+    {}
   (let [md5 (my-md5 val)
         results (doremi-text->parsed val)
         ]
@@ -56,7 +58,7 @@
             (assoc results :staffNotationPath (str "/compositions/" file-id ".png")))
           results 
           )
-        ))))
+        )))))
 
 ;; (-> "public/compositions/yesterday.txt" resource slurp)
 ;; (when-not (.exists (io/as-file fname))
