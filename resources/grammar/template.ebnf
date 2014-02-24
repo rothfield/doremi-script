@@ -57,7 +57,7 @@ doremi-stave)*
 
 doremi-stave  (* Spans multiple lines. *)
 =
-(doremi-upper-octave-line <newline>)*
+(doremi-upper-line <newline>)*
 doremi-notes-line 
 (<newline> lower-octave-line)*
 (<newline> lyrics-line)*
@@ -116,17 +116,17 @@ doremi-measure-item)*
 <doremi-measure-item> = begin-slur / end-slur / doremi-beat
 
 
-doremi-upper-octave-line (* Things above notes, including ornaments, 
+doremi-upper-line (* Things above notes, including ornaments, 
 talas, mordents, octaves,chords, octave indicating dots,
 and 1st and second ending symbols. TODO: add catchall for word?? *)
 = <white-space?> 
 ( <white-space> /
-upper-octave-dot /
+upper-line-dot /
 tala /
 doremi-ornament /
 chord /
 mordent /
-upper-upper-octave-symbol /
+upper-line-two-dots /
 ending )+
 
 

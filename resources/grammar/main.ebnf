@@ -105,12 +105,12 @@ ending
 = #"[1-3][\._]+" 
 
 
-upper-octave-dot= <dot> 
+upper-line-dot= <dot> 
 
 dot = (*  period and asterisk are allowed *)
 #"[\.*]"
 
-upper-upper-octave-symbol=<":">
+upper-line-two-dots=<":">
 
 tala (* tala markings. ie +203 for tintal. 012 for rupak *)
 = #"[+1203456]"
@@ -127,11 +127,11 @@ chord =<"[">  #"[a-gA-GvViI][^\s\]]*" <"]">
 lower-octave-line (* can put lower octave dots or semicolons for lower-lower octave (. or :)   *)
 = <white-space?> lower-octave-line-item+ <white-space?> 
 
-<lower-octave-line-item> =  <white-space> | lower-octave-dot |
-lower-lower-octave-symbol | kommal-indicator  
+<lower-octave-line-item> =  <white-space> | lower-line-dot |
+lower-line-two-dots | kommal-indicator  
 
-lower-octave-dot= <dot>
-lower-lower-octave-symbol=":"
+lower-line-dot= <dot>
+lower-line-two-dots=":"
 
 kommal-indicator (* an underscore for flat. for the traditional bhatkande notation - hindi, indicates a flatted note, since hindi seems not to have lowercase *)
 = "_"

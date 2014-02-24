@@ -106,12 +106,12 @@ ending
 = #"[1-3][\._]+" 
 
 
-upper-octave-dot= <dot> 
+upper-line-dot= <dot> 
 
 dot = (*  period and asterisk are allowed *)
 #"[\.*]"
 
-upper-upper-octave-symbol=<":">
+upper-line-two-dots=<":">
 
 tala (* tala markings. ie +203 for tintal. 012 for rupak *)
 = #"[+1203456]"
@@ -128,11 +128,11 @@ chord =<"[">  #"[a-gA-GvViI][^\s\]]*" <"]">
 lower-octave-line (* can put lower octave dots or semicolons for lower-lower octave (. or :)   *)
 = <white-space?> lower-octave-line-item+ <white-space?> 
 
-<lower-octave-line-item> =  <white-space> | lower-octave-dot |
-lower-lower-octave-symbol | kommal-indicator  
+<lower-octave-line-item> =  <white-space> | lower-line-dot |
+lower-line-two-dots | kommal-indicator  
 
-lower-octave-dot= <dot>
-lower-lower-octave-symbol=":"
+lower-line-dot= <dot>
+lower-line-two-dots=":"
 
 kommal-indicator (* an underscore for flat. for the traditional bhatkande notation - hindi, indicates a flatted note, since hindi seems not to have lowercase *)
 = "_"
@@ -207,7 +207,7 @@ abc-stave)*
 
 abc-stave  (* Spans multiple lines. *)
 =
-(abc-upper-octave-line <newline>)*
+(abc-upper-line <newline>)*
 abc-notes-line 
 (<newline> lower-octave-line)*
 (<newline> lyrics-line)*
@@ -266,17 +266,17 @@ abc-measure-item)*
 <abc-measure-item> = begin-slur / end-slur / abc-beat
 
 
-abc-upper-octave-line (* Things above notes, including ornaments, 
+abc-upper-line (* Things above notes, including ornaments, 
 talas, mordents, octaves,chords, octave indicating dots,
 and 1st and second ending symbols. TODO: add catchall for word?? *)
 = <white-space?> 
 ( <white-space> /
-upper-octave-dot /
+upper-line-dot /
 tala /
 abc-ornament /
 chord /
 mordent /
-upper-upper-octave-symbol /
+upper-line-two-dots /
 ending )+
 
 
@@ -349,7 +349,7 @@ hindi-stave)*
 
 hindi-stave  (* Spans multiple lines. *)
 =
-(hindi-upper-octave-line <newline>)*
+(hindi-upper-line <newline>)*
 hindi-notes-line 
 (<newline> lower-octave-line)*
 (<newline> lyrics-line)*
@@ -408,17 +408,17 @@ hindi-measure-item)*
 <hindi-measure-item> = begin-slur / end-slur / hindi-beat
 
 
-hindi-upper-octave-line (* Things above notes, including ornaments, 
+hindi-upper-line (* Things above notes, including ornaments, 
 talas, mordents, octaves,chords, octave indicating dots,
 and 1st and second ending symbols. TODO: add catchall for word?? *)
 = <white-space?> 
 ( <white-space> /
-upper-octave-dot /
+upper-line-dot /
 tala /
 hindi-ornament /
 chord /
 mordent /
-upper-upper-octave-symbol /
+upper-line-two-dots /
 ending )+
 
 
@@ -491,7 +491,7 @@ number-stave)*
 
 number-stave  (* Spans multiple lines. *)
 =
-(number-upper-octave-line <newline>)*
+(number-upper-line <newline>)*
 number-notes-line 
 (<newline> lower-octave-line)*
 (<newline> lyrics-line)*
@@ -550,17 +550,17 @@ number-measure-item)*
 <number-measure-item> = begin-slur / end-slur / number-beat
 
 
-number-upper-octave-line (* Things above notes, including ornaments, 
+number-upper-line (* Things above notes, including ornaments, 
 talas, mordents, octaves,chords, octave indicating dots,
 and 1st and second ending symbols. TODO: add catchall for word?? *)
 = <white-space?> 
 ( <white-space> /
-upper-octave-dot /
+upper-line-dot /
 tala /
 number-ornament /
 chord /
 mordent /
-upper-upper-octave-symbol /
+upper-line-two-dots /
 ending )+
 
 
@@ -633,7 +633,7 @@ sargam-stave)*
 
 sargam-stave  (* Spans multiple lines. *)
 =
-(sargam-upper-octave-line <newline>)*
+(sargam-upper-line <newline>)*
 sargam-notes-line 
 (<newline> lower-octave-line)*
 (<newline> lyrics-line)*
@@ -692,17 +692,17 @@ sargam-measure-item)*
 <sargam-measure-item> = begin-slur / end-slur / sargam-beat
 
 
-sargam-upper-octave-line (* Things above notes, including ornaments, 
+sargam-upper-line (* Things above notes, including ornaments, 
 talas, mordents, octaves,chords, octave indicating dots,
 and 1st and second ending symbols. TODO: add catchall for word?? *)
 = <white-space?> 
 ( <white-space> /
-upper-octave-dot /
+upper-line-dot /
 tala /
 sargam-ornament /
 chord /
 mordent /
-upper-upper-octave-symbol /
+upper-line-two-dots /
 ending )+
 
 
