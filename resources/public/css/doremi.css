@@ -377,7 +377,7 @@ span.tala {
   font-size: 0.5em;
   top: 0.7em;
 }
-span.chord,span.tala, span.ending {
+span.chord,span.tala, span.ending,span.mordent {
     z-index: 2;
     position: absolute;
   font-family:"Times New Roman",Georgia,Serif;
