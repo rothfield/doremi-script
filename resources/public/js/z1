@@ -1,0 +1,17 @@
+  Oldrender: function () {
+    var pitch = this.props.pitch;
+    console.log(pitch);
+    var normalizedPitch = pitch[1];
+    assert(isA(pitch, "pitch"));
+    /*
+    return React.DOM.span({
+      className: "note_wrapper",
+      key: this.props.key
+    }, React.DOM.span({
+    className: "note " + className
+		},src));
+	 */
+    return React.DOM.span({
+      className: "pitch "
+    }, normalizedPitch);
+  }

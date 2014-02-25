@@ -1,0 +1,11 @@
+(defn calculate-octave[x]
+  (when true (println "calculate-octave" x))
+  (if (not (is? :pitch x))
+    x
+    (let [without-dots (into [] (remove #(and (vector? %) (is-dot? %)) x))
+          octave (pitch->octave x)
+          ]
+      (into [] (conj without-dots [:octave octave]))
+    )))
+;;(pprint (-> "S- |\n.\nHi" doremi-text->collapsed-parse-tree))
+(pprint (-> "S- |\nHi" doremi-text->collapsed-parse-tree))

@@ -1,4 +1,21 @@
-			 var oldState=this.state;
-			 oldState.data.staffNotationPath=data.staffNotationPath;
-        this.setState(oldState);
-        };
+var PitchItem = React.createClass({
+  displayName: 'PitchItem',
+  zzz: ["pitch",
+    "C", ["mordent"],
+    ["upper-line-dot"],
+    ["syl", "hi"]
+  ],
+
+  // <span title="" data-column="0" class="note_wrapper"><span data-column="0" class="note line_number">1)</span></span>
+  render: function () {
+    var item = this.props.item;
+    var src = this.props.src;
+    var className = item[0].replace(/-/g, '_');
+    return React.DOM.span({
+      className: "note_wrapper",
+      key: this.props.key
+    }, React.DOM.span({
+      className: "note " + className
+    }, src));
+  }
+});

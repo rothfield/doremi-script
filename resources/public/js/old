@@ -1,0 +1,928 @@
+window.loadTimeout = null;
+
+function rest(x) {
+  // Analogous to clojure rest function
+  return x.slice(1);
+}
+
+function first(x) {
+  // Analogous to clojure function
+  return x[0];
+}
+
+function second(x) {
+  // Analogous to clojure function
+  return x[1];
+}
+
+function assert(condition, message) {
+  if (!condition) {
+    throw message || "Assertion failed";
+  }
+}
+
+function isArray(x) {
+  return (Object.prototype.toString.call(x) ===
+    '[object Array]');
+}
+
+function isA(x, kind) {
+  return (isArray(x) && (x[0] === kind));
+}
+
+
+
+
+var DoremiBox = React.createClass({
+
+  handleDoremiTextChange: function (txt) {
+    console.log("handleTextChange");
+    this.startLoadTimer();
+  },
+  startLoadTimer: function () {
+    if (!window.loadTimeout || window.loadTimeout.cleared) {
+      window.loadTimeout = setTimeout(this.loadDataFromServer,
+        2000);
+    }
+  },
+
+  sanitize: function (name) {
+    if (name === null) {
+      return null;
+    } else {
+      return name.replace(/[^0-9A-Za-z.\_]/g, '_')
+        .toLowerCase();
+    }
+  },
+  baseURL: "compositions/",
+
+  getStaffNotationPath: function (txt) {
+    var title = this.sanitize(this.extractTitle(txt));
+    var titleSnippet = "";
+    if (title) {
+      titleSnippet = title + "-";
+    }
+    return this.baseURL + titleSnippet + MD5(txt) +
+      ".png";
+  },
+  extractTitle: function (txt) {
+    // extract title from attributes. title: my title or Title: my title
+
+    var patt = /^title:( )*([^\n]+)( )*/mi;
+    var z = patt.exec(txt);
+    if (z) {
+      return z[2].trim();
+    } else {
+      return null;
+    }
+  },
+
+
+  ajaxCall: function (txt, flag) {
+    if (txt === "") {
+      window.loadTimeout = null;
+    } else {
+      console.log("ajax call");
+      $.ajax({
+        url: this.props.url,
+        dataType: 'json', //Type of data expected back from server
+        type: 'POST',
+        data: {
+          src: txt,
+          generateStaffNotation: flag
+        },
+        failure: function (data) {
+          console.log("failure");
+          window.loadTimeout = null;
+        },
+        complete: function (data) {
+          window.loadTimeout = null;
+        },
+        error: function (data) {
+          console.log("ajax error");
+        },
+        success: function (data) {
+          var oldData = this.state.data;
+          oldData.parsed = data.parsed;
+          oldData.lilypond = data.lilypond;
+          oldData.error = data.error;
+          oldData.attributes = data.attributes;
+          if (data.attributes) {
+            oldData.kind = data.attributes.kind;
+          } else {
+            oldData.kind = "(undetermined)";
+          }
+          assert(data.error || !data.attributes ||
+            data.attributes.kind);
+          this.setState({
+            data: oldData
+          });
+          assert(this.state.data);
+          assert(this.state.data.kind);
+          var curSrc = $('#the_area')
+            .val();
+
+          if (data.src !== curSrc) {
+            this.startLoadTimer();
+          }
+        }.bind(this)
+      });
+    }
+  },
+  displayName: 'DoremiBox',
+
+  handleGenerateStaffNotationButton: function () {
+    var oldData = this.state.data;
+    var txt = $('#the_area')
+      .val();
+    oldData.staffNotationPath = this.getStaffNotationPath(
+      txt);
+    this.setState({
+      data: oldData
+    });
+    this.ajaxCall(txt, true);
+    setTimeout(reloadLater, 5000);
+  },
+  handleToggleStaffNotation: function (bool) {
+    var data = this.state.data;
+    data.showStaffNotation = !data.showStaffNotation;
+    this.setState({
+      data: data
+    });
+  },
+
+  handleShowHideLilypond: function (bool) {
+    var data = this.state.data;
+    data.showLilypond = !data.showLilypond;
+    this.setState({
+      data: data
+    });
+  },
+  getInitialState: function () {
+    var myState = {
+      data: {
+        id: null,
+        resources: [],
+        staffNotationPath: "/images/blank.png",
+        parsed: [],
+        file_id: "",
+        src: "Key: Ab\n\nHi john\nHow are you\n\n | SSS\n\n" +
+          "   .:\n" +
+          "SSSSS\n" +
+          ".:",
+        error: null,
+        lilypond: null,
+        showStaffNotation: true,
+        showLilypond: false,
+        kind: "sargam-composition"
+      }
+    };
+    //  myState.data.staffNotationPath = this.getStaffNotationPath(
+    //   $('#the_area')
+    //  .val());
+    return myState;
+  },
+  loadDataFromServer: function () {
+    this.ajaxCall($('#the_area')
+      .val(), false);
+  },
+  componentWillMount: function () {
+    // TODO: set timeout after user enters data
+    // User types text, if there isn't a timeout already running,
+    // create new one to execute in 2 seconds
+    // console.log("componentWillMount");
+    this.startLoadTimer();
+  },
+  render: function () {
+    return (
+      React.DOM.div({
+          className: "doremiBox"
+        },
+        ParseErrors({
+          data: this.state.data
+        }),
+        React.DOM.div({},
+          GenerateStaffNotationButton({
+            handleGenerateStaffNotationButton: this.handleGenerateStaffNotationButton
+          }),
+          ShowHideLilypond({
+            handleShowHideLilypond: this.handleShowHideLilypond
+          }),
+          ToggleStaffNotation({
+            handleToggleStaffNotation: this.handleToggleStaffNotation
+          }),
+          DisplayKind({
+            kind: this.state.data.kind
+          })
+        ),
+        DoremiTextArea({
+          kind: this.state.data.kind,
+          handleDoremiTextChange: this.handleDoremiTextChange
+        }),
+        LilypondDisplay({
+          data: this.state.data
+        }),
+        StaffNotationDisplay({
+          staffNotationPath: this.state.data.staffNotationPath,
+          data: this.state.data
+        }),
+        CompositionInHTML({
+          data: this.state.data,
+          kind: this.state.data.kind
+        })
+      )
+    );
+  }
+});
+
+var DisplayKind = React.createClass({
+  displayName: 'DisplayKind',
+  render: function () {
+    return React.DOM.span({
+      className: "displayKind"
+    }, this.props.kind);
+  }
+});
+
+var ParseErrors = React.createClass({
+  displayName: 'ParseErrors',
+  render: function () {
+    var extra = "";
+    if (this.props.data.error === null) {
+      extra = " hidden";
+    }
+    return React.DOM.div({
+        className: "composition_parse_failed" + extra,
+      },
+      React.DOM.pre(null, this.props.data.error));
+  }
+
+});
+
+var LilypondDisplay = React.createClass({
+  displayName: 'LilypondDisplay',
+  render: function () {
+    var extra = "";
+    if (!this.props.data.showLilypond) {
+      extra = " hidden";
+    }
+    return React.DOM.div({
+      className: "lilypondDisplay" + extra,
+    }, this.props.data.lilypond);
+  }
+
+});
+
+//x=(draw_item(item) for item in line.items).join('')
+// # TODO: dry
+//"<div class='stave sargam_line'>#{x}</div>"
+
+//draw_beat= (beat) ->
+//  looped_class= if beat.subdivisions > 1 then "looped" else ""
+//  x=(draw_item(item) for item in beat.items).join('')
+//  extra=""
+//  extra= "data-subdivisions=#{beat.subdivisions} " if beat.subdivisions > 1
+//  """
+//  <span data-column="#{beat.column}" #{extra}class='beat #{looped_class}'>#{x}</span>
+//  """
+
+
+/*
+ *
+ *
+
+<div class="rendered_html not_editing" data-bind="rendered_doremi_script:rendered_in_html, visible: not_editing, event: { click: edit},clickBubble:false, css: {editing:editing,not_editing:not_editing,line_has_warnings: line_has_warnings,line_parse_failed: line_parse_failed},style: {width: $parent.composition_textarea_width}" style="width: 1009px;" data-hash="63353"><div class="stave sargam_line"><span title="" data-column="0" class="note_wrapper"><span data-column="0" data-fallback-if-no-utf8-chars="|" class="note single_barline">𝄀</span></span><span title="" data-column="1" class="note_wrapper"><span data-column="1" class="note whitespace">&nbsp;</span></span><span data-column="2" class="beat "><span data-column="2" title="1/1 of a beat" class="note_wrapper"><span data-column="2" data-fallback-if-no-utf8-chars="~" class="upper_attribute mordent">𝆝𝆝</span><span data-column="2" class="upper_octave_1 upper_octave_indicator">•</span><span data-column="2" class="syllable">hi</span><span data-column="2" class="note  pitch">S</span></span></span></div></div>
+
+
+*/
+
+/*
+
+<div class="rendered_html not_editing" data-bind="rendered_doremi_script:rendered_in_html, visible: not_editing, event: { click: edit},clickBubble:false, css: {editing:editing,not_editing:not_editing,line_has_warnings: line_has_warnings,line_parse_failed: line_parse_failed},style: {width: $parent.composition_textarea_width}" style="width: 1009px;" data-hash="63353">
+		<div class="stave sargam_line">
+				<span title="" data-column="0" class="note_wrapper">
+						<span data-column="0" data-fallback-if-no-utf8-chars="|" class="note single_barline">𝄀
+						</span>
+				</span>
+				<span title="" data-column="1" class="note_wrapper">
+						<span data-column="1" class="note whitespace">&nbsp;
+						</span>
+				</span>
+				<span data-column="2" class="beat ">
+						<span data-column="2" title="1/1 of a beat" class="note_wrapper">
+								<span data-column="2" data-fallback-if-no-utf8-chars="~" class="upper_attribute mordent">𝆝𝆝
+								</span>
+								<span data-column="2" class="upper_octave_1 upper_octave_indicator">•
+								</span>
+								<span data-column="2" class="syllable">hi
+								</span>
+								<span data-column="2" class="note  pitch">S
+								</span>
+						</span>
+				</span>
+		</div>
+</div>
+
+*/
+
+var sampleData = {
+  "src": "~ N\n.\nS\nhi",
+  "parsed": ["composition", ["attribute-section", "kind",
+      "sargam-composition"
+    ],
+    ["stave", ["notes-line", ["measure", ["beat", ["pitch",
+        "C", ["mordent"],
+        ["upper-line-dot"],
+        ["syl", "hi"]
+      ]]]],
+      ["lyrics-line", "hi"]
+    ]
+  ],
+  "attributes": {
+    "kind": "sargam-composition"
+  },
+  "error": null
+};
+
+var Pitch = React.createClass({
+  displayName: 'Pitch',
+  render: function () {
+    var pitch = this.props.item;
+    var items = rest(rest(pitch));
+    console.log("pitch", pitch, "items",items);
+    var ary = items.map(drawItem.bind(this));
+    var normalizedPitch = pitch[1];
+    assert(isA(pitch, "pitch"));
+    var src = this.props.src;
+    var className = pitch[0].replace(/-/g, '_');
+    return React.DOM.span({
+      className: "note_wrapper",
+      key: this.props.key
+    }, ary.push(React.DOM.span({
+      dangerouslySetInnerHTML: {
+        __html: src
+      }
+    })));
+  },
+
+  Oldrender: function () {
+    var pitch = this.props.pitch;
+    console.log(pitch);
+    var normalizedPitch = pitch[1];
+    assert(isA(pitch, "pitch"));
+    /*
+    return React.DOM.span({
+      className: "note_wrapper",
+      key: this.props.key
+    }, React.DOM.span({
+    className: "note " + className
+		},src));
+	 */
+    return React.DOM.span({
+      className: "pitch "
+    }, normalizedPitch);
+  }
+});
+var Beat = React.createClass({
+
+  displayName: 'Beat',
+
+  render: function () {
+    var looped = "";
+    var beat = this.props.beat;
+    var beatItems = rest(beat);
+    var count = beatItems.reduce(function (accum, cur) {
+      if (("pitch;dash")
+        .indexOf(cur[0]) > -1) {
+        return (accum + 1);
+      } else {
+        return accum;
+      }
+    }, 0);
+    if (count > 1) {
+      looped = " looped";
+    }
+    console.log("beat", beat, count);
+    var items = rest(beat);
+    var ary = items.map(drawItem.bind(this));
+    //console.log("render, beat is", beat);
+    assert(isA(beat, "beat"));
+    return React.DOM.span({
+      className: "beat " + looped
+    }, ary);
+  }
+});
+
+
+var Measure = React.createClass({
+
+  displayName: 'Measure',
+
+  render: function () {
+    var measure = this.props.measure;
+    var items = rest(measure);
+    var ary = items.map(drawItem.bind(this));
+    // console.log("render, measure is", measure);
+    assert(isA(measure, "measure"));
+    return React.DOM.span({
+      className: "measure"
+    }, ary);
+  }
+});
+
+
+var Barline = React.createClass({
+
+  displayName: 'Barline',
+
+  render: function () {
+    var barline = this.props.barline;
+    assert(isA(barline, "barline"));
+    return React.DOM.span({
+      className: "note_wrapper",
+      key: this.props.key
+    }, React.DOM.span({
+      className: "note barline",
+      dangerouslySetInnerHTML: {
+        __html: lookupBarlineTable[first(second(
+          barline))]
+      }
+    }));
+  }
+});
+
+/*
+ . The Unicode character ♭(U+266D) is the flat sign. Its HTML entity is &#9837;.
+In Unicode, the sharp symbol (♯) is at code point U+266F. Its HTML entity is &#9839;. The symbol for double sharp (double sharp) is at U+1D12A (so &#119082;). These characters may not display correctly in all fonts.
+*/
+var sharp_symbol = "&#9839;";
+var flat_symbol = "&#9837;";
+var lookup_simple = function (str) {
+  var LOOKUP;
+  LOOKUP = {
+    "b": "b",
+    "#": "#",
+    ".": "&bull;",
+    "*": "&bull;",
+    "|:": "|:",
+    "~": "~",
+    ":|": ":|",
+    "|": "|",
+    "||": "||",
+    "%": "%",
+    "|]": "|",
+    "[|": "|"
+  };
+  return LOOKUP[str];
+};
+
+var lookup_html_entity = function (str) {
+  var LOOKUP;
+  LOOKUP = {
+    "b": "&#9837;",
+    "#": "&#9839;",
+    ".": "&bull;",
+    "*": "&bull;",
+    "|:": "&#x1d106",
+    "~": "&#x1D19D&#x1D19D",
+    ":|": "&#x1d107",
+    "|": "&#x1d100",
+    "||": "&#x1d101",
+    "%": "&#x1d10E",
+    "|]": "&#x1d102",
+    "[|": "&#x1d103"
+  };
+  return LOOKUP[str];
+};
+
+var lookup1 = {
+  "Cb": "S" + flat_symbol,
+  "C": "S",
+  "C#": "S" + sharp_symbol,
+  "Db": "r",
+  "D": "R",
+  "D#": "R" + sharp_symbol,
+  "Eb": "g",
+  "E": "G",
+  "E#": "G" + sharp_symbol,
+  "F": "m",
+  "F#": "M",
+  "Gb": "P" + flat_symbol,
+  "G": "P",
+  "G#": "P" + sharp_symbol,
+  "Ab": "d",
+  "A": "D",
+  "A#": "D" + sharp_symbol,
+  "Bb": "n",
+  "B": "N",
+  "B#": "N" + sharp_symbol
+};
+
+
+/*
+reverse-final-barline = <'[' "|">
+final-barline = <'|' ']'>
+double-barline = <'|' '|'>
+single-barline = <'|' ! ('|' | ']' | ':')>
+left-repeat = <"|:">
+right-repeat = <":|">
+*/
+lookupBarlineTable = {
+  "single-barline": "&#x1d100",
+  "double-barline": "&#x1d101",
+  "left-repeat": "&#x1d106",
+  "mordent": "&#x1D19D&#x1D19D",
+  "right-repeat": "&#x1d107",
+  "final-barline": "&#x1d102",
+  "reverse-final-barline": "&#x1d103"
+};
+
+
+
+function renderPitchInKind(pitch, kind) {
+  // TODO: finish
+  return lookup1[pitch];
+}
+
+function drawItem(item, index) {
+  assert(isArray(item));
+  assert(this.props.kind);
+  var key = item[0];
+  var val;
+  switch (key) {
+    /*
+        "C", ["mordent"],
+        ["upper-line-dot"],
+        ["syl", "hi"]
+			 */
+  case "syl":
+    return PitchItem({
+      key: index,
+      item: item,
+      src: second(item),
+      kind: this.props.kind
+    });
+  case "upper-line-dot":
+  case "mordent":
+  case "line-number":
+    return LineItem({
+      key: index,
+      item: item,
+      src: item[1] + ")",
+      kind: this.props.kind
+    });
+  case "barline":
+    return Barline({
+      key: index,
+      barline: item,
+      kind: this.props.kind
+    });
+  case "pitch":
+    return Pitch({
+      item: item,
+      src: renderPitchInKind(item[1]),
+      key: index,
+      kind: this.props.kind
+    });
+  case "dash":
+    return LineItem({
+      item: item,
+      src: "-",
+      key: index,
+      kind: this.props.kind
+    });
+  case "barline":
+    return LineItem({
+      item: item,
+      key: index,
+      src: "|", // TODO
+      kind: this.props.kind,
+    });
+  case "beat":
+    return Beat({
+      beat: item,
+      key: index,
+      kind: this.props.kind
+    });
+  case "measure":
+    return Measure({
+      measure: item,
+      key: index,
+      kind: this.props.kind
+    });
+  default:
+    return React.DOM.span({
+        key: index
+      },
+      JSON.stringify(item));
+  }
+}
+
+var NotesInLineInHTML = React.createClass({
+  displayName: 'NotesInLineInHTML',
+
+
+  render: function () {
+    assert(this.props.kind);
+    var items = rest(this.props.notesInLine);
+    var myKind = this.props.kind;
+    //console.log("props", this.props);
+    var ary = items.map(drawItem.bind(this));
+    //console.log("NotesInLineInHTML, stave=", this.props.notesInLine);
+    return React.DOM.div({
+      className: "stave sargam_line",
+      key: this.props.key
+    }, ary);
+  }
+});
+
+
+/*
+								<span data-column="2" data-fallback-if-no-utf8-chars="~" class="upper_attribute mordent">𝆝𝆝
+								</span>
+								<span data-column="2" class="upper_octave_1 upper_octave_indicator">•
+								</span>
+								<span data-column="2" class="syllable">hi
+								</span>
+								<span data-column="2" class="note  pitch">S
+								</span>
+*/
+var PitchItem = React.createClass({
+  displayName: 'PitchItem',
+  zzz: ["pitch",
+    "C", ["mordent"],
+    ["upper-line-dot"],
+    ["syl", "hi"]
+  ],
+
+  // <span title="" data-column="0" class="note_wrapper"><span data-column="0" class="note line_number">1)</span></span>
+  render: function () {
+    var item = this.props.item;
+    var src = this.props.src;
+    var className = item[0].replace(/-/g, '_');
+    return React.DOM.span({
+      className: "note_wrapper",
+      key: this.props.key
+    }, React.DOM.span({
+      className: "note " + className
+    }, src));
+  }
+});
+
+var PitchItem = React.createClass({
+  displayName: 'PitchItem',
+  // <span data-column="2" class="syllable">hi
+
+  render: function () {
+    var item = this.props.item;
+    var src = this.props.src;
+    var className = item[0].replace(/-/g, '_');
+    return React.DOM.span({
+      className: className
+    }, src);
+  }
+});
+
+var LineItem = React.createClass({
+  displayName: 'LineItem',
+
+  // <span title="" data-column="0" class="note_wrapper"><span data-column="0" class="note line_number">1)</span></span>
+  render: function () {
+    var item = this.props.item;
+    var src = this.props.src;
+    var className = item[0].replace(/-/g, '_');
+    return React.DOM.span({
+      className: "note_wrapper",
+      key: this.props.key
+    }, React.DOM.span({
+      className: "note " + className
+    }, src));
+  }
+});
+
+/*
+draw_lyrics_section=(lyrics_section) ->
+  # For now, display hyphens
+  without_dashes=lyrics_section.unhyphenated_source.replace(/-/g,'')
+  #without_dashes=lyrics_section.source
+  x="<div title='Lyrics Section' class='stave lyrics_section unhyphenated'>#{lyrics_section.unhyphenated_source}</div>"
+  x+"<div title='Lyrics Section' class='stave lyrics_section hyphenated'>#{lyrics_section.hyphenated_source}</div>"
+*/
+
+var LyricsSection = React.createClass({
+  displayName: 'LyricsSection',
+
+  render: function () {
+    var lyricsSection = this.props.lyricsSection;
+    assert(isA(lyricsSection,
+      "lyrics-section"));
+    var lyricLines =
+      (rest(lyricsSection))
+      .map(function (x) {
+        assert(isA(x, "lyrics-line"));
+        return rest(x)
+          .join(" ");
+      });
+    str = lyricLines.join("\n");
+    //console.log("lyricLines=", lyricLines);
+    return React.DOM.div({
+        title: 'Lyrics Section',
+        className: 'stave lyrics_section unhyphenated'
+      },
+      str);
+  }
+});
+
+var CompositionInHTML = React.createClass({
+  displayName: 'CompositionInHTML',
+  render: function () {
+    var myKind = this.props.kind;
+    var staves;
+    if (!this.props.data.parsed) {
+      staves = [];
+    } else {
+      //console.log("render CompositionInHTML,this.props",
+      //this.props);
+      staves = this.props.data.parsed.map(function (
+        stave,
+        index) {
+        //console.log("stave is", stave);
+        if (isA(stave, "lyrics-section")) {
+          return LyricsSection({
+            lyricsSection: stave,
+            key: index
+          });
+        } else if (isA(stave, "stave")) {
+          assert(isA(stave[1],
+            "notes-line"));
+          return NotesInLineInHTML({
+            kind: myKind,
+            notesInLine: stave[1],
+            key: index
+          });
+        } else {
+          return null;
+        }
+
+      });
+    }
+    return React.DOM.div({
+      className: "composition",
+    }, staves);
+  }
+});
+
+
+var StaffNotationDisplay = React.createClass({
+  displayName: 'StaffNotationDisplay',
+  render: function () {
+    var extra = "";
+    if (!this.props.data.showStaffNotation) {
+      extra = " hidden";
+    }
+    return React.DOM.img({
+      src: this.props.staffNotationPath,
+      //	"/compositions/" + this.props.data.file_id + ".png",
+      load: (function () {
+        console.log("image loaded correctly");
+      }),
+      error: (function () {
+        console.log("error loading image");
+      }),
+      id: "staff_notation",
+      name: "",
+      className: "" + extra,
+    });
+  }
+});
+
+
+var GenerateStaffNotationButton = React.createClass({
+  displayName: 'GenerateStaffNotationButton',
+  handleClick: function (event) {
+    this.props.handleGenerateStaffNotationButton(event.target
+      .value);
+  },
+  render: function () {
+    return React.DOM.button({
+      name: "generateStaffNotation",
+      className: "",
+      onClick: this.handleClick,
+    }, "Generate Staff Notation");
+  }
+});
+
+var ShowHideLilypond = React.createClass({
+  displayName: 'ShowHideLilypond',
+  handleClick: function (event) {
+    this.props.handleShowHideLilypond(event.target.value);
+  },
+  render: function () {
+    return React.DOM.button({
+      name: "lilypondToggle",
+      className: "toggleButton",
+      onClick: this.handleClick,
+    }, "Lilypond");
+  }
+});
+
+var ToggleStaffNotation = React.createClass({
+  displayName: 'ToggleStaffNotation',
+  handleClick: function (event) {
+    this.props.handleToggleStaffNotation(event.target.value);
+  },
+  render: function () {
+    return React.DOM.button({
+      name: "staffNotationToggle",
+      className: "toggleButton",
+      onClick: this.handleClick,
+    }, "Staff Notation Hide/Show");
+  }
+});
+
+
+
+$("textarea")
+  .keyup(function (e) {
+    while ($(this)
+      .outerHeight() < this.scrollHeight + parseFloat($(
+          this)
+        .css("borderTopWidth")) + parseFloat($(this)
+        .css("borderBottomWidth"))) {
+      $(this)
+        .height($(this)
+          .height() + 1);
+    }
+  });
+
+
+var DoremiTextArea = React.createClass({
+
+  getInitialState: function () {
+    return {
+      value: "Key: Ab\n\nHi john\nHow are you\n\n | SSS\n\n" +
+        "   .:\n" +
+        "SSSSS\n" +
+        ".:"
+    };
+  },
+  displayName: 'DoremiTextArea',
+  handleTextChange: function (event) {
+
+    this.setState({
+      value: event.target.value
+    });
+    this.props.handleDoremiTextChange(event);
+  },
+  render: function () {
+    var value = this.state.value;
+    return React.DOM.div({},
+      React.DOM.textarea({
+        value: value,
+        rows: 8,
+        cols: 80,
+        id: "the_area",
+        name: "src",
+        className: "editor",
+        onChange: this.handleTextChange,
+        placeholder: "Say something...",
+        ref: "src"
+      }));
+  }
+});
+
+
+
+React.renderComponent(
+  DoremiBox({
+    url: "/parse" // URL to post to server
+  }),
+  document.getElementById('content'));
+
+function reloadLater() {
+  var t = 5; // Interval in Seconds
+  var tmp = new Date();
+  tmp = '?' + tmp.getTime();
+  tmp = '';
+  if (document.images.staff_notation) {
+    document.images.staff_notation.src = document.images.staff_notation
+      .src + tmp;
+  }
+}
+
+function imgLoad(x) {
+  console.log("imgLoad");
+  $('#staff_notation')
+    .removeClass("hidden");
+}
+
+function imgError(x) {
+  console.log("imgError");
+  $('#staff_notation')
+    .addClass("hidden");
+  setTimeout(reloadLater, 5000);
+}
+$('#staff_notation')
+  .load(imgLoad);
+$('#staff_notation')
+  .error(imgError);
