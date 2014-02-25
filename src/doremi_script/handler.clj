@@ -9,6 +9,7 @@
             [clojure.pprint :refer [pprint]] 
             [ring.middleware.json :as middleware]
             [ring.middleware.etag   :refer [wrap-etag]]
+             [ring.middleware [multipart-params :as mp]]
             [ring.middleware.params         :only [wrap-params]]
             [compojure.route :as route]))
 ;; (wrap-file "compositions")
@@ -67,19 +68,22 @@
 
   )
 (defroutes app-routes
-  (GET "/load/yesterday.txt"[]
-       {:body (-> "public/compositions/yesterday.txt" resource slurp doremi-text->parsed)}
-       )
+;;  (mp/wrap-multipart-params 
+ ;;   (POST "/file" {params :params} (upload-file (get params "file"))))
 
-  (POST "/parse" [src generateStaffNotation] 
-        (if (= "true" generateStaffNotation)
-          {:body (doremi-generate-staff-notation src) }
-          ;;
-          {:body  (doremi-text->collapsed-parse-tree src) }
-          ))
+(GET "/load/yesterday.txt"[]
+     {:body (-> "public/compositions/yesterday.txt" resource slurp doremi-text->parsed)}
+     )
 
-  (route/resources "/")
-  (route/not-found "Not Found"))
+(POST "/parse" [src generateStaffNotation] 
+      (if (= "true" generateStaffNotation)
+        {:body (doremi-generate-staff-notation src) }
+        ;;
+        {:body  (doremi-text->collapsed-parse-tree src) }
+        ))
+
+(route/resources "/")
+(route/not-found "Not Found"))
 
 (defn wrap-dir-index [handler]
   (fn [req]
@@ -87,6 +91,16 @@
       (update-in req [:uri]
                  #(if (= "/" %) "/index.html" %)))))
 
+
+
+
+;;(defn upload-file
+ ;; [file]
+  ;;(ds/copy (file :tempfile) (ds/file-str "file.out"))
+  ;;(render (upload-success)))
+
+;;(defroutes public-routes
+;;             (GET  "/" [] (render (index)))
 (def app
   (->  app-routes
       handler/site 
