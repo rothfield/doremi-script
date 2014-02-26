@@ -3,6 +3,7 @@
   :url "http://github.com/rothfield/doremi-script"
   :dependencies [
                  [org.clojure/clojure "1.5.1"]
+                 [hiccup "1.0.5"]
                  [compojure "1.1.6"]
                 [ring/ring-json "0.2.0"]
                  [ring/ring-jetty-adapter "1.2.0"] 

@@ -10,7 +10,7 @@
   <scm>
     <connection>scm:git:git://github.com/rothfield/doremi-script.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/rothfield/doremi-script.git</developerConnection>
-    <tag>6d47204569e96cbbc8d0b70dee0417cf2e3e0b17
+    <tag>b6fc74c041eaedc84ce8232fd984d55ca0965356
 </tag>
     <url>https://github.com/rothfield/doremi-script</url>
   </scm>
@@ -62,6 +62,26 @@
       <version>1.5.1</version>
     </dependency>
     <dependency>
+      <groupId>hiccup</groupId>
+      <artifactId>hiccup</artifactId>
+      <version>1.0.5</version>
+    </dependency>
+    <dependency>
+      <groupId>compojure</groupId>
+      <artifactId>compojure</artifactId>
+      <version>1.1.6</version>
+    </dependency>
+    <dependency>
+      <groupId>ring</groupId>
+      <artifactId>ring-json</artifactId>
+      <version>0.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>ring</groupId>
+      <artifactId>ring-jetty-adapter</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.clojars.mikejs</groupId>
       <artifactId>ring-etag-middleware</artifactId>
       <version>0.1.0-SNAPSHOT</version>
@@ -70,16 +90,6 @@
       <groupId>instaparse</groupId>
       <artifactId>instaparse</artifactId>
       <version>1.2.2</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
-    </dependency>
-    <dependency>
-      <groupId>compojure</groupId>
-      <artifactId>compojure</artifactId>
-      <version>1.1.6</version>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>
@@ -103,6 +113,12 @@
           <artifactId>clojure</artifactId>
         </exclusion>
       </exclusions>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
