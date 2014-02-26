@@ -1,21 +1,171 @@
-var PitchItem = React.createClass({
-  displayName: 'PitchItem',
-  zzz: ["pitch",
-    "C", ["mordent"],
-    ["upper-line-dot"],
-    ["syl", "hi"]
-  ],
-
-  // <span title="" data-column="0" class="note_wrapper"><span data-column="0" class="note line_number">1)</span></span>
-  render: function () {
-    var item = this.props.item;
-    var src = this.props.src;
-    var className = item[0].replace(/-/g, '_');
-    return React.DOM.span({
-      className: "note_wrapper",
-      key: this.props.key
-    }, React.DOM.span({
-      className: "note " + className
-    }, src));
-  }
-});
+diff --git a/resources/public/js/doremi.js b/resources/public/js/doremi.js
+index 847a590..2a96157 100644
+--- a/resources/public/js/doremi.js
++++ b/resources/public/js/doremi.js
+@@ -1,43 +1,42 @@
+-/*jshint smarttabs:true */
+ window.loadTimeout = null;
+ 
+-var span=React.DOM.span;
+-var div=React.DOM.div;
+-var textarea=React.DOM.textarea;
+-var input=React.DOM.input;
+-var pre=React.DOM.pre;
+-var form=React.DOM.form;
+-var img=React.DOM.img;
+-var button=React.DOM.button;
+-var createClass=React.createClass;
+-
+-var rest =function(x) {
++var span = React.DOM.span;
++var div = React.DOM.div;
++var textarea = React.DOM.textarea;
++var input = React.DOM.input;
++var pre = React.DOM.pre;
++var form = React.DOM.form;
++var img = React.DOM.img;
++var button = React.DOM.button;
++var createClass = React.createClass;
++
++var rest = function (x) {
+   // Analogous to clojure rest function
+   return x.slice(1);
+ }
+ 
+-var first =function(x) {
++var first = function (x) {
+   // Analogous to clojure function
+   return x[0];
+ }
+ 
+-var second= function(x) {
++var second = function (x) {
+   // Analogous to clojure function
+   return x[1];
+ }
+ 
+-var assert= function(condition, message) {
++var assert = function (condition, message) {
+   if (!condition) {
+     throw message || "Assertion failed";
+   }
+ }
+ 
+-var isArray= function(x) {
++var isArray = function (x) {
+   return (Object.prototype.toString.call(x) ===
+     '[object Array]');
+ }
+ 
+-var isA= function(x, kind) {
++var isA = function (x, kind) {
+   return (isArray(x) && (x[0] === kind));
+ }
+ 
+@@ -584,7 +583,7 @@ var FileUploadForm = createClass({
+         size: "20"
+       }),
+       input({
+-					type:"submit",
++        type: "submit",
+         name: "submit",
+         value: "submit"
+       })
+@@ -704,23 +703,31 @@ lookupBarlineTable = {
+ 
+ 
+ 
+-var renderPitchInKind= function(pitch, kind) {
++var renderPitchInKind = function (pitch, kind) {
+   // TODO: finish
+   return lookup1[pitch];
+ }
+ 
+-var drawItem= function(item, index) {
++var drawItem = function (item, index) {
+   assert(isArray(item));
+   assert(this.props.kind);
+   var key = item[0];
+   console.log("drawItem, item=", item, "key=", key);
+   var val;
+   switch (key) {
+-    /*
+-        "C", ["mordent"],
+-        ["upper-line-dot"],
+-        ["syl", "hi"]
+-			 */
++  case "ornament":
++	return null; // TODO
++  case "lyrics-section":
++    return LyricsSection({
++      lyricsSection: stave,
++      key: index
++    });
++  case "stave":
++    return NotesLine({
++      kind: myKind,
++      notesInLine: stave[1],
++      key: index
++    });
+   case "end-slur-id":
+   case "begin-slur":
+     return null;
+@@ -910,31 +917,10 @@ var Composition = createClass({
+     if (!this.props.data.parsed) {
+       staves = [];
+     } else {
+-				//TODO- use drawItem !!!
++      //TODO- use drawItem !!!
+       //console.log("render Composition,this.props",
+       //this.props);
+-      staves = this.props.data.parsed.map(function (
+-        stave,
+-        index) {
+-        //console.log("stave is", stave);
+-        if (isA(stave, "lyrics-section")) {
+-          return LyricsSection({
+-            lyricsSection: stave,
+-            key: index
+-          });
+-        } else if (isA(stave, "stave")) {
+-          assert(isA(stave[1],
+-            "notes-line"));
+-          return NotesLine({
+-            kind: myKind,
+-            notesInLine: stave[1],
+-            key: index
+-          });
+-        } else {
+-          return null;
+-        }
+-
+-      });
++      staves = items.map(drawItem.bind(this));
+     }
+     return div({
+       className: "composition",
+@@ -1066,7 +1052,7 @@ React.renderComponent(
+   }),
+   document.getElementById('content'));
+ 
+-var reloadLater= function() {
++var reloadLater = function () {
+   var t = 5; // Interval in Seconds
+   var tmp = new Date();
+   tmp = '?' + tmp.getTime();
+@@ -1077,13 +1063,13 @@ var reloadLater= function() {
+   }
+ }
+ 
+-var imgLoad= function(x) {
++var imgLoad = function (x) {
+   console.log("imgLoad");
+   $('#staff_notation')
+     .removeClass("hidden");
+ }
+ 
+-var imgError= function(x) {
++var imgError = function (x) {
+   console.log("imgError");
+   $('#staff_notation')
+     .addClass("hidden");

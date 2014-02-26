@@ -1,17 +1,17 @@
-  Oldrender: function () {
-    var pitch = this.props.pitch;
-    console.log(pitch);
-    var normalizedPitch = pitch[1];
-    assert(isA(pitch, "pitch"));
-    /*
-    return React.DOM.span({
-      className: "note_wrapper",
-      key: this.props.key
-    }, React.DOM.span({
-    className: "note " + className
-		},src));
-	 */
-    return React.DOM.span({
-      className: "pitch "
-    }, normalizedPitch);
-  }
+        if (isA(stave, "lyrics-section")) {
+          return LyricsSection({
+            lyricsSection: stave,
+            key: index
+          });
+        } else if (isA(stave, "stave")) {
+          assert(isA(stave[1],
+            "notes-line"));
+          return NotesLine({
+            kind: myKind,
+            notesInLine: stave[1],
+            key: index
+          });
+        } else {
+          return null;
+        }
+      });

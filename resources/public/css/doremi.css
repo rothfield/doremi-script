@@ -372,6 +372,7 @@ span.note.whitespace {
 span.upper_octave_indicator {
     top: -1em;
 }
+/* Don't want chords and talas on top of each other! */
 span.tala {
   font-family: serif;
   font-size: 0.5em;
@@ -384,6 +385,9 @@ span.chord,span.tala, span.ending,span.mordent {
   font-size: 1em;
   top: 1em;
   left:.2em;
+}
+span.chord {
+		top: .2em;
 }
 
 span.ending {
@@ -454,6 +458,7 @@ span.note.double_barline
 }
 
 span.tala,
+span.chord,
 span.slur,
 span.mordent,
 div.sargam_line span.syl, 
