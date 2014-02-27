@@ -3,6 +3,13 @@ DoremiScript
 
 [Integration test results](https://rawgithub.com/rothfield/doremi-script/master/test/good_test_results/report.html?https://raw.github.com/user/repo/master/)
 
+   MILESTONE RELEASE Feb 27,2014 - Tests look good
+   
+   GUI is written and up at http://ragapedia.com
+	 Implemented multi notation system support
+	 Added doremi to notation systems
+	 Chords are now entered in brackets. [Dm7]
+
    MILESTONE RELEASE Feb 12,2014 - Tests look good
    
 	 Status: Lilypond conversion is working. TODO: MusicXML output and 
