@@ -15,7 +15,7 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  \afterGrace g'8[({bf'16)} af'8] \bar "" \break 
+  \afterGrace g'8[({bf'16)} af'8] \break 
  }
 text = \lyricmode {
   

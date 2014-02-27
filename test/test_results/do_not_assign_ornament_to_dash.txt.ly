@@ -18,7 +18,7 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  ef'4 f'4 af'4( bf'4) \bar "|"  c''4 r4 \grace {ef''16}df''4 c''4 \bar "|" \bar "" \break 
+  ef'4 f'4 af'4( bf'4) \bar "|"  c''4 r4 \grace {ef''16}df''4 c''4 \bar "|" \break 
  }
 text = \lyricmode {
 ji- na ja-  u san- ga 

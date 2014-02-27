@@ -19,7 +19,7 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  e'8[ g'8] r4 r4 r4 \bar "|"  e'8[ d'8] r4 r4 r4 \bar "|" \bar "" \break 
+  e'8[ g'8] r4 r4 r4 \bar "|"  e'8[ d'8] r4 r4 r4 \bar "|" \break 
  }
 text = \lyricmode {
 Geor- gia geor- gia 

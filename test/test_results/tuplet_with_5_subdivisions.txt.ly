@@ -13,7 +13,7 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  \times 4/5{ c'4[ d'16] }  \bar "" \break 
+  \times 4/5{ c'4[ d'16] }  \break 
  }
 text = \lyricmode {
   

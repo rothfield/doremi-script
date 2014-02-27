@@ -15,7 +15,7 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  g'8[( e'8]) \bar "|"  c'4 e'4 g'4 \bar "|"  c''4 r4 e''8[ d''8] \bar "|" \bar "" \break 
+  g'8[( e'8]) \bar "|"  c'4 e'4 g'4 \bar "|"  c''4 r4 e''8[ d''8] \bar "|" \break 
  }
 text = \lyricmode {
 Oh  say can you see by the 

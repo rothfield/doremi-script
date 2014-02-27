@@ -15,7 +15,7 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  c'4 r4 r4 r4 \bar "" \break 
+  c'4 r4 r4 r4 \break 
   d'4 r4 r4 r4 }
 text = \lyricmode {
   

@@ -19,7 +19,7 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  \afterGrace c'4({b16[ d'16 c'16 b16 c'16])} \bar "" \break 
+  \afterGrace c'4({b16[ d'16 c'16 b16 c'16])} \break 
  }
 text = \lyricmode {
  

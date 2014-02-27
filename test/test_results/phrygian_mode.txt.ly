@@ -15,7 +15,7 @@ melody = {
 \key c 
 \phrygian
 \cadenzaOn
-  c'4 af'4 g'4 af'4 \bar "|"  f'4 g'4 ef'4 f'4 \bar "|"  bf'4 af'4 r4 df'4 \bar "|"  r4 ef'4 f'4 g'4 \bar "|" \bar "" \break 
+  c'4 af'4 g'4 af'4 \bar "|"  f'4 g'4 ef'4 f'4 \bar "|"  bf'4 af'4 r4 df'4 \bar "|"  r4 ef'4 f'4 g'4 \bar "|" \break 
  }
 text = \lyricmode {
               

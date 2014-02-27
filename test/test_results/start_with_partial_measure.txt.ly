@@ -17,7 +17,7 @@ melody = {
 \key c 
 \major
 \cadenzaOn
- \bar "|:"  c'8[ c'8] \bar "|"  d'4 c'4 f'4 \bar "|"  e'4 r4 \bar ":|" \bar "" \break 
+ \bar "|:"  c'8[ c'8] \bar "|"  d'4 c'4 f'4 \bar "|"  e'4 r4 \bar ":|" \break 
  }
 text = \lyricmode {
 ha- ppy birth- day to you 

@@ -16,7 +16,7 @@ melody = {
 \clef treble
 \key fs \minor
 \cadenzaOn
-  as'4 cs''4 fs''4 \bar "" \break 
+  as'4 cs''4 fs''4 \break 
  }
 text = \lyricmode {
    

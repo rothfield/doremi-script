@@ -19,6 +19,7 @@ cp $DIR/report.js  $target_directory/
 report=$target_directory/report.html
 
 echo "<html><head>" > $report # create new report
+echo "<meta charset='utf-8'>" >> $report
 echo "<link rel='stylesheet' href='report.css'>" >> $report
 echo "<title>doremi-script report: $argcount files tested</title>" >> $report
 echo "</head>" >> $report

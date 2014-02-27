@@ -15,7 +15,7 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  \afterGrace c'4({d'16[ e'16])} \bar "" \break 
+  \afterGrace c'4({d'16[ e'16])} \break 
  }
 text = \lyricmode {
  

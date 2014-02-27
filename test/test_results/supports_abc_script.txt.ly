@@ -14,7 +14,7 @@ melody = {
 \clef treble
 \key c \major
 \cadenzaOn
-  \grace {d'16[}c'16 d'16 e'16 fs'16] g'8[ gs'8] \bar "|" \bar "" \break 
+  \grace {d'16[}c'16 d'16 e'16 fs'16] g'8[ gs'8] \bar "|" \break 
  }
 text = \lyricmode {
       

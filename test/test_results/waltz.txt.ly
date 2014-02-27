@@ -17,7 +17,7 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  c'4 r4 r4 \bar "|"  d'4 r4 c'4 \bar "|"  b4 r4 r4 \bar "|"  r4 r4 r4 \bar "|" \bar "" \break 
+  c'4 r4 r4 \bar "|"  d'4 r4 c'4 \bar "|"  b4 r4 r4 \bar "|"  r4 r4 r4 \bar "|" \break 
  }
 text = \lyricmode {
 i- rene good night 
