@@ -3,12 +3,14 @@ DoremiScript
 
 [Integration test results](https://rawgithub.com/rothfield/doremi-script/master/test/good_test_results/report.html?https://raw.github.com/user/repo/master/)
 
-   MILESTONE RELEASE Feb 27,2014 - Tests look good
+   MILESTONE RELEASE Feb 27,2014 - New GUI and multi notation system support
    
-   GUI is written and up at http://ragapedia.com
-	 Implemented multi notation system support
-	 Added doremi to notation systems
-	 Chords are now entered in brackets. [Dm7]
+   - New GUI is written and up at [http://ragapedia.com](http://ragapedia.com)
+	 - GUI is written using [react.js](http://facebook.github.io/react/)
+	 - Implemented multi notation system support
+	 - Added doremi to notation systems
+	 - Chords are now entered in brackets. [Dm7]
+	 - Old gui (written using knockout.js) is [here](http://ragapedia.com/doremi-script-gui/index.html#/root)
 
    MILESTONE RELEASE Feb 12,2014 - Tests look good
    
@@ -112,7 +114,7 @@ should be used to indicate the melismas
       - Open DoremiScript file in musescore:
         - (Not implemented) cat composition.txt | doremi2musicxml  > composition.xml ; mscore composition.xml
   - This project borrows ideas from [ABC musical notation](http://en.wikipedia.org/wiki/ABC_notation), [lilypond](http://lilypond.org), and [markdown](http://en.wikipedia.org/wiki/Markdown).
-  - Special thanks to George Ruckert, Ali Akbar Khan and the authors of Clojure, Instaprse, and lilypond.
+  - Special thanks to George Ruckert, Ali Akbar Khan and the authors of Clojure, Instaprse, react.js, and lilypond.
 
 
    
