@@ -14,7 +14,7 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  c'4^"1.____" r4 r4 r4 \bar "||"   d'4^"2.____" r4 r4 r4 }
+  g'4^"1.____" r4 r4 r4 \bar "||"   d'4^"2.____" r4 r4 r4 }
 text = \lyricmode {
   
 }

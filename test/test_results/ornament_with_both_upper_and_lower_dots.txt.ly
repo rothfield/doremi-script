@@ -18,10 +18,10 @@ melody = {
 \key c 
 \major
 \cadenzaOn
-  \grace {d'16}c'4 \break 
+  d'4 \break 
  }
 text = \lyricmode {
- 
+S 
 }
 \score{
 

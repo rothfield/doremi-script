@@ -49,11 +49,11 @@
 ;; (pprint (-> "SSS" doremi-text->parsed))
 ;; (pprint (-> "Title: john\n\n|SSS" doremi-text->parsed))
 ;;(-> "Title: hi\n\nSSS|" (doremi-post true))
-(defn doremi-generate-staff-notation[x]
+(defn doremi-generate-staff-notation[x kind]
   (if (= "" x)
     {}
     (let [md5 (my-md5 x)
-          results (doremi-text->parsed x)
+          results (doremi-text->parsed x kind)
           ]
       (if (:error results) ;; error
         results
@@ -87,12 +87,16 @@
        {:body (-> "public/compositions/yesterday.txt" resource slurp doremi-text->parsed)}
        )
 
-  (POST "/parse" [src generateStaffNotation] 
+  (POST "/parse" [src generateStaffNotation kind] 
+        (let [kind2 (if (= kind "")
+                      nil
+                      (keyword kind))
+              ]
         (if (= "true" generateStaffNotation)
-          {:body (doremi-generate-staff-notation src) }
+          {:body (doremi-generate-staff-notation src kind2) }
           ;;
-          {:body  (doremi-text->collapsed-parse-tree src) }
-          ))
+          {:body  (doremi-text->collapsed-parse-tree src kind2) }
+          )))
 
   (route/resources "/")
   (route/not-found "Not Found"))
