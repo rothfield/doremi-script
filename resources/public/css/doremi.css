@@ -20,10 +20,10 @@ fieldset#composition_info label {
   display: inline-block;
 }
 
-div.edit_line_wrapper.line_has_warnings, div.line_has_warnings,span.show_warnings {
+div.editLineWrapper.line_has_warnings, div.line_has_warnings,span.show_warnings {
   border:2px solid orange;
 }
-div.edit_line_wrapper.line_parse_failed, div.line_parse_failed, div.composition_parse_failed {
+div.editLineWrapper.line_parse_failed, div.line_parse_failed, div.composition_parse_failed {
   border: 2px solid red;
 }
 div.lyrics_section {
@@ -96,7 +96,7 @@ div.rendered_html.not_editing:hover {
   /* border: 2px solid black; */
 }
 
-div#rendered_doremi_script, div.rendered_doremi_script, div.parse_tree_div {
+div#rendered_doremi_script, div.rendered_doremi_script, div.parseTree {
   border: 2px dotted #CCCCCC;
 }
 
@@ -111,22 +111,22 @@ span.note_wrapper {
     padding-left: 10px;
 }
 
-div.edit_line_wrapper {
+div.editLineWrapper {
   background-color: AntiqueWhite;
   border: 3px solid black;
 }
 
-div.edit_line_wrapper textarea.entry_area {
+div.editLineWrapper textarea.entryArea {
  border:none;
 }
-textarea#entry_area, textarea.entry_area {
+textarea.entryArea {
     /* don't try nowrap or overflow: auto. Causes problems in chrome */
     font-family: monospace; 
     font-size: 18px;
     padding-left: 10px;
 
 }
-#parse_tree,#warnings_div {
+div.parseTree,div.warnings {
     border: 1px solid black;
     width: 70%;
     height:550px;

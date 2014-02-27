@@ -4,4 +4,15 @@
 img.hidden {
   display:none;
 }
+.displayKind {
+  font-weight:bold;
+}
+textarea.entryArea {
+  width:100%; 
+ /*  height:100%; */
+  position:relative;
+  left:20px;
+  margin:0;
+  border:none;  /* 0px solid white; */
+ }
 
