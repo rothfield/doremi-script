@@ -23,9 +23,6 @@ fieldset#composition_info label {
 div.editLineWrapper.line_has_warnings, div.line_has_warnings,span.show_warnings {
   border:2px solid orange;
 }
-div.editLineWrapper.line_parse_failed, div.line_parse_failed, div.composition_parse_failed {
-  border: 2px solid red;
-}
 div.lyrics_section {
    font-family: serif;
    font-size: 1.6em;
@@ -109,22 +106,6 @@ span.note_wrapper {
     font-family: monospace; 
     font-size: 18px;
     padding-left: 10px;
-}
-
-div.editLineWrapper {
-  background-color: AntiqueWhite;
-  border: 3px solid black;
-}
-
-div.editLineWrapper textarea.entryArea {
- border:none;
-}
-textarea.entryArea {
-    /* don't try nowrap or overflow: auto. Causes problems in chrome */
-    font-family: monospace; 
-    font-size: 18px;
-    padding-left: 10px;
-
 }
 div.parseTree,div.warnings {
     border: 1px solid black;
