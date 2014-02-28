@@ -83,16 +83,6 @@ div.rendered_html.editing:hover
   background-color:normal; 
 }
 
-
-div.rendered_html.editing:hover {
-  cursor:normal;
-}
-
-div.rendered_html.not_editing:hover { 
-  cursor:pointer;
-  /* border: 2px solid black; */
-}
-
 div#rendered_doremi_script, div.rendered_doremi_script, div.parseTree {
   border: 2px dotted #CCCCCC;
 }
