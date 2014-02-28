@@ -23,7 +23,10 @@ button.button_on {
 div#rendered_doremi_script, div.rendered_doremi_script, div.parseTree {
   border: 2px dotted #CCCCCC;
 }
-
+span.note_wrapper span.alteration {
+  bottom: 0.7em;
+	font-size:1em;
+}
 span.note_wrapper {
     position: relative;
 }

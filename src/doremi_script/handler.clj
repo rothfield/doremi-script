@@ -64,10 +64,12 @@
                         (if title
                           (str (sanitize title) "-"))
                         md5) 
+              doremi-script-fname (str "resources/public/compositions/" file-id ".doremi.txt")
               lilypond-fname (str "resources/public/compositions/" file-id ".ly")
               url (str "compositions/" file-id ".png")
               ]
           (->> (:lilypond results)(spit lilypond-fname))
+          (->> x (spit doremi-script-fname))
           (assoc results :staffNotationPath (str "/compositions/" file-id ".png"))
           results 
           )
