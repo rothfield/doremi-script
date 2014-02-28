@@ -1,6 +1,6 @@
 (ns doremi_script.handler
   (:use compojure.core)
-   (:import [java.io File])
+  (:import [java.io File])
   (:require  [compojure.handler :only [site]]
             [hiccup.core :refer [html]]
             [clojure.java.io :as io :refer [input-stream resource]]
@@ -10,9 +10,10 @@
              [split replace-first upper-case lower-case join] :as string] 
             [clojure.pprint :refer [pprint]] 
             [ring.middleware.json :only wrap-json-response]
-      ;;json/wrap-json-response  ;; Converts responses that are clojure objects to json
+            ;;json/wrap-json-response  ;; Converts responses that are clojure objects to json
             [ring.middleware.etag   :refer [wrap-etag]]
             [ring.middleware [multipart-params :as mp]]
+            [doremi_script.middleware :only [wrap-request-logging]]
             [ring.middleware.params         :only [wrap-params]]
             [compojure.route :as route]))
 ;; (wrap-file "compositions")
@@ -76,9 +77,24 @@
 ;; (when-not (.exists (io/as-file fname))
 
 
-(defn doremi-parse[src]
+(defn doParse [src generateStaffNotation kind] 
+  (try
+    (let [kind2 (if (= kind "")
+                  nil
+                  (keyword kind))
+          ]
+      (if (= "true" generateStaffNotation)
+        {:body (doremi-generate-staff-notation src kind2) }
+        ;;
+        {:body  (doremi-text->collapsed-parse-tree src kind2) }
+        ))
+    (catch Exception e 
+      { :error
+       (str "caught exception: " (.getMessage e))
+       } 
+      )))
 
-  )
+
 (defroutes app-routes
   ;;  (mp/wrap-multipart-params 
   ;;   (POST "/file" {params :params} (upload-file (get params "file"))))
@@ -88,15 +104,8 @@
        )
 
   (POST "/parse" [src generateStaffNotation kind] 
-        (let [kind2 (if (= kind "")
-                      nil
-                      (keyword kind))
-              ]
-        (if (= "true" generateStaffNotation)
-          {:body (doremi-generate-staff-notation src kind2) }
-          ;;
-          {:body  (doremi-text->collapsed-parse-tree src kind2) }
-          )))
+        (doParse src generateStaffNotation kind)
+        )
 
   (route/resources "/")
   (route/not-found "Not Found"))
@@ -122,4 +131,5 @@
       compojure.handler/site 
       ring.middleware.json/wrap-json-response  ;; Converts responses that are clojure objects to json
       wrap-dir-index
+      doremi_script.middleware/wrap-request-logging 
       ))

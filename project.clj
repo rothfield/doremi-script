@@ -9,6 +9,7 @@
                  [ring/ring-jetty-adapter "1.2.0"] 
                  [org.clojars.mikejs/ring-etag-middleware "0.1.0-SNAPSHOT"]
                  [instaparse "1.2.2"] 
+                 [ring.middleware.logger "0.4.0"]
                  ]
                 ;;  [javax.servlet/servlet-api "2.5"]
                  ;;                 [com.googlecode.texhyphj/texhyphj "1.2"]
