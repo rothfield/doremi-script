@@ -16,12 +16,12 @@ div.controls a {
 textarea.entryArea {
 		/* don't try nowrap or overflow: auto. Causes problems in chrome */
 		font-family: monospace; 
-		font-size: 14px;
-		padding-left: 10px;
+		padding-left: 1em;
+		font-size: 1.6em;
 		width:100%; 
 		/*  height:100%; */
 		position:relative;
-		left:10px;
+		left:1em;
 		margin:0;
 		border:none;  /* 0px solid white; */
 }

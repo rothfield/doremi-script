@@ -1,28 +1,6 @@
-h4,ul,menu,dir {
-  margin:0px;  
-  padding:0px;  
-  -webkit-margin-before: 0em;
-  -webkit-margin-after: 0em;
-  -webkit-margin-start: 0px;
-  -webkit-margin-end: 0px;
-}
-div#help {
-  margin-left: 3em;
-}
-div.commented_out {
-  display:none;
-}
-span.required {
-  color: red;  
-}
-fieldset#composition_info label {
-  width: 100px;
-  display: inline-block;
-}
+/* TODO: Use a css preprocessor!!! */
 
-div.editLineWrapper.line_has_warnings, div.line_has_warnings,span.show_warnings {
-  border:2px solid orange;
-}
+
 div.lyrics_section {
    font-family: serif;
    font-size: 1.6em;
@@ -33,56 +11,15 @@ div.lyrics_section {
    text-align:center;
    width:30em;
 }
-.like_pre {
-   font-family: monospace;
-   white-space: pre; 
-   border: 2px dotted #CCCCCC;
-}
-
-button.toggle_line_parse_tree {
-  margin-left: 10em;
-}
 button.button_on {
   background-color: black;
   color: white;
 }
-.controls li
-{
-        display: inline;
-        list-style-type: none;
-        padding-right: 20px;
-}
 
-h2.step {
-  width:600px;
-  font-size: 14px;
-  background-color: lavender;
-  border: 1px solid black;
+/** Controls scaling of text box AND rendered notation **/
+.doremiContent {
+   font-size:14px;
 }
-div.staff_notation_div {
-}
-div#open_div {
-  display:none
-}
-div#reopen  a {
-  margin-right:10px;
-}
-div#reopen {
-  padding:4px;
-  background-color:DarkOrange;
-  border:1px solid black;
-}
-
-input#url_to_reopen {
-  padding:10px;
-  width:500px;
-}
-
-div.rendered_html.editing:hover
-{ 
-  background-color:normal; 
-}
-
 div#rendered_doremi_script, div.rendered_doremi_script, div.parseTree {
   border: 2px dotted #CCCCCC;
 }
@@ -90,30 +27,9 @@ div#rendered_doremi_script, div.rendered_doremi_script, div.parseTree {
 span.note_wrapper {
     position: relative;
 }
-
-.show_sargam_source {
-    border: 1px solid black;
-    font-family: monospace; 
-    font-size: 18px;
-    padding-left: 10px;
+span.note_wrapper span.line_number {
+  margin-right: 0.6em;
 }
-div.parseTree,div.warnings {
-    border: 1px solid black;
-    width: 70%;
-    height:550px;
-    overflow:scroll;
-    margin-left: 20px;
-    padding:4px;
-    display:none;
-}
-#warnings_div {
-  height:auto;
-}
-div.line {
-    position: relative;
-    font-family: sans-serif;
-}
-
 span.beat.looped {
     border-top: 0px;
     border-bottom: .1em solid;
@@ -129,7 +45,6 @@ span.beat.looped {
     border-bottom-width:1px;
     border-right-width: 0px;
 }
-
 
 span.beat {
     margin-right: 1em;
@@ -166,11 +81,13 @@ span.ornament_item {
 span.ornament_item.octave_2, span.ornament_item.octave_2 {
   /* octave of -2 or 2 */
 }
+span.upper_attribute.ornament.placement_after {
+		margin-left:1.3em; /* related to the 1.6em */
+}
 span.upper_attribute.ornament {
     position: absolute;
-    bottom: 1.6em;
-    font-size: .5em;
-    margin-left: 2.2em;
+    bottom: 0.98em;
+    font-size: 0.9em;
 }
 
 span.ornament span.note {
@@ -178,9 +95,6 @@ span.ornament span.note {
 }
 
 div.sargam_line {
-    /* font-size: 1em; */
-   /*  font-family: sans-serif; */
-    /* border: 1px black dotted; */
     border: none;
     height: auto;
     padding-top: 0em;
@@ -202,9 +116,6 @@ span.note.barline {
     padding:.2em;
 }
 
-span.testing_utf_support {
-  display:none;
-}
 /* displayed as || */
 span.note.double_barline.dont_use_utf8_chars {
     font-weight:normal;
@@ -212,40 +123,13 @@ span.note.double_barline.dont_use_utf8_chars {
 }
 
 div.composition {
-  /*
-  border-left: 1px solid black;
-  border-top: 1px solid black;
-  border-bottom: 1px solid black;
-  border-right: 1px highlight dotted;
-  */
-  padding-left: 10px;
-  padding-top:4px;
+  padding-left: 1.0em;
+  padding-top:0.4em;
   white-space:nowrap;
 }
 
-div.rendered_wrapper {
-  border:1px solid black;
-}
-span.line_number {
-  display:none;
-}
 div.composition_headers.hide_title, div.hide_hyphenated_lyrics {
   display:none;
-}
-@media print {
-    div.composition_headers.hide_title {
-      /* This seems to be the opposite of display:none */
-      display:block !important;
-    }
-    h1.title, .controls,span.line_number,button {
-      display:none;
-    }
-    div.lyrics_section.hyphenated {
-      display:none;
-    }
-    div.composition, div.rendered_wrapper,div.rendered_html,div.stave_wrapper {
-      border:none;
-  }
 }
 
 span.ornament {
@@ -344,11 +228,6 @@ span.upper_octave_indicator {
     top: -1em;
 }
 /* Don't want chords and talas on top of each other! */
-span.tala {
-  font-family: serif;
-  font-size: 0.5em;
-  top: 0.7em;
-}
 span.chord,span.tala, span.ending,span.mordent {
     z-index: 2;
     position: absolute;
@@ -356,6 +235,11 @@ span.chord,span.tala, span.ending,span.mordent {
   font-size: 1em;
   top: 1em;
   left:.2em;
+}
+span.tala {
+  font-family: serif;
+  font-size: 0.8em;
+  top: 0.5em;
 }
 span.chord {
 		top: .2em;
@@ -397,8 +281,8 @@ span.note, span.note_wrapper {
     font-family: sans-serif;
     font-size: 1.6em; 
     position: relative;
-    margin-right: -.75px;
-    margin-left: -.75px;
+    margin-right: 0.0em;
+    margin-left: 0.0em;
     display: inline-block;
 }
 
