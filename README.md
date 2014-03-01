@@ -64,6 +64,9 @@ Generated Western Staff Notation
 
 Examples from existing works
 --------------------------------
+
+  - From Bhatkhande's 4 volume Hindustani Sangita Paddhati(1913)
+   
 ![Bhatkande (1913)](https://github.com/rothfield/doremi-script/raw/master/doc/bhatkande.png "")
 
 
