@@ -62,6 +62,11 @@ Generated Western Staff Notation
 --------------------------------
 ![Converted to western notation](https://github.com/rothfield/doremi-script/raw/master/doc/bansuri_in_western_notation.png "")
 
+Examples from existing works
+--------------------------------
+![Bhatkande (1913)](https://github.com/rothfield/doremi-script/raw/master/doc/bhatkande.png "")
+
+
 
 
   - Use a blank line to separate lines of music.
