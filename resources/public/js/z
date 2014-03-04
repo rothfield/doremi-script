@@ -1,7 +1,0 @@
-			span({
-        className: "note barline",
-        dangerouslySetInnerHTML: {
-          __html: lookupBarlineTable[first(second(
-            barline))]
-        }
-      })
