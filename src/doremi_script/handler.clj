@@ -23,14 +23,19 @@
        (> (.indexOf txt "#(ly") -1)))
 
 (defn my-md5[txt]
+  (let [long-string 
   (apply str
          (map (partial format "%02x")
               (.digest (doto (java.security.MessageDigest/getInstance "MD5")
                          .reset
                          (.update (.getBytes 
                                     txt
-                                    )))))))
-
+                                    ))))))
+        ]
+       (subs long-string 0 8) 
+        ))
+;; (my-md5 "S")
+;;
 
 
 (defn upload-file [file]
@@ -51,10 +56,14 @@
 ;; (pprint (-> "Title: john\n\n|SSS" doremi-text->parsed))
 ;;(-> "Title: hi\n\nSSS|" (doremi-post true))
 (defn doremi-generate-staff-notation[x kind]
+  (try
+    (let [kind2 (if (= kind "")
+                  nil
+                  )]
   (if (= "" x)
-    {}
+    {} ;; TODO review
     (let [md5 (my-md5 x)
-          results (doremi-text->parsed x kind)
+          results (doremi-text->parsed x kind2)
           ]
       (if (:error results) ;; error
         results
@@ -74,26 +83,29 @@
           results 
           )
         ))))
+    (catch Exception e 
+      { :error
+       (str "caught exception: " (.getMessage e))
+       } 
+  )))
 
 ;; (-> "public/compositions/yesterday.txt" resource slurp)
 ;; (when-not (.exists (io/as-file fname))
 
 
-(defn doParse [src generateStaffNotation kind] 
+(defn doParse [src kind] 
+  ;; returns a hash
   (try
     (let [kind2 (if (= kind "")
                   nil
                   (keyword kind))
           ]
-      (if (= "true" generateStaffNotation)
-        {:body (doremi-generate-staff-notation src kind2) }
-        ;;
-        {:body  (doremi-text->collapsed-parse-tree src kind2) }
-        ))
+        (doremi-text->collapsed-parse-tree src kind2)
+        )
     (catch Exception e 
       { :error
        (str "caught exception: " (.getMessage e))
-       } 
+       }
       )))
 
 
@@ -105,8 +117,15 @@
        {:body (-> "public/compositions/yesterday.txt" resource slurp doremi-text->parsed)}
        )
 
-  (POST "/parse" [src generateStaffNotation kind] 
-        (doParse src generateStaffNotation kind)
+  (POST "/parse" [src  kind] 
+        {:body
+        (doParse src kind)
+         }
+        )
+  (POST "/generate_staff_notation" [src  kind] 
+        {:body
+        (doremi-generate-staff-notation src kind)
+         }
         )
 
   (route/resources "/")

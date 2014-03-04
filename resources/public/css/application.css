@@ -13,16 +13,24 @@ div.controls span,
 div.controls a {
  margin-right: 2em;
 }
+.exampleTxt {
+  border: 1px solid black;
+	display: inline-block;
+	padding: 0.2em;
+	font-size: 1.0em;
+}
 textarea.entryArea {
 		/* don't try nowrap or overflow: auto. Causes problems in chrome */
 		font-family: monospace; 
 		padding-left: 1em;
 		font-size: 1.6em;
+		height: 4.80em;
 		width:100%; 
 		/*  height:100%; */
 		position:relative;
 		left:1em;
-		margin:0;
+		padding:0.3em;
+		margin-bottom:0.8em;
 		border:none;  /* 0px solid white; */
 }
 textarea:focus {

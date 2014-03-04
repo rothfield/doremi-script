@@ -17,9 +17,9 @@
   ;; You can run the standalone jar as follows
   ;; java -jar target/doremi-script-standalone.jar
   ;; It will run the main function in doremi_core
-  :main doremi_script.doremi_core 
+  :main doremi_script.doremi_main 
   :jar-name "doremi-script.jar"
-  :uberjar-name "doremi-script-standalone.jar"
+  :uberjar-name "doremi.jar"
   :ring {:handler doremi_script.handler/app}
   :profiles { :uberjar {:aot :all}
              :dev {:dependencies [
