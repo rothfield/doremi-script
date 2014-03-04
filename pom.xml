@@ -10,7 +10,7 @@
   <scm>
     <connection>scm:git:git://github.com/rothfield/doremi-script.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/rothfield/doremi-script.git</developerConnection>
-    <tag>b6fc74c041eaedc84ce8232fd984d55ca0965356
+    <tag>a89e2bea56812f7cc0b400a80b915ec49f73791a
 </tag>
     <url>https://github.com/rothfield/doremi-script</url>
   </scm>
@@ -90,6 +90,16 @@
       <groupId>instaparse</groupId>
       <artifactId>instaparse</artifactId>
       <version>1.2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>ring.middleware.logger</groupId>
+      <artifactId>ring.middleware.logger</artifactId>
+      <version>0.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>clojurescript</artifactId>
+      <version>0.0-2173</version>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>
