@@ -5,7 +5,7 @@
      [split replace-first upper-case lower-case join] :as string] 
     [ring.adapter.jetty :only [run-jetty]]
     [clojure.java.io :as io :only [input-stream resource]]
-    [doremi_script.handler :only [app]]
+    [doremi_script.handler :only [app compositions-dir]]
     [doremi_script.doremi_core :only [parse-failed? format-instaparse-errors 
                                     doremi-text->lilypond]]
 ;;    [instaparse.core :as insta]
@@ -70,7 +70,18 @@
 
 (defn stop[]
   (.stop server))
+
+(defn check-compositions-dir[]
+  (let [my-dir (clojure.java.io/file doremi_script.handler/compositions-dir)]
+  (when (not  (.isDirectory my-dir))
+  (println "Compositions directory is " doremi_script.handler/compositions-dir)
+     (println "ERROR ****" " Please create the directory " doremi_script.handler/compositions-dir)
+         )
+  ))
 (defn main-aux[args]
+  (println "doremi-script by John Rothfield, rthfield@sonic.net")
+  (println "Make sure to start the watcher script to generate lilypond")
+  (check-compositions-dir)
   (cond  (empty? args)
         (usage)
         (= "-s" (last args))

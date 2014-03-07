@@ -2,7 +2,7 @@
 
 # get the current path
 current_path=`pwd`
-watch_dir=$current_path/resources/public/compositions
+watch_dir=$HOME/compositions
 echo "Watching $watch_dir for changes"
 inotifywait -mr --timefmt '%d/%m/%y %H:%M' --format '%T %w %f' \
 		-e close_write $watch_dir | while read date time dir file; do

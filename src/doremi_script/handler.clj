@@ -15,25 +15,32 @@
             [ring.middleware [multipart-params :as mp]]
             [doremi_script.middleware :only [wrap-request-logging]]
             [ring.middleware.params         :only [wrap-params]]
+            [ring.util.response :only [file-response]]
             [compojure.route :as route]))
 ;; (wrap-file "compositions")
 ;;
+
+
+(def compositions-dir
+     (str (System/getenv "HOME") "/compositions"))
+
+;; (println compositions-dir)
 (defn parse-succeeded[txt]
   (and (string? txt)
        (> (.indexOf txt "#(ly") -1)))
 
 (defn my-md5[txt]
   (let [long-string 
-  (apply str
-         (map (partial format "%02x")
-              (.digest (doto (java.security.MessageDigest/getInstance "MD5")
-                         .reset
-                         (.update (.getBytes 
-                                    txt
-                                    ))))))
+        (apply str
+               (map (partial format "%02x")
+                    (.digest (doto (java.security.MessageDigest/getInstance "MD5")
+                               .reset
+                               (.update (.getBytes 
+                                          txt
+                                          ))))))
         ]
-       (subs long-string 0 8) 
-        ))
+    (subs long-string 0 8) 
+    ))
 ;; (my-md5 "S")
 ;;
 
@@ -60,37 +67,34 @@
     (let [kind2 (if (= kind "")
                   nil
                   )]
-  (if (= "" x)
-    {} ;; TODO review
-    (let [md5 (my-md5 x)
-          results (doremi-text->parsed x kind2)
-          ]
-      (if (:error results) ;; error
-        results
-        (let [
-              title (get-in results [:attributes :title])
-              file-id (str
-                        (if title
-                          (str (sanitize title) "-"))
-                        md5) 
-              doremi-script-fname (str "resources/public/compositions/" file-id ".doremi.txt")
-              lilypond-fname (str "resources/public/compositions/" file-id ".ly")
-              url (str "compositions/" file-id ".png")
+      (if (= "" x)
+        {} ;; TODO review
+        (let [md5 (my-md5 x)
+              results (doremi-text->parsed x kind2)
               ]
-          (->> (:lilypond results)(spit lilypond-fname))
-          (->> x (spit doremi-script-fname))
-          (assoc results :staffNotationPath (str "/compositions/" file-id ".png"))
-          results 
-          )
-        ))))
+          (if (:error results) ;; error
+            results
+            (let [
+                  title (get-in results [:attributes :title])
+                  file-id (str
+                            (if title
+                              (str (sanitize title) "-"))
+                            md5) 
+                  doremi-script-fname (str compositions-dir "/" file-id ".doremi.txt")
+                  lilypond-fname (str compositions-dir "/" file-id ".ly")
+                  url (str "compositions/" file-id ".png")
+                  ]
+              (->> (:lilypond results)(spit lilypond-fname))
+              (->> x (spit doremi-script-fname))
+              (assoc results :staffNotationPath (str "/compositions/" file-id ".png"))
+              results 
+              )
+            ))))
     (catch Exception e 
       { :error
        (str "caught exception: " (.getMessage e))
        } 
-  )))
-
-;; (-> "public/compositions/yesterday.txt" resource slurp)
-;; (when-not (.exists (io/as-file fname))
+      )))
 
 
 (defn doParse [src kind] 
@@ -100,8 +104,8 @@
                   nil
                   (keyword kind))
           ]
-        (doremi-text->collapsed-parse-tree src kind2)
-        )
+      (doremi-text->collapsed-parse-tree src kind2)
+      )
     (catch Exception e 
       { :error
        (str "caught exception: " (.getMessage e))
@@ -119,38 +123,43 @@
 
   (POST "/parse" [src  kind] 
         {:body
-        (doParse src kind)
+         (doParse src kind)
          }
         )
   (POST "/generate_staff_notation" [src  kind] 
         {:body
-        (doremi-generate-staff-notation src kind)
+         (doremi-generate-staff-notation src kind)
          }
         )
+  (GET "/compositions/:filename" [filename]
+       (ring.util.response/file-response
+         (str filename)
+         {:root (str (System/getenv "HOME") "/compositions")}
+         ))
 
-  (route/resources "/")
-  (route/not-found "Not Found"))
+         (route/resources "/")
+         (route/not-found "Not Found"))
 
-(defn wrap-dir-index [handler]
-  (fn [req]
-    (handler
-      (update-in req [:uri]
-                 #(if (= "/" %) "/index.html" %)))))
-
-
+       (defn wrap-dir-index [handler]
+         (fn [req]
+           (handler
+             (update-in req [:uri]
+                        #(if (= "/" %) "/index.html" %)))))
 
 
-;;(defn upload-file
-;; [file]
-;;(ds/copy (file :tempfile) (ds/file-str "file.out"))
-;;(render (upload-success)))
 
-;;(defroutes public-routes
-;;             (GET  "/" [] (render (index)))
-(def app
-  (->  app-routes
-      compojure.handler/site 
-      ring.middleware.json/wrap-json-response  ;; Converts responses that are clojure objects to json
-      wrap-dir-index
-      doremi_script.middleware/wrap-request-logging 
-      ))
+
+       ;;(defn upload-file
+       ;; [file]
+       ;;(ds/copy (file :tempfile) (ds/file-str "file.out"))
+       ;;(render (upload-success)))
+
+       ;;(defroutes public-routes
+       ;;             (GET  "/" [] (render (index)))
+       (def app
+         (->  app-routes
+             compojure.handler/site 
+             ring.middleware.json/wrap-json-response  ;; Converts responses that are clojure objects to json
+             wrap-dir-index
+             doremi_script.middleware/wrap-request-logging 
+             ))
