@@ -1,4 +1,4 @@
-(ns todomvc.utils
+(ns doremi_script.utils
   (:require [cljs.reader :as reader])
   (:import [goog.ui IdGenerator]))
 

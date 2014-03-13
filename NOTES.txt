@@ -1,8 +1,8 @@
 # clean clojurescript files
 lein cljsbuild clean 
-
 # watch clojurescript files and rebuild them automatically
 lein cljsbuild auto
+
 
 # run repl
 lein repl

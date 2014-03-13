@@ -11,11 +11,8 @@
    [org.clojars.mikejs/ring-etag-middleware "0.1.0-SNAPSHOT"]
    [instaparse "1.2.2"] 
    [ring.middleware.logger "0.4.0"]
-   ;; For Clojurescript
    [org.clojure/clojurescript "0.0-2173"]
-   [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
-   [om "0.5.1"]
-   [secretary "0.4.0"]  ;; client-side routing for clojure script
+    [om "0.5.1"]
    ]
   ;;                 [com.googlecode.texhyphj/texhyphj "1.2"]
   :plugins 
@@ -29,13 +26,13 @@
   :jar-name "doremi-script.jar"
   :uberjar-name "doremi.jar"
   :ring {:handler doremi_script.handler/app}
-  :source-path "src/clj"
-  :source-paths ["src/clj"]
+   :source-paths ["src/clj" "src/cljs"]
   :profiles
   { :uberjar {:aot :all}
    :dev {:dependencies [
                         [javax.servlet/servlet-api "2.5"]
                         [ring-mock "0.1.5"]]}}
+
   :cljsbuild
   {
    :builds {

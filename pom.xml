@@ -10,7 +10,7 @@
   <scm>
     <connection>scm:git:git://github.com/rothfield/doremi-script.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/rothfield/doremi-script.git</developerConnection>
-    <tag>810216d52779591728aafba194d80b8d652077fd
+    <tag>a89e2bea56812f7cc0b400a80b915ec49f73791a
 </tag>
     <url>https://github.com/rothfield/doremi-script</url>
   </scm>
@@ -100,16 +100,6 @@
       <groupId>org.clojure</groupId>
       <artifactId>clojurescript</artifactId>
       <version>0.0-2173</version>
-    </dependency>
-    <dependency>
-      <groupId>om</groupId>
-      <artifactId>om</artifactId>
-      <version>0.5.1</version>
-    </dependency>
-    <dependency>
-      <groupId>secretary</groupId>
-      <artifactId>secretary</artifactId>
-      <version>0.4.0</version>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>

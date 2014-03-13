@@ -1,4 +1,4 @@
-(ns todomvc.app
+(ns doremi_script.app
   (:require-macros [cljs.core.async.macros :refer [go]]
                    [secretary.macros :refer [defroute]])
   (:require [goog.events :as events]
@@ -6,9 +6,9 @@
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [secretary.core :as secretary]
-            [todomvc.utils :refer [pluralize now guid store hidden]]
+            [doremi_script.utils :refer [pluralize now guid store hidden]]
             [clojure.string :as string]
-            [todomvc.item :as item])
+            [doremi_script.item :as item])
   (:import [goog History]
            [goog.history EventType]))
 
@@ -157,7 +157,7 @@
             (footer app active completed comm)))))))
 
 (om/root todo-app app-state
-  {:target (.getElementById js/document "todoapp")})
+  {:target (.getElementById js/document "content")})
 
 (dom/render
   (dom/div nil
