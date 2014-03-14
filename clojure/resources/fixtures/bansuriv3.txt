@@ -1,0 +1,32 @@
+Rag:Bhairavi
+Tal:Tintal
+Title:Bansuri
+Author:Traditional
+Source:AAK
+Mode: phrygian
+Filename: bansuriv3
+TimeSignature: 4/4
+Key: D
+
+
+          
+                               [i]          [IV]       . 
+         3S             n      +            2         DSnDn
+1)|: (Sr | n) S   (gm <P d)> | P - P  P   | P - D    n     |
+           .
+      ban-    su-  ri          ba- ja ra-   hi  dhu- na
+
+  0  ~                 3           mgm        +  .     *  *   
+| P  d   P    d    |  (Pm   PmnP)    (g m) | (PdnS) -- g  S |
+  ma-dhu-ra   kan-     nai-           ya      khe-     la-ta
+
+   2               0     
+                Pm ~
+| (d-Pm  g) P  m | r - S :|
+   ga-      wa-ta  ho- ri
+
+                 .
+                 g
+              .   . .
+| g m (d n) | S - r S |
+ji-na ja-     u san-ga

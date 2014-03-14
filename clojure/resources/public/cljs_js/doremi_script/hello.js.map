@@ -1,0 +1,8 @@
+{"version":3,
+ "file":
+ "/home/john/doremi-script/resources/public/cljs_js/doremi_script/hello.js",
+ "sources":["hello.cljs"],
+ "lineCount":8,
+ "mappings":
+ ";AAAA;;AACA,4BAAA,mBAAA,/CAAeA,4CAAOC,GACpB,sBAAA,wBAAcA",
+ "names":["doremi_script.hello/greet", "n"]}

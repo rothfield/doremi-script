@@ -1,0 +1,28 @@
+# clean clojurescript files
+lein cljsbuild clean 
+
+# watch clojurescript files and rebuild them automatically
+lein cljsbuild auto
+
+# run repl
+lein repl
+
+Compositions directory is located at $HOME/compositions and must be writeable
+
+# start the server from the jar file
+java -jar doremi.jar -s
+
+# start the server via lein
+lein ring server
+
+# start the server from the repl:
+
+(main-aux ["-s"])
+
+Lilypond version required is 
+
+GNU LilyPond 2.12.3
+
+Also need ImageMagick 6.7.7-10 for the convert command.
+
+

@@ -1,0 +1,668 @@
+#!/bin/bash
+#******************************************************************************#
+# Script for making image files from lilypond source suitable for use as       #
+# musical examples to insert in a document or web page.			       #
+# Creator		- Jonathan Kulp					       #
+# Scripting Guru	- Patrick Horgan				       #
+#******************************************************************************#
+# Change log
+#
+# 1.2	    Added loop to image conversion to accommodate lilypond files that 
+#  	    have more than one page. It loops until it has converted each of the 
+# 	    png files output by Lilypond.  
+# 1.1.1.12  Added final exit 0 status at end of file; updated manpage
+# 1.1.1.11  Added jpg=jpeg, tif=tiff when values set at command line; added
+# 	    echoes of netpbm activity and echoes at end of process.
+# 1.1.1.10  -V implies -p ph
+# 1.1.1.9   Added range check to getnumval ph
+# 1.1.1.8   -p flag is now necessary for preview--image is not opened in 
+#	    viewer by default. jk
+#  	    Quiet mode is really quiet as long as sufficient parameters are
+# 	    set at command line for process to succeed. jk
+# 1.1.1.7   Added -p flag: allows forced preview even in quiet mode. jk
+#           Made quiet mode more quiet. jk
+# 1.1.1.6   Changed the call to Lilypond on OSX by defining $PATH
+# 	    early in the script. Changed Patrick's "Johnny Come Lately" to
+# 	    "Major Contributor" :) and added a few echoes when formats,
+#	    resolutions, and so forth are set. We could remove these if you 
+# 	    they're too much. jk
+# 1.1.1.5   Added -w option to specify white background and avoid prompt for
+#	    transparency jk
+# 1.1.1.4   Added lines to clean up png file if desired format is not png. jk
+# 1.1.1.3   Changed list of Darwin viewers--Darwin doesn't have eog and evince
+#	    Added quiet mode "-q" (I think it works!) jk
+# 1.1.1.2   Fixed handling of dirs and files with spaces ph
+# 1.1.1.1   Added search for default list of viewers ph
+# 1.1.1     Added -a, -V and much comments changed default viewer to xdg-open ph
+# 1.1       Added checking of return codes so we could
+#           abort if something failed. ph
+# 1.0	    Initial beta release jk
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# in quiet mode exits with various return codes from
+# failures
+# 40 - transparency not set and no default
+# 41 - format not set and no default
+# 42 - resolution not set and no default
+# 43 - netpbm utilities not installed
+# 44 - unable to find conversion program for desired output
+# 45 - resolution from command line not positive numeric
+# 46 - format from command line invalid
+# various - if any of the programs we call fail, we
+#	exit with whatever error code they returned
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# setformatlist - gets the list of all the things that # you can convert to
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setformatlist()
+{
+    currentdir=`pwd`	# Remember our current directory
+    examp=`which ppmtojpeg` # find out where the progs are
+    returnstatus=$?
+    if [ $returnstatus -eq 0 ] ; then
+	# We found it! Use it as model to find the rest.
+	OUTDIR="`dirname $examp`" #grab the directory
+	cd $OUTDIR	# change to it so we can
+	# find all the programs starting with ppmtoxxxx
+	# and remove the initial part so that we can 
+	# figure out what ppms can be converted to
+	ppmtos=`ls ppmto* | sed -n s/ppmto//p`
+	# same for pnmto
+	pnmtos=`ls pnmto* | sed -n s/pnmto//p`
+	# Now combine the two, change the space separated
+	# list into individ line that sort can sort with
+	# -u to throw away duplicates, then change newlines
+	# back to spaces so we have a sorted list without
+	# duplicate of all things we can convert to
+	alltos=`echo  $ppmtos $pnmtos | tr " " "\n" | sort -u | tr "\n" " "`
+    fi
+    cd "$currentdir"   # Change back so we don't affect anything
+}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# usage is called when we're called incorrectly.  it never returns
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+usage()
+{
+    echo "Usage: " `basename $0` " [-v] [-t] [-rN] [-fFORMAT] filename"
+    echo "	-v 			print version number and quit"
+    echo "	-a			about - tell about us and exit"
+    echo "	-t			set background to transparent"
+    echo "	-r=N			set resolution to N (usually 72-2000)"
+    echo "	-f=FORMAT		set format to FORMAT one of:"
+    echo "				  jpeg, png, tiff, gif, pcx, bmp . . ."
+    echo "	-V=viewer		set image viewer, examp: -V=evince"
+    echo "	filename		a lilypond file"
+    echo "	-q			quiet mode - no echoes, error code on exit"
+    echo "	-p			show created image in a viewer"
+    fromusage='Y'
+    about
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# about - tell about us and exit
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+about()
+{
+    if [ "$fromusage" != 'Y' ] ; then
+	echo `basename $0` "- convert lilypond files to cropped images"
+    else
+	echo
+    fi
+    echo "	Creator			Jonathan Kulp"
+    echo "	Gadfly			Patrick Horgan"
+    echo "	Chief Beta Tester	Josh Parmenter"
+    exit 0
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# getval()
+# o Set prompt to the prompt you want to give a user
+# o goodvals to the list of acceptable values
+# o call getval
+# o when it returns your value is in outval
+# o when called in quiet mode it returns default or if none , outval == "FAIL"
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getval()
+{
+    flag="notdone"
+    elementcount=${#goodvals[@]}
+    if [ "$quiet" == "Y" ] ; then
+	if [ A$default != "A" ] ; then
+	    outval=$default
+	    default=""
+	else
+	    outval="FAIL"
+	fi
+    else
+	until [ $flag == "done" ] ; do
+	    echo -n $prompt " "
+	    read inval
+	    if [ A$inval == "A" ] ; then
+		# inval is empty
+		if [ A$default != 'A' ] ; then
+		    # default is set to something
+		    inval=$default
+		    default=""
+		else
+		    #inval is empty, no default
+		    echo You must enter a value
+		    index=0
+		    echo -n "Expecting one of : "
+		    while [ "$index" -lt "$elementcount" ] ; do
+			echo -n "${goodvals["$index"]}" " "
+			let index++
+		    done
+		    echo
+		fi
+	    fi
+	    if [ A$inval != "A" ] ; then
+		# inval not empty, either they sent us something
+		# or we got it from the default
+		index=0
+		while [ "$index" -lt "$elementcount" ] ; do
+		    # Walk through list of goodvals to see if we got one
+		    if [ ${goodvals[$index]} == $inval ] ; then
+			# Yep!  We're done.
+			flag="done"
+			outval=${goodvals[$index]}
+		    fi
+		    let index++
+		done
+		if [ $flag != "done" ] ; then
+		    # inval not in goodvals, let them know
+		    index=0
+		    echo -n "Expecting one of : "
+		    while [ "$index" -lt "$elementcount" ] ; do
+			echo -n "${goodvals["$index"]}" " "
+			let index++
+		    done
+		    echo
+		fi
+	    fi
+	done
+    fi
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# getnumval()
+# o Set prompt to the prompt you want to give a user
+# o call getnumval
+# o when it returns your value is in outval
+# o when called in quiet mode it returns default or if none , outval == "FAIL"
+# o set option min and/or max to range
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getnumval()
+{
+    flag="notdone"
+    if [ "$quiet" == "Y" ] ; then
+	if [ A$default != "A" ] ; then
+	    outval=$default
+	    default=""
+	else
+	    outval="FAIL"
+	fi
+    else
+	until [ $flag == "done" ] ; do
+	    echo -n $prompt " "
+	    read inval
+	    if [ A$inval == "A" ] ; then
+		# inval is empty
+		if [ A$default != 'A' ] ; then
+		    # but default is not, so use it
+		    inval=$default
+		    default=""
+		else
+		    # no inval, no default
+		    echo "You must enter a value, expecting a positive numeric value"
+		fi
+	    fi
+	    if [ "A"$inval != 'A' ] ; then
+		# inval set either from user or default
+		case $inval in
+		    *[^0-9]*)
+			echo "Error: expecting positive numeric value" ;;
+		    * )
+		        minmaxerror='F'
+		        if [ A$min != 'A' ] ; then
+			    if [ $inval -lt $min ] ; then
+				echo "Error: entered $inval must be >= $min"
+				minmaxerror='T'
+			    fi
+			fi
+		        if [ A$max != 'A' ] ; then
+			    if [ $inval -gt $max ] ; then
+				echo "Error: entered $inval must be <= $max"
+				minmaxerror='T'
+			    fi
+			fi
+			if [ $minmaxerror != 'T' ] ; then
+			    flag="done"
+			fi
+			;;
+		esac
+	    fi
+	done
+	min=""
+	max=""
+	outval=$inval
+    fi
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# validatearg()
+# o set inarg to the value of the argument
+# o set goodvals to the list of acceptable values
+# o set prompt to the error message you'd like to give,
+#   for example "ERROR: bad value for transparency arg"
+#   this routine will, if not quiet mode, append to it, " expecting: " and
+#   the list of values from goodvals, then call usage # to exit
+# o set errorval to error code to exit with in case of quiet mode
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+validatearg()
+{
+    flag="notgood"
+    elementcount=${#goodvals[@]}
+    index=0
+    if [ "A"$inarg != "A" ] ; then
+	while [ "$index" -lt "$elementcount" ] ; do
+	    if [ ${goodvals[$index]} == $inarg ] ; then
+		flag="good"
+		outval=${goodvals[$index]}
+	    fi
+	    let index++
+	done
+    fi
+    if [ $flag != "good" ] ; then
+	if [ "$quiet" == "Y" ] ; then
+	    exit $errorcode
+	fi
+	index=0
+	echo -n $prompt
+	echo -n " expecting one of : "
+	while [ "$index" -lt "$elementcount" ] ; do
+	    echo -n "${goodvals["$index"]}" " "
+	    let index++
+	done
+	echo
+	echo
+	usage
+    fi
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# getopt_simple - Orig by Chris Morgan, stolen from ABS Guide and modified a bit
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getopt_simple()
+{
+    until [ -z "$1" ] ; do
+	if [ ${1:0:1} = '-' ] ; then
+	    tmp=${1:1}               # Strip off leading '-' . . .
+	    if [ ${tmp:0:1} = '-' ] ; then
+		tmp=${tmp:1}	     # Allow double -
+	    fi
+	    parameter=${tmp%%=*}     # Extract name.
+	    value=${tmp##*=}         # Extract value.
+	    eval $parameter=$value
+	else
+	    filename="$1"
+	fi
+	shift
+    done
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Our program starts here.  This is the equivalent of our main()
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Give initial defaults to things so we can tell if they
+# change
+OS=$(uname)
+fromusage=""
+alltos=""
+transparency='no'
+t='no'
+resolution=72
+r=0
+format='jpg'
+f='none'
+quiet='no'
+q='no'
+p='no'
+preview='no'
+errorcode=0
+viewer="none"
+
+# set Lilypond PATH if OS is Darwin
+if [ "$OS" == 'Darwin' ] ; then
+   export PATH="$PATH:/Applications/LilyPond.app/Contents/Resources/bin/"
+fi 
+
+# search for default viewers starting with xdg-open and going to eog
+# then trying evince, add to the list to change.
+
+if [ "$OS" == "Darwin" ] ; then
+    viewers=( open preview )
+else
+    viewers=( xdg-open eog evince gwenview )
+fi
+elementcount=${#viewers[@]}
+index=0
+
+flag='notsogood'
+while [[ ( "$index" -lt "$elementcount") && ( $flag != 'good' ) ]] ; do
+    which >& /dev/null ${viewers[$index]}
+    if [ $? -eq 0 ] ; then
+	flag="good"
+	defaultV=${viewers[$index]}
+    fi
+    let index++
+done
+
+filename="none"
+version=1.2
+
+setformatlist		# Gets list of all image formats we can convert to
+if [ $returnstatus -ne 0 ] ; then
+    # Apparently none!
+    echo "Sorry, you have to have the netpbm utilities installed to use this."
+    exit 43
+fi
+
+# process all the options
+
+getopt_simple "$@"
+
+if [ "$v" == 'v' ] ; then
+    # version
+    echo `basename $0` version $version
+    exit 0
+fi
+
+if [ A$V != 'A' ] ; then 
+    # if they set one from the command line, use it
+    viewer=$V	# default to eog
+    preview='Y' # doesn't make sense to sprecify viewer without viewing
+elif [ A$defaultV != "A" ] ; then
+    # they didn't set one from the command line, use default if set
+    viewer=$defaultV
+else
+    # no command line, no default.
+    viewer='none'
+fi
+
+if [ "$a" == 'a' ] ; then
+    about
+fi
+if [ "$filename" == "none" ] ; then
+    usage
+fi
+
+if [ $t != 'no' ] ; then
+    # We let them use -t or --transparency, so if they used -t, we shove
+    # the value in $transparency so we don't have to deal with both later
+    transparency=$t
+fi
+if [ $transparency != 'no' ] ; then
+    # if transparency is set, make that setting be 'Y' cause that's what
+    # we check for later.
+    transparency='Y'
+fi
+if [ $q != 'no' ] ; then
+    quiet=$q
+fi
+if [ $quiet != 'no' ] ; then
+    quiet='Y'
+    exec >& /dev/null
+fi
+
+if [ $p != 'no' ] ; then
+    preview="$p"
+fi
+if [ $preview != 'no' ] ; then
+    preview="Y"
+fi
+
+# We know $r starts numeric cause we initialize it to 0 if it's not numeric
+# now the user put something in it not numeric
+
+case $r in
+    *[^0-9]*)
+    	if [ $quiet != 'no' ] ; then
+	    exit 45
+	else
+	    echo "Error: resolution must be postive numeric"; usage
+	fi ;;
+esac
+
+if [ $r -ne 0 ] ; then
+    # same as with -t, two versions of args, -r and --resolution
+    resolution=$r
+fi
+
+# Now check resolution for numeric...if it came from -r it has already
+# been checked, but no harm checking again
+
+case $resolution in
+    *[^0-9]*)
+    	if [ $quiet != 'no' ] ; then
+	    exit 45
+	else
+	    echo "Error: resolution must be positive numeric"; usage
+	fi ;;
+esac
+if [ $f != 'none' ] ; then
+    # fold -f into --format
+    format=$f
+fi
+
+if [ $format != "none" ] ; then
+    # They set format so check it
+    inarg=$format
+    if [ "$format" == "jpg" ] ; then
+        inarg="jpeg"
+	format=$inarg
+    elif [ "$format" == "tif" ] ; then
+        inarg="tiff"
+	format=$inarg
+    fi 
+    goodvals=( $alltos )
+    prompt="Error: format arg incorrect"
+    errorcode=46
+    validatearg
+    echo "Output format is $format..."
+fi
+
+
+# get filename from first argument
+
+srcfile=$(basename "$filename")
+
+# get filename without .ly extension
+
+STEM=$(basename "$filename" .ly)
+
+# determine output directory
+
+OUTDIR=$(dirname "$filename")
+
+
+if [[ $resolution -ne 0 ]] ; then
+    echo "Resolution set to $resolution DPI..."
+  else
+    # ask for output resolution
+    prompt="Enter output resolution in DPI 72, 150, 300, 600, etc...(150): "
+    default=150
+    min=2	# if resolution is less than two lilypond will fail
+    getnumval
+    if [ outval == "FAIL" ] ; then
+	exit 42
+    fi
+    resolution=$outval
+    echo "Resolution set to $outval DPI..."
+fi
+
+# ask for desired final output format with a lot of complications based on 
+# whether transparency is set.
+
+if [[ ( "$transparency" == "Y" )  || ( "$transparency" == "y" ) ]] ; then
+    echo "Background is set to transparent."
+    if [[ ( "$format" != 'gif') && ( "$format" != 'png' ) ]] ; then
+	# if they ask for transparency and format's set to something other
+	# than gif or png we can't procede--it makes no sense, get them to
+	# resolve it.
+	if [[ "$format" != 'none' ]] ; then
+	    echo "You ask for transparency, which doesn't work with" $format
+	fi
+	prompt="Enter desired output format png, gif (png): "
+	default="png"
+	goodvals=("png" "gif")
+	getval
+	if [ outval == "FAIL" ] ; then
+	    exit 41
+	fi
+	FORMAT=$outval
+	echo "Output format is $outval..."
+    else
+	FORMAT=$format
+    fi
+else
+    # we know transparency's not Y or y, but make any other value be 'no'
+    # so we only have one thing to check for later
+    transparency="no"
+    # transparency's not set, so if they gave us a format on the command
+    # line use that, else ask them for one.
+    if [[ $format != 'none' ]] ; then
+	if [ "$format" == "jpg" ] ; then
+	FORMAT=jpeg
+	elif [ "$format" == "tif" ] ; then
+	FORMAT=tiff
+	else
+	FORMAT=$format
+	fi
+    else
+	prompt="Enter desired output format jpeg, png, tiff, gif, pcx, bmp ... (png): "
+	default='png'
+	goodvals=( $alltos )
+	getval
+	if [ outval == "FAIL" ] ; then
+	    exit 41
+	fi
+	FORMAT=$outval
+        echo "Output format is $FORMAT..."
+    fi
+fi
+
+cd $OUTDIR
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Okay! - Everything up to here was getting ready, now we'll finally do the job!
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# run lilypond on file with png output for further processing...
+
+echo lilypond --format=png -dresolution=$resolution "$srcfile"
+lilypond --include=$HOME --format=png -dresolution=$resolution "$srcfile"
+
+returnstatus=$?
+if [ "$returnstatus" -ne 0 ] ; then
+    echo lilypond failed - `basename $0` aborting
+    exit $returnstatus
+fi
+
+# The next commands crop the png file so that
+# it only includes the example instead of an entire page.
+# First, it converts image to pnm for processing with netpbm tools,
+# then it crops off the whitespace, then it turns the image into
+# whatever format was specified. 
+# It had to go in a loop to accommodate multi-page scores, which are
+# chopped up into separate pages, each in a separate file, when lilypond
+# outputs to .png format.
+
+for FILE in "$STEM"*.png ; do
+	stem=$(basename $FILE .png) 
+	echo pngtopnm "$FILE" '>' "$stem".pnm
+	pngtopnm "$FILE" > "$stem".pnm
+	returnstatus=$?
+	if [ "$returnstatus" -ne 0 ] ; then
+	    echo pngtopnm failed converting the file to pnm so it could be cropped.
+	    echo `basename $0` aborting
+	    exit $returnstatus
+	fi
+
+	# crop all the white space off
+	echo pnmcrop -white "$stem".pnm '>' "$stem"-cropped.pnm
+	pnmcrop -white "$stem".pnm > "$stem"-cropped.pnm
+	returnstatus=$?
+	if [ "$returnstatus" -ne 0 ] ; then
+	    echo pnmcrop failed - `basename $0` aborting
+	    exit $returnstatus
+	fi
+
+	# Now look for a command to do the final conversion, assume we won't find it...
+
+	outcmd="invalid"
+
+	# assume ppmto$FORMAT will be found
+
+	which >& /dev/null ppmto$FORMAT
+	if [ $? -eq 0 ] ; then
+	    outcmd=ppmto$FORMAT
+	else
+	    # Nope, try pnmto$FORMAT and see if we find that
+
+	    which >& /dev/null pnmto$FORMAT
+	    if [ $? -eq 0 ] ; then
+		outcmd=pnmto$FORMAT
+	    fi
+	fi
+
+	if [ $outcmd == "invalid" ] ; then
+	    # Baboo!  Didn't find the command
+	    echo "Sorry, can't find a command for that format."
+	    exit 44
+	fi
+	# convert to end format
+
+	if [[ $transparency != 'no' ]] ; then
+	    echo $outcmd -transparent '#ffffff' "$stem"-cropped.pnm
+	    $outcmd -transparent '#ffffff' "$stem"-cropped.pnm > "$stem".$FORMAT
+	else
+	    echo $outcmd "$stem"-cropped.pnm
+	    $outcmd "$stem"-cropped.pnm > "$stem".$FORMAT
+	fi
+	returnstatus=$?
+	if [ "$returnstatus" -ne 0 ] ; then
+	    echo $outcmd failed converting to final output - `basename $0` aborting.
+	    exit $returnstatus
+	fi
+done
+
+# removes pnm and ps files
+echo "cleaning up..."
+rm *.pnm
+
+if [ $FORMAT != 'ps' ] ; then
+    # use -f so that it won't complain if not found
+    rm -f "$STEM".ps 
+fi
+
+# remove png files as long as that wasn't the specified format
+if [ $FORMAT != 'png' ] ; then
+    # use -f so that it won't complain if not found
+    rm -f $STEM*.png
+fi
+
+# if -p preview is specified, open image in viewer,
+# otherwise echo success.
+# known issue: if there is more than one page, then xdg-open can't 
+# handle it.  Specify -V=eog instead.
+
+if [ "$preview" != "Y" ] ; then
+    echo "Conversion successful."
+    elif [ "$preview" == "Y" ] ; then
+        if [ $viewer != "none" ] ; then
+	echo "Conversion successful."
+	$viewer "$STEM"*.$FORMAT &
+    else
+	echo "Sorry, I can't display the image, I can't find a viewer."
+    fi
+fi
+exit 0

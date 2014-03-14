@@ -1,0 +1,24 @@
+hindi-pitch =
+    (* TODO: support hindi sharps and flats. *)
+  "\u0938" ! flat-or-sharp |   (* sa *)
+  "\u0930" ! flat-or-sharp |  (* re *)
+  "\u095A" ! flat-or-sharp |  (* ga *)
+  "\u092E" ! (flat-or-sharp | tick) |  (* ma *)
+  "\u092a" ! flat-or-sharp |  (* pa *)
+  "\u0927" ! flat-or-sharp |  (* dha *)
+  "\u0929" ! flat-or-sharp |  (* ni *)
+  "\u092E'" (* ma sharp, note the tick *)
+
+hindi-ornament-pitch =
+    (* TODO: support hindi sharps and flats. *)
+  "\u0938" ! flat-or-sharp (* sa *)
+  "\u0930" ! flat-or-sharp (* re *)
+  "\u095A" ! flat-or-sharp (* ga *)
+  "\u092E" ! (flat-or-sharp | tick)  (* ma *)
+  "\u092a" ! flat-or-sharp (* pa *)
+  "\u0927" ! flat-or-sharp (* dha *)
+  "\u0929" ! flat-or-sharp (* ni *)
+  "\u092E'" (* ma sharp, note the tick *)
+
+
+

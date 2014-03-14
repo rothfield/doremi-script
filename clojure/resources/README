@@ -1,0 +1,4 @@
+These files can be accessed via
+(slurp (io/resource "fixtures/yesterday.txt")))
+in the java/clojure code.
+Note the lack of the word "resources" in the file path.

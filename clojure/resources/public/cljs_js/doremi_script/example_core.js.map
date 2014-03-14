@@ -1,0 +1,16 @@
+{"version":3,
+ "file":
+ "/home/john/doremi-script/resources/public/cljs_js/doremi_script/example_core.js",
+ "sources":["example_core.cljs"],
+ "lineCount":61,
+ "mappings":
+ ";AAAA;;;;AAGA,mCAAA,mBAAA,tDAAuBA,mDAAOC,GAC5B,sBAAA,wBAAcA;;;AAEhB,iCAAA,kBAAA,nDAAeC,+CAAKC,IAClB,OAACC,oCAAQD;;;AAEX,8CAAA,2CAAA,zFAAeE,yEAAYC,IAAIC,MAAMC,MACnC,qIAAA,jIAAMC,OAAK,AAACC,0BAAMJ,SACZK,UAAQ,AAACD,0BAAMD,UACfG,UAAQ,AAACC,yBAAKJ,MAClB,YAAA,ZAAMK,qBAAoBN,KAAKD,MAAMD;AACrC,sBAAKE,oBAAKD,qBAAMD,mBAAIG,oBAAKE,uBAAQC;;;AAErC;;;oCAAA,pCAAMG;mEAAN,lCAAcC,OAAOC,QAAQC,SAAWC,UACtC,AAACC,0BAAMC,iBAAEL,OAAOC,QAAQC;AACxB,OAACI,wBAAIC,mBAASJ;;uBAFFH,OAAOC,QAAQC;IAAWC;EAAAA;kCAA1BH,OAAOC,QAAQC,SAAWC;;;IAA1BH;;IAAOC;;IAAQC;IAAWC;wBAA1BH,OAAOC,QAAQC,SAAWC;;;;;;AAIxC;;;uCAAA,vCAAMK;8CAAN,VAAmBC,UACjB,+BAAA,xBAACH,iFAAYG;;;IADIA;EAAAA;qCAAAA;;;IAAAA;2BAAAA",
+ "names":
+ ["doremi_script.example_core/greet", "n",
+  "doremi_script.example_core/sum", "xs", "doremi_script.foo.bar/sum",
+  "doremi_script.example_core/let-works?", "day", "month", "year",
+  "hour", "cljs.core/first", "minutes", "seconds", "cljs.core/last",
+  "js/console", "doremi_script.example_core/bailey", "proton",
+  "neutron", "electron", "comedies", "cljs.core/apply", "cljs.core/+",
+  "cljs.core/map", "cljs.core/identity",
+  "doremi_script.example_core/videotape", "rainbows"]}

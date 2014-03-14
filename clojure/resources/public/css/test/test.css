@@ -1,0 +1,17 @@
+body.visual_test_suite {
+  font-size: 16px;  
+}
+
+table.test_results td {
+  vertical-align: top;
+}
+table.test_results
+{
+  border-collapse:collapse;
+  margin-top: 40px;
+}
+table.test_results , table.test_results th,  table.test_results td
+{
+  border: 1px solid black;
+}
+`

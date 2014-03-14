@@ -1,0 +1,9 @@
+{"version":3,
+ "file":
+ "/home/john/doremi-script/resources/public/cljs_js/doremi_script/foo/bar.js",
+ "sources":["bar.cljs"],
+ "lineCount":7,
+ "mappings":
+ ";AAAA;;AAEA,4BAAA,kBAAA,9CAAMA,0CAAKC,IACT,mDAAA,5CAACC,2BAAOC,mBAAIF",
+ "names":
+ ["doremi_script.foo.bar/sum", "xs", "cljs.core/reduce", "cljs.core/+"]}

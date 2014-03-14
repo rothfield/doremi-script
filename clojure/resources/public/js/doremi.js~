@@ -1,0 +1,1221 @@
+(function () {
+  "use strict";
+  var debug = false;
+  window.loadTimeout = null;
+  /** Save typing **/
+  var span = window.React.DOM.span;
+  var div = window.React.DOM.div;
+  var textarea = window.React.DOM.textarea;
+  var a = window.React.DOM.a;
+  var input = window.React.DOM.input;
+  var pre = window.React.DOM.pre;
+  var form = window.React.DOM.form;
+  var img = window.React.DOM.img;
+  var button = window.React.DOM.button;
+  var select = window.React.DOM.select;
+  var label = window.React.DOM.label;
+  var h3 = window.React.DOM.h3;
+  var option = window.React.DOM.option;
+  var createClass = window.React.createClass;
+  var rest = function (x) {
+    // Analogous to clojure rest function
+    return x.slice(1);
+  };
+
+  var first = function (x) {
+    // Analogous to clojure function
+    return x[0];
+  };
+
+  var second = function (x) {
+    // Analogous to clojure function
+    return x[1];
+  };
+
+  var assert = function (condition, message) {
+    if (!condition) {
+      throw message || "Assertion failed";
+    }
+  };
+
+  var isArray = function (x) {
+    return (Object.prototype.toString.call(x) ===
+      '[object Array]');
+  };
+
+  var isA = function (kind, x) {
+    // Our data looks like ["note" blah blah blah]
+    // Usage is then isA("note",myObject)
+    return (isArray(x) && (x[0] === kind));
+  };
+
+  var merge = function (o1, o2) {
+    if (o1 === null || o2 === null) {
+      return o1
+    }
+
+    for (var key in o2) {
+      if (o2.hasOwnProperty(key)) {
+        o1[key] = o2[key];
+      }
+    }
+    return o1;
+  }
+
+
+  var classNameFor = function (item) {
+    assert(isArray(item))
+    return item[0].replace(/-/g, '_');
+  }
+
+  var DoremiBox = createClass({
+
+    handleDoremiTextChange: function () {
+      if (debug) {
+        console.log("handleTextChange");
+      }
+      this.startParserTimer();
+    },
+    startParserTimer: function () {
+      if (!window.loadTimeout || window.loadTimeout.cleared) {
+        window.loadTimeout = setTimeout(this.loadDataFromServer,
+          2000);
+      }
+    },
+
+    sanitize: function (name) {
+      // Sanitize file name
+      if (name === null) {
+        return null;
+      } else {
+        return name.replace(/[^0-9A-Za-z.\_]/g, '_')
+          .toLowerCase();
+      }
+    },
+    baseURL: "compositions/",
+
+    getStaffNotationPath: function (txt) {
+      // A bit of caching. Using the txt, generate the file
+      // name on the server. Does MD5 on the txt
+      var title = this.sanitize(this.extractTitle(txt));
+      var titleSnippet = "";
+      if (title) {
+        titleSnippet = title + "-";
+      }
+      return this.baseURL + titleSnippet + window.MD5(
+        txt) +
+        ".png";
+    },
+
+    extractTitle: function (txt) {
+      // extract title from attributes.
+      // Title will be found like:
+      //  title: my title or Title: my title
+      var patt = /^title:( )*([^\n]+)( )*/mi;
+      var z = patt.exec(txt);
+      if (z) {
+        return z[2].trim();
+      } else {
+        return null;
+      }
+    },
+
+
+    ajaxCall: function (txt, flag, kind) {
+      console.log("ajaxCall");
+      if (txt === "") {
+        window.loadTimeout = null;
+      } else {
+        if (debug) {
+          console.log("ajax call");
+        }
+        $.ajax({
+          url: this.props.url,
+          dataType: 'json', //Type of data expected back from server
+          type: 'POST',
+          data: {
+            src: txt,
+            generateStaffNotation: flag,
+            kind: kind
+          },
+          failure: function () {
+            // TODO: setState
+            if (debug) {
+              console.log("failure");
+            }
+            window.loadTimeout = null;
+          },
+          complete: function () {
+            window.loadTimeout = null;
+          },
+          error: function () {
+            if (debug) {
+              console.log("ajax error");
+            }
+          },
+          success: function (data) {
+            var oldData = this.state.data;
+            oldData.parsed = data.parsed;
+            oldData.lilypond = data.lilypond;
+            oldData.error = data.error;
+            oldData.attributes = data.attributes;
+            if (data.attributes) {
+              oldData.kind = data.attributes.kind;
+            }
+            assert(data.error || !data.attributes ||
+              data.attributes.kind);
+            this.setState({
+              data: oldData
+            });
+            assert(this.state.data);
+            assert(this.state.data.kind);
+            var curSrc = $('#the_area')
+              .val();
+
+            if (data.src !== curSrc) {
+              this.startParserTimer();
+            }
+          }.bind(this)
+        });
+      }
+    },
+    displayName: 'DoremiBox',
+
+    handleGenerateStaffNotationButton: function () {
+      var oldData = this.state.data;
+      var txt = $('#the_area')
+        .val();
+      oldData.staffNotationPath = this.getStaffNotationPath(
+        txt);
+
+      this.setState({
+        data: oldData
+      });
+      this.ajaxCall(txt, true, this.state.data.kind);
+      setTimeout(reloadLater, 5000);
+    },
+    handleToggleStaffNotation: function () {
+      var data = this.state.data;
+      data.showStaffNotation = !data.showStaffNotation;
+      this.setState({
+        data: data
+      });
+    },
+    kinds: ["", "abc-composition", "doremi-composition",
+      "hindi-composition",
+      "number-composition", "sargam-composition"
+    ],
+    handleKindChange: function (x) {
+      this.setState({
+        data: merge(this.state.data, {
+          kind: x
+        })
+      })
+      this.startParserTimer();
+      console.log("change")
+    },
+    handleShowHideLilypond: function () {
+      var data = this.state.data;
+      data.showLilypond = !data.showLilypond;
+      this.setState({
+        data: data
+      });
+    },
+    getInitialState: function () {
+      var myState = {
+        data: {
+          kind: "",
+          id: null,
+          resources: [],
+          staffNotationPath: "/images/blank.png",
+          parsed: [],
+          file_id: "",
+          src: "Key: Ab\n\nHi john\nHow are you\n\n | SSS\n\n" +
+            "   .:\n" +
+            "SSSSS\n" +
+            ".:",
+          error: null,
+          lilypond: null,
+          showStaffNotation: true,
+          showLilypond: false
+        }
+      };
+      //  myState.data.staffNotationPath = this.getStaffNotationPath(
+      //   $('#the_area')
+      //  .val());
+      return myState;
+    },
+    loadDataFromServer: function () {
+      this.ajaxCall($('#the_area')
+        .val(), false, this.state.data.kind);
+    },
+    componentDidMount: function () {
+      // User types text, if there isn't a timeout already running,
+      // create new one to execute in 2 seconds
+      this.startParserTimer();
+    },
+    componentDidUpdate: function () {
+      // console.log("componentDidUpdate");
+      //console.log("calling dom_fixes");
+      //dom_fixes($(this.getDOMNode()));
+    },
+    render: function () {
+      return (
+        div({
+            className: "doremiBox"
+          },
+          Example(null),
+          // FileUploadForm({}),
+          div({className: "controls"},
+            SelectKindBox({
+              kinds: this.kinds,
+              kind: this.state.data.kind,
+              handleKindChange: this.handleKindChange
+            }),
+            GenerateStaffNotationButton({
+              handleGenerateStaffNotationButton: this
+                .handleGenerateStaffNotationButton
+            }),
+            ShowHideLilypond({
+              handleShowHideLilypond: this.handleShowHideLilypond
+            }),
+            ToggleStaffNotation({
+              handleToggleStaffNotation: this.handleToggleStaffNotation
+            }),
+            VisualTestSuite(null),
+            Development(null)
+          ),
+          DoremiTextAreaBox({
+            kind: this.state.data.kind,
+            handleDoremiTextChange: this.handleDoremiTextChange
+          }),
+          ParseErrors({
+            data: this.state.data
+          }),
+          Lilypond({
+            data: this.state.data
+          }),
+          StaffNotationDisplay({
+            staffNotationPath: this.state.data.staffNotationPath,
+            data: this.state.data
+          }),
+          Composition({
+            data: this.state.data,
+            kind: this.state.data.kind
+          })
+        )
+      );
+    }
+  });
+  var Example = createClass({
+			example:  "Enter letter music notation using 1234567,CDEFGABC, DoReMi (using drmfslt or DRMFSLT), SRGmPDN, or devanagri: " +
+          "सर ग़म म'प धऩ" + "\n\n",
+
+    example2: ["Title: Happy Birthday",
+      "Filename: happy_birthday_in_D",
+      "Key: c",
+      "Author: Traditional",
+      "TimeSignature: 3/4",
+      "",
+      "|: P-P | D P S | N - PP | D P R | S - PP | ",
+      "   . .   . .     .   ..   . .         ..  ",
+      "ha-ppy birth-day to you ha-ppy birth-day to you ha-ppy",
+      "",
+      "                                     1.____   2.______",
+      "| P G S | (N - - | D) - mm | G S R | S -   :| S -P DP | n",
+      "                                                 . ..   .",
+      "  birth-day dear Jim ha-ppy birth-day to you  you and ma-ny more",
+    ].join("\n"),
+
+    render: function () {
+      return h3({
+        title: "Example",
+      }, this.example)
+    }
+  })
+
+  var Development = createClass({
+    render: function () {
+      return a({
+        title: "Opens in new window",
+        target: "_blank",
+        href: "https://raw.github.com/rothfield/doremi-script#readme"
+      }, "Development")
+    }
+  })
+
+  var VisualTestSuite = createClass({
+    render: function () {
+      return a({
+        title: "Opens in new window",
+        target: "_blank",
+        href: "https://rawgithub.com/rothfield/doremi-script/master/test/good_test_results/report.html"
+      }, "Visual test suite")
+    }
+  })
+  /*
+			 <a href='http://github.com/rothfield/doremi-script-gui' target='_blank'>
+	          Development
+						        </a>
+										        <a href='test.html' target='_blank'>
+														          Visual test suite
+																			        </a>
+  */
+
+
+
+  var DisplayKind = createClass({
+    displayName: 'DisplayKind',
+    render: function () {
+      return span({
+        className: "displayKind"
+      }, this.props.kind);
+    }
+  });
+
+  var SelectKindBox = createClass({
+    handleChange: function (x) {
+      this.props.handleKindChange(x.target.value)
+    },
+    displayName: 'SelectKindBox',
+    render: function () {
+      var options = this.props.kinds.map(
+        function (x) {
+          return option({
+            value: x
+          }, x)
+        }.bind(this))
+      return div({
+          className: "selectNotationBox"
+        },
+        label({
+          htmlFor: "selectNotation"
+        }, "Notation System"),
+        select({
+            id: "selectNotation",
+            value: this.props.kind,
+            onChange: this.handleChange
+          },
+          options
+        )
+      )
+    }
+  });
+  if (false) {console.log( DisplayKind)}; // avoid jshint error
+  var ParseErrors = createClass({
+    displayName: 'ParseErrors',
+    render: function () {
+      var extra = "";
+      if (this.props.data.error === null) {
+        extra = " hidden";
+      }
+      return div({
+          className: "compositionParseFailed" + extra,
+        },
+        pre(null, this.props.data.error));
+    }
+
+  });
+
+  var Lilypond = createClass({
+    displayName: 'Lilypond',
+    render: function () {
+      var extra = "";
+      if (!this.props.data.showLilypond) {
+        extra = " hidden";
+      }
+      return div({
+        className: "lilypondDisplay" + extra,
+      }, this.props.data.lilypond);
+    }
+
+  });
+
+  // ["ornament",["ornament-pitch","D"],"after"] 
+  // <span data-column="2" class="ornament_item upper_octave_1">G</span>
+  var OrnamentPitch = createClass({
+
+    class_for_ornament_pitch_octave: function (
+      octave_num) {
+      if (octave_num === null) {
+        return "octave0";
+      }
+      if (octave_num < 0) {
+        return "lower_octave_" + (octave_num * -1);
+      }
+      if (octave_num > 0) {
+        return "upper_octave_" + octave_num
+      }
+      return "octave0";
+    },
+
+    render: function () {
+      var octave;
+      var item = this.props.item;
+      var items = rest(rest(item))
+      var filtered = items.filter(function (x) {
+        return isA("octave", x)
+      })
+      if (filtered.length > 0) {
+        octave = filtered[0][1]
+      } else {
+        octave = 0
+      }
+      var src = renderPitchInKind(item[1])
+      return span({
+        className: "ornament_item " +
+          this.class_for_ornament_pitch_octave(
+            octave),
+        dangerouslySetInnerHTML: {
+          __html: src
+        }
+      })
+    }
+  })
+  var Ornament = createClass({
+
+    render: function () {
+      var item = this.props.item;
+      var items = rest(item);
+      var filtered = items.filter(function (x) {
+        return isArray(x)
+      })
+      var ary = filtered.map(drawItem.bind(this));
+      return span({
+        className: "upper_attribute" + " " +
+          classNameFor(item),
+        placement: "after" //TODO
+      }, ary)
+    }
+  });
+
+
+  var BeginSlur = createClass({
+    displayName: 'BeginSlur',
+
+    render: function () {
+      return span({
+        className: "slur",
+        id: this.props.id
+      });
+    }
+  });
+
+  var EndSlur = createClass({
+    displayName: 'EndSlur',
+
+    render: function () {
+      return span({
+        className: "ignore-end-slur"
+      });
+    }
+  });
+
+  var PitchItem = createClass({
+    displayName: 'PitchItem',
+
+    render: function () {
+      var item = this.props.item;
+      if (debug) {
+        console.log("pitchItem.render", item);
+      }
+      return span({
+        className: classNameFor(item)
+      }, this.props.src);
+    }
+  });
+
+  var PitchSpan = createClass({
+    displayName: 'PitchSpan',
+
+    render: function () {
+      return span({
+        className: "note  pitch",
+        dangerouslySetInnerHTML: {
+          __html: this.props.src
+        }
+      });
+    }
+  });
+
+  var Octave = createClass({
+    class_for_octave: function (octave_num) {
+      if (octave_num === null) {
+        return "octave0";
+      }
+      if (octave_num < 0) {
+        return "lower_octave_" + (octave_num * -1);
+      }
+      if (octave_num > 0) {
+        return "upper_octave_" + octave_num +
+          " upper_octave_indicator";
+      }
+      return "octave0";
+    },
+    bullet: "&bull;",
+    displayName: 'Octave',
+    render: function () {
+      var item = this.props.item;
+      if (debug) {
+        console.log(item);
+      }
+      //assert(isA("octave", item));
+      var src = this.bullet;
+      return span({
+        className: this.class_for_octave(second(item)),
+        dangerouslySetInnerHTML: {
+          __html: src
+        }
+      });
+    }
+  });
+
+  var Pitch = createClass({
+    displayName: 'Pitch',
+    render: function () {
+      var pitch = this.props.item;
+      var src = renderPitchInKind(pitch[1])
+      assert(isA("pitch", pitch));
+      var items = rest(rest(pitch));
+      var beginSlurId = items.filter(function (x) {
+        return ("begin-slur-id" === first(x));
+      });
+      var endSlurId = items.filter(function (x) {
+        return ("end-slur-id" === first(x));
+      });
+      if (beginSlurId.length > 0) {
+        this.props.slurId = beginSlurId[0][1];
+      }
+      if (endSlurId.length > 0) {
+        this.props.endSlurId = endSlurId[0][1];
+      }
+      var ary = items.map(drawItem.bind(this));
+      var pitchSpan = PitchSpan({
+        key: items.length + 1,
+        src: src
+      });
+      var ary2 = ary.concat([pitchSpan]);
+      var noteWrapperProps = {
+        className: "note_wrapper",
+        key: this.props.key
+      }
+      if (endSlurId.length > 0) {
+        merge(noteWrapperProps, {
+          'data-begin-slur-id': endSlurId[0][1]
+        })
+      }
+      return span(
+        noteWrapperProps,
+        ary2);
+    },
+
+  });
+  var Beat = createClass({
+
+    displayName: 'Beat',
+
+    render: function () {
+      var looped = "";
+      var beat = this.props.beat;
+      var beatItems = rest(beat);
+      var count = beatItems.reduce(function (accum, cur) {
+        if (("pitch;dash")
+          .indexOf(cur[0]) > -1) {
+          return (accum + 1);
+        } else {
+          return accum;
+        }
+      }, 0);
+      if (count > 1) {
+        looped = " looped";
+      }
+      if (debug) {
+        console.log("beat", beat, count);
+      }
+      var items = rest(beat);
+      var ary = items.map(drawItem.bind(this));
+      assert(isA("beat", beat));
+      return span({
+        className: "beat " + looped
+      }, ary);
+    }
+  });
+
+
+  var Measure = createClass({
+
+    displayName: 'Measure',
+
+    render: function () {
+      var measure = this.props.measure;
+      var items = rest(measure);
+      var ary = items.map(drawItem.bind(this));
+      // console.log("render, measure is", measure);
+      assert(isA("measure", measure));
+      return span({
+        className: "measure"
+      }, ary);
+    }
+  });
+
+  if (false) {
+    return FileUploadForm
+  }
+  var FileUploadForm = createClass({
+
+    displayName: 'FileUploadForm',
+    render: function () {
+      return form({
+          action: "/file",
+          method: "post",
+          encType: "multipart/form-data"
+        },
+        input({
+          name: "file",
+          type: "file",
+          size: "20"
+        }),
+        input({
+          type: "submit",
+          name: "submit",
+          value: "submit"
+        })
+      );
+    }
+    //   <input name="file" type="file" size="20" />
+    //<input type="submit" name="submit" value="submit" />
+    //</form>
+
+  });
+
+  var Barline = createClass({
+
+    displayName: 'Barline',
+
+    render: function () {
+      var barline = this.props.barline;
+      assert(isA("barline", barline));
+      return span({
+        className: "note_wrapper",
+        key: this.props.key
+      }, span({
+        className: "note barline",
+        dangerouslySetInnerHTML: {
+          __html: lookupBarlineTable[first(second(
+            barline))]
+        }
+      }));
+    }
+  });
+
+  /*
+ . The Unicode character ♭(U+266D) is the flat sign. Its HTML entity is &#9837;.
+In Unicode, the sharp symbol (♯) is at code point U+266F. Its HTML entity is &#9839;. The symbol for double sharp (double sharp) is at U+1D12A (so &#119082;). These characters may not display correctly in all fonts.
+*/
+  var sharp_symbol = "&#9839;";
+  var flat_symbol = "&#9837;";
+  var lookup_simple = function (str) {
+    var LOOKUP;
+    LOOKUP = {
+      "b": "b",
+      "#": "#",
+      ".": "&bull;",
+      "*": "&bull;",
+      "|:": "|:",
+      "~": "~",
+      ":|": ":|",
+      "|": "|",
+      "||": "||",
+      "%": "%",
+      "|]": "|",
+      "[|": "|"
+    };
+    return LOOKUP[str];
+  };
+  if (false) {
+    console.log(lookup_simple)
+  }
+  var lookup_html_entity = function (str) {
+    var LOOKUP;
+    LOOKUP = {
+      "b": "&#9837;",
+      "#": "&#9839;",
+      ".": "&bull;",
+      "*": "&bull;",
+      "|:": "&#x1d106",
+      "~": "&#x1D19D&#x1D19D",
+      ":|": "&#x1d107",
+      "|": "&#x1d100",
+      "||": "&#x1d101",
+      "%": "&#x1d10E",
+      "|]": "&#x1d102",
+      "[|": "&#x1d103"
+    };
+    return LOOKUP[str];
+  };
+  if (false) {
+    console.log(lookup_html_entity)
+  }
+
+  var lookup1 = {
+    "Cb": "S" + flat_symbol,
+    "C": "S",
+    "C#": "S" + sharp_symbol,
+    "Db": "r",
+    "D": "R",
+    "D#": "R" + sharp_symbol,
+    "Eb": "g",
+    "E": "G",
+    "E#": "G" + sharp_symbol,
+    "F": "m",
+    "F#": "M",
+    "Gb": "P" + flat_symbol,
+    "G": "P",
+    "G#": "P" + sharp_symbol,
+    "Ab": "d",
+    "A": "D",
+    "A#": "D" + sharp_symbol,
+    "Bb": "n",
+    "B": "N",
+    "B#": "N" + sharp_symbol
+  };
+
+
+  /*
+reverse-final-barline = <'[' "|">
+final-barline = <'|' ']'>
+double-barline = <'|' '|'>
+single-barline = <'|' ! ('|' | ']' | ':')>
+left-repeat = <"|:">
+right-repeat = <":|">
+*/
+  var lookupBarlineTable = {
+    "single-barline": "&#x1d100",
+    "double-barline": "&#x1d101",
+    "left-repeat": "&#x1d106",
+    "mordent": "&#x1D19D&#x1D19D",
+    "right-repeat": "&#x1d107",
+    "final-barline": "&#x1d102",
+    "reverse-final-barline": "&#x1d103"
+  };
+
+
+
+  var renderPitchInKind = function (pitch, kind) {
+    if (false) {
+      console.log(kind)
+    }
+    // TODO: finish
+    return lookup1[pitch];
+  }
+
+  var drawItem = function (item, index) {
+    if (debug) {
+      console.log("drawItem, item=", item);
+    }
+    assert(isArray(item));
+    assert(this.props.kind);
+    var key = item[0];
+    switch (key) {
+    case "ornament-pitch":
+      return OrnamentPitch({
+        kind: this.props.kind,
+        item: item,
+        key: index
+      });
+    case "ornament":
+      return Ornament({
+        kind: this.props.kind,
+        item: item,
+        key: index
+      });
+
+    case "lyrics-section":
+      return LyricsSection({
+        lyricsSection: item,
+        key: index
+      });
+    case "stave":
+      return NotesLine({
+        kind: this.props.kind,
+        item: item[1],
+        key: index
+      });
+    case "end-slur-id":
+    case "begin-slur":
+    case "attribute-section":
+      return null;
+    case "octave":
+      if (second(item) === 0) {
+        return null;
+      } else {
+        return Octave({
+          key: index,
+          item: item,
+          kind: this.props.kind
+        });
+      }
+      break;
+    case "begin-slur-id":
+      return BeginSlur({
+        key: index,
+        item: item,
+        id: this.props.slurId // Passed from Pitch!
+      });
+    case "end-slur":
+      return EndSlur({
+        key: index,
+        item: item,
+      });
+
+    case "chord":
+    case "tala":
+    case "ending":
+      return PitchItem({
+        key: index,
+        item: item,
+        src: item[1],
+        kind: this.props.kind
+      });
+    case "mordent":
+      return PitchItemWithEntity({
+        key: index,
+        item: item,
+        src: "&#x1D19D&#x1D19D",
+        kind: this.props.kind
+      });
+
+    case "syl":
+      return PitchItem({
+        key: index,
+        item: item,
+        src: item[1],
+        kind: this.props.kind
+      });
+      //case "upper-line-dot":
+      //case "mordent":
+    case "line-number":
+      return LineItem({
+        key: index,
+        item: item,
+        src: item[1] + ")",
+        kind: this.props.kind
+      });
+    case "barline":
+      return Barline({
+        key: index,
+        barline: item,
+        kind: this.props.kind
+      });
+    case "pitch":
+      return Pitch({
+        item: item,
+        key: index,
+        kind: this.props.kind
+      });
+    case "dash":
+      return LineItem({
+        item: item,
+        src: "-",
+        key: index,
+        kind: this.props.kind
+      });
+    case "barline":
+      return LineItem({
+        item: item,
+        key: index,
+        src: "|", // TODO
+        kind: this.props.kind,
+      });
+    case "beat":
+      return Beat({
+        beat: item,
+        key: index,
+        kind: this.props.kind
+      });
+    case "measure":
+      return Measure({
+        measure: item,
+        key: index,
+        kind: this.props.kind
+      });
+    default:
+      return null;
+      //	span({
+      //       key: index
+      //    },
+      //   JSON.stringify(item));
+    }
+  }
+  var PitchItemWithEntity = createClass({
+    displayName: 'PitchItemWithEntity',
+
+    render: function () {
+      var item = this.props.item;
+      return span({
+        className: classNameFor(item),
+        dangerouslySetInnerHTML: {
+          __html: this.props.src
+        }
+      });
+    }
+  });
+
+  var NotesLine = createClass({
+    displayName: 'NotesLine',
+
+    componentDidMount: function () {
+      window.dom_fixes($(this.getDOMNode()));
+    },
+    componentDidUpdate: function () {
+      window.dom_fixes($(this.getDOMNode()));
+    },
+
+    render: function () {
+      assert(this.props.kind);
+      var item = this.props.item;
+      var items = rest(item);
+      if (debug) {
+        console.log("props", this.props);
+      }
+      if (debug) {
+        console.log("item", item);
+      }
+      if (debug) {
+        console.log("items", items);
+      }
+      var ary = items.map(drawItem.bind(this));
+      return div({
+        className: "stave sargam_line",
+        key: this.props.key
+      }, ary);
+    }
+  });
+
+
+
+  var LineItem = createClass({
+    displayName: 'LineItem',
+
+    // <span title="" data-column="0" class="note_wrapper"><span data-column="0" class="note line_number">1)</span></span>
+    render: function () {
+      var item = this.props.item;
+      var src = this.props.src;
+      var className = item[0].replace(/-/g, '_');
+      return span({
+        className: "note_wrapper",
+        key: this.props.key
+      }, span({
+        className: "note " + className
+      }, src));
+    }
+  });
+
+  /*
+draw_lyrics_section=(lyrics_section) ->
+  # For now, display hyphens
+  without_dashes=lyrics_section.unhyphenated_source.replace(/-/g,'')
+  #without_dashes=lyrics_section.source
+  x="<div title='Lyrics Section' class='stave lyrics_section unhyphenated'>#{lyrics_section.unhyphenated_source}</div>"
+  x+"<div title='Lyrics Section' class='stave lyrics_section hyphenated'>#{lyrics_section.hyphenated_source}</div>"
+*/
+
+  var LyricsSection = createClass({
+    displayName: 'LyricsSection',
+
+    render: function () {
+      var lyricsSection = this.props.lyricsSection;
+      assert(isA("lyrics-section", lyricsSection))
+      var lyricLines = (rest(lyricsSection))
+        .map(function (x) {
+          assert(isA("lyrics-line", x))
+          return rest(x)
+            .join(" ");
+        });
+      var str = lyricLines.join("\n");
+      //console.log("lyricLines=", lyricLines);
+      return div({
+          title: 'Lyrics Section',
+          className: 'stave lyrics_section unhyphenated'
+        },
+        str);
+    }
+  });
+
+  var Composition = createClass({
+    displayName: 'Composition',
+    render: function () {
+      if (debug) {
+        console.log("parsed=", this.props.data.parsed);
+      }
+      var ary;
+      var items;
+      if (!this.props.data.parsed) {
+        ary = [];
+      } else {
+        items = rest(this.props.data.parsed);
+        if (debug) {
+          console.log("in Composition, items=", items);
+        }
+        ary = items.map(drawItem.bind(
+          this));
+      }
+      return div({
+        className: "composition",
+      }, ary);
+    }
+  });
+
+
+  var StaffNotationDisplay = createClass({
+
+    displayName: 'StaffNotationDisplay',
+    imgLoad: function () {
+      // TODO: better to use callback to set state
+      $('#staff_notation')
+        .removeClass("hidden");
+      window.dom_fixes();
+    },
+
+    imgError: function () {
+      $('#staff_notation')
+        .addClass("hidden");
+      setTimeout(reloadLater, 5000);
+    },
+    render: function () {
+      var extra = "";
+      if (!this.props.data.showStaffNotation) {
+        extra = " hidden";
+      }
+      return img({
+        src: this.props.staffNotationPath,
+        onLoad: this.imgLoad,
+        onError: this.imgError,
+        id: "staff_notation",
+        name: "",
+        className: "" + extra,
+      });
+    }
+  });
+
+
+  var GenerateStaffNotationButton = createClass({
+    displayName: 'GenerateStaffNotationButton',
+    handleClick: function (event) {
+      this.props.handleGenerateStaffNotationButton(
+        event.target
+        .value);
+    },
+    render: function () {
+      return button({
+        name: "generateStaffNotation",
+        className: "",
+        onClick: this.handleClick,
+      }, "Generate Staff Notation");
+    }
+  });
+
+  var ShowHideLilypond = createClass({
+    displayName: 'ShowHideLilypond',
+    handleClick: function (event) {
+      this.props.handleShowHideLilypond(event.target.value);
+    },
+    render: function () {
+      return button({
+        name: "lilypondToggle",
+        className: "toggleButton",
+        onClick: this.handleClick,
+      }, "Lilypond");
+    }
+  });
+
+  var ToggleStaffNotation = createClass({
+    displayName: 'ToggleStaffNotation',
+    handleClick: function (event) {
+      this.props.handleToggleStaffNotation(event.target
+        .value);
+    },
+    render: function () {
+      return button({
+        name: "staffNotationToggle",
+        className: "toggleButton",
+        onClick: this.handleClick,
+      }, "Staff Notation Hide/Show");
+    }
+  });
+
+
+  var DoremiTextAreaBox = createClass({
+    displayName: 'DoremiTextAreaBox',
+    render: function () {
+      return div({
+          className: "entryAreaBox"
+        },
+        DoremiTextArea({
+          kind: this.props.kind,
+          handleDoremiTextChange: this.props.handleDoremiTextChange
+        }))
+    }
+  });
+
+  var DoremiTextArea = createClass({
+    getInitialState: function () {
+      return {
+        value: " ..\n RG\nS\nHi"
+      };
+    },
+    displayName: 'DoremiTextArea',
+    handleTextChange: function (event) {
+
+      this.setState({
+        value: event.target.value
+      });
+      this.props.handleDoremiTextChange(event);
+    },
+    componentDidMount: function () {
+      $(this.getDOMNode())
+        .autosize();
+    },
+    componentDidUpdate: function () {
+      // Not needed
+      //$(this.getDOMNode()).trigger('autosize.resize');
+    },
+    render: function () {
+      var value = this.state.value;
+      return textarea({
+        value: value,
+        rows: 8,
+        cols: 80,
+        id: "the_area",
+        name: "src",
+        className: "entryArea",
+        onChange: this.handleTextChange,
+        placeholder: "Enter letter music notation using 1234567,CDEFGABC, DoReMi (using drmfslt or DRMFSLT), SRGmPDN, or devanagri: " +
+          "सर ग़म म'प धऩ" + "\n\n",
+        ref: "src"
+      });
+    }
+  });
+
+
+
+  window.React.renderComponent(
+    DoremiBox({
+      url: "/parse" // URL to post to server
+    }),
+    document.getElementById('content'));
+
+
+  var reloadLater = function () {
+    var tmp = new Date();
+    tmp = '?' + tmp.getTime();
+    tmp = '';
+    if (document.images.staff_notation) {
+      document.images.staff_notation.src = document.images
+        .staff_notation
+        .src + tmp;
+    }
+  }
+
+
+}());

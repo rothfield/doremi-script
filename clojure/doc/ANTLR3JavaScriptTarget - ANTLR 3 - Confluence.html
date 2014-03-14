@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html>
+<head>
+                    <title>ANTLR3JavaScriptTarget - ANTLR 3 - Confluence</title>
+    
+        
+
+                        
+    
+                        
+    
+
+                
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE,chrome=IE7">
+<meta charset="UTF-8">
+<meta id="confluence-context-path" name="confluence-context-path" content="/wiki">
+<meta id="confluence-base-url" name="confluence-base-url" content="https://theantlrguy.atlassian.net/wiki">
+
+<meta id="atlassian-token" name="atlassian-token" content="c0d616178d56733eeb22d4bfcbfb0ad5fcbf0e6b">
+
+<meta id="confluence-space-key" name="confluence-space-key" content="ANTLR3">
+<script type="text/javascript">
+        var contextPath = '/wiki';
+</script>
+
+    
+
+<!-- include system css resources -->
+
+
+    <link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/11/_/download/superbatch/css/batch.css" media="all">
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/11/_/download/superbatch/css/batch.css?media=print" media="print">
+<!--[if lt IE 9]>
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/11/_/download/superbatch/css/batch.css?conditionalComment=lt+IE+9" media="all">
+<![endif]-->
+<!--[if lte IE 8]>
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/11/_/download/superbatch/css/batch.css?conditionalComment=lte+IE+8" media="all">
+<![endif]-->
+<!--[if lte IE 9]>
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/11/_/download/superbatch/css/batch.css?conditionalComment=lte+IE+9" media="all">
+<![endif]-->
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/159908c75ca24afae38261ebd2f6c577/_/download/contextbatch/css/page/batch.css" media="all">
+<!--[if lt IE 9]>
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/159908c75ca24afae38261ebd2f6c577/_/download/contextbatch/css/page/batch.css?conditionalComment=lt+IE+9" media="all">
+<![endif]-->
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/7d471b788071f08c674f57492843c05c/_/download/contextbatch/css/pagebanner/batch.css" media="all">
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/21de84c77e989fe1d51cb450e2ec628e/_/download/contextbatch/css/viewcontent,atl.general,main/batch.css" media="all">
+<!--[if lt IE 9]>
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/21de84c77e989fe1d51cb450e2ec628e/_/download/contextbatch/css/viewcontent,atl.general,main/batch.css?conditionalComment=lt+IE+9" media="all">
+<![endif]-->
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/2.1.3/_/download/batch/com.atlassian.confluence.ext.newcode-macro-plugin:syntaxhighlighter/com.atlassian.confluence.ext.newcode-macro-plugin:syntaxhighlighter.css" media="all">
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/2.1.3/_/download/batch/com.atlassian.confluence.ext.newcode-macro-plugin:sh-theme-confluence/com.atlassian.confluence.ext.newcode-macro-plugin:sh-theme-confluence.css" media="all">
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/6.3.7/_/download/batch/com.atlassian.confluence.plugins.confluence-space-ia:spacesidebar/com.atlassian.confluence.plugins.confluence-space-ia:spacesidebar.css" media="all">
+<!--[if lt IE 9]>
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/6.3.7/_/download/batch/com.atlassian.confluence.plugins.confluence-space-ia:spacesidebar/com.atlassian.confluence.plugins.confluence-space-ia:spacesidebar.css?conditionalComment=lt+IE+9" media="all">
+<![endif]-->
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/1.4/_/download/batch/com.atlassian.confluence.plugins.confluence-highlight-actions:highlighting-experiment-resources/com.atlassian.confluence.plugins.confluence-highlight-actions:highlighting-experiment-resources.css" media="all">
+<!--[if lt IE 9]>
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/1.4/_/download/batch/com.atlassian.confluence.plugins.confluence-highlight-actions:highlighting-experiment-resources/com.atlassian.confluence.plugins.confluence-highlight-actions:highlighting-experiment-resources.css?conditionalComment=lt+IE+9" media="all">
+<![endif]-->
+<link type="text/css" rel="stylesheet" href="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/5.4.3/_/download/batch/confluence.extra.jira:web-resources-adg/confluence.extra.jira:web-resources-adg.css" media="all">
+<link type="text/css" rel="stylesheet" href="/wiki/s/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/1/_/styles/colors.css?spaceKey=ANTLR3" media="all">
+<link type="text/css" rel="stylesheet" href="/wiki/s/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/1.0/_/download/resources/com.atlassian.confluence.themes.default:styles/default-theme.css" media="all">
+
+<!-- end system css resources -->
+
+    <meta name="confluence-request-time" content="1394607104687">
+        
+    
+        
+            <meta name="ajs-is-confluence-admin" content="false">
+            <meta name="ajs-connection-timeout" content="10000">
+            <meta name="ajs-discovered-plugin-features" content="$discoveredList">
+            <meta name="ajs-use-keyboard-shortcuts" content="true">
+            <meta name="ajs-keyboardshortcut-hash" content="44553066b06425e9d75f1504c2c236f6">
+            
+            <script type="text/x-template" title="gliffy-webpanel-footer">
+        <div class="gliffy-webpanel-footer"><span>Gliffy is unlicensed.  Please install a license to draw diagrams in your wiki.</span></div>
+</script>
+
+
+            <meta id="team-calendars-user-timezone" content="America/Los_Angeles">
+            <script type="text/x-template" id="team-calendars-messages" title="team-calendars-messages">
+    <fieldset class="i18n hidden">
+                    <input type="hidden" name="calendar3.month.short.april" value="Apr">
+                    <input type="hidden" name="calendar3.month.short.november" value="Nov">
+                    <input type="hidden" name="calendar3.month.long.november" value="November">
+                    <input type="hidden" name="calendar3.day.short.friday" value="Fri">
+                    <input type="hidden" name="calendar3.month.long.february" value="February">
+                    <input type="hidden" name="calendar3.month.short.february" value="Feb">
+                    <input type="hidden" name="calendar3.day.long.wednesday" value="Wednesday">
+                    <input type="hidden" name="calendar3.month.long.december" value="December">
+                    <input type="hidden" name="calendar3.day.short.sunday" value="Sun">
+                    <input type="hidden" name="calendar3.month.long.april" value="April">
+                    <input type="hidden" name="calendar3.month.long.july" value="July">
+                    <input type="hidden" name="calendar3.month.short.august" value="Aug">
+                    <input type="hidden" name="calendar3.month.long.september" value="September">
+                    <input type="hidden" name="calendar3.month.short.june" value="Jun">
+                    <input type="hidden" name="calendar3.month.short.may" value="May">
+                    <input type="hidden" name="calendar3.day.short.tuesday" value="Tue">
+                    <input type="hidden" name="calendar3.day.short.wednesday" value="Wed">
+                    <input type="hidden" name="calendar3.day.long.thursday" value="Thursday">
+                    <input type="hidden" name="calendar3.month.long.march" value="March">
+                    <input type="hidden" name="calendar3.month.long.october" value="October">
+                    <input type="hidden" name="calendar3.day.short.saturday" value="Sat">
+                    <input type="hidden" name="calendar3.month.short.january" value="Jan">
+                    <input type="hidden" name="calendar3.month.long.may" value="May">
+                    <input type="hidden" name="calendar3.month.long.january" value="January">
+                    <input type="hidden" name="calendar3.month.short.october" value="Oct">
+                    <input type="hidden" name="calendar3.day.short.thursday" value="Thu">
+                    <input type="hidden" name="calendar3.day.long.friday" value="Friday">
+                    <input type="hidden" name="calendar3.day.long.sunday" value="Sunday">
+                    <input type="hidden" name="calendar3.month.long.june" value="June">
+                    <input type="hidden" name="calendar3.month.long.august" value="August">
+                    <input type="hidden" name="calendar3.day.long.tuesday" value="Tuesday">
+                    <input type="hidden" name="calendar3.day.long.saturday" value="Saturday">
+                    <input type="hidden" name="calendar3.month.short.september" value="Sep">
+                    <input type="hidden" name="calendar3.day.long.monday" value="Monday">
+                    <input type="hidden" name="calendar3.month.short.july" value="Jul">
+                    <input type="hidden" name="calendar3.month.short.march" value="Mar">
+                    <input type="hidden" name="calendar3.day.short.monday" value="Mon">
+                    <input type="hidden" name="calendar3.month.short.december" value="Dec">
+            </fieldset>
+</script>
+
+            
+
+            <script>
+    window._AP = window._AP || {};
+    
+        window._AP.dialogOptions = {
+                            };
+
+    window._AP.inlineDialogOptions = {
+                            };
+</script>
+
+            <style>.ia-fixed-sidebar, .ia-splitter-left {width: 285px;}.theme-default .ia-splitter #main {margin-left: 285px;}.ia-fixed-sidebar {visibility: hidden;}</style>
+            
+
+    
+            
+    
+    
+            <meta name="ajs-page-id" content="2687401">
+            <meta name="ajs-content-type" content="page">
+            <meta name="ajs-page-title" content="ANTLR3JavaScriptTarget">
+            <meta name="ajs-parent-page-title" content="Code Generation Targets">
+            <meta name="ajs-parent-page-id" content="2687352">
+            <meta name="ajs-space-key" content="ANTLR3">
+            <meta name="ajs-space-name" content="ANTLR 3">
+            <meta name="ajs-jira-metadata-count" content="-1">
+            <meta name="ajs-from-page-title" content="">
+            <meta name="ajs-can-remove-page" content="false">
+            <meta name="ajs-browse-page-tree-mode" content="view">
+            <meta name="ajs-editor.loader.comment.resources" content="&lt;link type=&quot;text/css&quot; rel=&quot;stylesheet&quot; href=&quot;/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/d2aa0888278ed29082213638967bf1d7/_/download/contextbatch/css/comment-editor/batch.css&quot; media=&quot;all&quot;&gt;
+">
+            <meta name="ajs-context-path" content="/wiki">
+            <meta name="ajs-base-url" content="https://theantlrguy.atlassian.net/wiki">
+            <meta name="ajs-version-number" content="5.4-OD-7">
+            <meta name="ajs-build-number" content="4923">
+            <meta name="ajs-remote-user" content="">
+            <meta name="ajs-current-user-fullname" content="">
+            <meta name="ajs-current-user-avatar-url" content="">
+            <meta name="ajs-static-resource-url-prefix" content="/wiki/s/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/_">
+            <meta name="ajs-global-settings-attachment-max-size" content="104857600">
+            <meta name="ajs-user-locale" content="en_GB">
+            <meta name="ajs-enabled-dark-features" content="rotp.admin.shortcuts,app-switcher.new,rotp.project.shortcuts">
+            <meta name="ajs-atl-token" content="c0d616178d56733eeb22d4bfcbfb0ad5fcbf0e6b">
+            <meta name="ajs-confluence-flavour" content="STANDALONE">
+            <meta name="ajs-editor.loader.resources" content="&lt;link type=&quot;text/css&quot; rel=&quot;stylesheet&quot; href=&quot;/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/a4127852dc14275a716015d3b02f6e40/_/download/contextbatch/css/editor,macro-browser,fullpage-editor,-viewcontent,-atl.general/batch.css&quot; media=&quot;all&quot;&gt;
+&lt;link type=&quot;text/css&quot; rel=&quot;stylesheet&quot; href=&quot;/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/a4127852dc14275a716015d3b02f6e40/_/download/contextbatch/css/editor,macro-browser,fullpage-editor,-viewcontent,-atl.general/batch.css?media=%28max-width%3A+1450px%29&quot; media=&quot;(max-width: 1450px)&quot;&gt;
+&lt;link type=&quot;text/css&quot; rel=&quot;stylesheet&quot; href=&quot;/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/a4127852dc14275a716015d3b02f6e40/_/download/contextbatch/css/editor,macro-browser,fullpage-editor,-viewcontent,-atl.general/batch.css?media=print&quot; media=&quot;print&quot;&gt;
+&lt;!--[if lt IE 9]&gt;
+&lt;link type=&quot;text/css&quot; rel=&quot;stylesheet&quot; href=&quot;/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/a4127852dc14275a716015d3b02f6e40/_/download/contextbatch/css/editor,macro-browser,fullpage-editor,-viewcontent,-atl.general/batch.css?conditionalComment=lt+IE+9&quot; media=&quot;all&quot;&gt;
+&lt;![endif]--&gt;
+&lt;!--[if IE]&gt;
+&lt;link type=&quot;text/css&quot; rel=&quot;stylesheet&quot; href=&quot;/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/a4127852dc14275a716015d3b02f6e40/_/download/contextbatch/css/editor,macro-browser,fullpage-editor,-viewcontent,-atl.general/batch.css?ieonly=true&quot; media=&quot;all&quot;&gt;
+&lt;![endif]--&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/a4127852dc14275a716015d3b02f6e40/_/download/contextbatch/js/editor,macro-browser,fullpage-editor,-viewcontent,-atl.general/batch.js&quot; &gt;&lt;/script&gt;
+">
+            <meta name="ajs-date.format" content="MMM dd, yyyy">
+    
+    <link rel="shortcut icon" href="/wiki/s/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/_/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/wiki/s/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/_/favicon.ico">
+
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/opensearch/osd.action" title="Confluence"/>
+    
+                    
+            <meta name="ajs-create-issue-metadata-show-discovery" content="false">
+            
+
+    <!-- include system javascript resources -->
+    <script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/11/_/download/superbatch/js/batch.js" ></script>
+<!--[if lte IE 8]>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/11/_/download/superbatch/js/batch.js?conditionalComment=lte+IE+8" ></script>
+<![endif]-->
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/159908c75ca24afae38261ebd2f6c577/_/download/contextbatch/js/page/batch.js" ></script>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/21de84c77e989fe1d51cb450e2ec628e/_/download/contextbatch/js/viewcontent,atl.general,main/batch.js" ></script>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/27bbcfcb2d2fcff7da30629456b58bba/_/download/contextbatch/js/atl.comments/batch.js" ></script>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/2.1.3/_/download/batch/com.atlassian.confluence.ext.newcode-macro-plugin:syntaxhighlighter/com.atlassian.confluence.ext.newcode-macro-plugin:syntaxhighlighter.js" ></script>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/2.1.3/_/download/batch/com.atlassian.confluence.ext.newcode-macro-plugin:syntaxhighlighter-brushes/com.atlassian.confluence.ext.newcode-macro-plugin:syntaxhighlighter-brushes.js" ></script>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/6.3.7/_/download/batch/com.atlassian.confluence.plugins.confluence-space-ia:soy-resources/com.atlassian.confluence.plugins.confluence-space-ia:soy-resources.js" ></script>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/5.4-OD-7/_/download/batch/com.atlassian.confluence.plugins.editor-loader:background-loading-editor/com.atlassian.confluence.plugins.editor-loader:background-loading-editor.js" ></script>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/6.3.7/_/download/batch/com.atlassian.confluence.plugins.confluence-space-ia:spacesidebar/com.atlassian.confluence.plugins.confluence-space-ia:spacesidebar.js" ></script>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/1.4/_/download/batch/com.atlassian.confluence.plugins.confluence-highlight-actions:highlighting-experiment-resources/com.atlassian.confluence.plugins.confluence-highlight-actions:highlighting-experiment-resources.js" ></script>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/3.2.12/_/download/batch/com.atlassian.plugins.atlassian-nav-links-plugin:administration-shortcuts-resources/com.atlassian.plugins.atlassian-nav-links-plugin:administration-shortcuts-resources.js" ></script>
+<script type="text/javascript" src="/wiki/download/batch/com.atlassian.growth.experiments-plugin:atlassian-experiments/com.atlassian.growth.experiments-plugin:atlassian-experiments.js?cache=false" ></script>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/1.6/_/download/batch/com.atlassian.mywork.mywork-confluence-host-plugin:mw-header-anchor/com.atlassian.mywork.mywork-confluence-host-plugin:mw-header-anchor.js" ></script>
+<script type="text/javascript" src="/wiki/s/d41d8cd98f00b204e9800998ecf8427e/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/1.16/_/download/batch/com.atlassian.plugins.browser.metrics.browser-metrics-plugin:browser-metrics/com.atlassian.plugins.browser.metrics.browser-metrics-plugin:browser-metrics.js" ></script>
+
+    
+
+        
+    <!-- end system javascript resources -->
+
+        
+        
+
+    
+                <link rel="canonical" href="https://theantlrguy.atlassian.net/wiki/display/ANTLR3/ANTLR3JavaScriptTarget">
+        <link rel="shortlink" href="https://theantlrguy.atlassian.net/wiki/x/qQEp">
+    <meta name="wikilink" content="[ANTLR3:ANTLR3JavaScriptTarget]">
+    <meta name="page-version" content="7">
+
+</head>
+
+<body             onload="placeFocus()"
+     id="com-atlassian-confluence" class="theme-default  aui-layout aui-theme-default">
+
+        
+    <ul id="assistive-skip-links" class="assistive">
+    <li><a href="#title-heading">Skip to content</a></li>
+    <li><a href="#breadcrumbs">Skip to breadcrumbs</a></li>
+    <li><a href="#header-menu-bar">Skip to header menu</a></li>
+    <li><a href="#navigation">Skip to action menu</a></li>
+    <li><a href="#quick-search-query">Skip to quick search</a></li>
+</ul>
+<div id="page">
+<div id="full-height-container">
+    <div id="header-precursor">
+        <div class="cell">
+            
+                            </div>
+    </div>
+    
+
+
+
+<header id="header" role="banner">
+    <nav class="aui-header aui-dropdown2-trigger-group" role="navigation"><div class="aui-header-inner"><div class="aui-header-primary"><h1 id="logo" class="aui-header-logo aui-header-logo-custom"><a href="/wiki/"><img src="/wiki/s/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/_/images/logo/confluence-logo.png" alt="Confluence" /></a></h1><ul class="aui-nav">
+                            <li>
+            
+        
+        
+<a  id="space-directory-link" href="/wiki/spacedirectory/view.action"  class=" aui-nav-imagelink"   title="Spaces">
+            <span>Spaces</span>
+    </a>
+        </li>
+                    <li>
+            
+    
+        
+<a  id="people-directory-link" href="/wiki/peopledirectory.action"  class=" aui-nav-imagelink"   title="People">
+            <span>People</span>
+    </a>
+        </li>
+                        </ul>
+</div><div class="aui-header-secondary"><ul class="aui-nav">
+                <li>
+<form id="quick-search" class="aui-quicksearch dont-default-focus header-quicksearch" action="/wiki/dosearchsite.action" method="get">
+    <fieldset>
+                        <label for="quick-search-query" class="assistive">Quick Search</label>
+        <input id="quick-search-query" class="text app-search search quick-search-query" type="text"
+               accessKey="q" autocomplete="off" name="queryString" title="Quick Search"  placeholder="Search" />
+        <input id="quick-search-submit" class="quick-search-submit" type="submit" value="Search"/>
+
+        <div class="aui-dd-parent quick-nav-drop-down"></div>
+    </fieldset>
+    <div class="hidden parameters">
+                    <!-- putMetadata failed to add value for key "quick-nav-enabled" so rendering metadata inline - see server debug log for details -->
+        <meta name="ajs-quick-nav-enabled" content="true">
+                </div>
+</form>
+</li>
+    <li>    
+        <a id="help-menu-link" class="aui-nav-link aui-dropdown2-trigger" href="#" aria-haspopup="true" aria-owns="help-menu-link-content" title="Help">
+        <span class="aui-icon aui-icon-small aui-iconfont-help">Help</span>
+    </a>
+    <nav id="help-menu-link-content" class="aui-dropdown2 aui-style-default" aria-hidden="true">
+                    <div class="aui-dropdown2-section">
+                <ul  id="help-menu-link-leading" class="aui-list-truncate section-leading first">
+                                            <li>
+    
+            
+<a  id="confluence-help-link" href="http://confluence.atlassian.com/display/AOD/Getting+Help+And+Support" class="    "      title="Visit the Confluence documentation home"  target="_blank"
+>
+        Online Help
+</a>
+</li>
+                                            <li>
+    
+            
+<a  id="keyboard-shortcuts-link" href="/wiki" class="    "      title="View available keyboard shortcuts" >
+        Keyboard Shortcuts
+</a>
+</li>
+                                            <li>
+    
+            
+<a  id="feed-builder-link" href="/wiki/dashboard/configurerssfeed.action" class="    "      title="Create your custom RSS feed." >
+        Feed Builder
+</a>
+</li>
+                                            <li>
+    
+            
+<a  id="whats-new-menu-link" href="http://docs.atlassian.com/confluence/docs-54/whatsnew/iframe" class="    "      title="" >
+        What’s new
+</a>
+</li>
+                                            <li>
+    
+            
+<a  id="gadget-directory-link" href="/wiki" class="   user-item administration-link "      title="Browse gadgets provided by Confluence" >
+        Available Gadgets
+</a>
+</li>
+                                            <li>
+    
+            
+<a  id="confluence-about-link" href="/wiki/aboutconfluencepage.action" class="    "      title="Get more information about Confluence" >
+        About Confluence
+</a>
+</li>
+                                    </ul>
+            </div>
+            </nav>
+    </li>
+    <li>    
+    </li>
+                <li>                                    <li>
+    
+            
+<a  id="login-link" href="/wiki/login.action?os_destination=%2Fdisplay%2FANTLR3%2FANTLR3JavaScriptTarget" class="   user-item login-link "      title="" >
+        Log in
+</a>
+</li>
+                        </li>
+</ul>
+</div></div><!-- .aui-header-inner--></nav><!-- .aui-header -->
+    <br class="clear">
+</header>
+
+    
+    	<div class="ia-splitter">
+    		<div class="ia-splitter-left">
+    			<div class="ia-fixed-sidebar">
+    				
+	    	<div class="acs-side-bar ia-scrollable-section"><div class="acs-side-bar-space-info tipsy-enabled" data-configure-tooltip="Edit space details"><div class="avatar"><div class="space-logo project-shortcut-dialog-trigger" data-key="ANTLR3" data-name="ANTLR 3" data-entity-type="confluence.space"><div class="avatar-img-container"><div class="avatar-img-wrapper"><a href="/wiki/display/ANTLR3" title="ANTLR 3"><img class="avatar-img" src="/wiki/download/attachments/2689406/ANTLR3?version=1&amp;modificationDate=1229714323000&amp;api=v2" alt="ANTLR 3"></a></div></div></div></div><div class="name"><a href="/wiki/display/ANTLR3" title="ANTLR 3">ANTLR 3</a></div><div class="flyout-handle icon"></div></div><div class="acs-side-bar-content"><div class="acs-nav-wrapper"><div class="acs-nav" data-has-create-permission="false" data-quick-links-state="null" data-nav-type="pages"><div class="acs-nav-sections"><div class="main-links-section "><ul class="acs-nav-list"><li class="acs-nav-item wiki current-item"data-collector-key="spacebar-pages"><a class="acs-nav-item-link tipsy-enabled" href="/wiki/collector/pages.action?key=ANTLR3" data-collapsed-tooltip="Pages"><span class="icon"></span><span class="acs-nav-item-label">Pages</span></a></li><li class="acs-nav-item blog"data-collector-key="spacebar-blogs"><a class="acs-nav-item-link tipsy-enabled" href="/wiki/pages/viewrecentblogposts.action?key=ANTLR3" data-collapsed-tooltip="Blog"><span class="icon"></span><span class="acs-nav-item-label">Blog</span></a></li></ul></div><div class="quick-links-wrapper"></div></div></div></div><div class="ia-secondary-container tipsy-enabled" data-tree-type="pages"><div class="ia-secondary-header"><h5 class="ia-secondary-header-title pages"><span class="label">Child pages</span></h5></div><div class="ia-secondary-parent-content"><ul class="parent ia-secondary-header-title wiki"><li class="parent-item"><a class="parent-item-link" href="/wiki/display/ANTLR3/Code+Generation+Targets" title="Code Generation Targets"><span class="icon"></span><span class="label">Code Generation Targets</span></a></li></ul></div><div class="ia-secondary-current-content"><ul class="ia-secondary-currentPage-title wiki current-item"><li><span class="icon"></span><span class="label">ANTLR3JavaScriptTarget</span></li></ul></div><div class="ia-secondary-content"><div class="contextual-nav-child-pages"></div></div></div></div><div class="hidden"><a href="/wiki/collector/pages.action?key=ANTLR3" id="space-pages-link"></a><script type="text/x-template" title="logo-config-content"><h2>Space details</h2><form id="crop-photo-form" class="aui" method="post" action="#"><div id="sidebar-logo-messages"></div><fieldset><div class="field-group"><label for="spaceName">Name</label><input autocomplete="off" name="spaceName" id="spaceName" class="text" maxlength="255" value="{spaceName}"><input type="hidden" name="spaceKey" id="spaceKey" value="ANTLR3"><input type="hidden" name="offsetX" id="avatar-offsetX" value="-1"><input type="hidden" name="offsetY" id="avatar-offsetY" value="-1"><input type="hidden" name="width" id="avatar-width" value="-1"><input type="hidden" name="logoType" id="logoType" value="custom" data-last-value="custom"></div></fieldset></form><form id="upload-logo-form" class="aui" method="POST" action="#" enctype="multipart/form-data"><fieldset class="group"><legend><span>Logo</span></legend><div class="field-group"><input class="upload" type="file" id="upload-logo-input" name="upload-logo-input"></div><small ><a href="#" id="reset-logo">Reset to default logo</a></small><div id="image-holder" /></fieldset></form><div id="space-details-actions" class="buttons-container"><div class="buttons"><button class="aui-button save">Save</button><a href="#" class="aui-button aui-button-link cancel">Cancel</a></div></div></script></div></div><div class="space-tools-section"><div id="space-tools-menu-additional-items" class="hidden"><div data-label="Browse pages" data-class="" data-href="/wiki/pages/reorderpages.action?key=ANTLR3">Browse pages</div></div><div id="space-tools-dd-dummy"></div><a id="space-tools-menu-trigger" class="aui-button aui-button-subtle aui-dropdown2-trigger tipsy-enabled" aria-owns="space-tools-dd-dummy"><span class="aui-icon aui-icon-small aui-iconfont-configure">Configure</span><span class="label">Space tools</span></a><a class="expand-collapse-trigger"></a></div>
+    
+    			</div>
+    		</div>
+        <!-- \#header -->
+
+        
+        <div id="main" class=" aui-page-panel">
+                <div id="main-header">
+            
+    <div id="navigation" class="content-navigation view">
+                    <ul class="ajs-menu-bar">
+                                    
+                    
+        <li class="normal ajs-menu-item">
+        <a id="action-menu-link" class="action ajs-menu-title aui-dropdown2-trigger" href="#" aria-haspopup="true" aria-owns="action-menu" data-container="#navigation"><span><span>Tools</span></span></a>         <div id="action-menu" class="aui-dropdown2 aui-style-default">
+                            <ul  id="action-menu-primary"                     class="section-primary first aui-dropdown2-section">
+                                            <li>
+
+    
+        
+                            
+    
+    
+    <a  id="view-attachments-link" href="/wiki/pages/viewpageattachments.action?pageId=2687401" rel="nofollow"  class="action-view-attachments"  accessKey="t"  title="View Attachments">
+                <span>A<u>t</u>tachments (1)</span>    </a>
+</li>
+                                        <li>
+
+    
+        
+                            
+    
+    
+    <a  id="action-view-history-link" href="/wiki/pages/viewpreviousversions.action?pageId=2687401" rel="nofollow"  class="action-view-history"   title="">
+                <span>Page History</span>    </a>
+</li>
+                                        <li>
+
+    
+        
+                            
+    
+    
+    <a  id="action-page-permissions-link" href="/wiki/pages/viewinfo.action?pageId=2687401" rel="nofollow"  class="action-page-permissions"   title="Edit restrictions">
+                <span>Restrictions</span>    </a>
+</li>
+                                </ul>
+                            <ul  id="action-menu-secondary"                     class="section-secondary aui-dropdown2-section">
+                                            <li>
+
+    
+        
+                            
+    
+    
+    <a  id="view-page-info-link" href="/wiki/pages/viewinfo.action?pageId=2687401" rel="nofollow"  class="action-view-info"   title="">
+                <span>Page Information</span>    </a>
+</li>
+                                        <li>
+
+    
+        
+                            
+    
+    
+    <a  id="link-to-page-link" href="/wiki/pages/viewinfo.action?pageId=2687401" rel="nofollow"  class=""   title="Link to this Page">
+                <span>Link to this Page…</span>    </a>
+</li>
+                                        <li>
+
+    
+        
+                            
+    
+    
+    <a  id="view-in-hierarchy-link" href="/wiki/pages/reorderpages.action?key=ANTLR3&amp;openId=2687401#selectedPageInHierarchy" rel="nofollow"  class=""   title="">
+                <span>View in Hierarchy</span>    </a>
+</li>
+                                        <li>
+
+    
+        
+                            
+    
+    
+    <a  id="action-view-source-link" href="/wiki/plugins/viewsource/viewpagesrc.action?pageId=2687401" rel="nofollow"  class="action-view-source popup-link"   title="">
+                <span>View Source</span>    </a>
+</li>
+                                        <li>
+
+    
+        
+                            
+    
+    
+    <a  id="action-export-pdf-link" href="/wiki/spaces/flyingpdf/pdfpageexport.action?pageId=2687401" rel="nofollow"  class=""   title="">
+                <span>Export to PDF</span>    </a>
+</li>
+                                        <li>
+
+    
+        
+                            
+    
+    
+    <a  id="action-export-word-link" href="/wiki/exportword?pageId=2687401" rel="nofollow"  class="action-export-word"   title="">
+                <span>Export to Word</span>    </a>
+</li>
+                                </ul>
+                    </div>
+    </li>
+            </ul>
+    </div>
+
+            
+            <div id="title-heading" class="pagetitle with-breadcrumbs">
+                
+                                    <div id="breadcrumb-section">
+                        
+    
+    
+    <ol id="breadcrumbs">
+                    
+                
+        <li class="first" >
+                
+
+                    <span class=""><a href="/wiki/collector/pages.action?key=ANTLR3">Pages</a></span>
+                                                <li id="ellipsis" title="Show all breadcrumbs"><span><strong>&#8230;</strong></span></li>
+                                    
+                
+        <li class="hidden-crumb" >
+                
+
+                    <span class=""><a href="/wiki/display/ANTLR3/ANTLR+3+Wiki+Home">ANTLR 3 Wiki Home</a></span>
+                                        
+                
+        <li class="hidden-crumb" >
+                
+
+                    <span class=""><a href="/wiki/display/ANTLR3/ANTLR+v3+documentation">ANTLR v3 documentation</a></span>
+                            
+                
+        <li>
+                
+
+                    <span class=""><a href="/wiki/display/ANTLR3/Code+Generation+Targets">Code Generation Targets</a></span>
+                </ol>
+
+
+                    </div>
+                
+                
+        <a href="#page-banner-end" class="assistive">Skip to end of banner</a>
+<div id="page-banner-start" class="assistive"></div>
+
+                    
+            <div id="page-metadata-banner"><ul class="banner"><li id="system-content-items" class="noprint"><a href="" title="Restrictions apply" id="content-metadata-page-restrictions" class="hidden"><img class="page-banner-item-icon" src="/wiki/s/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/_/download/resources/com.atlassian.confluence.plugins.confluence-page-banner:page-banner-resources/images/red_padlock.png" style="height: 16px; width: 16px;"/></a><a href="/wiki/pages/viewpageattachments.action?pageId=2687401&amp;metadataLink=true" title="1 attachment" id="content-metadata-attachments" ><img class="page-banner-item-icon" src="/wiki/s/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/_/download/resources/com.atlassian.confluence.plugins.confluence-page-banner:page-banner-resources/images/grey_attach.png" style="height: 16px; width: 16px;"/></a></li><li class="page-metadata-item noprint"  id="content-metadata-jira-wrapper"><a href="" title="" id="content-metadata-jira" class="aui-button aui-button-subtle content-metadata-jira tipsy-disabled hidden"><img class="page-banner-item-icon" src="/wiki/s/en_GB-1988229788/4923/2f48478733c63a221a88ec973d689d110cebf32e.1/_/download/resources/com.atlassian.confluence.plugins.confluence-jira-metadata:confluence-jira-metadata-resources/img/icon-jira-link.png" style="height: 16px; width: 16px;"/><span>JIRA links</span></a></li></ul></div>
+            
+
+<a href="#page-banner-start" class="assistive">Go to start of banner</a>
+<div id="page-banner-end" class="assistive"></div>
+    
+
+                <h1 id="title-text" class="with-breadcrumbs">
+                                                <a href="/wiki/display/ANTLR3/ANTLR3JavaScriptTarget">ANTLR3JavaScriptTarget</a>
+                                    </h1>
+            </div>
+        </div><!-- \#main-header -->
+        
+        
+
+        <div id="sidebar-container">
+                                                </div><!-- \#sidebar-container -->
+
+        
+    
+
+        
+
+
+
+
+        
+
+    
+    
+        
+    
+    
+                    
+    
+
+                        
+    
+    
+
+    
+
+
+
+
+<div id="content" class="page view">
+    
+
+<div id="action-messages">
+                        </div>
+
+
+
+        <script type="text/x-template" title="searchResultsGrid">
+    <table class="aui">
+        <thead>
+            <tr class="header">
+                <th class="search-result-title">Page Title</th>
+                <th class="search-result-space">Space</th>
+                <th class="search-result-date">Updated</th>
+            </tr>
+        </thead>
+    </table>
+</script>
+<script type="text/x-template" title="searchResultsGridCount">
+    <p class="search-result-count">{0}</p>
+</script>
+<script type="text/x-template" title="searchResultsGridRow">
+    <tr class="search-result">
+        <td class="search-result-title"><a href="{1}" class="content-type-{2}"><span>{0}</span></a></td>
+        <td class="search-result-space"><a class="space" href="/wiki/display/{4}/" title="{3}">{3}</a></td>
+        <td class="search-result-date"><span class="date" title="{6}">{5}</span></td>
+    </tr>
+</script>
+        
+    
+            
+
+        
+                            
+    
+
+                    
+
+        
+        <a href="#page-metadata-end" class="assistive">Skip to end of metadata</a>
+<div id="page-metadata-start" class="assistive"></div>
+
+    <div class="page-metadata">
+        <ul>
+            <li class="page-metadata-modification-info">
+                
+        
+    
+        
+    
+        
+        
+            Created and last modified by <span class='author'>     <span class="unknown-user">Unknown User (jhurst)</span></span> on <a class='last-modified' title='May 18, 2010 08:08' href='/wiki/pages/diffpagesbyversion.action?pageId=2687401&amp;selectedPageVersions=6&amp;selectedPageVersions=7'>May 18, 2010</a>
+                </li>
+        </ul>
+    </div>
+
+
+<a href="#page-metadata-start" class="assistive">Go to start of metadata</a>
+<div id="page-metadata-end" class="assistive"></div>
+
+        
+                                
+        <div id="main-content" class="wiki-content">
+                           
+        <p>The ANTLR 3 JavaScript target is available for the first time in the ANTLR 3.1 release.  Being new, this target is in <strong>beta state</strong>. This means that most parts are working (and passing a large suite of functional tests), but bugs and problems are to be expected and documentation is pretty poor.</p>
+
+<p>Both the runtime module and the code generation templates should now be feature complete and in sync with the Java target, <a href="#ANTLR3JavaScriptTarget-missingFeatures">except for the features listed below</a>.</p>
+
+<p>Please send bug reports, feedback, and patches to <a href="mailto:jhurstus+antlr@gmail.com" class="external-link" rel="nofollow">me</a> or the <a href="http://www.antlr.org:8080/mailman/listinfo/antlr-interest" class="external-link" rel="nofollow">antlr-interest mailing list</a>. </p>
+
+<p>This page was modeled on the Python target's page: thanks Benjamin Niemann.</p>
+
+<h2 id="ANTLR3JavaScriptTarget-ReleaseHistory">Release History</h2>
+
+<p><strong>IMPORTANT:</strong> Unfortunately, the JavaScript target <strong>is broken in the latest 3.1 and 3.2 releases.</strong>  If you'd like to use the JavaScript target, you'll <strong>need to download a recent source snapshot from <a href="http://fisheye2.atlassian.com/browse/antlr" class="external-link" rel="nofollow">Fisheye</a> or <a href="http://github.com/antlr/antlr" class="external-link" rel="nofollow">Github</a></strong> and build from source.</p>
+
+<p>3.1 - JavaScript target added.</p>
+
+<p>3.2 - Unfortunately, ANTLR 3.2 shipped with some serious bugs in the JavaScript target that makes it mostly unusable.  These have been fixed in the trunk, so it is suggested that you <strong>build ANTLR from source if you'd like to use the JavaScript target</strong>.  An up-to-date build of the JavaScript runtime is attached to this page for convenience.</p>
+
+<h2 id="ANTLR3JavaScriptTarget-Requirements">Requirements</h2>
+
+<p>The JavaScript target has been tested on IE 7/8, FF 2/3, Safari 3, and Rhino.  We plan to support all <a href="http://developer.yahoo.com/yui/articles/gbs/" class="external-link" rel="nofollow">A Grade Browsers</a>, Rhino, and SpiderMonkey eventually.  The JavaScript runtime library will need to be loaded before you can make use of a compiled grammar.  In addition, if you're using Rhino and would like to use the ANTLRFileStream class, you'll need to include the antlr3-cli script.</p>
+
+<h2 id="ANTLR3JavaScriptTarget-Usage">Usage</h2>
+
+
+<h3 id="ANTLR3JavaScriptTarget-SelectingJavaScriptOutput">Selecting JavaScript Output</h3>
+
+<p>Just add <code>language=JavaScript;</code> to the options section of your grammar:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<script type="syntaxhighlighter" class="theme: Confluence; brush: java; gutter: false"><![CDATA[
+grammar T;
+options {
+    language=JavaScript;
+    [other options]
+}
+
+...  
+]]></script>
+</div></div>
+<p>For a grammar <code>T.g</code> ANTLR3 will then create the files <code>TLexer.js</code> and <code>TParser.js</code> which contain the classes <code>TLexer</code> and <code>TParser</code> (or just one of those, if you have a pure lexer/parser). For tree parsers, ANTLR3 creates <code>T.js</code> containing the class <code>T</code>.</p>
+
+<h3 id="ANTLR3JavaScriptTarget-UsingtheGeneratedClasses">Using the Generated Classes</h3>
+
+<p>To use a grammar <code>T.g</code>:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<script type="syntaxhighlighter" class="theme: Confluence; brush: java; gutter: false"><![CDATA[
+&lt;script type=&quot;text/javascript&quot; src=&quot;lib/antlr3-all-min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;TLexer.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;TParser.js&quot;&gt;&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+var input = &quot;...what you want to feed into the parser...&quot;,
+     cstream = new org.antlr.runtime.ANTLRStringStream(input),
+     lexer = new TLexer(cstream),
+     tstream = new org.antlr.runtime.CommonTokenStream(lexer),
+     parser = new TParser(tstream);
+parser.entry_rule();
+&lt;/script&gt;
+]]></script>
+</div></div>
+<p>If you want to access the tokens in your code, they are stored as static properties of the lexer and parser:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<script type="syntaxhighlighter" class="theme: Confluence; brush: java; gutter: false"><![CDATA[
+doSomethingWith(TLexer.IDENTIFIER);
+doSomethingWith(TParser.IDENTIFIER);
+]]></script>
+</div></div>
+
+<h3 id="ANTLR3JavaScriptTarget-UsingTreeParsers">Using Tree Parsers</h3>
+
+<p>For  grammars <code>T.g</code> (parser and lexer) and <code>TWalker.g</code> (the tree parser):</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<script type="syntaxhighlighter" class="theme: Confluence; brush: java; gutter: false"><![CDATA[
+&lt;script type=&quot;text/javascript&quot; src=&quot;lib/antlr3-all-min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;TLexer.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;TParser.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;TWalker.js&quot;&gt;&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+var input = &quot;...what you want to feed into the parser...&quot;,
+     cstream = new org.antlr.runtime.ANTLRStringStream(input),
+     lexer = new TLexer(cstream),
+     tstream = new org.antlr.runtime.CommonTokenStream(lexer),
+     parser = new TParser(tstream),
+     r = parser.entry_rule();
+
+var nodes = new org.antlr.runtime.tree.CommonTreeNodeStream(r.getTree());
+nodes.setTokenStream(tstream);
+var walker = new TWalker(nodes);
+walker.tree_entry_rule();
+&lt;/script&gt;
+]]></script>
+</div></div>
+
+<h3 id="ANTLR3JavaScriptTarget-APIDocumentation">API Documentation</h3>
+
+<p>Heh . . . we're working on this (using JSDoc).  For now, your best bet is to use the <a href="http://www.antlr.org/api/Java/" class="external-link" rel="nofollow">Java target API documentation</a>, which should be almost entirely compatible with the JavaScript target at both the class and method level.</p>
+
+<h3 id="ANTLR3JavaScriptTarget-Examples">Examples</h3>
+
+<p>There are a wealth of <a href="http://fisheye2.atlassian.com/browse/antlr-examples/JavaScript" class="external-link" rel="nofollow">examples available in antlr-examples repository</a>.  You also might want to look at the <a href="http://fisheye2.atlassian.com/browse/antlr/runtime/JavaScript/tests/functional" class="external-link" rel="nofollow">functional tests</a>.</p>
+
+<p><span class="confluence-anchor-link" id="ANTLR3JavaScriptTarget-missingFeatures"></span></p>
+
+<h2 id="ANTLR3JavaScriptTarget-UnsupportedFeatures">Unsupported Features</h2>
+
+<ul>
+	<li> -debug option is not available</li>
+	<li>haven't integrated with ANTLRWorks yet</li>
+	<li>StringTemplate output (&quot;output=template;&quot;) not available</li>
+</ul>
+
+                
+        
+    
+        </div>
+
+        <!--
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
+         <rdf:Description
+    rdf:about="https://theantlrguy.atlassian.net/wiki/display/ANTLR3/ANTLR3JavaScriptTarget"
+    dc:identifier="https://theantlrguy.atlassian.net/wiki/display/ANTLR3/ANTLR3JavaScriptTarget"
+    dc:title="ANTLR3JavaScriptTarget"
+    trackback:ping="https://theantlrguy.atlassian.net/wiki/rpc/trackback/2687401"/>
+</rdf:RDF>
+-->
+
+                        
+    
+
+
+
+<div id="labels-section" class="pageSection group">
+    <div class="labels-section-content content-column" entityid="2687401" entitytype="page">
+	<div class="labels-content">
+		
+    <ul class="label-list label-list-right ">
+            <li class="no-labels-message">
+            No labels
+        </li>
+            </ul>
+
+    </div>
+</div></div>
+        
+		
+            
+
+
+
+
+            
+    
+
+
+
+
+
+
+
+
+                    
+    
+<div id="comments-section" class="pageSection group">
+    
+    
+    
+    
+            <div class="bottom-comment-panels comment-panels">
+                                    
+    
+
+
+    
+            </div>
+    
+    </div>
+
+
+            
+</div>
+
+
+    
+
+
+
+
+    
+    
+
+    
+    
+    
+
+
+    
+<div id="space-tools-web-items" class="hidden">
+                <div data-label="Overview" data-href="/wiki/spaces/viewspacesummary.action?key=ANTLR3">Overview</div>
+            <div data-label="Content Tools" data-href="/wiki/pages/reorderpages.action?key=ANTLR3">Content Tools</div>
+    </div>
+
+
+
+
+    </div><!-- \#main -->
+        
+    
+        
+            
+<div id="footer" role="contentinfo">
+    <section class="footer-body">
+        
+
+        <ul id="poweredby">
+            <li class="noprint"><a href="http://www.atlassian.com/">Powered by Atlassian</a></li>
+            <li class="print-only">Printed by Atlassian Confluence 5.4-OD-7, Team Collaboration Software.</li>
+            <li class="noprint"><a href="http://www.atlassian.com/hosted/terms.jsp">Terms of Use</a></a></li>
+            <li class="noprint"><a href="https://answers.atlassian.com/questions/ask/?tags=on-demand">Answers</a></li>
+        </ul>
+
+        <div id="footer-logo"><a href="http://www.atlassian.com/">Atlassian</a></div>
+
+                    
+            </section>
+</div>
+            
+            
+    
+</div>
+
+</div><!-- \#full-height-container -->
+</div><!-- \#page -->
+</body>
+</html>
