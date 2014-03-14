@@ -317,7 +317,10 @@ lookup_lilypond_barline= (barline_type) ->
     "double_barline":'''
       \\bar "||" 
     '''
-    "single_barline":"|"
+    "single_barline":'''
+      \\bar "|" 
+    '''
+    # "single_barline":"|"
     "left_repeat":'''
       \\bar "|:" 
     '''
