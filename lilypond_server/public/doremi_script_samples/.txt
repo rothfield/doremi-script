@@ -1,0 +1,5 @@
+ForceSargamChars: SrGmMdN
+Raga: Lalit
+
+| N r G mM | m
+  .

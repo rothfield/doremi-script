@@ -1,0 +1,6 @@
+ForceSargamChars: SrGmMdN
+Raga: Lalit
+Filename: johntest
+
+| N r G mM | m
+  .
