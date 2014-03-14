@@ -1,3 +1,7 @@
+THIS DIRECTORY CONTAINS the older doremi-script code which was implemented in javascript/coffee script
+
+
+
 DoremiScript
 ============
 
