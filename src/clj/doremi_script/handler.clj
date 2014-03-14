@@ -156,15 +156,15 @@
 										
 							(println "convert results =")
 							(pprint convert-results)
+              )))
               (assoc results :staffNotationPath (str "/compositions/" file-id ".png"))
-              ))))
-            ))))
-;    (comment Exception e 
-;      { :error
-;       (str "caught exception: " (.getMessage e))
-;       } 
-;      )
-    
+						 ;; TODO: refactor code	
+							)
+            )
+					
+					))
+			
+			)
     ))
 
 
