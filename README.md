@@ -3,6 +3,11 @@ DoremiScript
 
 [Integration test results](https://rawgithub.com/rothfield/doremi-script/master/test/good_test_results/report.html?https://raw.github.com/user/repo/master/)
 
+
+   3/14/2014  Merged doremi-script with doremi-script-base. doremi-script-base is the older version written in Javascript. The legacy directory contains the older code.
+
+	3/13/2014  Staff notation generation moved from shell script to a java shell call and ajax updated.
+
    MILESTONE RELEASE Feb 28,2014 - New GUI and multi notation system support
    
      - New GUI is written and up at [http://ragapedia.com](http://ragapedia.com)
