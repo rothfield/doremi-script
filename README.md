@@ -3,6 +3,8 @@ DoremiScript
 
 [Integration test results](https://rawgithub.com/rothfield/doremi-script/master/test/good_test_results/report.html?https://raw.github.com/user/repo/master/)
 
+   3/14/2014 Note that lilypond 2.12.3 is required in order to get web-friendly staff notation via the lily2image program.
+	 I found the old version at this page: http://www.lilypond.org/old-downloads.html  
 
    3/14/2014  Merged doremi-script with doremi-script-base. doremi-script-base is the older version written in Javascript. The legacy directory contains the older code.
 

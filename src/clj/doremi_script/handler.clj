@@ -131,27 +131,33 @@
               (println "writing" lilypond-fname)
               (->> x (spit doremi-script-fname))
               (println "running lily2image")
-              (let [shell-results
+              (let [
+							shell-results
               (clojure.java.shell/sh "lily2image" "-f=png" "-q" lilypond-fname)
                     ]
                 (println "lily2image returns")
-               ;; (println shell-results)
+                (println shell-results)
                 )
               (when (.exists (clojure.java.io/as-file fname-with-page1))
               (let [
                     arg1 (str file-path-base  "-page*.png")
                     _ (println "arg1=" arg1)
                     _ (println "arg3=" (str file-path-base ".png")) ]
+										_ (println "running convert")
                 ;;(clojure.java.shell/sh "convert" "/home/john/compositions/094f03ce-page*.png"  "-append" "/home/john/compositions/094f03ce.png")
 				             ;;convert ${fp}-page*.png -append ${fp}.png
                 ;;
-                (when true
+                (let [convert-results
                     (clojure.java.shell/sh "convert" 
                                            arg1
                                            "-append"
-                                     (str file-path-base ".png")))))
+                                     (str file-path-base ".png"))
+							]
+										
+							(println "convert results =")
+							(pprint convert-results)
               (assoc results :staffNotationPath (str "/compositions/" file-id ".png"))
-              )
+              ))))
             ))))
 ;    (comment Exception e 
 ;      { :error
