@@ -1,19 +1,19 @@
 (ns doremi_script.doremi_main
   (:gen-class)
-  (:require	
-    [clojure.string :refer 
-     [split replace-first upper-case lower-case join] :as string] 
+  (:require
+    [clojure.string :refer
+     [split replace-first upper-case lower-case join] :as string]
     [ring.adapter.jetty :only [run-jetty]]
     [clojure.java.io :as io :only [input-stream resource]]
     [doremi_script.handler :only [app compositions-dir]]
-    [doremi_script.doremi_core :only [parse-failed? format-instaparse-errors 
+    [doremi_script.doremi_core :only [parse-failed? format-instaparse-errors
                                     doremi-text->lilypond]]
 ;;    [instaparse.core :as insta]
-;;    [clojure.string :refer 
-;;     [split replace-first upper-case lower-case join] :as string] 
+;;    [clojure.string :refer
+;;     [split replace-first upper-case lower-case join] :as string]
 ;;    [clojure.zip :as zip]
 ;;    [clojure.java.io :as io :refer [input-stream resource]]
-;;    [clojure.pprint :refer [pprint]] 
+;;    [clojure.pprint :refer [pprint]]
 ;;    [clojure.walk :refer [postwalk]]
     ))
 
@@ -22,8 +22,8 @@
   ;; cpr runs current file in vim
   ;; cp% runs current form. vim-fireplace
   (set! *warn-on-reflection* true)
-  (use 'doremi_script.main :reload) (ns doremi_script.main) 
-  (use 'clojure.stacktrace) 
+  (use 'doremi_script.main :reload) (ns doremi_script.main)
+  (use 'clojure.stacktrace)
   (print-stack-trace *e)
   (print-stack-trace *e)
   (pst)
@@ -67,7 +67,7 @@
 
 (defonce server (atom nil))
 
-(defn start-server[] 
+(defn start-server[]
    (reset! server (ring.adapter.jetty/run-jetty (var doremi_script.handler/app)
               {:port 3000 :join? false}))
   (println "Starting server at " (str "http://localhost:" port))
