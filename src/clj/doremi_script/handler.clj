@@ -2,7 +2,6 @@
   (:use compojure.core)
   (:import [java.io File])
   (:require  [compojure.handler :only [site]]
-            [hiccup.core :refer [html]]
             [clojure.java.io :as io :refer [input-stream resource]]
             [clojure.java.shell :only  [sh]]
             [doremi_script.doremi_core :refer 
@@ -45,16 +44,6 @@
 ;;
 
 
-(defn upload-file [file]
-  (let [file-name (file :filename)
-        size (file :size)
-        actual-file (file :tempfile)]
-    (do
-      (io/copy actual-file (File. (format "/Users/milinda/Desktop/%s" file-name)))
-      {:status 200
-       :headers {"Content-Type" "text/html"}
-       :body (html [:h1 file-name]
-                   [:h1 size])})))
 (defn sanitize[x]
   (if x
     (-> x (string/replace  #"[^0-9A-Za-z\.]" "_") string/lower-case)))

@@ -1,0 +1,10 @@
+(defn upload-file [file]
+  (let [file-name (file :filename)
+        size (file :size)
+        actual-file (file :tempfile)]
+    (do
+      (io/copy actual-file (File. (format "/Users/milinda/Desktop/%s" file-name)))
+      {:status 200
+       :headers {"Content-Type" "text/html"}
+       :body (html [:h1 file-name]
+                   [:h1 size])})))

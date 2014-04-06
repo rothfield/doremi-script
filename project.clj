@@ -12,7 +12,6 @@
    [instaparse "1.2.2"] 
    [ring.middleware.logger "0.4.0"]
    [org.clojure/clojurescript "0.0-2173"]
-    [om "0.5.1"]
    ]
   ;;                 [com.googlecode.texhyphj/texhyphj "1.2"]
   :plugins 
