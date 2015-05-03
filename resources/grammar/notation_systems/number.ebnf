@@ -1,0 +1,21 @@
+number-pitch  =  
+"1b"| "1#"| "2b" | "2#" | "2#" | "3b" | "3#" | "4#" | "5b" |
+"5#" | "6b" | "6#" | "7b" | 
+"1" ! flat-or-sharp|
+"2" ! flat-or-sharp|
+"3" ! flat-or-sharp|
+"4" ! flat-or-sharp|
+"5" ! flat-or-sharp|
+"6" ! flat-or-sharp|
+"7" !  flat-or-sharp
+
+number-ornament-pitch  =  
+"1b"| "1#"| "2b" | "2#" | "2#" | "3b" | "3#" | "4#" | "5b" |
+"5#" | "6b" | "6#" | "7b" | 
+"1" ! flat-or-sharp|
+"2" ! flat-or-sharp|
+"3" ! flat-or-sharp|
+"4" ! flat-or-sharp|
+"5" ! flat-or-sharp|
+"6" ! flat-or-sharp|
+"7" !  flat-or-sharp

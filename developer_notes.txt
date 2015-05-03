@@ -1,0 +1,17 @@
+Can test using curl:
+
+curl -X POST --data "src=|S--R|&param2=value2" http://ragapedia.com:3000/generate_staff_notation 
+
+In development, disabled doremiserverd in /etc/init.d
+sudo /etc/init.d/doremiserverd stop
+
+Then
+
+lein repl
+
+and in repl, start the server
+
+(use 'doremi-script.handler :reload)
+
+(defonce server (run-jetty #'app {:port 4000 :join? false}))
+

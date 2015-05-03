@@ -1,0 +1,25 @@
+doremi-pitch  =  
+ 
+"db"| "d#"| "rb" | "r#" | "mb" | "m#" | "f#" | "sb" |
+"s#" | "lb" | "l#" | "tb" | "t#" |
+"d" ! flat-or-sharp|
+"r" ! flat-or-sharp|
+"m" ! flat-or-sharp|
+"f" ! flat-or-sharp|
+"s" ! flat-or-sharp|
+"l" ! flat-or-sharp|
+"t" !  flat-or-sharp |
+"Db"| "D#"| "Rb" | "R#" | "Mb" | "M#" | "F#" | "Sb" |
+"S#" | "Lb" | "L#" | "Tb" | "T#" |
+"D" ! flat-or-sharp|
+"R" ! flat-or-sharp|
+"M" ! flat-or-sharp|
+"F" ! flat-or-sharp|
+"S" ! flat-or-sharp|
+"L" ! flat-or-sharp|
+"T" !  flat-or-sharp
+
+doremi-ornament-pitch  =  
+    "zzzzzz"
+
+

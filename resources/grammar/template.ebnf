@@ -1,0 +1,153 @@
+doremi-composition (* a musical piece *)
+(* each section is separated by one or more 'empty' lines.
+the empty line can have spaces. section doesn't include the eol.
+that allows things like "s" to parse as a composition *)
+= doremi-stave / doremi-staves-only  / attributes-only / doremi-attributes-and-staves / 
+doremi-one-lyrics-and-staves
+/ doremi-many-lyrics-and-staves / doremi-attributes-lyrics-and-staves
+(*
+= doremi-staves-only  | attributes-only | doremi-attributes-and-staves |
+doremi-one-lyrics-and-staves
+| doremi-many-lyrics-and-staves | doremi-attributes-lyrics-and-staves
+
+*)
+<attributes-only>= 
+<empty-line*> attribute-section 
+<empty-line*>
+<white-space*> 
+ *
+<attributes-only>= 
+<empty-line*> attribute-section 
+<empty-line*>
+<white-space*> 
+
+<doremi-attributes-and-staves>= 
+<empty-line*> attribute-section 
+(<newline>
+<empty-line+>
+doremi-stave)*
+<empty-line*>
+<white-space*> 
+
+<doremi-staves-only> =
+<empty-line*>
+doremi-stave
+(<newline>
+<empty-line+>
+doremi-stave)*
+<empty-line*>
+<white-space*> 
+
+<doremi-many-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline> <empty-line+> lyrics-section)*
+(<newline>
+<empty-line+>
+doremi-stave)*
+<empty-line*>
+<white-space*> 
+
+<doremi-one-lyrics-and-staves>=
+    <empty-line*> lyrics-section 
+(<newline>
+<empty-line+>
+doremi-stave)*
+<empty-line*>
+<white-space*> 
+
+<doremi-attributes-lyrics-and-staves> =
+    <empty-line*> attribute-section 
+(<newline> <empty-line+> lyrics-section)+
+(<newline>
+<empty-line+>
+doremi-stave)*
+<empty-line*>
+<white-space*> 
+
+
+doremi-stave  (* Spans multiple lines. *)
+=
+(doremi-upper-line <newline>)*
+doremi-notes-line 
+(<newline> lower-octave-line)*
+(<newline> lyrics-line)*
+
+
+doremi-notes-line (* consists of optional line# at beginning of
+line, followed by 1 or more measures *) 
+= line-number?
+<white-space?> 
+barline? 
+doremi-measure 
+(barline doremi-measure)*  
+barline?
+<white-space?>
+
+doremi-beat = 
+doremi-beat-delimited |
+!begin-beat-symbol doremi-beat-undelimited 
+
+
+<doremi-beat-delimited> 
+(* ie <s r g m> . useful if ornaments wouldn't line up otherwise!. 
+use srgm> or s r g m> to group pithes into a single beat. the > delimiters correspond to the lower loop in the aacm notation system *)
+= <begin-beat-symbol> 
+doremi-beat-delimited-item+ 
+<end-beat-symbol>
+
+
+<doremi-beat-delimited-item> =
+begin-slur /
+end-slur /
+doremi-pitch / 
+dash /
+<white-space>
+
+
+<doremi-beat-undelimited> (* beats can be indicated by a group of pitches that consist only of pitches and dashes such as 's--r--g-'   can't contain spaces *)
+= doremi-beat-undelimited-item+
+
+
+<doremi-beat-undelimited-item> (* inside of a simple beat, ie s--r--g- note that undelimited beats cannot contain spaces *)
+= doremi-pitch / 
+dash /
+begin-slur /
+end-slur
+
+
+doremi-measure = 
+<white-space?>
+doremi-measure-item
+(<white-space>
+doremi-measure-item)*
+<white-space?>
+
+
+<doremi-measure-item> = begin-slur / end-slur / doremi-beat
+
+
+doremi-upper-line (* Things above notes, including ornaments, 
+talas, mordents, octaves,chords, octave indicating dots,
+and 1st and second ending symbols. TODO: add catchall for word?? *)
+= <white-space?>  doremi-upper-line-item-non-blank
+( <white-space> /
+doremi-upper-line-item-non-blank)*
+
+
+doremi-upper-line-item-non-blank=
+upper-line-dot /
+tala /
+doremi-ornament /
+chord /
+mordent /
+upper-line-two-dots /
+ending 
+
+doremi-ornament= 
+doremi-ornament-pitch+  !doremi-ornament-pitch |
+<delimited-doremi-ornament> (* in upper line <nrsns> *)
+
+<delimited-doremi-ornament> (* in upper line <nrsns> *)
+=  <"<"> doremi-ornament-pitch+ !doremi-ornament-pitch <">">
+
+

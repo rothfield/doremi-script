@@ -1,0 +1,18 @@
+\score {
+  \new Staff {
+  \relative c' 
+    \key {{{key}}}
+		%  \clef treble
+		% \cadenzaOn
+    \accidentalStyle modern-cautionary
+		{{{time-signature-snippet}}}
+		{{{transpose-snippet}}} 
+    \autoBeamOn  
+    {
+    {{{melody}}}
+    }
+  \addlyrics 
+  {  {{{lyrics}}}
+  }
+  }
+}

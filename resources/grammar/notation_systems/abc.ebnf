@@ -1,0 +1,23 @@
+abc-pitch  =  
+"Cb"| "C#"| "Db" | "D#" | "D#" | "Eb" | "E#" | "F#" | "Gb" |
+"G#" | "Ab" | "A#" | "Bb" | "B#" |
+"C" ! flat-or-sharp|
+"D" ! flat-or-sharp|
+"E" ! flat-or-sharp|
+"F" ! flat-or-sharp|
+"G" ! flat-or-sharp|
+"A" ! flat-or-sharp|
+"B" !  flat-or-sharp
+
+abc-ornament-pitch  =  
+"Cb"| "C#"| "Db" | "D#" | "D#" | "Eb" | "E#" | "Fb" | "F#" | "Gb" |
+"G#" | "Ab" | "A#" | "Bb" | "B#"
+"C" ! flat-or-sharp|
+"D" ! flat-or-sharp|
+"E" ! flat-or-sharp|
+"F" ! flat-or-sharp|
+"G" ! flat-or-sharp|
+"A" ! flat-or-sharp|
+"B" ! flat-or-sharp
+
+

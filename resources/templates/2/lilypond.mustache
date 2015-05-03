@@ -1,0 +1,42 @@
+#(ly:set-option 'midi-extension "mid")
+\version "{{version}}"
+\include "english.ly"
+\header{ 
+title = "{{{title}}}" 
+composer = "{{{composer}}}" 
+tagline = ""  % remove lilypond footer!!!
+}
+
+\include "english.ly"
+
+%{
+    {{{doremi-source}}}
+%}
+
+
+melody =  {
+		%  \clef treble
+%		\cadenzaOn
+    \accidentalStyle modern-cautionary
+		{{{time-signature-snippet}}}
+		{{{key-signature-snippet}}}
+    \autoBeamOn  
+		\override Staff.TimeSignature #'style = #'()
+{{{staves}}}
+
+}
+\score {
+	\new Staff <<
+   {{{transpose-snippet}}} \melody
+   \addlyrics {  {{{all-lyrics}}}
+	 }
+>>
+\layout { }
+		\midi {
+				\context {
+						\Staff
+				}
+				\tempo 2 = 72
+		}
+
+}

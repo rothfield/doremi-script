@@ -1,0 +1,154 @@
+(*  EBNF grammar for doremi-script - this is for the clojure instaparse libarary *)
+(* grammar for aacm/bhatkande style sargam/letter notation  *)
+(* author: john rothfield 707 538-5133, cell 415 317-5154  rthfield@sonic.net *)
+(* use syntax highlighting for ocaml or applescript in your text editor *)
+(* vim: set filetype=ocaml  For indentation try se filetype=css and F3 *)
+
+
+
+attribute-section (* key value pairs *)
+= attribute-line (<newline> attribute-line)* 
+
+lyrics-section (* lines of lyrics *)
+= lyrics-line (<newline> lyrics-line)*
+
+<empty-line>= white-space? newline  
+
+
+(************** barlines **********************)
+barline 
+= 
+reverse-final-barline  |
+final-barline  |
+double-barline  |
+left-repeat  |
+right-repeat  |
+single-barline 
+
+reverse-final-barline = <'[' "|">
+
+final-barline = <'|' ']'>
+
+double-barline = <'|' '|'>
+
+single-barline = <'|' ! ('|' | ']' | ':')>
+
+left-repeat = <"|:">
+
+right-repeat = <":|">
+
+(***********end barline section ****************)
+
+(***********pitches, sharps and flats ************)	
+
+flat-or-sharp = '#' | 'b'
+tick ="'"
+
+(******** end pitch section*********************)
+
+
+
+end-slur = <')'>
+
+
+<newline>= "\r\n" | "\n"
+
+space = ' '
+
+<white-space> (* one or more spaces *)
+=    #' +'   
+
+(***** beats and measures ****)
+<begin-beat-symbol> =   '<' 
+<end-beat-symbol>  =   '>'  
+
+(* beats are sequences of pitches or dashes. spaces separate beats. beats can also be
+delimited by angle brackets, in which case white space can be used in the beat *)
+
+dash =  (* ie a -, used as a rhythmical placeholder. ie s--r--g- *) 
+<'-'>
+
+line-number (*    1)    2)     3) etc     *) 
+= digits  <')'>  <white-space?>
+
+<digits> = (* one or more digits *)  #'\d+'
+
+
+repeat-symbol = <'%'>
+begin-slur = <"(">
+end-slur = <")">
+
+
+lyrics-line (* line of syllables *)
+= <white-space?> lyrics-line-items
+
+<lyrics-line-items> = syl (lyrics-line-item)*
+
+<lyrics-line-item> = syl | <white-space>
+
+<syl> = (* items in lyrics line, ie a word or a syllable. ie he-llo john gives 3 items, 3 syllables *)
+hyphenated-syl | non-hyphenated-syl
+
+<hyphenated-syl> (* ends in a hyphen *)
+= #"[a-zA-Z'!]+-" 
+
+<non-hyphenated-syl> (* doesn't end in hyphen  *)
+= #"[a-zA-Z'!]+" !"-"
+
+
+
+mordent = <"~"> 
+
+ending 
+(*   1.------- 2.--- etc. the period is optional. must have either dot or underscores. todo: accepts 1-.--- which is not exactly what i want.  *)
+
+= #"[1-3][\._]+" 
+
+
+upper-line-dot= <dot> 
+
+dot = (*  period and asterisk are allowed *)
+#"[\.*]"
+
+upper-line-two-dots=<":">
+
+tala (* tala markings. ie +203 for tintal. 012 for rupak *)
+= #"[+1203456]"
+
+forward-slash-char  (* note that putting forward slash in regex doesn't seem to work *)
+= "\\"
+
+(* OLD chord = #"[a-gA-GvViI][^\s]*"  *) 
+
+(* 2015 now chords are any text alphanumeric and spaces [hello] *)
+chord =<"[">  #"[a-zA-Z0-9 ]*" <"]"> 
+
+
+lower-octave-line (* can put lower octave dots or semicolons for lower-lower octave (. or :)   *)
+= <white-space?> lower-octave-line-item-non-blank 
+lower-octave-line-item* <white-space?> 
+
+ <lower-octave-line-item> =  <white-space> | lower-line-dot |
+lower-line-two-dots | kommal-indicator  
+
+
+<lower-octave-line-item-non-blank> =   lower-line-dot |
+lower-line-two-dots | kommal-indicator  
+
+lower-line-dot= <dot>
+lower-line-two-dots=":"
+
+kommal-indicator (* an underscore for flat. for the traditional bhatkande notation - hindi, indicates a flatted note, since hindi seems not to have lowercase *)
+= "_"
+
+
+<attribute-line> (* ie author: john rothfield *)
+= key <white-space?>   <":"> <white-space?> value <white-space?>
+
+<key>= (* ie author *)  #"\w+"
+
+<value>=  (* attribute value can have embedded spaces.  *)
+(* non-space followed by (spaces | non-space)   *)
+#"[^\n\r| ](( *)[^|\n\r ])*"
+
+

@@ -1,0 +1,43 @@
+This is the doremi-server component that provides a service to generate lilypond/midi/mp3 from dormi text. It also includes the legacy GUI written using javascript and react.js
+
+
+# run repl
+lein repl
+
+Compositions directory is located at $HOME/doremi-public/compositions and must be writeable
+
+# start the server from the jar file
+java -jar doremi.jar -s
+
+# start the server via lein
+lein ring server
+
+# start the server from the repl:
+
+(main-aux ["-s"])
+
+Lilypond version required is 
+
+GNU LilyPond 2.12.3
+
+Also need ImageMagick 6.7.7-10 for the convert command.
+
+To build and deploy on ragapedia server:
+lein ring uberjar
+cd /etc/init.d
+sudo /etc/init.d/doremi-serverd restart 
+
+You can use the following to deploy
+(git pull ; lein ring uberjar ; sudo /etc/init.d/doremi-serverd restart) 
+
+and for an integration test on your local machine
+
+and open the staff-notation-url in the response
+
+
+Here's one with newlines
+curl -X POST --data "src=Title:john%0A%0A|S--R|&param2=value2" http://localhost:3001/run-lilypond-on-doremi-text
+
+# ==>
+# {"staff-notation-url":"http://localhost:3001/compositions/john-55123bb9.png","midi-url":"http://localhost:3001/compositions/john-55123bb9.mid","lilypond-url":"http://localhost:3001/compositions/john-55123bb9.ly","doremi-text-url":"http://localhost:3001/compositions/john-55123bb9.doremi.txt"}
+

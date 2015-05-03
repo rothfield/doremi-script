@@ -1,0 +1,23 @@
+#(ly:set-option 'midi-extension "mid")
+\version "{{version}}"
+\include "english.ly"
+\header{ 
+title = "{{{title}}}" 
+composer = "{{{composer}}}" 
+tagline = ""  % remove lilypond footer
+}
+
+\include "english.ly"
+
+%{
+    {{{doremi-source}}}
+%}
+
+{{{staves}}}
+\layout {
+  \context {
+  \Score
+  \remove "Bar_number_engraver"
+  } 
+}
+

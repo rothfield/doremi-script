@@ -1,0 +1,29 @@
+Filename: yesterday
+Key: F
+Mode: major
+Title: Yesterday
+Author: McCartney
+Time: 4/4
+EnteredBy: John Rothfield
+
+      [F]           [Em7]   [A7]   *   [Dmi]  [Dmi]
+1) |  RS S -- --  | -- GM P#D NS | N DD -- -- |
+
+| -- DD Pm GR | m GG -- R- | S G R D | S GG - - |
+                                   * 
+
+                                 *  
+2) |  RS S- -- --  | -- GM P#D  NS | N DD -- -- |
+
+   | -- DD Pm GR | m GG -- R- | S G R D | S GG - - :|
+                                      *
+
+
+                      *        G 
+3) || G -  G - |  D N S-  ND | N- -D P   DG | - - - - |
+
+                                        1_____      2______
+                   *                    *           *           
+   | G - G - | D N S- ND | N- -D P N | (S P m G) :| S - - -     ||
+
+ 
