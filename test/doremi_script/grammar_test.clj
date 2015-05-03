@@ -4,11 +4,16 @@
             [instaparse.core :as insta]
             [clojure.java.io :as io :refer [input-stream resource]]
             [ring.mock.request :as mock]
-            [doremi-script.doremi-core :refer [is-kind? doremi-script-grammar doremi-script-parse]]))
+            [doremi-script.core :refer [initialize-parser! doremi-script-parser]]))
 
 
 ;; (run-tests)
+(defonce initialize-parser
+  (initialize-parser!  (slurp (resource "doremiscript.ebnf"))))
 
+
+;; (println (fixtures :abc-composition))
+;; (def which :emi-composition)
 (defn fixtures[which]
   (->> (str "fixtures/" (clojure.string/replace (name which) "-" "_"))
        io/resource
@@ -22,13 +27,14 @@
 
 ;; (def my-file (-> "fixtures/semantic_analyzer_test.txt" io/resource slurp doremi-script-parse))
 ;; (prn my-file)
+;; (def txt "S-|") 
+;; (def which :sargam-composition)
 (defn parse-fixtures-test-helper[which]
   (doseq [my-file (fixtures which)
           :let [file-name (.getName my-file)
                 txt (-> my-file slurp)
-                result
-                (-> txt (doremi-script-parse which))
-                results2 (insta/parses doremi-script-grammar txt
+                result (insta/parse @doremi-script-parser txt :start which)
+                results2 (insta/parses @doremi-script-parser txt
                                        :start which )
                 more (second results2)
                 ambiguous? (not (nil? (second results2)))
@@ -48,7 +54,7 @@
       (is (true? failure?)
           (str file-name "was expected  to fail, but didn't!\n" txt "\n" (-> result pprint with-out-str)))
       (is (false? failure?)
-          (str "insta/failure:\n " txt "\n"  (insta/get-failure result))
+          (str "insta/failure:\n " file-name "\n" txt "\n"  (insta/get-failure result))
           ))
     ))
 
@@ -62,6 +68,7 @@
 (deftest test-doremi-composition[]
   (parse-fixtures-test-helper :doremi-composition)
   )
+;; (fixtures "doremi-composition")
 (deftest test-hindi-composition[]
   (parse-fixtures-test-helper :hindi-composition)
   )

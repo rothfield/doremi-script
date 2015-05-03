@@ -14,8 +14,7 @@
             [doremi-script.to-lilypond :refer [to-lilypond]]
             [doremi-script.utils :refer [format-instaparse-errors get-attributes]]
             [doremi-script.core :refer 
-             [doremi-text->collapsed-parse-tree 
-              ]]
+             [doremi-text->collapsed-parse-tree initialize-parser! ]]
             [doremi-script.to-lilypond :refer [to-lilypond]]
             [clojure.string :refer [split replace-first upper-case
                                     lower-case join] :as string] 
@@ -253,10 +252,16 @@
     ))
 
 
-;; for testing
-;;(def mp3 true)
 (defn init []
-  (println "doremi-script is starting"))
+  ;; This is called once before the handler starts
+  ;; See lein-ring docs
+  ;; In project.clj, this is set under the ring key: 
+  ;;  :ring {:handler doremi-script.handler/app
+  ;;             :init doremi-script.handler/init
+  ;;             :destroy doremi-script.handler/destroy}
+  (initialize-parser!
+    (slurp (resource "doremiscript.ebnf")))
+  (println "doremi-script/handler.init: doremi-script is starting"))
 
 (defn destroy []
   (println "doremi-script is shutting down"))

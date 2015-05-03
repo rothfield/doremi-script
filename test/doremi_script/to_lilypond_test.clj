@@ -4,10 +4,10 @@
             [instaparse.core :as insta]
             [clojure.java.io :as io :refer [input-stream resource]]
             [ring.mock.request :as mock]
-            [doremi-script.doremi-core :refer [is-kind? doremi-script-grammar doremi-script-parse]]))
+            [doremi-script.core :refer []]))
 
 
-;;; TODO:
+;;; TODO: *******
 ;;;
 
   (comment 

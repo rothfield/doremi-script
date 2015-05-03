@@ -2,9 +2,9 @@
   (:require	
     [instaparse.core :as insta]
     [clojure.string :refer 
-     [lower-case split replace-first upper-case lower-case join] :as string] 
+     [lower-case split lower-case join] :as string] 
     [clojure.zip :as zip]
-    [clojure.java.io :as io :refer [input-stream resource]]
+    [clojure.java.io :as io :refer [resource]]
     [clojure.pprint :refer [pprint]] 
     [clojure.walk :refer [postwalk]]
     [doremi-script.utils :refer [items map-even-items is? get-attribute]]
@@ -22,16 +22,29 @@
   (pst)
   )
 
-(def doremi-script-parser 
-  ;;;Optional keyword arguments to insta/parser:
-  ;;;   :start :keyword  (where :keyword is name of starting production rule)
-  ;;;   :partial true    (parses that don't consume the whole string are okay)
-  ;;;   :total true      (if parse fails, embed failure node in tree)
-  ;;;   :unhide <:tags or :content or :all> (for this parse, disable hiding)
-  ;;;   :optimize :memory   (when possible, employ strategy to use less memory)
-  ;;;
-  (insta/parser
-    (slurp (resource "doremiscript.ebnf")) :total true))
+(def doremi-script-parser (atom nil))
+
+(defn initialize-parser![ebnf-txt]
+  (reset! doremi-script-parser
+          (insta/parser ebnf-txt :total true)))
+
+(comment
+  (initialize-parser!
+    (slurp (resource "doremiscript.ebnf")))
+  )
+  
+;;;; (def doremi-script-parser 
+;;;;   ;;;Optional keyword arguments to insta/parser:
+;;;;   ;;;   :start :keyword  (where :keyword is name of starting production rule)
+;;;;   ;;;   :partial true    (parses that don't consume the whole string are okay)
+;;;;   ;;;   :total true      (if parse fails, embed failure node in tree)
+;;;;   ;;;   :unhide <:tags or :content or :all> (for this parse, disable hiding)
+;;;;   ;;;   :optimize :memory   (when possible, employ strategy to use less memory)
+;;;;   ;;;
+;;;;   (insta/parser
+;;;;     (slurp (resource "doremiscript.ebnf")) :total true))
+;;;; 
+
 
 (defn ^:private is-notation-system-name?
   [x]
@@ -202,7 +215,7 @@
 
 (defn ^:private apply-kommal-to-pitches
   [original-tree] ;; assigned]
-  (when true 
+  (when false
     (pprint "apply-kommal-to-pitches, tree is")
     (pprint original-tree))
   (assert (is? :stave original-tree))
@@ -231,8 +244,10 @@
       :post [(vector? %)]
    }
   (assert (is? :composition original-tree))
+  (when false
   (println "entering match-slurs, original-tree=")
   (pprint original-tree)
+    )
   ;;(pprint "matchslurs") (pprint original-tree)
   ;(assoc original-tree :parsed
   (loop [loc (zip/vector-zip original-tree)
@@ -288,8 +303,10 @@
   { :pre [(vector? original-tree)]
    :post [(vector? %)]
    }
+  (when false
   (prn "entering normalize-pitches")
   (pprint original-tree)
+    )
   (assert (is-kind? (first original-tree)))
   (loop [loc (zip/vector-zip original-tree) ]
     (if (zip/end? loc)
@@ -372,7 +389,7 @@
   (let [line-start (start-index my-line)
         ]
     (reduce (fn[accum obj]
-              (when nil (println "line-column-map:, obj =" obj)
+              (when false (println "line-column-map:, obj =" obj)
                 (println "start-index obj=" (start-index obj))
                 )
               (let [start-index (start-index obj)
@@ -766,7 +783,7 @@
     ([txt ] (doremi-text->collapsed-parse-tree txt default-kind))
     ([txt kind] 
      (assert (is-kind? kind))
-     (let [ parsed (insta/parse doremi-script-parser 
+     (let [ parsed (insta/parse @doremi-script-parser 
                                 txt 
                                 :start kind)
           ]
