@@ -768,7 +768,6 @@
      (assert (is-kind? kind))
      (let [ parsed (insta/parse doremi-script-parser 
                                 txt 
-                                :total true
                                 :start kind)
           ]
        (if (insta/failure? parsed)    ;;;  or (string? x)))

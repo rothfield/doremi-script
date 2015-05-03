@@ -12,7 +12,7 @@
             [clojure.java.shell :only  [sh]]
             [doremi-script.middleware]
             [doremi-script.to-lilypond :refer [to-lilypond]]
-            [doremi-script.utils :refer [get-attributes]]
+            [doremi-script.utils :refer [format-instaparse-errors get-attributes]]
             [doremi-script.core :refer 
              [doremi-text->collapsed-parse-tree 
               ]]
@@ -144,7 +144,8 @@
               composition (doremi-text->collapsed-parse-tree doremi-text kind2)
               ]
        (if (insta/failure? composition)    ;;;  or (string? x)))
-         { :error composition
+         { 
+          :error (-> composition format-instaparse-errors println with-out-str)
           :src doremi-text
           :links []
           }
