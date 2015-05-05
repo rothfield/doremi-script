@@ -37,8 +37,8 @@ start() {
 		exit 1
 	fi
 	echo "Starting $NAME on port $PORT"
-	#sudo -u john PORT=$PORT java  -server -Xms256M -Xmx512M -XX:MaxPermSize=128M -jar $INSTALL_JAR &> /dev/null &
-	sudo -u john APP_ENV=production PORT=$PORT java  -server -Xms256M -Xmx512M -XX:MaxPermSize=128M -jar $INSTALL_JAR &
+	sudo -u john APP_ENV=production PORT=$PORT java  -server -Xms256M -Xmx512M -XX:MaxPermSize=128M -jar $INSTALL_JAR &> /dev/null &
+	#sudo -u john APP_ENV=production PORT=$PORT java  -server -Xms256M -Xmx512M -XX:MaxPermSize=128M -jar $INSTALL_JAR &
 	PID=$!
 	echo $PID > $PID_FILE
 	exit 0
