@@ -344,7 +344,7 @@
                                           :access-control-allow-methods [:get :put :post])
               (handler/site)
               ring.middleware.json/wrap-json-response  ;; Converts responses that are clojure objects to json
-     ;;;    doremi-script.middleware/wrap-request-logging 
+         doremi-script.middleware/wrap-request-logging 
 ))
 
 (def my-port 4000)
