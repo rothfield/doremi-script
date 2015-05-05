@@ -23,8 +23,8 @@ server {
     listen 80;
     error_page 500 502 503 504  /50x.html;
 
-    #rewrite ^/open/(.*.doremi.txt)$ http://ragapedia.com?url=/compositions/$1  permanent; #last;
-    rewrite ^/open/(.*.doremi.txt)$ /?url=/compositions/$1  permanent; #last;
+    #rewrite ^/open/(.*.doremi*.txt)$ http://ragapedia.com?url=/compositions/$1  permanent; #last;
+    rewrite ^/open/(.*.doremi*.txt)$ /?url=/compositions/$1  permanent; #last;
     
     location /compositions {
     # This is the directory the ragapedia compositions are 
