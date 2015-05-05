@@ -126,6 +126,26 @@
 ;;(def midi-file-path "/home/john/yesterday.mid")
 ;; test (create-mp3! midi-file-path)
 
+(defn do-parse[doremi-text kind]
+  (if (= "" doremi-text)
+    {} ;; TODO review
+    (let [
+          composition (doremi-text->collapsed-parse-tree 
+                        doremi-text 
+                        (keyword kind))
+          ]
+      (if (insta/failure? composition)    ;;;  or (string? x)))
+        { 
+         :error 
+         (-> composition format-instaparse-errors println with-out-str)
+         :src doremi-text
+         }
+         {  
+         :composition composition
+         :src doremi-text
+         } 
+        ))))
+
 
 ;; (-> "|(SR)" (doremi-text->collapsed-parse-tree :sargam-composition))
 ;; (pprint (run-lilypond-on-doremi-text {} "S" :sargam-composition true))
@@ -284,7 +304,7 @@
 (defroutes app-routes
   (POST "/doremi-server/parse" [src  kind] 
         {:body
-         (doParse src kind)
+         (do-parse src kind)
          }
         )
   (GET "/doremi-server/run-lilypond-on-doremi-text" [] 

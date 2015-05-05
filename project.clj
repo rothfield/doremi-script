@@ -8,6 +8,8 @@
                  [compojure "1.3.3"]
                  [stencil "0.3.5"]  ;;; mustache implementation-clostache is broken
                  [instaparse "1.3.6"]
+                 [ring.middleware.jsonp "0.1.6"]
+                 [cheshire "5.4.0"]
                  [ring.middleware.logger "0.5.0"]
                  [ring/ring-json "0.3.1"]
                  [ring-cors "0.1.7"]
