@@ -1,8 +1,8 @@
 
 echo "running git pull"
 git pull
-echo "cleaning target"
-rm -rf target
+#echo "cleaning target"
+#rm -rf target
 echo "running boot cljs -O advanced"
 boot cljs -O advanced
 echo "minifying application.css and doremi.css in target/css.
