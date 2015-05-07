@@ -3,6 +3,7 @@ comp.pid
 watcher.pid
 *.pid
 /tmp
+/app_target
 /target
 /lib
 /classes
