@@ -1,12 +1,3 @@
-#  server {
-#      # new doremi-script-app clojure-script app 
-#      # ragapedia.com:8000 
-#      listen 8000;
-#      #etag on;
-#      server_name ragapedia.local;
-#      root /home/john/doremi-script-app/target;
-#  }  
-
 #    server {
 #        listen 80;
 #           root /home/john/doremi-public;
@@ -54,7 +45,7 @@ server {
 
     location / {
 				    # Let nginx serve it!
-            root /home/john/doremi-script-app/target;
+            root /home/john/doremi-script/app_target;
  #location ~* \.(?:ico|css|js|gif|jpe?g|png)$ {
     expires 30d;
     add_header Pragma public;
