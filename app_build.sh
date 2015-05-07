@@ -38,6 +38,7 @@ sed -i 's#<link rel=\"stylesheet\".*># <!-- & --> #' index.html
 
 echo "adding stylesheet css/app.min.css"
 sed -i 's#</body># </body>\n<link rel=\"stylesheet\" href=\"css/app.min.css\">#' index.html
+sed -i 's#<-- loadcsshere -->#<script> loadCSS(\"css/app.min.css\" ); </script>#' index.html
 sed  -i 's/^<html /<html manifest="manifest.appcache" /' index.html
 echo "bumping version of manifest.appcache"
 sed  -i "s/^#version.*$/#version `date`/" manifest.appcache
