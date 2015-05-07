@@ -24,6 +24,8 @@
 ;;; [servant "0.1.3"]
  [reagent "0.5.0"]])
 
+(set-env! :target-path "app_target")
+
 (require
  '[boot.pod :as pod]
  '[boot.util :as util]

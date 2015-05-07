@@ -1,14 +1,15 @@
-
+TARGET=app_target
+echo "target directory is $TARGET"
 echo "running git pull"
 git pull
-#echo "cleaning target"
-#rm -rf target
+#echo "cleaning $TARGET"
+#rm -rf $TARGET
 echo "running boot cljs -O advanced"
 boot cljs -O advanced
-echo "minifying application.css and doremi.css in target/css.
+echo "minifying application.css and doremi.css in $TARGET/css.
 #Uses npm minify command"
 # sudo npm install -g minify 
-cd ./target/css
+cd ./$TARGET/css
 # minify doesn't take multiple args
 echo "minifying bootstrap.css doremi.css and application.css" 
 minify bootstrap.css 
@@ -42,5 +43,5 @@ sed -i 's#<-- loadcsshere -->#<script> loadCSS(\"css/app.min.css\" ); </script>#
 sed  -i 's/^<html /<html manifest="manifest.appcache" /' index.html
 echo "bumping version of manifest.appcache"
 sed  -i "s/^#version.*$/#version `date`/" manifest.appcache
-echo "to test, cd target and start http server. I use node's http-server"
+echo "to test, cd $TARGET and start http server. I use node's http-server"
 cd ..
