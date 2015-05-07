@@ -1,27 +1,223 @@
-<!-- index.html -->
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 		<head>
-				<meta charset='utf-8'>
-				<title>Doremi Editor</title>
-				<link href='doremi-server/css/application.css' rel='stylesheet' type='text/css' />
-				<link href='doremi-server/css/styles.css' rel='stylesheet' type='text/css' />
-				<link href='doremi-server/css/doremi.css' rel='stylesheet' type='text/css' />
+				<!--
+				@media (min-width: 768px) {
+				-->
+
+				<style>
+						label {
+								display: inline-block;
+								max-width: 100%;
+								margin-bottom: 5px;
+								font-weight: 700;
+						}
+						body {
+								font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+								font-size: 14px;
+								line-height: 1.42857143;
+								color: #333;
+								background-color: #fff;
+						}
+						.btn-primary {
+								color: #fff;
+								background-color: #337ab7;
+								border-color: #2e6da4;
+						}
+						.btn {
+								display: inline-block;
+								padding: 6px 12px;
+								margin-bottom: 0;
+								font-size: 14px;
+								font-weight: 400;
+								line-height: 1.42857143;
+								text-align: center;
+								white-space: nowrap;
+								vertical-align: middle;
+								-ms-touch-action: manipulation;
+								touch-action: manipulation;
+								cursor: pointer;
+								-webkit-user-select: none;
+								-moz-user-select: none;
+								-ms-user-select: none;
+								user-select: none;
+								background-image: none;
+								border: 1px solid transparent;
+								border-radius: 4px;
+						}
+						.btn-primary	.btn-primary.active, .btn-primary.focus, .btn-primary:active, .btn-primary:focus, .btn-primary:hover, .open>.dropdown-toggle.btn-primary {
+								color: #fff;
+								background-color: #286090;
+								border-color: #204d74;
+						}
+						.form-inline .form-group {
+								display: inline-block;
+								margin-bottom: 0;
+								vertical-align: middle;
+						}
+						.form-inline .form-control {
+								display: inline-block;
+								width: auto;
+								vertical-align: middle;
+						}
+						.form-inline .form-control-static {
+								display: inline-block;
+						}
+						.form-inline .input-group {
+								display: inline-table;
+								vertical-align: middle;
+						}
+						.form-inline .input-group .input-group-addon,
+						.form-inline .input-group .input-group-btn,
+						.form-inline .input-group .form-control {
+								width: auto;
+						}
+						.form-inline .input-group > .form-control {
+								width: 100%;
+						}
+						.form-inline .control-label {
+								margin-bottom: 0;
+								vertical-align: middle;
+						}
+						.form-inline .radio,
+						.form-inline .checkbox {
+								display: inline-block;
+								margin-top: 0;
+								margin-bottom: 0;
+								vertical-align: middle;
+						}
+						.form-inline .radio label,
+						.form-inline .checkbox label {
+								padding-left: 0;
+						}
+						.form-inline .radio input[type="radio"],
+						.form-inline .checkbox input[type="checkbox"] {
+								position: relative;
+								margin-left: 0;
+						}
+						.form-inline .has-feedback .form-control-feedback {
+								top: 0;
+						}
+
+						label {
+								display: inline-block;
+								max-width: 100%;
+								margin-bottom: 5px;
+								font-weight: 700;
+						}
+						.form-group {
+								margin-bottom: 15px;
+						}
+
+						.form-control {
+								display: block;
+								width: 100%;
+								height: 34px;
+								padding: 6px 12px;
+								font-size: 14px;
+								line-height: 1.42857143;
+								color: #555;
+								background-color: #fff;
+								background-image: none;
+								border: 1px solid #ccc;
+								border-radius: 4px;
+								-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+								box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+								-webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+								-o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+								transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+						}
+
+				</style>
+				<meta charset="utf-8">
+				<meta http-equiv="X-UA-Compatible" content="IE=edge">
+				<meta name="viewport" content="width=device-width, initial-scale=1">
+				<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+				<meta name="description" content="">
+				<meta name="author" content="">
+				<link rel="icon" href="favicon.ico">
+
+				<title>DOREMI Music Notation Editor</title>
+
+				<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+				<!--[if lt IE 9]>
+				<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+				<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+				<![endif]-->
 		</head>
 		<body>
-				<div id="yesterday"></div>
-				<div id="content"></div>
-				<!--				<script src="js/react-0.9.0.min.js"></script>  -->
-				<script src="doremi-server/js/react-0.9.0.js"></script> 
-				<script src="doremi-server/js/jquery-1.11.0.js"></script>
-				<script src="doremi-server/js/jquery.autosize.min.js"></script>
-				<script src="doremi-server/js/md5.js"></script>
-				<script src="doremi-server/js/dom_fixer.js"></script>
-				<script src="doremi-server/js/doremi.js"></script>
-		<script src="./doremi-server/js/jasmid-master/stream.js"></script>
-		<script src="./doremi-server/js/jasmid-master/midifile.js"></script>
-		<script src="./doremi-server/js/jasmid-master/replayer.js"></script>
-		<script src="./doremi-server/js/jasmid-master/synth.js"></script>
-		<script src="./doremi-server/js/jasmid-master/audio.js"></script>
-		<script src="./doremi-server/js/my_midi.js"></script>
+				<div class="container" id="container">
+
+						<div class="doremiBox" data-reactid=".0" data-react-checksum="-298457273">
+								<form class="form-inline" data-reactid=".0.0">
+										<div class="form-group" data-reactid=".0.0.0">
+												<label for="selectNotation" data-reactid=".0.0.0.0">Enter Notation as: 
+												</label>
+												<select id="selectNotation" class="selectNotation form-control" data-reactid=".0.0.0.1">
+														<option data-reactid=".0.0.0.1.0">
+														</option>
+														<option value="abc-composition" data-reactid=".0.0.0.1.1">ABC
+														</option>
+														<option value="doremi-composition" data-reactid=".0.0.0.1.2">doremi
+														</option>
+														<option value="hindi-composition" data-reactid=".0.0.0.1.3">hindi( स र ग़ म म&#x27; प ध ऩ )
+														</option>
+														<option value="number-composition" data-reactid=".0.0.0.1.4">number
+														</option>
+														<option selected value="sargam-composition" data-reactid=".0.0.0.1.5">sargam
+														</option>
+												</select>
+										</div>
+										<div class="form-group" data-reactid=".0.0.1">
+												<label for="renderAs" data-reactid=".0.0.1.0">Render as:
+												</label>
+												<select id="renderAs" class="renderAs form-control" data-reactid=".0.0.1.1">
+														<option data-reactid=".0.0.1.1.0">
+														</option>
+														<option value="abc-composition" data-reactid=".0.0.1.1.1">ABC
+														</option>
+														<option value="doremi-composition" data-reactid=".0.0.1.1.2">doremi
+														</option>
+														<option value="hindi-composition" data-reactid=".0.0.1.1.3">hindi( स र ग़ म म&#x27; प ध ऩ )
+														</option>
+														<option value="number-composition" data-reactid=".0.0.1.1.4">number
+														</option>
+														<option selected value="sargam-composition" data-reactid=".0.0.1.1.5">sargam
+														</option>
+												</select>
+										</div>
+										<button title="Generates staff notation and MIDI file using Lilypond" name="generateStaffNotation" class="btn btn-primary" data-reactid=".0.0.2">Generate Staff Notation
+										</button>
+								</form>
+								<div class="form-group" data-reactid=".0.1">
+										<label for="entryArea" data-reactid=".0.1.0">Enter Letter Notation:
+										</label>
+										<textarea style="height:10em;width:90%" placeholder="Enter letter music notation using 1234567,CDEFGABC, DoReMi (using drmfslt or DRMFSLT), |: SRGm PDN :|, or devanagri: सर ग़म म&#x27;प धऩ   Example:  | 1 -2 3- -1 | 3 1 3 - |" name="src" spellcheck="false" autofocus="autofocus" id="the_area" class="entryArea form-control" data-reactid=".0.1.1"></textarea>
+								</div>
+								<div class="composition doremiContent" data-reactid=".0.2">
+								</div>
+						</div>
+				</div>
+				<!-- bootstrap claims to need it. remove for now -->
+				<!--
+				-->
+				<!-- Don't think I need it yet
+				<script src="js/jquery.min.js"></script>  
+				<script src="js/bootstrap.min.js"></script>
+	  <script src="zzjs/jquery.js"></script>  
+	  <script src="zzzjs/bootstrap.js"></script>
+				-->
 		</body>
+		<link rel="stylesheet" href="css/bootstrap.css">
+		<link rel="stylesheet" href="css/doremi.css">
+		<link rel="stylesheet" href="css/application.css">
+		<script type="text/javascript">
+				window.DOREM_SCRIPT_APP_ENV="development";
+		</script>
+		<script type="text/javascript" src="js/app.js"></script>
+
+		<!--
+		<script type="text/javascript">goog.require('adzerk.boot_cljs_repl');</script>
+		-->
 </html>

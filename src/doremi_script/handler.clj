@@ -3,7 +3,6 @@
            [java.net URL MalformedURLException]
            )
   (:require [compojure.core :refer [ GET POST PUT defroutes routes]]
-            [instaparse.core :as insta]
             [digest]
             [ring.adapter.jetty :refer [run-jetty]]
             [compojure.route :as route :refer [resources]]
@@ -12,7 +11,7 @@
             [clojure.java.shell :only  [sh]]
             [doremi-script.middleware]
             [doremi-script.to-lilypond :refer [to-lilypond]]
-            [doremi-script.utils :refer [format-instaparse-errors get-attributes]]
+            [doremi-script.utils :refer [get-attributes]]
             [doremi-script.core :refer 
              [doremi-text->collapsed-parse-tree initialize-parser! ]]
             [doremi-script.to-lilypond :refer [to-lilypond]]
@@ -85,10 +84,6 @@
   (if x
     (-> x (string/replace  #"[^0-9A-Za-z\.]" "_") string/lower-case)))
 
-(defn doremi-generate-staff-notation[req x kind]
-  { :deprecated true
-   })
-
 (defn remove-from-end [s end]
     (if (.endsWith s end)
             (.substring s 0 (- (count s)
@@ -122,29 +117,15 @@
      :mp3-file-name mp3-file-name
      }
     ))
-;; (def tim-file-name "/home/john/yesterday.tim")
-;;(def midi-file-path "/home/john/yesterday.mid")
-;; test (create-mp3! midi-file-path)
 
-(defn do-parse[doremi-text kind]
-  (if (= "" doremi-text)
-    {} ;; TODO review
-    (let [
-          composition (doremi-text->collapsed-parse-tree 
+(defn parse[doremi-text kind]
+  (if (or (nil? doremi-text) (= "" doremi-text))
+    {:error "empty input"
+     :composition nil}
+        (doremi-text->collapsed-parse-tree 
                         doremi-text 
                         (keyword kind))
-          ]
-      (if (insta/failure? composition)    ;;;  or (string? x)))
-        { 
-         :error 
-         (-> composition format-instaparse-errors println with-out-str)
-         :src doremi-text
-         }
-         {  
-         :composition composition
-         :src doremi-text
-         } 
-        ))))
+        ))
 
 
 ;; (-> "|(SR)" (doremi-text->collapsed-parse-tree :sargam-composition))
@@ -160,14 +141,10 @@
       (if (= "" doremi-text)
         {} ;; TODO review
         (let [md5 (digest/md5 doremi-text)
-              composition (doremi-text->collapsed-parse-tree doremi-text kind2)
+              {:keys [:error :composition]:as results} (doremi-text->collapsed-parse-tree doremi-text kind2)
               ]
-       (if (insta/failure? composition)    ;;;  or (string? x)))
-         { 
-          :error (-> composition format-instaparse-errors println with-out-str)
-          :src doremi-text
-          :links []
-          }
+       (if error 
+         results
             (let [
                   attributes (get-attributes composition)
                   title (sanitize (get attributes :title "untitled"))
@@ -243,7 +220,7 @@
            ;;   (assert (:src parse-results))
             ;;  (assert (:parsed parse-results)) ;; TODO: change to :parsed to  :parse-tree
              ;; (assert (:attributes parse-results))
-              {  
+            (merge results  {  
                :links {
                :pdf-url 
                (str path-for-url ".pdf")
@@ -259,10 +236,7 @@
                (str path-for-url ".mp3")
               :browse-url
                   (absolute-url (str "/open/" title) req)
-                     } 
-               :composition composition
-               :src doremi-text
-               } 
+                     }}) 
               )
             )
 
@@ -272,39 +246,24 @@
     ))
 
 
-(defn init []
+(defn init[]
   ;; This is called once before the handler starts
   ;; See lein-ring docs
   ;; In project.clj, this is set under the ring key: 
   ;;  :ring {:handler doremi-script.handler/app
   ;;             :init doremi-script.handler/init
   ;;             :destroy doremi-script.handler/destroy}
-  (initialize-parser!
-    (slurp (resource "doremiscript.ebnf")))
+  (initialize-parser!  (slurp (resource "doremiscript.ebnf")))
   (println "doremi-script/handler.init: doremi-script is starting"))
 
 (defn destroy []
   (println "doremi-script is shutting down"))
 
-(defn doParse [src kind] 
-  ;; returns a hash
-  (try
-    (let [kind2 (if (= kind "")
-                  nil
-                  (keyword kind))
-          ]
-      (doremi-text->collapsed-parse-tree src kind2)
-      )
-    (catch Exception e 
-      { :error
-       (str "caught exception: " (.getMessage e))
-       }
-      )))
 
 (defroutes app-routes
   (POST "/doremi-server/parse" [src  kind] 
         {:body
-         (do-parse src kind)
+         (parse src kind)
          }
         )
   (GET "/doremi-server/run-lilypond-on-doremi-text" [] 
@@ -320,12 +279,6 @@
            }
           ))
 
-  (POST "/doremi-server/generate_staff_notation" [src  kind] 
-        (fn [req]
-          {:body
-           (doremi-generate-staff-notation req src kind)
-           }
-          ))
   (GET "/doremi-server/ping" []
        "doremi-server is up!!")
   (route/resources "/doremi-server")
@@ -348,8 +301,6 @@
 ))
 
 (def my-port 4000)
-
-(println "in handler")
 
 ;;(println "STARTING server on port" my-port)
 ;;(defonce server (run-jetty #'app {:port my-port :join? false}))

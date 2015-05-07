@@ -1,0 +1,33 @@
+NOTE:This project does NOT provide a web server.
+Note that in development mode, boot dev provides a web server
+In production, my server uses nginx.
+
+
+# start development environment
+boot dev
+
+# compile for production. Production code is in target
+boot css-min cljs -O advanced
+boot cljs -O advanced
+
+# Use node's http-server to test the production code
+# install
+sudo npm install -g http-server
+
+The following minifier is required by the build.sh script
+sudo npm install -g minifier
+# Test production code
+http-server target
+
+The script build.css compiles in production mode, minifies, sets script tag async, and updates manifest.
+To deploy to production:
+
+git pull; ./build.sh
+
+
+Running in development mode:
+
+boot dev    
+starts a web server and serves up the app on port 3000
+and reloads and recompiles cljs as it changes
+

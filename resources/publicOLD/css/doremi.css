@@ -1,12 +1,5 @@
 /* TODO: Use a css preprocessor!!! */
-@media print {
-.doremiContent {
-}
-}
 
-.doremiContent.printing {
-   font-size:8px  !important;;
-}
 
 div.lyrics_section {
    font-family: serif;
@@ -55,10 +48,6 @@ span.beat.looped {
     border-bottom-width:1px;
     border-right-width: 0px;
 }
-.doremiContent.printing span.beat.looped {
-    border-bottom-left-radius: 2em;
-    border-bottom-right-radius: 2em;
-}
 
 span.beat {
     margin-right: 1em;
@@ -80,17 +69,8 @@ span.slur {
     border-right-width: 0em;
 }
 
-.doremiContent.printing span.slur {
-		border-top-width: 1px;
-  border-top-width: 1px;
-    border-top-left-radius: 1.8em;
-    border-top-right-radius: 1.8em;
-}
-
-  /* TODO: review Funky fix for chrome to avoid 
-	  hairline on right and left */ 
-
 span.beat.looped,span.slur {
+  /* TODO: review Funky fix for chrome to avoid hairline on right and left */
   border-right-color:white;
   border-left-color:white;
   border-left-width:1px;

@@ -15,7 +15,7 @@
                  [ring-cors "0.1.7"]
                  [ring-server "0.4.0"]]
   :plugins [[lein-ring "0.8.12"]]
-  :repl-options { :init-ns doremi-script.to-lilypond}
+  :repl-options { :init-ns doremi-script.core}
   :ring {:handler doremi-script.handler/app
          :init doremi-script.handler/init
          :destroy doremi-script.handler/destroy}

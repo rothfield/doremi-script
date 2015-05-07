@@ -1,27 +1,3 @@
-select.selectNotation.form-control ,select.renderAs.form-control {
-  width: 100px;
-}
-.form-inline audio {
-  vertical-align: middle
-}
-div.has-error #parse-results {
-  font-family: monospace;
-}
-div.downloads {
-  display:inline-block;
-}
-@media print {
-div.composition {
- height:auto !important;
- border: none !important;
-}
-}
- /* height:175px;   or set for printing initial */
-div.composition {
-  overflow:auto;
-	resize:both;
-	border: 1px black solid;
-}
 .hidden {
 		display:none;
 }
@@ -48,17 +24,19 @@ textarea.entryArea {
 		font-family: monospace; 
 		padding-left: 1em;
 		font-size: 1.6em;
-		height: 170px; 
-		width:95%; 
-	  overflow-x: scroll;
+		height: 4.80em;
+		width:100%; 
+		/*  height:100%; */
 		position:relative;
 		left:1em;
+		padding:0.3em;
+		margin-bottom:0.8em;
+		border:none;  /* 0px solid white; */
 }
-
 textarea:focus {
 		outline: none;
 }
-div.zentryAreaBox {
+div.entryAreaBox {
 		position: relative;
 		left: 5px; 
 		top: 5px;

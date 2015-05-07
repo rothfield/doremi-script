@@ -1,14 +1,37 @@
+;;; core.cljc    Common to both clj and cljs !!!!!!
 (ns doremi-script.core
   (:require	
-    [instaparse.core :as insta]
+    [instaparse.core :as insta] 
+    [instaparse.viz :as viz]
     [clojure.string :refer 
      [lower-case split lower-case join] :as string] 
     [clojure.zip :as zip]
-    [clojure.java.io :as io :refer [resource]]
-    [clojure.pprint :refer [pprint]] 
     [clojure.walk :refer [postwalk]]
     [doremi-script.utils :refer [items map-even-items is? get-attribute]]
     ))
+
+(def insta-span viz/span)
+
+#?(:cljs
+(enable-console-print!)
+    )
+(println "new2")
+(defn- format-instaparse-errors
+  "Tightens up instaparse error format by deleting newlines after 'of' "
+  [z]
+  { :pre [string? z]
+   :post [(string? %)]
+   }
+  (if (string? z)
+    z
+    (let [a (with-out-str (println z))
+          ;;_ (println "a is" a)
+          [left,right] (split a #"of")
+          ]
+      (str left "of\n"
+           (if right
+             (string/replace right #"\n" " "))))))
+
 
 (comment
   ;; to use in repl:
@@ -22,15 +45,19 @@
   (pst)
   )
 
-(def doremi-script-parser (atom nil))
+(defonce doremi-script-parser (atom nil))
+
+
+(defn get-parser[] @doremi-script-parser)
+
 
 (defn initialize-parser![ebnf-txt]
   (reset! doremi-script-parser
-          (insta/parser ebnf-txt :total true)))
+          (insta/parser ebnf-txt :start :composition :total true)))
 
 (comment
   (initialize-parser!
-    (slurp (resource "doremiscript.ebnf")))
+    (slurp (clojure.java.io/resource "doremiscript.ebnf")))
   )
   
 ;;;; (def doremi-script-parser 
@@ -204,10 +231,10 @@
    ;; :post [(is? :pitch %)]
    }
   (when false (println "make-it-kommal")
-    (pprint pitch))
+    (println pitch))
   (let [without-kommal (vec (remove #(is? :kommal-indicator %) pitch))]
     ;;    [:pitch "D" [:kommal-indicator "_"] [:octave 0]]]]
-    ;;   (pprint without-kommal)
+    ;;   (println without-kommal)
     (if (#{"D" "E" "A" "B"} (second pitch))
       (vec (update-in without-kommal [1] str "b"))
       pitch)
@@ -216,8 +243,8 @@
 (defn ^:private apply-kommal-to-pitches
   [original-tree] ;; assigned]
   (when false
-    (pprint "apply-kommal-to-pitches, tree is")
-    (pprint original-tree))
+    (println "apply-kommal-to-pitches, tree is")
+    (println original-tree))
   (assert (is? :stave original-tree))
   (loop [loc (zip/vector-zip original-tree)
          id 0 ]
@@ -246,9 +273,9 @@
   (assert (is? :composition original-tree))
   (when false
   (println "entering match-slurs, original-tree=")
-  (pprint original-tree)
+  (println original-tree)
     )
-  ;;(pprint "matchslurs") (pprint original-tree)
+  ;;(println "matchslurs") (println original-tree)
   ;(assoc original-tree :parsed
   (loop [loc (zip/vector-zip original-tree)
          id 0 ]
@@ -305,7 +332,7 @@
    }
   (when false
   (prn "entering normalize-pitches")
-  (pprint original-tree)
+  (println original-tree)
     )
   (assert (is-kind? (first original-tree)))
   (loop [loc (zip/vector-zip original-tree) ]
@@ -354,7 +381,7 @@
   (assert (is-kind? (first x)))
   (when false
     (println "entering normalize-kind, x =")
-  (pprint x)
+  (println x)
     )
   (let [kind (first x)]
     (cond
@@ -377,9 +404,9 @@
                    (rest (second x))))
 
       )))
-
+ 
 (defn ^:private start-index[x]
-  (let [x (insta/span x)]
+  (let [x (insta-span x)]
     (when x
       (first x))))
 
@@ -405,7 +432,7 @@
                       ;; Add the ornament twice in the column map.
                       ;; ;;  [:ornament [:G] [:m] [:P] [:D]]
                       (let [
-                            span (insta/span obj)
+                            span ( insta-span obj)
                             ornament-string-length
                             (apply - (reverse span))
                             column-for-after-ornament (dec column)
@@ -509,8 +536,8 @@
   {;; :pre [(is-stave? my-stave)]
    :post [(is? :stave %)] }
   (when false
-    (pprint @assigned)
-    (pprint my-stave)
+    (println @assigned)
+    (println my-stave)
     )
   (let [column-map (lines->column-map
                      (filter #(is? :upper-line %) (items my-stave)))
@@ -776,19 +803,47 @@
   (-> ornament rest drop-last)
   )
 
-(def default-kind :sargam-composition)
+;{:index 4, :reason [{:tag :string, :expecting :} {:tag :regexp, :expecting #"^ +"} {:tag :string, :expecting -} {:tag :string, :expecting 
+;} {:tag :string, :expecting 
+;} {:tag :regexp, :expecting #"^[a-zA-Z'!]+"} {:tag :regexp, :expecting #"^[a-zA-Z'!]+-"}], :column 5, :line 1, :text SSSz|}
+(defn my-format-instaparse-error[{:keys [:index :column :line :text] :as failure}]
+  (str "Error on line " line " column " column "\n"
+       text "\n"
+       (apply str (repeat (dec column) " ")) "^")
+  )
 
-;; (-> "a:hi\n\n.\n (Sr)" doremi-text->collapsed-parse-tree pprint)
+(def default-kind :sargam-composition)
+;; (-> "S-|z" doremi-text->collapsed-parse-tree)
+
+;; (-> "a:hi\n\n.\n (Sr)" doremi-text->collapsed-parse-tree println)
 (defn doremi-text->collapsed-parse-tree
+  "return a composition or an error string. Composition looks like [:composition...]"
     ([txt ] (doremi-text->collapsed-parse-tree txt default-kind))
     ([txt kind] 
+  { :pre [(string? txt)
+          (keyword? kind) 
+          ]
+   :post [(map? %)
+          (= #{:composition :error} (into #{} (keys %)))
+              ]
+   }
      (assert (is-kind? kind))
      (let [ parsed (insta/parse @doremi-script-parser 
                                 txt 
                                 :start kind)
+           
           ]
        (if (insta/failure? parsed)    ;;;  or (string? x)))
-         parsed
+        {:error 
+
+#?(:cljs
+         (-> parsed insta/get-failure my-format-instaparse-error))
+#?(:clj
+         (-> parsed insta/get-failure format-instaparse-errors))
+
+        :composition nil}
+         {:error nil
+          :composition
          (->> parsed
               normalize-kind
               normalize-pitches
@@ -799,5 +854,6 @@
               vec
              match-slurs
               )
+          }
          ))))
 
