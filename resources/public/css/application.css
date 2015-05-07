@@ -11,6 +11,9 @@ div.downloads {
   display:inline-block;
 }
 @media print {
+ul.nav {
+		display:none;
+}
 div.composition {
  height:auto !important;
  border: none !important;
