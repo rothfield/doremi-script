@@ -270,7 +270,6 @@
       sargam-set->key-map)
     ))
 
-;;; (println "keywordize-vector nil->" (keywordize-vector nil))
 
 (defn generate-staff-notation-xhr-callback[event]
   ;; response looks somthing like
@@ -327,7 +326,6 @@
   (let [composition-view (dom/getElement "doremiContent")]
   ;; reagent doesn't immediately redraw it, so do it manually
 ;;   (set! (.-innerHTML composition-view) "Redrawing: Please wait")
-  ;; (swap! app-state assoc :composition nil)
      (-> doremi-text  
            (doremi-text->collapsed-parse-tree (get @app-state :the-parser) kind)
             update-app-state!)))
@@ -353,7 +351,6 @@
 
 
 (defn parse-xhr[url {src :src kind :kind}]
-   (swap! app-state assoc :composition nil)
   (log "entering parse-xhr:"  "url=" url " src= " src "\nkind=" kind)
   (let [ query-data (new goog.Uri/QueryData) ]
     (.set query-data "src"  src)
@@ -377,8 +374,7 @@
     (log "entering GENERATE-STAFF-NOTATION-URL" url content)
     (swap! app-state 
            assoc :links nil
-           :ajax-is-running true
-           :composition nil)
+           :ajax-is-running true)
 
     (let [ query-data (new goog.Uri/QueryData) ]
       ;; TODO: try sending json
