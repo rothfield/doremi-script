@@ -10,10 +10,11 @@
             [clojure.java.io :as io :refer [input-stream resource]]
             [clojure.java.shell :only  [sh]]
             [doremi-script.middleware]
+            [com.stuartsierra.component :as component]
             [doremi-script.to-lilypond :refer [to-lilypond]]
             [doremi-script.utils :refer [get-attributes]]
             [doremi-script.core :refer 
-             [doremi-text->collapsed-parse-tree initialize-parser! ]]
+             [doremi-text->collapsed-parse-tree new-parser]]
             [doremi-script.to-lilypond :refer [to-lilypond]]
             [clojure.string :refer [split replace-first upper-case
                                     lower-case join] :as string] 
@@ -25,6 +26,9 @@
             [ring.middleware.file-info :refer [wrap-file-info]]
             [ring.middleware.cors :refer [wrap-cors]]
            )) 
+
+(defonce app-state (atom {:the-parser nil}))
+
 
 (def production?
     (= "production" (get (System/getenv) "APP_ENV")))
@@ -124,6 +128,7 @@
      :composition nil}
         (doremi-text->collapsed-parse-tree 
                         doremi-text 
+                        (get @app-state :the-parser)
                         (keyword kind))
         ))
 
@@ -141,7 +146,11 @@
       (if (= "" doremi-text)
         {} ;; TODO review
         (let [md5 (digest/md5 doremi-text)
-              {:keys [:error :composition]:as results} (doremi-text->collapsed-parse-tree doremi-text kind2)
+              {:keys [:error :composition]:as results} 
+              (doremi-text->collapsed-parse-tree 
+                doremi-text
+             (get @app-state :the-parser)
+                  kind2)
               ]
        (if error 
          results
@@ -245,7 +254,6 @@
       )
     ))
 
-
 (defn init[]
   ;; This is called once before the handler starts
   ;; See lein-ring docs
@@ -253,7 +261,11 @@
   ;;  :ring {:handler doremi-script.handler/app
   ;;             :init doremi-script.handler/init
   ;;             :destroy doremi-script.handler/destroy}
-  (initialize-parser!  (slurp (resource "doremiscript.ebnf")))
+  (swap! app-state 
+           assoc
+           :the-parser 
+           (component/start (new-parser
+                    (slurp (resource "doremiscript.ebnf")))))
   (println "doremi-script/handler.init: doremi-script is starting"))
 
 (defn destroy []

@@ -1,3 +1,5 @@
+node_modules
+node_stuff
 *.log
 comp.pid
 watcher.pid

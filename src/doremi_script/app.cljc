@@ -5,8 +5,14 @@
                      [cljs.core.async.macros :refer [go]]
                    )
   (:require 
-    [doremi-script.core :refer [initialize-parser!
-                                get-parser
+    #?(:clj
+        [com.stuartsierra.component :as component]
+        )
+    #?(:cljs
+        [quile.component :as component]
+        )
+    [doremi-script.core :refer [
+                                new-parser
                                 doremi-text->collapsed-parse-tree]]
     [doremi-script.utils :refer [get-attributes keywordize-vector 
                                  log is?] ]
@@ -38,6 +44,7 @@
                    (fn [e] (put! out e)))
     out))
 
+(comment
 (let [uri (new goog/Uri "//www.google.com/images/zcleardot.gif")
       _  (.makeUnique uri)
       img (new js/Image)
@@ -48,9 +55,9 @@
   (go  (println "img on load returns" (.log js/console (<! ch)))
       (println "after image has loaded") 
       ))
-
-
 (println "after let")
+)
+
 
 
 
@@ -156,6 +163,7 @@
 (defonce app-state
   (reagent.core/atom 
     {
+     :the-parser nil
      :key-map {}
      :rendering false
      :ajax-is-running false 
@@ -206,7 +214,7 @@
     out))
 
 
-(go  (println "network-tester returns" (<! (network-tester))))
+;;; (go  (println "network-tester returns" (<! (network-tester))))
 
 
 (defn load-grammar-xhr[]
@@ -233,6 +241,7 @@
                ))
            )
     out))
+
 (defn load-doremi-url-xhr[url]
   (swap! app-state assoc :ajax-is-running true)
   (log "load-doremi-url-xhr")
@@ -261,7 +270,8 @@
       sargam-set->key-map)
     ))
 
-(println "keywordize-vector nil->" (keywordize-vector nil))
+;;; (println "keywordize-vector nil->" (keywordize-vector nil))
+
 (defn generate-staff-notation-xhr-callback[event]
   ;; response looks somthing like
   ;; {
@@ -319,7 +329,7 @@
 ;;   (set! (.-innerHTML composition-view) "Redrawing: Please wait")
   ;; (swap! app-state assoc :composition nil)
      (-> doremi-text  
-           (doremi-text->collapsed-parse-tree kind)
+           (doremi-text->collapsed-parse-tree (get @app-state :the-parser) kind)
             update-app-state!)))
 
 
@@ -612,12 +622,12 @@
     :on-change (fn[evt]
                  (.preventDefault evt)
                  (.open js/window (.-value (.-target evt))))
-    :value "TODO"                         
+  ;;  :value "TODO"                         
     } 
    [:option
-    {:selected true
-
-     :value "TODO" }
+    {
+     :defaultValue true
+      }
     "Links"]
    (when-let [links (get-in @app-state [:links])] 
      (doall (map-indexed
@@ -1555,13 +1565,7 @@
    ]
   )
 
-(def generate-initial-page true)
 
-(comment
-  (go  (initialize-parser! (<! (load-serialized-grammar-xhr)))
-      (println (-> "S|" doremi-text->collapsed-parse-tree))
-      )
-  )
 (defn milliseconds-since-epoch[]
   (.getTime (js/Date.))
   )
@@ -1572,22 +1576,15 @@
   )
 
 
-(go 
-  (let [t1 (milliseconds-since-epoch)]
-    (initialize-parser! (<! (load-serialized-grammar-xhr)))
-    ;;  (initialize-parser! (<! (load-grammar-xhr)))
-    (print-elapsed-seconds t1 (milliseconds-since-epoch))
-    (println (-> "S|" doremi-text->collapsed-parse-tree))
-    ))
 
 (defn print-out-grammar[]
   (println "Save this in resources/ebnf.txt")
   (go
-    (initialize-parser! (<! (load-grammar-xhr)))
+    (let [parser (component/start (new-parser (<! (load-grammar-xhr))))]
     ;; use this to create ebnf.txt file
     (binding [*print-dup* true] 
-      (prn (:grammar (get-parser))
-           ))))
+      (prn (:grammar (:parser parser)) 
+           )))))
 
 
 ;;;; *******************IMPORTANT****************
@@ -1612,6 +1609,13 @@
         )))
 
 (defn init []
+  (go
+    (swap! app-state 
+           assoc
+           :the-parser 
+           (component/start (new-parser
+                                    (<! (load-serialized-grammar-xhr))))
+           ))
   (let [old-val (.-value (.getElementById js/document "the_area"))
         url-to-load (.getParameterValue
                       (new goog/Uri (.-href (.-location js/window)))
@@ -1675,7 +1679,8 @@
                (str "<li>" result "</li>")))
       "</ul>"))
 
-  (defn init []
+  (defn zzzzinit []
+    (println "in init")
     (let [ results-view (dom/getElement "results")
           last-value (atom "") 
           keypresses (listen (dom/getElement "query") "keypress")]

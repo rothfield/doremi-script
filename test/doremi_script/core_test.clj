@@ -1,32 +1,14 @@
 (ns doremi-script.core-test
   (:require [clojure.test :refer :all]
     [instaparse.core :as insta]
+        [com.stuartsierra.component :as component]
             [clojure.java.io :as io :refer [resource]]
             [ring.mock.request :as mock]
             [doremi-script.utils :refer [get-attributes]]
-            [doremi-script.core :refer [doremi-script-parser initialize-parser! doremi-text->collapsed-parse-tree]]))
+            [doremi-script.core :refer [doremi-script-parser new-parser doremi-text->collapsed-parse-tree]]))
 
-(defonce initialize-parser
-  (initialize-parser!  (slurp (resource "doremiscript.ebnf"))))
-
-(defn destroy []
-  (println "doremi-script is shutting down"))
-
-(defn doParse [src kind] 
-  ;; returns a hash
-  (try
-    (let [kind2 (if (= kind "")
-                  nil
-                  (keyword kind))
-          ]
-      (doremi-text->collapsed-parse-tree src kind2)
-      )
-    (catch Exception e 
-      { :error
-       (str "caught exception: " (.getMessage e))
-       }
-      )))
-
+(defonce parser 
+  (component/start (new-parser (slurp (resource "doremiscript.ebnf")))))
 
 (deftest test-is-kind?
   (is #'doremi-script.core/is-kind? :sargam-composition))
@@ -50,7 +32,7 @@
                           [:sargam-beat 
                            [:sargam-pitch "S"]]]]]] 
 
-        (insta/parse @doremi-script-parser 
+        (insta/parse (:parser parser)
                      "S"
                      :start 
                      :sargam-composition))

@@ -12,8 +12,6 @@
   (initialize-parser!  (slurp (resource "doremiscript.ebnf"))))
 
 
-;; (println (fixtures :abc-composition))
-;; (def which :emi-composition)
 (defn fixtures[which]
   (->> (str "fixtures/" (clojure.string/replace (name which) "-" "_"))
        io/resource
@@ -43,12 +41,12 @@
                 ] 
 
           ]
-    (println "processing" (.getPath my-file))
+   ;; (println "processing" (.getPath my-file))
     ;;(println "failure? is" failure?)
     (when ambiguous? 
-      (println "Warning: (known bug) " file-name " had an ambiguous parse" txt
-               "\nFirst 5 results are\n")
-      (->> results2 (take 5) pprint)) 
+    )
+     ;; (println "Warning: (known bug) " file-name " had an ambiguous parse" txt))
+    ;;  (->> results2 (take 5) pprint)) 
 
     (if (.contains file-name "fail")
       (is (true? failure?)
@@ -75,6 +73,5 @@
 (deftest test-abc-composition[]
   (parse-fixtures-test-helper :abc-composition)
   )
-(println "testv1")
 ;; (run-tests)
 ; attribute-section->map

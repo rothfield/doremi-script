@@ -1,0 +1,56 @@
+Running ClojureScript on Node.js
+
+First install Node.js. For instructions on installing Node.js, see the Node.js wiki. Only the current stable versions of Node.js (0.12.X) are supported at this time. Your src/hello_world/core.cljs should look like the following:
+
+(ns hello-world.core
+  (:require [cljs.nodejs :as nodejs]))
+
+(nodejs/enable-util-print!)
+
+(defn -main [& args]
+  (println "Hello world!"))
+
+(set! *main-cli-fn* -main)
+Make a build helper file called node.clj:
+
+(require 'cljs.closure)
+
+(cljs.closure/build "src"
+  {:main 'hello-world.core
+	   :output-to "main.js"
+		    :target :nodejs})
+The only differences are that we had to specify a :nodejs target and we do not output main.js to the out directory. This is important due to the way that Node.js resolves JavaScript source files.
+
+Node.js has great source mapping support, in order to enable it just install source-map-support:
+
+npm install source-map-support
+Let's build your Node project:
+
+java -cp cljs.jar:src clojure.main node.clj
+You can run your file with:
+
+node main.js
+Node.js REPL
+
+Running a Node.js REPL is much simpler than running a browser REPL. Create a helper build file called node_repl.clj that looks like the following:
+
+(require 'cljs.repl)
+(require 'cljs.closure)
+(require 'cljs.repl.node)
+
+(cljs.closure/build "src"
+  {:main 'hello-world.core
+	   :output-to "out/main.js"
+		    :verbose true})
+
+(cljs.repl/repl (cljs.repl.node/repl-env)
+  :watch "src"
+	  :output-dir "out")
+There's no need to add any REPL specific bits to src/hello_world/core.cljs, make sure it looks as described in the previous section.
+
+Let's start the REPL:
+
+rlwrap java -cp cljs.jar:src clojure.main node_repl.clj
+All the previously described REPL interactions for the browser should work.
+
+

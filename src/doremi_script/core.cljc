@@ -1,6 +1,12 @@
 ;;; core.cljc    Common to both clj and cljs !!!!!!
 (ns doremi-script.core
   (:require	
+    #?(:clj
+        [com.stuartsierra.component :as component]
+        )
+    #?(:cljs
+        [quile.component :as component]
+        )
     [instaparse.core :as insta] 
     [instaparse.viz :as viz]
     [clojure.string :refer 
@@ -10,12 +16,46 @@
     [doremi-script.utils :refer [items map-even-items is? get-attribute]]
     ))
 
+(defrecord Parser [grammar-specification default-kind]
+  ;; Implement the Lifecycle protocol
+  component/Lifecycle
+  (start [component]
+    (let [ret-value
+          (assoc component :parser  (insta/parser (:grammar-specification component) :start :composition :total true))]
+      (println "Parser has been initialized")
+      ret-value
+      ))
+
+  (stop [component]
+    (println ";; stopping Parser")
+    )
+  )
+
+(defn new-parser 
+  ( [grammar-specification]
+   (new-parser grammar-specification :sargam-composition))
+  ( [grammar-specification default-kind]
+   (map->Parser {:grammar-specification grammar-specification :default-kind default-kind})
+   ))
+
+(comment
+  (def my-parser   (component/start (new-parser 
+                                      (slurp (clojure.java.io/resource "doremiscript.ebnf"))
+                                      :doremi-composition 
+                                      )))
+  )
+(comment
+  (println (doremi-text->collapsed-parse-tree my-parser "S"))
+  (->> "S-" (doremi-text->collapsed-parse-tree 
+              (component/start (new-parser 
+                                 (slurp (clojure.java.io/resource "doremiscript.ebnf"))))))
+  )
 (def insta-span viz/span)
 
 #?(:cljs
-(enable-console-print!)
+    (enable-console-print!)
     )
-(println "new2")
+
 (defn- format-instaparse-errors
   "Tightens up instaparse error format by deleting newlines after 'of' "
   [z]
@@ -51,15 +91,20 @@
 (defn get-parser[] @doremi-script-parser)
 
 
-(defn initialize-parser![ebnf-txt]
+(defn initialize-parser![grammar-specification]
+  ;; Note that grammar-specification can be ebnf text or a map containing
+  ;; the serialized grammar
   (reset! doremi-script-parser
-          (insta/parser ebnf-txt :start :composition :total true)))
+          (insta/parser grammar-specification :start :composition :total true)))
 
 (comment
+  ;; Testing
   (initialize-parser!
     (slurp (clojure.java.io/resource "doremiscript.ebnf")))
+
+  (-> "S" doremi-text->collapsed-parse-tree)
   )
-  
+
 ;;;; (def doremi-script-parser 
 ;;;;   ;;;Optional keyword arguments to insta/parser:
 ;;;;   ;;;   :start :keyword  (where :keyword is name of starting production rule)
@@ -266,14 +311,14 @@
           (recur (zip/next loc) id))))))
 
 (defn ^:private match-slurs[original-tree]
-;;  "add id to begin and end slurs"
+  ;;  "add id to begin and end slurs"
   { :pre [(vector? original-tree)]
-      :post [(vector? %)]
+   :post [(vector? %)]
    }
   (assert (is? :composition original-tree))
   (when false
-  (println "entering match-slurs, original-tree=")
-  (println original-tree)
+    (println "entering match-slurs, original-tree=")
+    (println original-tree)
     )
   ;;(println "matchslurs") (println original-tree)
   ;(assoc original-tree :parsed
@@ -331,8 +376,8 @@
    :post [(vector? %)]
    }
   (when false
-  (prn "entering normalize-pitches")
-  (println original-tree)
+    (prn "entering normalize-pitches")
+    (println original-tree)
     )
   (assert (is-kind? (first original-tree)))
   (loop [loc (zip/vector-zip original-tree) ]
@@ -381,7 +426,7 @@
   (assert (is-kind? (first x)))
   (when false
     (println "entering normalize-kind, x =")
-  (println x)
+    (println x)
     )
   (let [kind (first x)]
     (cond
@@ -404,7 +449,7 @@
                    (rest (second x))))
 
       )))
- 
+
 (defn ^:private start-index[x]
   (let [x (insta-span x)]
     (when x
@@ -807,7 +852,7 @@
 ;} {:tag :string, :expecting 
 ;} {:tag :regexp, :expecting #"^[a-zA-Z'!]+"} {:tag :regexp, :expecting #"^[a-zA-Z'!]+-"}], :column 5, :line 1, :text SSSz|}
 (defn my-format-instaparse-error[{:keys [:index :column :line :text] :as failure}]
-  (str "Error on line " line " column " column "\n"
+  (str " Error on line " line " column " column "\n"
        text "\n"
        (apply str (repeat (dec column) " ")) "^")
   )
@@ -816,44 +861,47 @@
 ;; (-> "S-|z" doremi-text->collapsed-parse-tree)
 
 ;; (-> "a:hi\n\n.\n (Sr)" doremi-text->collapsed-parse-tree println)
+
 (defn doremi-text->collapsed-parse-tree
   "return a composition or an error string. Composition looks like [:composition...]"
-    ([txt ] (doremi-text->collapsed-parse-tree txt default-kind))
-    ([txt kind] 
-  { :pre [(string? txt)
-          (keyword? kind) 
-          ]
-   :post [(map? %)
-          (= #{:composition :error} (into #{} (keys %)))
-              ]
-   }
-     (assert (is-kind? kind))
-     (let [ parsed (insta/parse @doremi-script-parser 
-                                txt 
-                                :start kind)
-           
-          ]
-       (if (insta/failure? parsed)    ;;;  or (string? x)))
-        {:error 
+  ([txt parser] (doremi-text->collapsed-parse-tree parser txt (:default-kind parser)))
+  ([txt parser kind] 
+   { :pre [(string? txt)
+           (keyword? kind) 
+           ]
+    :post [(map? %)
+           (= #{:composition :error} (into #{} (keys %)))
+           ]
+    }
+   (assert (is-kind? kind))
+   (let [ parsed (insta/parse (:parser parser)
+                              txt 
+                              :start kind)
 
-#?(:cljs
-         (-> parsed insta/get-failure my-format-instaparse-error))
-#?(:clj
-         (-> parsed insta/get-failure format-instaparse-errors))
+         ]
+     (if (insta/failure? parsed)    ;;;  or (string? x)))
+       {:error 
+
+        #?(:cljs
+            (-> parsed insta/get-failure my-format-instaparse-error))
+        #?(:clj
+            (-> parsed insta/get-failure format-instaparse-errors))
 
         :composition nil}
-         {:error nil
-          :composition
-         (->> parsed
-              normalize-kind
-              normalize-pitches
-              remove-notation-system-prefixes
-              (map  #(if (is? :stave %)
-                       (collapse-stave %)
-                       %))
-              vec
+       {:error nil
+        :composition
+        (->> parsed
+             normalize-kind
+             normalize-pitches
+             remove-notation-system-prefixes
+             (map  #(if (is? :stave %)
+                      (collapse-stave %)
+                      %))
+             vec
              match-slurs
-              )
-          }
-         ))))
+             )
+        }
+       ))))
+
+
 

@@ -1,0 +1,1486 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="">
+  <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# object: http://ogp.me/ns/object# article: http://ogp.me/ns/article# profile: http://ogp.me/ns/profile#">
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Language" content="en">
+    
+    
+    <title>stuartsierra/component · GitHub</title>
+    <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="GitHub">
+    <link rel="fluid-icon" href="https://github.com/fluidicon.png" title="GitHub">
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-114.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-144.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144.png">
+    <meta property="fb:app_id" content="1401488693436528">
+
+      <meta content="@github" name="twitter:site" /><meta content="summary" name="twitter:card" /><meta content="stuartsierra/component" name="twitter:title" /><meta content="component - Managed lifecycle of stateful objects in Clojure" name="twitter:description" /><meta content="https://avatars2.githubusercontent.com/u/95044?v=3&amp;s=400" name="twitter:image:src" />
+      <meta content="GitHub" property="og:site_name" /><meta content="object" property="og:type" /><meta content="https://avatars2.githubusercontent.com/u/95044?v=3&amp;s=400" property="og:image" /><meta content="stuartsierra/component" property="og:title" /><meta content="https://github.com/stuartsierra/component" property="og:url" /><meta content="component - Managed lifecycle of stateful objects in Clojure" property="og:description" />
+      <meta name="browser-stats-url" content="https://api.github.com/_private/browser/stats">
+    <meta name="browser-errors-url" content="https://api.github.com/_private/browser/errors">
+    <link rel="assets" href="https://assets-cdn.github.com/">
+    
+    <meta name="pjax-timeout" content="1000">
+    
+
+    <meta name="msapplication-TileImage" content="/windows-tile.png">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="selected-link" value="repo_source" data-pjax-transient>
+      <meta name="google-analytics" content="UA-3769691-2">
+
+    <meta content="collector.githubapp.com" name="octolytics-host" /><meta content="collector-cdn.github.com" name="octolytics-script-host" /><meta content="github" name="octolytics-app-id" /><meta content="32FAC39B:73EF:1FA93E43:5550CF28" name="octolytics-dimension-request_id" />
+    
+    <meta content="Rails, view, files#disambiguate" name="analytics-event" />
+    <meta class="js-ga-set" name="dimension1" content="Logged Out">
+    <meta class="js-ga-set" name="dimension2" content="Header v3">
+    <meta name="is-dotcom" content="true">
+    <meta name="hostname" content="github.com">
+    <meta name="user-login" content="">
+
+    
+    <link rel="icon" type="image/x-icon" href="https://assets-cdn.github.com/favicon.ico">
+
+
+    <meta content="authenticity_token" name="csrf-param" />
+<meta content="it2LIckYo5T+VnuMa3m/Yrf1uDjRHwuM1Ldlpqr3vJg+Vcy7J+G6Whx/RT1SDBk8WPRneutEWONXXiTiGVl/Gw==" name="csrf-token" />
+
+    <link href="https://assets-cdn.github.com/assets/github-c486157afcc5f58155a921bc675afb08733fbaa8dcf39ac2104d381dd9c82ac2.css" media="all" rel="stylesheet" />
+    <link href="https://assets-cdn.github.com/assets/github2-26ca3159d96cf926f7d5e7912b781f0d01f4a04ea62184b2edeb65df519b6228.css" media="all" rel="stylesheet" />
+    
+    
+
+
+    <meta http-equiv="x-pjax-version" content="33a77ba32783fc43837acf7cdaaaa359">
+
+      
+  <meta name="description" content="component - Managed lifecycle of stateful objects in Clojure">
+  <meta name="go-import" content="github.com/stuartsierra/component git https://github.com/stuartsierra/component.git">
+
+  <meta content="95044" name="octolytics-dimension-user_id" /><meta content="stuartsierra" name="octolytics-dimension-user_login" /><meta content="13760299" name="octolytics-dimension-repository_id" /><meta content="stuartsierra/component" name="octolytics-dimension-repository_nwo" /><meta content="true" name="octolytics-dimension-repository_public" /><meta content="false" name="octolytics-dimension-repository_is_fork" /><meta content="13760299" name="octolytics-dimension-repository_network_root_id" /><meta content="stuartsierra/component" name="octolytics-dimension-repository_network_root_nwo" />
+  <link href="https://github.com/stuartsierra/component/commits/master.atom" rel="alternate" title="Recent Commits to component:master" type="application/atom+xml">
+
+  </head>
+
+
+  <body class="logged_out  env-production linux vis-public">
+    <a href="#start-of-content" tabindex="1" class="accessibility-aid js-skip-to-content">Skip to content</a>
+    <div class="wrapper">
+      
+      
+      
+
+
+        
+        <div class="header header-logged-out" role="banner">
+  <div class="container clearfix">
+
+    <a class="header-logo-wordmark" href="https://github.com/" data-ga-click="(Logged out) Header, go to homepage, icon:logo-wordmark">
+      <span class="mega-octicon octicon-logo-github"></span>
+    </a>
+
+    <div class="header-actions" role="navigation">
+        <a class="btn btn-primary" href="/join" data-ga-click="(Logged out) Header, clicked Sign up, text:sign-up">Sign up</a>
+      <a class="btn" href="/login?return_to=%2Fstuartsierra%2Fcomponent" data-ga-click="(Logged out) Header, clicked Sign in, text:sign-in">Sign in</a>
+    </div>
+
+    <div class="site-search repo-scope js-site-search" role="search">
+      <form accept-charset="UTF-8" action="/stuartsierra/component/search" class="js-site-search-form" data-global-search-url="/search" data-repo-search-url="/stuartsierra/component/search" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
+  <input type="text"
+    class="js-site-search-field is-clearable"
+    data-hotkey="s"
+    name="q"
+    placeholder="Search"
+    data-global-scope-placeholder="Search GitHub"
+    data-repo-scope-placeholder="Search"
+    tabindex="1"
+    autocapitalize="off">
+  <div class="scope-badge">This repository</div>
+</form>
+    </div>
+
+      <ul class="header-nav left" role="navigation">
+          <li class="header-nav-item">
+            <a class="header-nav-link" href="/explore" data-ga-click="(Logged out) Header, go to explore, text:explore">Explore</a>
+          </li>
+          <li class="header-nav-item">
+            <a class="header-nav-link" href="/features" data-ga-click="(Logged out) Header, go to features, text:features">Features</a>
+          </li>
+          <li class="header-nav-item">
+            <a class="header-nav-link" href="https://enterprise.github.com/" data-ga-click="(Logged out) Header, go to enterprise, text:enterprise">Enterprise</a>
+          </li>
+          <li class="header-nav-item">
+            <a class="header-nav-link" href="/blog" data-ga-click="(Logged out) Header, go to blog, text:blog">Blog</a>
+          </li>
+      </ul>
+
+  </div>
+</div>
+
+
+
+      <div id="start-of-content" class="accessibility-aid"></div>
+          <div class="site" itemscope itemtype="http://schema.org/WebPage">
+    <div id="js-flash-container">
+      
+    </div>
+    <div class="pagehead repohead instapaper_ignore readability-menu">
+      <div class="container">
+        
+<ul class="pagehead-actions">
+
+  <li>
+      <a href="/login?return_to=%2Fstuartsierra%2Fcomponent"
+    class="btn btn-sm btn-with-count tooltipped tooltipped-n"
+    aria-label="You must be signed in to watch a repository" rel="nofollow">
+    <span class="octicon octicon-eye"></span>
+    Watch
+  </a>
+  <a class="social-count" href="/stuartsierra/component/watchers">
+    36
+  </a>
+
+  </li>
+
+  <li>
+      <a href="/login?return_to=%2Fstuartsierra%2Fcomponent"
+    class="btn btn-sm btn-with-count tooltipped tooltipped-n"
+    aria-label="You must be signed in to star a repository" rel="nofollow">
+    <span class="octicon octicon-star"></span>
+    Star
+  </a>
+
+    <a class="social-count js-social-count" href="/stuartsierra/component/stargazers">
+      724
+    </a>
+
+  </li>
+
+    <li>
+      <a href="/login?return_to=%2Fstuartsierra%2Fcomponent"
+        class="btn btn-sm btn-with-count tooltipped tooltipped-n"
+        aria-label="You must be signed in to fork a repository" rel="nofollow">
+        <span class="octicon octicon-repo-forked"></span>
+        Fork
+      </a>
+      <a href="/stuartsierra/component/network" class="social-count">
+        47
+      </a>
+    </li>
+</ul>
+
+        <h1 itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="entry-title public">
+          <span class="mega-octicon octicon-repo"></span>
+          <span class="author"><a href="/stuartsierra" class="url fn" itemprop="url" rel="author"><span itemprop="title">stuartsierra</span></a></span><!--
+       --><span class="path-divider">/</span><!--
+       --><strong><a href="/stuartsierra/component" class="js-current-repository" data-pjax="#js-repo-pjax-container">component</a></strong>
+
+          <span class="page-context-loader">
+            <img alt="" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+          </span>
+
+        </h1>
+      </div><!-- /.container -->
+    </div><!-- /.repohead -->
+
+    <div class="container">
+      <div class="repository-with-sidebar repo-container new-discussion-timeline with-full-navigation ">
+        <div class="repository-sidebar clearfix">
+            
+<nav class="sunken-menu repo-nav js-repo-nav js-sidenav-container-pjax js-octicon-loaders"
+     role="navigation"
+     data-pjax="#js-repo-pjax-container"
+     data-issue-count-url="/stuartsierra/component/issues/counts">
+  <ul class="sunken-menu-group">
+    <li class="tooltipped tooltipped-w" aria-label="Code">
+      <a href="/stuartsierra/component" aria-label="Code" class="selected js-selected-navigation-item sunken-menu-item" data-hotkey="g c" data-selected-links="repo_source repo_downloads repo_commits repo_releases repo_tags repo_branches /stuartsierra/component">
+        <span class="octicon octicon-code"></span> <span class="full-word">Code</span>
+        <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+</a>    </li>
+
+      <li class="tooltipped tooltipped-w" aria-label="Issues">
+        <a href="/stuartsierra/component/issues" aria-label="Issues" class="js-selected-navigation-item sunken-menu-item" data-hotkey="g i" data-selected-links="repo_issues repo_labels repo_milestones /stuartsierra/component/issues">
+          <span class="octicon octicon-issue-opened"></span> <span class="full-word">Issues</span>
+          <span class="js-issue-replace-counter"></span>
+          <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+</a>      </li>
+
+    <li class="tooltipped tooltipped-w" aria-label="Pull requests">
+      <a href="/stuartsierra/component/pulls" aria-label="Pull requests" class="js-selected-navigation-item sunken-menu-item" data-hotkey="g p" data-selected-links="repo_pulls /stuartsierra/component/pulls">
+          <span class="octicon octicon-git-pull-request"></span> <span class="full-word">Pull requests</span>
+          <span class="js-pull-replace-counter"></span>
+          <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+</a>    </li>
+
+      <li class="tooltipped tooltipped-w" aria-label="Wiki">
+        <a href="/stuartsierra/component/wiki" aria-label="Wiki" class="js-selected-navigation-item sunken-menu-item" data-hotkey="g w" data-selected-links="repo_wiki /stuartsierra/component/wiki">
+          <span class="octicon octicon-book"></span> <span class="full-word">Wiki</span>
+          <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+</a>      </li>
+  </ul>
+  <div class="sunken-menu-separator"></div>
+  <ul class="sunken-menu-group">
+
+    <li class="tooltipped tooltipped-w" aria-label="Pulse">
+      <a href="/stuartsierra/component/pulse" aria-label="Pulse" class="js-selected-navigation-item sunken-menu-item" data-selected-links="pulse /stuartsierra/component/pulse">
+        <span class="octicon octicon-pulse"></span> <span class="full-word">Pulse</span>
+        <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+</a>    </li>
+
+    <li class="tooltipped tooltipped-w" aria-label="Graphs">
+      <a href="/stuartsierra/component/graphs" aria-label="Graphs" class="js-selected-navigation-item sunken-menu-item" data-selected-links="repo_graphs repo_contributors /stuartsierra/component/graphs">
+        <span class="octicon octicon-graph"></span> <span class="full-word">Graphs</span>
+        <img alt="" class="mini-loader" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+</a>    </li>
+  </ul>
+
+
+</nav>
+
+              <div class="only-with-full-nav">
+                  
+<div class="clone-url open"
+  data-protocol-type="http"
+  data-url="/users/set_protocol?protocol_selector=http&amp;protocol_type=clone">
+  <h3><span class="text-emphasized">HTTPS</span> clone URL</h3>
+  <div class="input-group js-zeroclipboard-container">
+    <input type="text" class="input-mini input-monospace js-url-field js-zeroclipboard-target"
+           value="https://github.com/stuartsierra/component.git" readonly="readonly">
+    <span class="input-group-button">
+      <button aria-label="Copy to clipboard" class="js-zeroclipboard btn btn-sm zeroclipboard-button tooltipped tooltipped-s" data-copied-hint="Copied!" type="button"><span class="octicon octicon-clippy"></span></button>
+    </span>
+  </div>
+</div>
+
+  
+<div class="clone-url "
+  data-protocol-type="subversion"
+  data-url="/users/set_protocol?protocol_selector=subversion&amp;protocol_type=clone">
+  <h3><span class="text-emphasized">Subversion</span> checkout URL</h3>
+  <div class="input-group js-zeroclipboard-container">
+    <input type="text" class="input-mini input-monospace js-url-field js-zeroclipboard-target"
+           value="https://github.com/stuartsierra/component" readonly="readonly">
+    <span class="input-group-button">
+      <button aria-label="Copy to clipboard" class="js-zeroclipboard btn btn-sm zeroclipboard-button tooltipped tooltipped-s" data-copied-hint="Copied!" type="button"><span class="octicon octicon-clippy"></span></button>
+    </span>
+  </div>
+</div>
+
+
+
+<p class="clone-options">You can clone with
+  <a href="#" class="js-clone-selector" data-protocol="http">HTTPS</a> or <a href="#" class="js-clone-selector" data-protocol="subversion">Subversion</a>.
+  <a href="https://help.github.com/articles/which-remote-url-should-i-use" class="help tooltipped tooltipped-n" aria-label="Get help on which URL is right for you.">
+    <span class="octicon octicon-question"></span>
+  </a>
+</p>
+
+
+
+
+                <a href="/stuartsierra/component/archive/master.zip"
+                   class="btn btn-sm sidebar-button"
+                   aria-label="Download the contents of stuartsierra/component as a zip file"
+                   title="Download the contents of stuartsierra/component as a zip file"
+                   rel="nofollow">
+                  <span class="octicon octicon-cloud-download"></span>
+                  Download ZIP
+                </a>
+              </div>
+        </div><!-- /.repository-sidebar -->
+
+        <div id="js-repo-pjax-container" class="repository-content context-loader-container" data-pjax-container>
+
+          
+<span id="js-show-full-navigation"></span>
+
+<div class="repository-meta js-details-container ">
+    <div class="repository-description">
+      Managed lifecycle of stateful objects in Clojure
+    </div>
+
+
+
+</div>
+
+<div class="overall-summary overall-summary-bottomless">
+
+  <div class="stats-switcher-viewport js-stats-switcher-viewport">
+    <div class="stats-switcher-wrapper">
+    <ul class="numbers-summary">
+      <li class="commits">
+        <a data-pjax href="/stuartsierra/component/commits/master">
+            <span class="octicon octicon-history"></span>
+            <span class="num text-emphasized">
+              66
+            </span>
+            commits
+        </a>
+      </li>
+      <li>
+        <a data-pjax href="/stuartsierra/component/branches">
+          <span class="octicon octicon-git-branch"></span>
+          <span class="num text-emphasized">
+            4
+          </span>
+          branches
+        </a>
+      </li>
+
+      <li>
+        <a data-pjax href="/stuartsierra/component/releases">
+          <span class="octicon octicon-tag"></span>
+          <span class="num text-emphasized">
+            5
+          </span>
+          releases
+        </a>
+      </li>
+
+      <li>
+        
+  <a href="/stuartsierra/component/graphs/contributors">
+    <span class="octicon octicon-organization"></span>
+    <span class="num text-emphasized">
+      1
+    </span>
+    contributor
+  </a>
+      </li>
+    </ul>
+
+      <div class="repository-lang-stats">
+        <ol class="repository-lang-stats-numbers">
+          <li>
+              <a href="/stuartsierra/component/search?l=clojure">
+                <span class="color-block language-color" style="background-color:#db5855;"></span>
+                <span class="lang">Clojure</span>
+                <span class="percent">100.0%</span>
+              </a>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  <div class="repository-lang-stats-graph js-toggle-lang-stats" title="Click for language details">
+    <span class="language-color" aria-label="Clojure 100.0%" style="width:100.0%; background-color:#db5855;" itemprop="keywords">Clojure</span>
+  </div>
+
+<include-fragment src="/stuartsierra/component/show_partial?partial=tree%2Frecently_touched_branches_list"></include-fragment>
+
+<div class="file-navigation in-mid-page">
+  <a href="/stuartsierra/component/find/master"
+        class="js-show-file-finder btn btn-sm empty-icon tooltipped tooltipped-s right"
+        data-pjax
+        data-hotkey="t"
+        aria-label="Quickly jump between files">
+    <span class="octicon octicon-list-unordered"></span>
+  </a>
+    <a href="/stuartsierra/component/compare" aria-label="Compare, review, create a pull request" class="btn btn-sm btn-primary tooltipped tooltipped-se left compare-button" aria-label="Compare &amp; review" data-pjax data-ga-click="Repository, go to compare view, location:repo overview; icon:git-compare">
+      <span class="octicon octicon-git-compare"></span>
+    </a>
+
+  
+<div class="select-menu js-menu-container js-select-menu left">
+  <span class="btn btn-sm select-menu-button js-menu-target css-truncate" data-hotkey="w"
+    data-master-branch="master"
+    data-ref="master"
+    title="master"
+    role="button" aria-label="Switch branches or tags" tabindex="0" aria-haspopup="true">
+    <span class="octicon octicon-git-branch"></span>
+    <i>branch:</i>
+    <span class="js-select-button css-truncate-target">master</span>
+  </span>
+
+  <div class="select-menu-modal-holder js-menu-content js-navigation-container" data-pjax aria-hidden="true">
+
+    <div class="select-menu-modal">
+      <div class="select-menu-header">
+        <span class="select-menu-title">Switch branches/tags</span>
+        <span class="octicon octicon-x js-menu-close" role="button" aria-label="Close"></span>
+      </div>
+
+      <div class="select-menu-filters">
+        <div class="select-menu-text-filter">
+          <input type="text" aria-label="Filter branches/tags" id="context-commitish-filter-field" class="js-filterable-field js-navigation-enable" placeholder="Filter branches/tags">
+        </div>
+        <div class="select-menu-tabs">
+          <ul>
+            <li class="select-menu-tab">
+              <a href="#" data-tab-filter="branches" data-filter-placeholder="Filter branches/tags" class="js-select-menu-tab">Branches</a>
+            </li>
+            <li class="select-menu-tab">
+              <a href="#" data-tab-filter="tags" data-filter-placeholder="Find a tag…" class="js-select-menu-tab">Tags</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="select-menu-list select-menu-tab-bucket js-select-menu-tab-bucket" data-tab-filter="branches">
+
+        <div data-filterable-for="context-commitish-filter-field" data-filterable-type="substring">
+
+
+            <a class="select-menu-item js-navigation-item js-navigation-open "
+               href="/stuartsierra/component/tree/check-nils"
+               data-name="check-nils"
+               data-skip-pjax="true"
+               rel="nofollow">
+              <span class="select-menu-item-icon octicon octicon-check"></span>
+              <span class="select-menu-item-text css-truncate-target" title="check-nils">
+                check-nils
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open selected"
+               href="/stuartsierra/component/tree/master"
+               data-name="master"
+               data-skip-pjax="true"
+               rel="nofollow">
+              <span class="select-menu-item-icon octicon octicon-check"></span>
+              <span class="select-menu-item-text css-truncate-target" title="master">
+                master
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open "
+               href="/stuartsierra/component/tree/nil-error"
+               data-name="nil-error"
+               data-skip-pjax="true"
+               rel="nofollow">
+              <span class="select-menu-item-icon octicon octicon-check"></span>
+              <span class="select-menu-item-text css-truncate-target" title="nil-error">
+                nil-error
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open "
+               href="/stuartsierra/component/tree/reverse-dependencies"
+               data-name="reverse-dependencies"
+               data-skip-pjax="true"
+               rel="nofollow">
+              <span class="select-menu-item-icon octicon octicon-check"></span>
+              <span class="select-menu-item-text css-truncate-target" title="reverse-dependencies">
+                reverse-dependencies
+              </span>
+            </a>
+        </div>
+
+          <div class="select-menu-no-results">Nothing to show</div>
+      </div>
+
+      <div class="select-menu-list select-menu-tab-bucket js-select-menu-tab-bucket" data-tab-filter="tags">
+        <div data-filterable-for="context-commitish-filter-field" data-filterable-type="substring">
+
+
+            <div class="select-menu-item js-navigation-item ">
+              <span class="select-menu-item-icon octicon octicon-check"></span>
+              <a href="/stuartsierra/component/tree/component-0.2.3"
+                 data-name="component-0.2.3"
+                 data-skip-pjax="true"
+                 rel="nofollow"
+                 class="js-navigation-open select-menu-item-text css-truncate-target"
+                 title="component-0.2.3">component-0.2.3</a>
+            </div>
+            <div class="select-menu-item js-navigation-item ">
+              <span class="select-menu-item-icon octicon octicon-check"></span>
+              <a href="/stuartsierra/component/tree/component-0.2.2"
+                 data-name="component-0.2.2"
+                 data-skip-pjax="true"
+                 rel="nofollow"
+                 class="js-navigation-open select-menu-item-text css-truncate-target"
+                 title="component-0.2.2">component-0.2.2</a>
+            </div>
+            <div class="select-menu-item js-navigation-item ">
+              <span class="select-menu-item-icon octicon octicon-check"></span>
+              <a href="/stuartsierra/component/tree/component-0.2.1"
+                 data-name="component-0.2.1"
+                 data-skip-pjax="true"
+                 rel="nofollow"
+                 class="js-navigation-open select-menu-item-text css-truncate-target"
+                 title="component-0.2.1">component-0.2.1</a>
+            </div>
+            <div class="select-menu-item js-navigation-item ">
+              <span class="select-menu-item-icon octicon octicon-check"></span>
+              <a href="/stuartsierra/component/tree/component-0.2.0"
+                 data-name="component-0.2.0"
+                 data-skip-pjax="true"
+                 rel="nofollow"
+                 class="js-navigation-open select-menu-item-text css-truncate-target"
+                 title="component-0.2.0">component-0.2.0</a>
+            </div>
+            <div class="select-menu-item js-navigation-item ">
+              <span class="select-menu-item-icon octicon octicon-check"></span>
+              <a href="/stuartsierra/component/tree/component-0.1.0"
+                 data-name="component-0.1.0"
+                 data-skip-pjax="true"
+                 rel="nofollow"
+                 class="js-navigation-open select-menu-item-text css-truncate-target"
+                 title="component-0.1.0">component-0.1.0</a>
+            </div>
+        </div>
+
+        <div class="select-menu-no-results">Nothing to show</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+  <div class="breadcrumb"><span class='repo-root js-repo-root'><span itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="/stuartsierra/component" class="" data-branch="master" data-direction="back" data-pjax="true" itemscope="url"><span itemprop="title">component</span></a></span></span><span class="separator">/</span>
+    <a class="btn-link disabled tooltipped tooltipped-e" href="#" aria-label="You must be signed in to make or propose changes">
+      <span class="octicon octicon-plus"></span>
+    </a>
+</div>
+</div>
+
+
+
+  
+  <div class="commit commit-tease js-details-container" >
+    <p class="commit-title ">
+        <a href="/stuartsierra/component/commit/1d1ad2cb91ec4978a1fa7f47db18327e86f61699" class="message" data-pjax="true" title="Prepare README &amp; project.clj for 0.2.4-SNAPSHOT">Prepare README &amp; project.clj for 0.2.4-SNAPSHOT</a>
+        
+    </p>
+    <div class="commit-meta">
+      <button aria-label="Copy SHA" class="js-zeroclipboard zeroclipboard-link" data-clipboard-text="1d1ad2cb91ec4978a1fa7f47db18327e86f61699" data-copied-hint="Copied!" type="button"><span class="octicon octicon-clippy"></span></button>
+      <a href="/stuartsierra/component/commit/1d1ad2cb91ec4978a1fa7f47db18327e86f61699" class="sha-block" data-pjax>latest commit <span class="sha">1d1ad2cb91</span></a>
+
+      <div class="authorship">
+        <img alt="Stuart Sierra" class="avatar" data-user="95044" height="20" src="https://avatars1.githubusercontent.com/u/95044?v=3&amp;s=40" width="20" />
+        <span class="author-name"><a href="/stuartsierra" rel="author">stuartsierra</a></span>
+        authored <time class="updated" datetime="2015-03-03T19:40:10Z" is="relative-time">Mar 3, 2015</time>
+
+      </div>
+    </div>
+  </div>
+
+  
+<div class="file-wrap">
+  <a href="/stuartsierra/component/tree/1d1ad2cb91ec4978a1fa7f47db18327e86f61699" class="hidden js-permalink-shortcut" data-hotkey="y">Permalink</a>
+
+  <table class="files" data-pjax>
+
+
+    <tbody>
+      <tr class="warning include-fragment-error">
+        <td class="icon"><span class="octicon octicon-alert"></span></td>
+        <td class="content" colspan="3">Failed to load latest commit information.</td>
+      </tr>
+
+        <tr>
+          <td class="icon">
+            <span class="octicon octicon-file-directory"></span>
+            <img alt="" class="spinner" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="/stuartsierra/component/tree/master/dev" class="js-directory-link" id="e77989ed21758e78331b20e477fc5582-396ffa4237cab17cd86314a463e281ee99fc3726" title="dev">dev</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+              <a href="/stuartsierra/component/commit/dafe9655d3d8f28db36d99b656c5b65444d89861" class="message" data-pjax="true" title="Copy README &amp; examples.clj from reverse-dependencies branch
+
+Includes additional notes about `stop` not being the inverse of
+`start` and an example warning not to `dissoc` base fields from a
+record.">Copy README &amp; examples.clj from reverse-dependencies branch</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time datetime="2014-07-06T23:04:03Z" is="time-ago">Jul 6, 2014</time></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="icon">
+            <span class="octicon octicon-file-directory"></span>
+            <img alt="" class="spinner" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="/stuartsierra/component/tree/master/src/com/stuartsierra" class="js-directory-link" id="f0a9b22347b7fba8751e12fdd1bf7cc5-4439c9be3b4fbf53342e0a0f47ffde6025defa90" title="This path skips through empty directories"><span class="simplified-path">src/com/</span>stuartsierra</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+              <a href="/stuartsierra/component/commit/fb891500506b048bd8d9d689dfd3ed8c0e940944" class="message" data-pjax="true" title="More specific error for components which are nil
+
+Before this change, a nil value in a system map would cause an error
+::missing-component.
+
+However, the most common cause of this error is a component which failed
+to return a value from `start` or `stop`. We can distinguish this error
+case from a component whose key was not in the system at all, and return
+a more informative error message.
+
+See also https://github.com/stuartsierra/component/issues/17">More specific error for components which are nil</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time datetime="2015-02-27T01:45:34Z" is="time-ago">Feb 26, 2015</time></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="icon">
+            <span class="octicon octicon-file-directory"></span>
+            <img alt="" class="spinner" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="/stuartsierra/component/tree/master/test/com/stuartsierra" class="js-directory-link" id="fc6b5b27a6b5facc4476fc20d11c9b98-6b16906ae98dc0df48c18e3fef19dcf6b1383153" title="This path skips through empty directories"><span class="simplified-path">test/com/</span>stuartsierra</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+              <a href="/stuartsierra/component/commit/fb891500506b048bd8d9d689dfd3ed8c0e940944" class="message" data-pjax="true" title="More specific error for components which are nil
+
+Before this change, a nil value in a system map would cause an error
+::missing-component.
+
+However, the most common cause of this error is a component which failed
+to return a value from `start` or `stop`. We can distinguish this error
+case from a component whose key was not in the system at all, and return
+a more informative error message.
+
+See also https://github.com/stuartsierra/component/issues/17">More specific error for components which are nil</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time datetime="2015-02-27T01:45:34Z" is="time-ago">Feb 27, 2015</time></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="icon">
+            <span class="octicon octicon-file-text"></span>
+            <img alt="" class="spinner" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="/stuartsierra/component/blob/master/.gitignore" class="js-directory-link" id="a084b794bc0759e7a6b77810e01874f2-c27622eee5d9ad3a9b23b1ba7467b8deb7538b5b" title=".gitignore">.gitignore</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+              <a href="/stuartsierra/component/commit/ab02501ab1d750906f1331d8b8ff7a3c5e2d3ce6" class="message" data-pjax="true" title="Initial commit">Initial commit</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time datetime="2013-10-22T01:57:26Z" is="time-ago">Oct 21, 2013</time></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="icon">
+            <span class="octicon octicon-file-text"></span>
+            <img alt="" class="spinner" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="/stuartsierra/component/blob/master/LICENSE.txt" class="js-directory-link" id="61e0bdf7e1b43c5c93d9488b22e04170-762ecc1edaefd6f1a49d98b4ac4492c3f1935f55" title="LICENSE.txt">LICENSE.txt</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+              <a href="/stuartsierra/component/commit/ab02501ab1d750906f1331d8b8ff7a3c5e2d3ce6" class="message" data-pjax="true" title="Initial commit">Initial commit</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time datetime="2013-10-22T01:57:26Z" is="time-ago">Oct 22, 2013</time></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="icon">
+            <span class="octicon octicon-file-text"></span>
+            <img alt="" class="spinner" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="/stuartsierra/component/blob/master/README.md" class="js-directory-link" id="04c6e90faac2675aa89e2176d2eec7d8-ed50905820b144421fc54cbd1903fd8c9a2cdee1" title="README.md">README.md</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+              <a href="/stuartsierra/component/commit/1d1ad2cb91ec4978a1fa7f47db18327e86f61699" class="message" data-pjax="true" title="Prepare README &amp; project.clj for 0.2.4-SNAPSHOT">Prepare README &amp; project.clj for 0.2.4-SNAPSHOT</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time datetime="2015-03-03T19:40:10Z" is="time-ago">Mar 3, 2015</time></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="icon">
+            <span class="octicon octicon-file-text"></span>
+            <img alt="" class="spinner" height="16" src="https://assets-cdn.github.com/assets/spinners/octocat-spinner-32-e513294efa576953719e4e2de888dd9cf929b7d62ed8d05f25e731d02452ab6c.gif" width="16" />
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="/stuartsierra/component/blob/master/project.clj" class="js-directory-link" id="0fff143854a4f5c0469a3819b978a483-1bd190776195e0bdacac477182a6155b404a3556" title="project.clj">project.clj</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+              <a href="/stuartsierra/component/commit/1d1ad2cb91ec4978a1fa7f47db18327e86f61699" class="message" data-pjax="true" title="Prepare README &amp; project.clj for 0.2.4-SNAPSHOT">Prepare README &amp; project.clj for 0.2.4-SNAPSHOT</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time datetime="2015-03-03T19:40:10Z" is="time-ago">Mar 3, 2015</time></span>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+</div>
+
+
+  <div id="readme" class="boxed-group flush clearfix announce instapaper_body md">
+    <h3>
+      <span class="octicon octicon-book"></span>
+      README.md
+    </h3>
+
+    <article class="markdown-body entry-content" itemprop="mainContentOfPage"><h1>
+<a id="user-content-component" class="anchor" href="#component" aria-hidden="true"><span class="octicon octicon-link"></span></a>component</h1>
+
+<p>'Component' is a tiny Clojure framework for managing the lifecycle of
+software components which have runtime state.</p>
+
+<p>This is primarily a design pattern with a few helper functions. It can
+be seen as a style of dependency injection using immutable data
+structures.</p>
+
+<p>See the <a href="https://www.youtube.com/watch?v=13cmHf_kt-Q">video from Clojure/West 2014</a> (YouTube, 40 minutes)</p>
+
+<h2>
+<a id="user-content-releases-and-dependency-information" class="anchor" href="#releases-and-dependency-information" aria-hidden="true"><span class="octicon octicon-link"></span></a>Releases and Dependency Information</h2>
+
+<ul>
+<li><p>I publish releases to <a href="http://clojars.org/">Clojars</a></p></li>
+<li><p>Latest stable release is <a href="https://github.com/stuartsierra/component/tree/component-0.2.3">0.2.3</a></p></li>
+<li><p><a href="https://clojars.org/com.stuartsierra/component">All releases</a></p></li>
+</ul>
+
+<p><a href="http://leiningen.org/">Leiningen</a> dependency information:</p>
+
+<pre><code>[com.stuartsierra/component "0.2.3"]
+</code></pre>
+
+<p><a href="http://maven.apache.org/">Maven</a> dependency information:</p>
+
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.stuartsierra&lt;/groupId&gt;
+  &lt;artifactId&gt;component&lt;/artifactId&gt;
+  &lt;version&gt;0.2.3&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p><a href="http://www.gradle.org/">Gradle</a> dependency information:</p>
+
+<pre><code>compile "com.stuartsierra:component:0.2.3"
+</code></pre>
+
+<h2>
+<a id="user-content-dependencies-and-compatibility" class="anchor" href="#dependencies-and-compatibility" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies and Compatibility</h2>
+
+<p>I have successfully tested 'Component' with Clojure versions
+1.4.0, 1.5.1, and 1.6.0.</p>
+
+<p>'Component' uses my <a href="https://github.com/stuartsierra/dependency">dependency</a> library.</p>
+
+<h3>
+<a id="user-content-api-stability" class="anchor" href="#api-stability" aria-hidden="true"><span class="octicon octicon-link"></span></a>API Stability</h3>
+
+<p>I will make an effort not to break backwards compability between
+releases at the same 0.N version, e.g. 0.2.1 and 0.2.2.</p>
+
+<p>Expect to find breaking changes between releases at different 0.N
+versions, e.g. 0.3.0 and 0.4.0.</p>
+
+<h2>
+<a id="user-content-discussion" class="anchor" href="#discussion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Discussion</h2>
+
+<p>Please post questions on the <a href="https://groups.google.com/forum/#!forum/clojure">Clojure Mailing List</a></p>
+
+<h2>
+<a id="user-content-introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>For the purposes of this framework, a <em>component</em> is a collection of
+functions or procedures which share some runtime state.</p>
+
+<p>Some examples of components:</p>
+
+<ul>
+<li><p>Database access: query and insert functions sharing a database
+connection</p></li>
+<li><p>External API service: functions to send and retrieve data sharing an
+HTTP connection pool</p></li>
+<li><p>Web server: functions to handle different routes sharing all the
+runtime state of the web application, such as a session store</p></li>
+<li><p>In-memory cache: functions to get and set data in a shared mutable
+reference such as a Clojure Atom or Ref</p></li>
+</ul>
+
+<p>A <em>component</em> is similar in spirit to the definition of an <em>object</em> in
+Object-Oriented Programming. Clojure is not an object-oriented
+programming language, so we do not have to cram everything into the OO
+model. Most functions are just functions, and most data are just data.
+But real-world applications need to manage state. Components are a
+tool to help with that.</p>
+
+<h3>
+<a id="user-content-advantages-of-the-component-model" class="anchor" href="#advantages-of-the-component-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advantages of the Component Model</h3>
+
+<p>Large applications often consist of many stateful processes which must
+be started and stopped in a particular order. The component model
+makes those relationships explicit and declarative, instead of
+implicit in imperative code.</p>
+
+<p>Components provide some basic guidance for structuring a Clojure
+application, with boundaries between different parts of a system.
+Components offer some encapsulation, in the sense of grouping together
+related entities. Each component receives references only to the
+things it needs, avoiding unnecessary shared state. Instead of
+reaching through multiple levels of nested maps, a component can have
+everything it needs at most one map lookup away.</p>
+
+<p>Instead of having mutable state (atoms, refs, etc.) scattered
+throughout different namespaces, all the stateful parts of an
+application can be gathered together. In some cases, using components
+may eliminate the need for mutable references altogether, for example
+to store the "current" connection to a resource such as a database. At
+the same time, having all state reachable via a single "system" object
+makes it easy to reach in and inspect any part of the application from
+the REPL.</p>
+
+<p>The component dependency model makes it easy to swap in "stub" or
+"mock" implementations of a component for testing purposes, without
+relying on time-dependent constructs, such as <code>with-redefs</code> or
+<code>binding</code>, which are often subject to race conditions in
+multi-threaded code.</p>
+
+<p>Having a coherent way to set up and tear down <strong>all</strong> the state
+associated with an application enables rapid development cycles
+without restarting the JVM. It can also make unit tests faster and
+more independent, since the cost of creating and starting a system is
+low enough that every test can create a new instance of the system.</p>
+
+<h3>
+<a id="user-content-disadvantages-of-the-component-model" class="anchor" href="#disadvantages-of-the-component-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Disadvantages of the Component Model</h3>
+
+<p>First and foremost, this framework works best when all parts of an
+application follow the same pattern. It is not easy to retrofit the
+component model to an existing application without major refactoring.</p>
+
+<p>In particular, the 'component' library assumes that all application
+state is passed as arguments to the functions that use it. As a
+result, this framework may not work well with code which relies on
+global or singleton references.</p>
+
+<p>For small applications, declaring the dependency relationships among
+components may actually be more work than manually starting all the
+components in the correct order. You can still use the 'Lifecycle'
+protocol without using the dependency-injection features, but the
+added value of 'component' in that case is small.</p>
+
+<p>The "system object" produced by this framework is a large and complex
+map with a lot of duplication. The same component may appear in
+multiple places in the map. The actual memory cost of this duplication
+is negligible due to persistent data structures, but the system map is
+typically too large to inspect visually.</p>
+
+<p>You must explicitly specify all the dependency relationships among
+components: the code cannot discover these relationships
+automatically.</p>
+
+<p>Finally, the 'component' library forbids cyclic dependencies among
+components. I believe that cyclic dependencies usually indicate
+architectural flaws and can be eliminated by restructuring the
+application. In the rare case where a cyclic dependency cannot be
+avoided, you can use mutable references to manage it, but this is
+outside the scope of 'component'.</p>
+
+<h2>
+<a id="user-content-usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">ns</span> <span class="pl-e">com.example.your-application</span>
+  (<span class="pl-c1">:require</span> [com.stuartsierra.component <span class="pl-c1">:as</span> component]))</pre></div>
+
+<h3>
+<a id="user-content-creating-components" class="anchor" href="#creating-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating Components</h3>
+
+<p>To create a component, define a Clojure record that implements the
+<code>Lifecycle</code> protocol.</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">defrecord</span> Database [host port connection]
+  <span class="pl-c">;; Implement the Lifecycle protocol</span>
+  component/Lifecycle
+
+  (<span class="pl-en">start</span> [component]
+    (<span class="pl-en">println</span> <span class="pl-s"><span class="pl-pds">"</span>;; Starting database<span class="pl-pds">"</span></span>)
+    <span class="pl-c">;; In the 'start' method, initialize this component</span>
+    <span class="pl-c">;; and start it running. For example, connect to a</span>
+    <span class="pl-c">;; database, create thread pools, or initialize shared</span>
+    <span class="pl-c">;; state.</span>
+    (<span class="pl-k">let</span> [conn (<span class="pl-en">connect-to-database</span> host port)]
+      <span class="pl-c">;; Return an updated version of the component with</span>
+      <span class="pl-c">;; the run-time state assoc'd in.</span>
+      (<span class="pl-en">assoc</span> component <span class="pl-c1">:connection</span> conn)))
+
+  (<span class="pl-en">stop</span> [component]
+    (<span class="pl-en">println</span> <span class="pl-s"><span class="pl-pds">"</span>;; Stopping database<span class="pl-pds">"</span></span>)
+    <span class="pl-c">;; In the 'stop' method, shut down the running</span>
+    <span class="pl-c">;; component and release any external resources it has</span>
+    <span class="pl-c">;; acquired.</span>
+    (<span class="pl-en">.close</span> connection)
+    <span class="pl-c">;; Return the component, optionally modified. Remember that if you</span>
+    <span class="pl-c">;; dissoc one of a record's base fields, you get a plain map.</span>
+    (<span class="pl-en">assoc</span> component <span class="pl-c1">:connection</span> <span class="pl-c1">nil</span>)))</pre></div>
+
+<p>Optionally, provide a constructor function that takes arguments for
+the essential configuration parameters of the component, leaving the
+runtime state blank.</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">defn</span> <span class="pl-e">new-database</span> [host port]
+  (<span class="pl-en">map-&gt;Database</span> {<span class="pl-c1">:host</span> host <span class="pl-c1">:port</span> port}))</pre></div>
+
+<p>Define the functions implementing the behavior of the component to
+take an <strong>instance</strong> of the component as an argument.</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">defn</span> <span class="pl-e">get-user</span> [database username]
+  (<span class="pl-en">execute-query</span> (<span class="pl-c1">:connection</span> database)
+    <span class="pl-s"><span class="pl-pds">"</span>SELECT * FROM users WHERE username = ?<span class="pl-pds">"</span></span>
+    username))
+
+(<span class="pl-k">defn</span> <span class="pl-e">add-user</span> [database username favorite-color]
+  (<span class="pl-en">execute-insert</span> (<span class="pl-c1">:connection</span> database)
+    <span class="pl-s"><span class="pl-pds">"</span>INSERT INTO users (username, favorite_color)<span class="pl-pds">"</span></span>
+    username favorite-color))</pre></div>
+
+<p>Define other components in terms of the components on which they
+depend.</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">defrecord</span> ExampleComponent [options cache database scheduler]
+  component/Lifecycle
+
+  (<span class="pl-en">start</span> [this]
+    (<span class="pl-en">println</span> <span class="pl-s"><span class="pl-pds">"</span>;; Starting ExampleComponent<span class="pl-pds">"</span></span>)
+    <span class="pl-c">;; In the 'start' method, a component may assume that its</span>
+    <span class="pl-c">;; dependencies are available and have already been started.</span>
+    (<span class="pl-en">assoc</span> this <span class="pl-c1">:admin</span> (<span class="pl-en">get-user</span> database <span class="pl-s"><span class="pl-pds">"</span>admin<span class="pl-pds">"</span></span>)))
+
+  (<span class="pl-en">stop</span> [this]
+    (<span class="pl-en">println</span> <span class="pl-s"><span class="pl-pds">"</span>;; Stopping ExampleComponent<span class="pl-pds">"</span></span>)
+    <span class="pl-c">;; Likewise, in the 'stop' method, a component may assume that its</span>
+    <span class="pl-c">;; dependencies will not be stopped until AFTER it is stopped.</span>
+    this))</pre></div>
+
+<p><strong>Do not pass component dependencies in a constructor.</strong>
+Systems are responsible for injecting runtime dependencies into the
+components they contain: see the next section.</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">defn</span> <span class="pl-e">example-component</span> [config-options]
+  (<span class="pl-en">map-&gt;ExampleComponent</span> {<span class="pl-c1">:options</span> config-options
+                          <span class="pl-c1">:cache</span> (<span class="pl-en">atom</span> {})}))</pre></div>
+
+<h3>
+<a id="user-content-systems" class="anchor" href="#systems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Systems</h3>
+
+<p>Components are composed into systems. A system is a component which
+knows how to start and stop other components. It is also responsible
+for injecting dependencies into the components which need them.</p>
+
+<p>The easiest way to create a system is with the <code>system-map</code> function,
+which takes a series of key/value pairs just like the <code>hash-map</code> or
+<code>array-map</code> constructors. Keys in the system map are the usually
+keywords. Values in the system map are <em>instances</em> of components,
+usually records or maps.</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">defn</span> <span class="pl-e">example-system</span> [config-options]
+  (<span class="pl-k">let</span> [{<span class="pl-c1">:keys</span> [host port]} config-options]
+    (<span class="pl-en">component/system-map</span>
+      <span class="pl-c1">:db</span> (<span class="pl-en">new-database</span> host port)
+      <span class="pl-c1">:scheduler</span> (<span class="pl-en">new-scheduler</span>)
+      <span class="pl-c1">:app</span> (<span class="pl-en">component/using</span>
+             (<span class="pl-en">example-component</span> config-options)
+             {<span class="pl-c1">:database</span>  <span class="pl-c1">:db</span>
+              <span class="pl-c1">:scheduler</span> <span class="pl-c1">:scheduler</span>}))))</pre></div>
+
+<p>Specify the dependency relationships among components with the <code>using</code>
+function. <code>using</code> takes a component and a collection of keys naming
+that component's dependencies.</p>
+
+<p>If the component and the system use the same keys, then you can
+specify dependencies as a <em>vector</em> of keys:</p>
+
+<div class="highlight highlight-clojure"><pre>    (<span class="pl-en">component/system-map</span>
+      <span class="pl-c1">:database</span> (<span class="pl-en">new-database</span> host port)
+      <span class="pl-c1">:scheduler</span> (<span class="pl-en">new-scheduler</span>)
+      <span class="pl-c1">:app</span> (<span class="pl-en">component/using</span>
+             (<span class="pl-en">example-component</span> config-options)
+             [<span class="pl-c1">:database</span> <span class="pl-c1">:scheduler</span>]))
+             <span class="pl-c">;; Both ExampleComponent and the system have</span>
+             <span class="pl-c">;; keys :database and :scheduler</span></pre></div>
+
+<p>If the component and the system use <em>different</em> keys, then specify
+them as a map: Keys in the map are the keys in the component record
+itself, values are the map are the corresponding keys in the system
+record.</p>
+
+<pre><code>{:component-key :system-key}
+</code></pre>
+
+<p>Using the same example:</p>
+
+<div class="highlight highlight-clojure"><pre>    (<span class="pl-en">component/system-map</span>
+      <span class="pl-c1">:db</span> (<span class="pl-en">new-database</span> host port)
+      <span class="pl-c1">:sched</span> (<span class="pl-en">new-scheduler</span>)
+      <span class="pl-c1">:app</span> (<span class="pl-en">component/using</span>
+             (<span class="pl-en">example-component</span> config-options)
+             {<span class="pl-c1">:database</span>  <span class="pl-c1">:db</span>
+              <span class="pl-c1">:scheduler</span> <span class="pl-c1">:sched</span>}))
+        <span class="pl-c">;;     ^          ^</span>
+        <span class="pl-c">;;     |          |</span>
+        <span class="pl-c">;;     |          \- Keys in the system map</span>
+        <span class="pl-c">;;     |</span>
+        <span class="pl-c">;;     \- Keys in the ExampleComponent record</span></pre></div>
+
+<p>The system map provides its own implementation of the Lifecycle
+protocol which uses this dependency information (stored as metadata on
+the component) to start the components in the correct order.</p>
+
+<p>Before starting each component, the system will <code>assoc</code> its
+dependencies based on the metadata provided by <code>using</code>.</p>
+
+<p>Again using the example above, the ExampleComponent would be started
+as if by:</p>
+
+<pre><code>(-&gt; example-component
+    (assoc :database (:db system))
+    (assoc :scheduler (:sched system))
+    (start))
+</code></pre>
+
+<p>Stop a system by calling the <code>stop</code> method on it. This will stop each
+component, in <em>reverse</em> dependency order, and then re-assoc the
+dependencies of each component. <strong>Note:</strong> <code>stop</code> is not the exact
+inverse of <code>start</code>; component dependencies will still be associated.</p>
+
+<p>It doesn't matter <em>when</em> you associate dependency metadata on a
+component, as long as it happens before you call <code>start</code>. If you know
+the names of all the components in your system in advance, you could
+choose to add the metadata in the component's constructor:</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">defrecord</span> AnotherComponent [component-a component-b])
+
+(<span class="pl-k">defrecord</span> AnotherSystem [component-a component-b component-c])
+
+(<span class="pl-k">defn</span> <span class="pl-e">another-component</span> []   <span class="pl-c">; constructor</span>
+  (<span class="pl-en">component/using</span>
+    (<span class="pl-en">map-&gt;AnotherComponent</span> {})
+    [<span class="pl-c1">:component-a</span> <span class="pl-c1">:component-b</span>]))</pre></div>
+
+<p>Alternately, component dependencies can be specified all at once for
+all components in the system with <code>system-using</code>, which takes a map
+from component names to their dependencies.</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">defn</span> <span class="pl-e">example-system</span> [config-options]
+  (<span class="pl-k">let</span> [{<span class="pl-c1">:keys</span> [host port]} config-options]
+    (<span class="pl-en">-&gt;</span> (<span class="pl-en">component/system-map</span>
+          <span class="pl-c1">:config-options</span> config-options
+          <span class="pl-c1">:db</span> (<span class="pl-en">new-database</span> host port)
+          <span class="pl-c1">:sched</span> (<span class="pl-en">new-scheduler</span>)
+          <span class="pl-c1">:app</span> (<span class="pl-en">example-component</span> config-options))
+        (<span class="pl-en">component/system-using</span>
+          {<span class="pl-c1">:app</span> {<span class="pl-c1">:database</span>  <span class="pl-c1">:db</span>
+                 <span class="pl-c1">:scheduler</span> <span class="pl-c1">:sched</span>}}))))</pre></div>
+
+<h3>
+<a id="user-content-example-repl-session" class="anchor" href="#example-repl-session" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example REPL Session</h3>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">def</span> <span class="pl-e">system</span> (<span class="pl-en">example-system</span> {<span class="pl-c1">:host</span> <span class="pl-s"><span class="pl-pds">"</span>dbhost.com<span class="pl-pds">"</span></span> <span class="pl-c1">:port</span> <span class="pl-c1">123</span>}))
+<span class="pl-c">;;=&gt; #'examples/system</span>
+
+(<span class="pl-en">alter-var-root</span> #'system component/start)
+<span class="pl-c">;; Starting database</span>
+<span class="pl-c">;; Opening database connection</span>
+<span class="pl-c">;; Starting scheduler</span>
+<span class="pl-c">;; Starting ExampleComponent</span>
+<span class="pl-c">;; execute-query</span>
+<span class="pl-c">;;=&gt; #examples.ExampleSystem{ ... }</span>
+
+(<span class="pl-en">alter-var-root</span> #'system component/stop)
+<span class="pl-c">;; Stopping ExampleComponent</span>
+<span class="pl-c">;; Stopping scheduler</span>
+<span class="pl-c">;; Stopping database</span>
+<span class="pl-c">;; Closing database connection</span>
+<span class="pl-c">;;=&gt; #examples.ExampleSystem{ ... }</span></pre></div>
+
+<h3>
+<a id="user-content-errors" class="anchor" href="#errors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Errors</h3>
+
+<p>While starting/stopping a system, if any component's <code>start</code> or <code>stop</code>
+method throws an exception, the <code>start-system</code> or <code>stop-system</code>
+function will catch and wrap it in an <code>ex-info</code> exception with the
+following keys in its <code>ex-data</code> map:</p>
+
+<ul>
+<li><p><code>:system</code> is the current system, including all the components which
+have already been started.</p></li>
+<li><p><code>:component</code> is the component which caused the exception, with its
+dependencies already <code>assoc</code>'d in.</p></li>
+</ul>
+
+<p>The original exception which the component threw is available as
+<code>.getCause</code> on the exception.</p>
+
+<p>Since the system map may be large, with a lot of repetition, you
+probably don't want to log or print this data. Instead, get the cause
+of the exception and print that.</p>
+
+<p>The 'component' library makes no attempt to recover from errors in a
+component, but you can use the system attached to the exception to
+clean up any partially-constructed state.</p>
+
+<h3>
+<a id="user-content-idempotence" class="anchor" href="#idempotence" aria-hidden="true"><span class="octicon octicon-link"></span></a>Idempotence</h3>
+
+<p>You may find it useful to define your <code>start</code> and <code>stop</code> methods to be
+idempotent, i.e., to have effect only if the component is not already
+started or stopped.</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">defrecord</span> IdempotentDatabaseExample [host port connection]
+  component/Lifecycle
+  (<span class="pl-en">start</span> [this]
+    (<span class="pl-k">if</span> connection  <span class="pl-c">; already started</span>
+      this
+      (<span class="pl-en">assoc</span> this <span class="pl-c1">:connection</span> (<span class="pl-en">connect</span> host port))))
+  (<span class="pl-en">stop</span> [this]
+    (<span class="pl-k">if</span> (<span class="pl-en">not</span> connection)  <span class="pl-c">; already stopped</span>
+      this
+      (<span class="pl-k">do</span> (<span class="pl-en">.close</span> connection)
+          (<span class="pl-en">assoc</span> this <span class="pl-c1">:connection</span> <span class="pl-c1">nil</span>)))))</pre></div>
+
+<p>The 'component' library does not require that stop/start be
+idempotent, but idempotence can make it easier to clean up state after
+an error, because you can call <code>stop</code> indiscriminately on everything.</p>
+
+<p>In addition, you could wrap the body of <code>stop</code> in a try/catch that
+ignores all exceptions. That way, errors stopping one component will
+not prevent other components from shutting down cleanly.</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">try</span> (<span class="pl-en">.close</span> connection)
+  (<span class="pl-k">catch</span> Throwable t
+    (<span class="pl-en">log/warn</span> t <span class="pl-s"><span class="pl-pds">"</span>Error when stopping component<span class="pl-pds">"</span></span>)))</pre></div>
+
+<h3>
+<a id="user-content-stateless-components" class="anchor" href="#stateless-components" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stateless Components</h3>
+
+<p>The default implementation of <code>Lifecycle</code> is a no-op. If you omit the
+<code>Lifecycle</code> protocol from a component, it can still participate in the
+dependency injection process.</p>
+
+<p>Components which do not need lifecycle can be ordinary Clojure maps.</p>
+
+<p>You <strong>cannot</strong> omit just one of the <code>start</code> or <code>stop</code> methods: any
+component which implements <code>Lifecycle</code> must supply both.</p>
+
+<h3>
+<a id="user-content-reloading" class="anchor" href="#reloading" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reloading</h3>
+
+<p>I developed this pattern in combination with my "reloaded" <a href="http://thinkrelevance.com/blog/2013/06/04/clojure-workflow-reloaded">workflow</a>.
+For development, I might create a <code>user</code> namespace like this:</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">ns</span> <span class="pl-e">user</span>
+  (<span class="pl-c1">:require</span> [com.stuartsierra.component <span class="pl-c1">:as</span> component]
+            [clojure.tools.namespace.repl <span class="pl-c1">:refer</span> (<span class="pl-en">refresh</span>)]
+            [examples <span class="pl-c1">:as</span> app]))
+
+(<span class="pl-k">def</span> <span class="pl-e">system</span> <span class="pl-e">nil</span>)
+
+(<span class="pl-k">defn</span> <span class="pl-e">init</span> []
+  (<span class="pl-en">alter-var-root</span> #'system
+    (<span class="pl-en">constantly</span> (<span class="pl-en">app/example-system</span> {<span class="pl-c1">:host</span> <span class="pl-s"><span class="pl-pds">"</span>dbhost.com<span class="pl-pds">"</span></span> <span class="pl-c1">:port</span> <span class="pl-c1">123</span>}))))
+
+(<span class="pl-k">defn</span> <span class="pl-e">start</span> []
+  (<span class="pl-en">alter-var-root</span> #'system component/start))
+
+(<span class="pl-k">defn</span> <span class="pl-e">stop</span> []
+  (<span class="pl-en">alter-var-root</span> #'system
+    (<span class="pl-k">fn</span> [s] (<span class="pl-k">when</span> s (<span class="pl-en">component/stop</span> s)))))
+
+(<span class="pl-k">defn</span> <span class="pl-e">go</span> []
+  (<span class="pl-en">init</span>)
+  (<span class="pl-en">start</span>))
+
+(<span class="pl-k">defn</span> <span class="pl-e">reset</span> []
+  (<span class="pl-en">stop</span>)
+  (<span class="pl-en">refresh</span> <span class="pl-c1">:after</span> 'user/go))</pre></div>
+
+<h3>
+<a id="user-content-production" class="anchor" href="#production" aria-hidden="true"><span class="octicon octicon-link"></span></a>Production</h3>
+
+<p>In the deployed or production version of my application, I typically
+have a "main" function that creates and starts the top-level system.</p>
+
+<div class="highlight highlight-clojure"><pre>(<span class="pl-k">ns</span> <span class="pl-e">com.example.application.main</span>
+  (<span class="pl-c1">:gen-class</span>)
+  (<span class="pl-c1">:require</span> [com.stuartsierra.component <span class="pl-c1">:as</span> component]
+            [examples <span class="pl-c1">:as</span> app]))
+
+(<span class="pl-k">defn</span> <span class="pl-e">-main</span> [&amp; args]
+  (<span class="pl-k">let</span> [[host port] args]
+    (<span class="pl-en">component/start</span>
+      (<span class="pl-en">app/example-system</span> {<span class="pl-c1">:host</span> host <span class="pl-c1">:port</span> port}))))</pre></div>
+
+<p>This also works well in conjunction with command-line drivers such as
+<a href="http://commons.apache.org/proper/commons-daemon/">Apache Commons Daemon</a>.</p>
+
+<h3>
+<a id="user-content-usage-notes" class="anchor" href="#usage-notes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage Notes</h3>
+
+<p>The top-level "system" record is intended to be used exclusively for
+starting and stopping other components. No component in the system
+should depend directly on its parent system.</p>
+
+<p>I do not intend that application functions should receive the
+top-level system as an argument. Rather, functions are defined in
+terms of components. Each component receives references only to the
+components on which it depends.</p>
+
+<p>The "application" or "business logic" may itself be represented by one
+or more components.</p>
+
+<p>Components may, of course, implement other protocols besides
+<code>Lifecycle</code>.</p>
+
+<p>Different implementations of a component (for example, a stub version
+for testing) can be injected into a system with <code>assoc</code> before calling
+<code>start</code>.</p>
+
+<p>Systems may be composed into larger systems, although I have not yet
+found a need for this.</p>
+
+<h3>
+<a id="user-content-notes-for-library-authors" class="anchor" href="#notes-for-library-authors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notes for Library Authors</h3>
+
+<p>'Component' is intended as a tool for applications, not resuable
+libraries. I would not expect a general-purpose library to impose any
+particular framework on the applications which use it.</p>
+
+<p>That said, library authors can make it trivially easy for applications
+to use their libraries in combination with the 'Component' pattern by
+following these guidelines:</p>
+
+<ul>
+<li><p>Never create global mutable state (for example, an Atom or Ref
+stored in a <code>def</code>).</p></li>
+<li><p>Never rely on dynamic binding to convey state (for example, the
+"current" database connection) unless that state is necessarily
+confined to a single thread.</p></li>
+<li><p>Never perform side effects at the top level of a source file.</p></li>
+<li><p>Encapsulate all the runtime state needed by the library in a single
+data structure.</p></li>
+<li><p>Provide functions to construct and destroy that data structure.</p></li>
+<li><p>Take the encapsulated runtime state as an argument to any library
+functions which depend on it.</p></li>
+</ul>
+
+<h3>
+<a id="user-content-customization" class="anchor" href="#customization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Customization</h3>
+
+<p>A system map is just a record that implements the Lifecycle protocol
+via two public functions, <code>start-system</code> and <code>stop-system</code>. These two
+functions are just special cases of two other functions,
+<code>update-system</code> and <code>update-system-reverse</code>. (Added in 0.2.0)</p>
+
+<p>You could, for example, define your own lifecycle functions as new
+protocols. You don't even have to use protocols and records;
+multimethods and ordinary maps would work as well.</p>
+
+<p>Both <code>update-system</code> and <code>update-system-reverse</code> take a function as
+an argument and call it on each component in the system. Along the
+way, they <code>assoc</code> in the updated dependencies of each component.</p>
+
+<p>The <code>update-system</code> function iterates over the components in
+dependency order (a component will be called <em>after</em> its
+dependencies). The <code>update-system-reverse</code> function goes in reverse
+dependency order (a component will be called <em>before</em> its
+dependencies).</p>
+
+<p>Calling <code>update-system</code> with the <code>identity</code> function is equivalent to
+doing just the dependency injection part of 'component' without
+<code>Lifecycle</code>.</p>
+
+<h2>
+<a id="user-content-references--more-information" class="anchor" href="#references--more-information" aria-hidden="true"><span class="octicon octicon-link"></span></a>References / More Information</h2>
+
+<ul>
+<li>
+<a href="https://www.youtube.com/watch?v=13cmHf_kt-Q">video from Clojure/West 2014</a> (YouTube, 40 minutes)</li>
+<li><a href="https://github.com/clojure/tools.namespace">tools.namespace</a></li>
+<li><a href="http://stuartsierra.com/2013/03/29/perils-of-dynamic-scope">On the Perils of Dynamic Scope</a></li>
+<li>
+<a href="http://www.infoq.com/presentations/Clojure-Large-scale-patterns-techniques">Clojure in the Large</a> (video)</li>
+<li>
+<a href="http://thinkrelevance.com/blog/2013/05/29/stuart-sierra-episode-032">Relevance Podcast Episode 32</a> (audio)</li>
+<li><a href="http://thinkrelevance.com/blog/2013/06/04/clojure-workflow-reloaded">My Clojure Workflow, Reloaded</a></li>
+<li>
+<a href="https://github.com/stuartsierra/reloaded">reloaded</a> Leiningen template</li>
+<li><a href="http://stuartsierra.com/2013/09/15/lifecycle-composition">Lifecycle Composition</a></li>
+</ul>
+
+<h2>
+<a id="user-content-change-log" class="anchor" href="#change-log" aria-hidden="true"><span class="octicon octicon-link"></span></a>Change Log</h2>
+
+<ul>
+<li>Version 0.2.4-SNAPSHOT (in development)
+
+<ul>
+<li>Current Git <code>master</code> branch</li>
+</ul>
+</li>
+<li>Version <a href="https://github.com/stuartsierra/component/tree/component-0.2.3">0.2.3</a> released on March 3, 2015
+
+<ul>
+<li>More-specific error message when a component returns <code>nil</code> from
+<code>start</code> or <code>stop</code>: see <a href="https://github.com/stuartsierra/component/commit/fb891500506b048bd8d9d689dfd3ed8c0e940944">commit fb891500</a>
+</li>
+</ul>
+</li>
+<li>Version <a href="https://github.com/stuartsierra/component/tree/component-0.2.2">0.2.2</a> released on September 7, 2014
+
+<ul>
+<li>System maps print as <code>#&lt;SystemMap&gt;</code> to avoid trying to print huge
+objects in the REPL</li>
+<li>Add error helpers <code>ex-component?</code> and <code>ex-without-components</code>
+</li>
+<li>Change <code>:component-key</code> to <code>:system-key</code> in <code>ex-data</code> maps:
+breaking change for code which depended on the value of
+<code>:component-key</code>
+</li>
+<li>Add <code>:system-key</code> to <code>ex-data</code> map from <code>try-action</code>
+</li>
+<li>Minor changes to exception message strings</li>
+<li>Leiningen profiles / aliases to test on all supported Clojure
+versions</li>
+</ul>
+</li>
+<li>Version <a href="https://github.com/stuartsierra/component/tree/component-0.2.1">0.2.1</a> released on December 17, 2013
+
+<ul>
+<li>Add generic <code>system-map</code>
+</li>
+<li>More descriptive messages on exceptions</li>
+<li>Add arity-1 versions of <code>start-system</code> and <code>stop-system</code> that
+default to all keys in the system</li>
+</ul>
+</li>
+<li>Version <a href="https://github.com/stuartsierra/component/tree/component-0.2.0">0.2.0</a> released on November 20, 2013
+
+<ul>
+<li>API compatible with 0.1.0</li>
+<li>Some exception messages changed</li>
+<li>Added default no-op implementation of Lifecycle protocol</li>
+<li>Added <code>update-system</code> and <code>update-system-reverse</code>
+</li>
+<li>Redefined <code>start-system</code> and <code>stop-system</code> in terms of these</li>
+<li>
+<code>stop-system</code> now assoc's dependencies just like <code>start-system</code>
+</li>
+</ul>
+</li>
+<li>Version <a href="https://github.com/stuartsierra/component/tree/component-0.1.0">0.1.0</a> released on October 28, 2013</li>
+</ul>
+
+<h2>
+<a id="user-content-copyright-and-license" class="anchor" href="#copyright-and-license" aria-hidden="true"><span class="octicon octicon-link"></span></a>Copyright and License</h2>
+
+<p>The MIT License (MIT)</p>
+
+<p>Copyright © 2013 Stuart Sierra</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+</article>
+  </div>
+
+
+        </div>
+
+      </div><!-- /.repo-container -->
+      <div class="modal-backdrop"></div>
+    </div><!-- /.container -->
+  </div><!-- /.site -->
+
+
+    </div><!-- /.wrapper -->
+
+      <div class="container">
+  <div class="site-footer" role="contentinfo">
+    <ul class="site-footer-links right">
+        <li><a href="https://status.github.com/" data-ga-click="Footer, go to status, text:status">Status</a></li>
+      <li><a href="https://developer.github.com" data-ga-click="Footer, go to api, text:api">API</a></li>
+      <li><a href="https://training.github.com" data-ga-click="Footer, go to training, text:training">Training</a></li>
+      <li><a href="https://shop.github.com" data-ga-click="Footer, go to shop, text:shop">Shop</a></li>
+        <li><a href="https://github.com/blog" data-ga-click="Footer, go to blog, text:blog">Blog</a></li>
+        <li><a href="https://github.com/about" data-ga-click="Footer, go to about, text:about">About</a></li>
+
+    </ul>
+
+    <a href="https://github.com" aria-label="Homepage">
+      <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+</a>
+    <ul class="site-footer-links">
+      <li>&copy; 2015 <span title="0.04357s from github-fe130-cp1-prd.iad.github.net">GitHub</span>, Inc.</li>
+        <li><a href="https://github.com/site/terms" data-ga-click="Footer, go to terms, text:terms">Terms</a></li>
+        <li><a href="https://github.com/site/privacy" data-ga-click="Footer, go to privacy, text:privacy">Privacy</a></li>
+        <li><a href="https://github.com/security" data-ga-click="Footer, go to security, text:security">Security</a></li>
+        <li><a href="https://github.com/contact" data-ga-click="Footer, go to contact, text:contact">Contact</a></li>
+    </ul>
+  </div>
+</div>
+
+
+    <div class="fullscreen-overlay js-fullscreen-overlay" id="fullscreen_overlay">
+  <div class="fullscreen-container js-suggester-container">
+    <div class="textarea-wrap">
+      <textarea name="fullscreen-contents" id="fullscreen-contents" class="fullscreen-contents js-fullscreen-contents" placeholder=""></textarea>
+      <div class="suggester-container">
+        <div class="suggester fullscreen-suggester js-suggester js-navigation-container"></div>
+      </div>
+    </div>
+  </div>
+  <div class="fullscreen-sidebar">
+    <a href="#" class="exit-fullscreen js-exit-fullscreen tooltipped tooltipped-w" aria-label="Exit Zen Mode">
+      <span class="mega-octicon octicon-screen-normal"></span>
+    </a>
+    <a href="#" class="theme-switcher js-theme-switcher tooltipped tooltipped-w"
+      aria-label="Switch themes">
+      <span class="octicon octicon-color-mode"></span>
+    </a>
+  </div>
+</div>
+
+
+
+    
+    
+
+    <div id="ajax-error-message" class="flash flash-error">
+      <span class="octicon octicon-alert"></span>
+      <a href="#" class="octicon octicon-x flash-close js-ajax-error-dismiss" aria-label="Dismiss error"></a>
+      Something went wrong with that request. Please try again.
+    </div>
+
+
+      <script crossorigin="anonymous" src="https://assets-cdn.github.com/assets/frameworks-06533d99d3f0ca9115a0563dec4017e1bfad7758231e12b95a178cef2cdc3d4c.js"></script>
+      <script async="async" crossorigin="anonymous" src="https://assets-cdn.github.com/assets/github-59cbed91abaeebed35de0a12f8c3adfea46b14dd56c5019b18a7dcdaf3c88a92.js"></script>
+      
+      
+
+  </body>
+</html>
+
