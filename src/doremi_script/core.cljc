@@ -18,6 +18,7 @@
 
 (defrecord Parser [grammar-specification default-kind]
   ;; Implement the Lifecycle protocol
+  ;; Discards the grammar-specification.
   component/Lifecycle
   (start [component]
     (let [ret-value
@@ -41,11 +42,11 @@
 (comment
   (def my-parser   (component/start (new-parser 
                                       (slurp (clojure.java.io/resource "doremiscript.ebnf"))
-                                      :doremi-composition 
+                                      :sargam-composition 
                                       )))
   )
 (comment
-  (println (doremi-text->collapsed-parse-tree my-parser "S"))
+  (println (doremi-text->collapsed-parse-tree "S" my-parser))
   (->> "S-" (doremi-text->collapsed-parse-tree 
               (component/start (new-parser 
                                  (slurp (clojure.java.io/resource "doremiscript.ebnf"))))))
@@ -84,38 +85,6 @@
   (print-stack-trace *e)
   (pst)
   )
-
-(defonce doremi-script-parser (atom nil))
-
-
-(defn get-parser[] @doremi-script-parser)
-
-
-(defn initialize-parser![grammar-specification]
-  ;; Note that grammar-specification can be ebnf text or a map containing
-  ;; the serialized grammar
-  (reset! doremi-script-parser
-          (insta/parser grammar-specification :start :composition :total true)))
-
-(comment
-  ;; Testing
-  (initialize-parser!
-    (slurp (clojure.java.io/resource "doremiscript.ebnf")))
-
-  (-> "S" doremi-text->collapsed-parse-tree)
-  )
-
-;;;; (def doremi-script-parser 
-;;;;   ;;;Optional keyword arguments to insta/parser:
-;;;;   ;;;   :start :keyword  (where :keyword is name of starting production rule)
-;;;;   ;;;   :partial true    (parses that don't consume the whole string are okay)
-;;;;   ;;;   :total true      (if parse fails, embed failure node in tree)
-;;;;   ;;;   :unhide <:tags or :content or :all> (for this parse, disable hiding)
-;;;;   ;;;   :optimize :memory   (when possible, employ strategy to use less memory)
-;;;;   ;;;
-;;;;   (insta/parser
-;;;;     (slurp (resource "doremiscript.ebnf")) :total true))
-;;;; 
 
 
 (defn ^:private is-notation-system-name?
@@ -256,6 +225,7 @@
 
 (defn ^:private remove-notation-system-prefix
   "Change keyword to remove notation prefixes. :sargam-pitch -> :pitch "
+  ;; another approach would be to hardcode the mapping.
   [k]
   { :pre [(keyword? k)]
    :post [(keyword? %)]
@@ -370,7 +340,7 @@
 
 (defn ^:private normalize-pitches
   "Replace pitch names to CDEFGAB style from the style found in
-  the parse tree (number,sargam,hindi)"
+  the parse tree (number,sargam,hindi,doremi)"
   [original-tree]
   { :pre [(vector? original-tree)]
    :post [(vector? %)]
@@ -635,7 +605,7 @@
                 )) my-stave))))
 
 
-(defn ^:private assign-syllables[assigned stave]
+(defn ^:private assign-syllables[stave]
   (let [ syls-to-apply
         (atom (mapcat items (filter #(is? :lyrics-line %) stave)))
         in-slur (atom false)
@@ -674,7 +644,7 @@
     ))
 
 
-(defn ^:private handle-slurs[assigned stave ]
+(defn ^:private handle-slurs[stave ]
   (map (fn[line]
          (if-not (is? :notes-line line)
            line
@@ -830,16 +800,16 @@
     (println "entering collapse-stave,stave=")
     (println stave)
     )
-  (let [my-assigned (atom (hash-set))]
+  (let [assigned (atom (hash-set))]
     (vec (->> stave
-              (handle-slurs my-assigned)
-              (assign-ornament-octaves my-assigned)
-              (assign-to-notes-line my-assigned)
+              handle-slurs
+              (assign-ornament-octaves assigned)
+              (assign-to-notes-line assigned)
               (remove
                 (fn[x] (and (vector? x)
                             (#{:upper-line :lower-octave-line} (first x)))))
               (vec)
-              (assign-syllables my-assigned)
+              assign-syllables
               (vec)
               apply-kommal-to-pitches
               ))))
@@ -864,7 +834,7 @@
 
 (defn doremi-text->collapsed-parse-tree
   "return a composition or an error string. Composition looks like [:composition...]"
-  ([txt parser] (doremi-text->collapsed-parse-tree parser txt (:default-kind parser)))
+  ([txt parser] (doremi-text->collapsed-parse-tree txt parser (:default-kind parser)))
   ([txt parser kind] 
    { :pre [(string? txt)
            (keyword? kind) 

@@ -7,7 +7,7 @@
 (def debug false)
 
 (defn format-instaparse-errors
-  "Tightens up instaparse error format by deleting newlines after 'of' "
+  "  Tightens up instaparse error format by deleting newlines after 'of' "
   [z]
   { :pre [string? z]
    :post [(string? %)]
@@ -23,14 +23,14 @@
              (string/replace right #"\n" " "))))))
 
 #?(:cljs
-(defn- log [& vals]
+(defn log [& vals]
   (when debug
   (println vals)
     )
 ))
 
 #?(:clj
-(defn- log [msg & vals]
+(defn log [msg & vals]
     (let [line (apply format msg vals)]
           (locking System/out (println line))))
 )
