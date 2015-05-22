@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta path="/core-async/">
+    <base href="/">
+    <title>
+      Master Concurrent Processes with core.async
+      | Clojure for the Brave and True
+    </title>
+    <link href="../stylesheets/main.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="../stylesheets/pygments.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Oswald:400,300%7CGentium+Book+Basic:400,700%7CFjalla+One%7CCourgette" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="title">
+          <a href="/">
+            CLOJURE<span> for the </span>BRAVE<span> and </span>TRUE
+          </a>
+        </div>
+        <div class="subtitle">
+          <span>learn the ultimate language, become a better programmer</span>
+        </div>
+      </div>
+      <div class="lambda">
+        λ
+      </div>
+    </header>
+    <div class="engage-me-please">
+      <div class="container">
+        <p>
+          <a href="http://nostarch.com/clojure">Preorder and get the massively updated early access PDF!</a> <br>Use coupon ZOMBIEHUGS for 30% off!
+        </p>
+        <form action="http://flyingmachinestudios.us1.list-manage.com/subscribe/post?u=60763b0c4890c24bd055f32e6&amp;amp;id=0b40ffd1e1" class="validate" id="mc-embedded-subscribe-form" method="post" name="mc-embedded-subscribe-form" novalidate="" target="_blank">
+          <p>
+            Spending your nights pining for the next chapter of
+            <em>Clojure for the Brave and True</em>?
+            <br>
+            Then follow
+            <a href="https://twitter.com/nonrecursive">@nonrecursive</a>
+            or get email updates:
+            <input class="email" id="mce-EMAIL" name="EMAIL" placeholder="email address" required="" type="email" value="">
+            <input class="button" id="mc-embedded-subscribe" name="subscribe" type="submit" value="get updates!">
+          </p>
+        </form>
+      </div>
+    </div>
+    <div id="top-nav"></div>
+    <div class="page container">
+      <div class="content">
+        <h1>Master Concurrent Processes with core.async</h1>
+        
+        <p>One day, while you are walking down the street, you will be surprised,
+        intrigued, and a little disgusted to discover a hot dog vending
+        machine. Your scalp tingling with guilty curiosity, you won't be able
+        to help yourself from pulling out three Sacagawea dollars and seeing
+        if this contraption actually works. After accepting your money, it
+        will emit a click and a whirr, and out will pop a fresh hot dog, bun
+        and all.</p>
+        
+        <p>The vending machine exhibits simple behavior: when it receives money,
+        it releases a hot dog, then readies itself for the next purchase. When
+        it's out of hot dogs, it stops. All around us are hot dog vending
+        machines in different guises, independent entities concurrently
+        responding to events in the world according to their nature. The
+        espresso machine at your favorite coffee shop, the pet hamster you
+        loved as a child - everything can be modeled in terms of behavior
+        using the general form, "when <em>x</em> happens, do <em>y</em>." Even the programs
+        we write are just glorified hot dog vending machines, each one an
+        independent process waiting for the next event, whether it's a
+        keystroke, a timeout, or the arrival of data on a socket.</p>
+        
+        <p><img src="images/core-async/machine.png" alt="Self Portrait"></p>
+        
+        <p>Clojure's core.async library allows you to create independent
+        processes within a single program. This chapter describes a useful
+        model for thinking about this style of programming as well as the
+        practical details you need to actually write stuff. You'll learn how
+        to use channels, alts, and go blocks to create independent processes
+        and communicate between them, and you'll learn a bit about how Clojure
+        uses threads and something called "parking" to allow this all to
+        happen efficiently.</p>
+        
+        <h2 id="1__Processes">1. Processes</h2>
+        
+        <p>At the heart of core.async is the <em>process</em>, a concurrently running
+        unit of logic that responds to events. The process concept is meant to
+        capture our mental model of the real world, with entities interacting
+        with and responding to each other completely independently, without
+        some kind of central control mechanism. You put your money in the
+        machine and out comes a hotdog, all without the Illuminati or Big
+        Brother orchestrating the whole thing. This differs from the view of
+        concurrency you've been exploring so far, where you've defined tasks
+        that are either mere extensions of the main thread of control (for
+        example, achieving data parallelism with <code>pmap</code>) or that you have no
+        interest in communicating with (<code>pmap</code> again and one-off tasks created
+        with <code>future</code>).</p>
+        
+        <p>It might be strange to consider a vending machine to be a process:
+        vending machines are noun-y and thing-y, and processes are verb-y and
+        do-y. To get yourself in the right mindset, try defining real-world
+        objects as the sum of their event-driven behavior. When a seed gets
+        watered, it sprouts; when a mother looks at her new-born child, she is
+        flooded with oxytocin and feels love; when you watch Star Wars Episode
+        I, you are filled with a deep anger and despair. If you want to get
+        super philosophical, consider whether it's possible to define every
+        thing's essence as the set of the events it recognizes and its
+        responses. Is reality just the composition of hot dog vending
+        machines?</p>
+        
+        <p>Anyway, enough of my yakking! Let's make these ideas real by creating
+        some simple processes. First, create a new Leiningen project called
+        "playsync" with <code>lein new app playsync</code>. Then, open the file <code>project.clj</code>
+        and add core.async to the <code>:dependencies</code> vector so that it reads:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">[[</span><span class="nv">org.clojure/clojure</span> <span class="s">"1.6.0"</span><span class="p">]</span>
+ <span class="p">[</span><span class="nv">org.clojure/core.async</span> <span class="s">"0.1.346.0-17112a-alpha"</span><span class="p">]]</span></pre></div></div>
+        <p>It's likely that the core.async version has advanced since I wrote
+        this; you can check on
+        <a href="https://github.com/clojure/core.async/">the core.async github project page</a>
+        for the latest version.</p>
+        
+        <p>Now that that's done, open up <code>src/playsync/core.clj</code> and change it so
+        that it reads:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="kd">ns </span><span class="nv">playsync.core</span>
+  <span class="p">(</span><span class="ss">:require</span> <span class="p">[</span><span class="nv">clojure.core.async</span>
+             <span class="ss">:as</span> <span class="nv">a</span>
+             <span class="ss">:refer</span> <span class="p">[</span><span class="nv">&gt;!</span> <span class="nv">&lt;!</span> <span class="nv">&gt;!!</span> <span class="nv">&lt;!!</span> <span class="nv">go</span> <span class="nv">chan</span> <span class="nv">buffer</span> <span class="nv">close!</span> <span class="nv">thread</span>
+                     <span class="nv">alts!</span> <span class="nv">alts!!</span> <span class="nv">timeout</span><span class="p">]]))</span></pre></div></div>
+        <p>Great! Now when you open this in a REPL, you'll have the most
+        frequently-used core.async functions at your disposal. Before creating
+        something as sophisticated and revolutionary as a hot dog vending
+        machine, let's create a process that simply prints the message it
+        receives:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="k">def </span><span class="nv">echo-chan</span> <span class="p">(</span><span class="nf">chan</span><span class="p">))</span>
+<span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nb">println </span><span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">echo-chan</span><span class="p">)))</span>
+<span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">echo-chan</span> <span class="s">"ketchup"</span><span class="p">)</span>
+<span class="c1">; =&gt; true</span>
+<span class="c1">; =&gt; ketchup</span></pre></div></div>
+        <p>Here, you created a <em>channel</em> named <code>echo-chan</code> with the <code>chan</code>
+        function. Channels communicate <em>messages</em>. Communication over a
+        channel is an event, and these communication events are what processes
+        respond to. In the physical world, we don't normally think about
+        channels or any other mechanism for conveying messages, and we don't
+        think about that communication as an event. You don't think of the
+        mechanical hot dog maker as listening on a channel, waiting for the
+        communication event that includes the "sufficient money" message. You
+        don't think about a person listening on a channel, waiting for the
+        communication event that include the "hot dog dispensed"
+        message. Still, these messages <em>are</em> communicated through the physical
+        media of light, sound, and grease odor molecules, and that
+        communication is an event that things respond to.</p>
+        
+        <p>With core.async, the channel is your virtual medium for communicating
+        messages. You can <em>put</em> messages on a channel and <em>take</em> messages off
+        of them. Processes wait for the completion of "put" and "take" -
+        they're the events that processes respond to.</p>
+        
+        <p>Next, you used <code>go</code> to create a new process. Everything within the go
+        expression - called a <em>go block</em> - will run concurrently on a separate
+        thread. (Go blocks actually use a thread pool, a detail that I'll
+        cover in a little bit.) In this case, the process <code>(println (&lt;!
+echo-chan))</code> expresses, "when I take a message from <code>echo-chan</code>, print
+        it." The process is shunted to another thread, freeing up the current
+        thread and allowing you to continue interacting with the REPL.</p>
+        
+        <p>The expression <code>(&lt;! echo-chan)</code> is how you express "wait until I take
+        message from <code>echo-chan</code>." <code>&lt;!</code> is the <em>take</em> function. It listens to
+        the channel you give it as an argument, causing the process to wait
+        until another process puts a message on the channel. You probably
+        noticed that <code>ketchup</code> didn't print in your REPL until you put it on
+        the channel. When <code>&lt;!</code> does retrieve a value, the value is returned
+        and the <code>println</code> expression is executed.</p>
+        
+        <p>The expression <code>(&gt;!! echo-chan "ketchup")</code> <em>puts</em> the string
+        <code>"ketchup"</code> on <code>echo-chan</code> and returns <code>true</code> When you put a message
+        on a channel, the process will block until another process takes the
+        message. In this case, the REPL process didn't have to wait at all
+        because there was already a process listening to the channel, waiting
+        to take something off of it. However, if you do this:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="nf">&gt;!!</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)</span> <span class="s">"mustard"</span><span class="p">)</span></pre></div></div>
+        <p>then your REPL will block indefinitely. You've created a new channel
+        and put something on it, but it's impossible for anything else to take
+        from it. So, processes don't just wait to receive messages, they also
+        wait for the messages they put on a channel to be taken.</p>
+        
+        <p>(By the way, if you don't think that ketchup is event-worthy, then
+        stop reading this immediately and go to Veggie Galaxy in Cambridge,
+        Massachusetts, because holy cow their ketchup is <em>delicious</em>. I think
+        it's seasoned with hippie love. Wait... I'm not sure that sounds as
+        good as I thought it would.)</p>
+        
+        <p>It's worth noting that there were <em>two</em> processes for this exercise:
+        the one you created with <code>go</code>, and the REPL process. These processes
+        don't have explicit knowledge of each other, and they act
+        independently. The REPL process could refrain from ketchuping on
+        <code>echo-chan</code>, and the go block could live on forever, waiting for
+        something to happen. Alternatively, the REPL process could have
+        ketchuped on <code>echo-chan</code> without knowing whether another process would
+        be there to handle the event.</p>
+        
+        <p>I picture this all taking place in a diner. The REPL is the ketchup
+        chef, and when he's done with a batch he belts out, "Ketchup!" It's
+        entirely possible that the rest of the staff is outside admiring the
+        latest batch of "hippie oregano" in their "organic garden", and the
+        chef just sits there waiting until someone shows up to take his
+        ketchup. On the flip side, the go process is one of those staff
+        members, and he's waiting patiently for something to respond to. It
+        could be that nothing ever happens, and he just waits indefinitely
+        until the restaurant closes.</p>
+        
+        <p>This situation seems a little pathological: what self-respecting
+        ketchup chef would just sit there waiting for someone to take his
+        latest batch when he could return to making more ketchup? To avoid
+        this tragic situation, you can create buffered channels:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="k">def </span><span class="nv">echo-buffer</span> <span class="p">(</span><span class="nf">chan</span> <span class="mi">2</span><span class="p">))</span>
+<span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">echo-buffer</span> <span class="s">"ketchup"</span><span class="p">)</span>
+<span class="c1">; =&gt; true</span>
+<span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">echo-buffer</span> <span class="s">"ketchup"</span><span class="p">)</span>
+<span class="c1">; =&gt; true</span>
+<span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">echo-buffer</span> <span class="s">"ketchup"</span><span class="p">)</span>
+<span class="c1">; blocks</span></pre></div></div>
+        <p>In this case, you've created a channel with buffer size 2. That means
+        that you can put two values on the channel without waiting, but
+        putting a third one will wait until another process takes a value
+        from the channel. You can also create "sliding" buffers with
+        <code>sliding-buffer</code>, which drops values in a first-in-first-out fashion
+        as you continue adding values, and "dropping" buffers with
+        <code>dropping-buffer</code>, which discards values in a last-in-first-out
+        fashion. Neither of these buffers will ever cause a put to block.</p>
+        
+        <p>Buffers, though, are just elaborations of the core model: processes
+        are independent, concurrently executing units of logic that respond to
+        events. You can create processes with go blocks and communicate messages
+        over channels. It's time to expand on this model, starting with go
+        blocks.</p>
+        
+        <h2 id="2__Go_Blocks__thread__Blocking__and_Parking">2. Go Blocks, thread, Blocking, and Parking</h2>
+        
+        <p>You may have noticed that the take function, <code>&lt;!</code>, used only one
+        exclamation point, while the put function, <code>&gt;!!</code> used two. In fact,
+        both put and take have a one-exclamation-point and
+        two-exclamation-point variety. When do you use which? The simple
+        answer is that you can use one exclamation point inside go blocks, but
+        you have to use two exclamation points outside:</p>
+        
+        <table>
+<thead>
+        <tr>
+        <th></th>
+        <th>inside go block</th>
+        <th>outside</th>
+        </tr>
+        </thead>
+<tbody>
+        <tr>
+        <td>put</td>
+        <td>
+<code>&gt;!</code> or <code>&gt;!!</code>
+</td>
+        <td><code>&gt;!!</code></td>
+        </tr>
+        <tr>
+        <td>take</td>
+        <td>
+<code>&lt;!</code> or <code>&lt;!!</code>
+</td>
+        <td><code>&lt;!!</code></td>
+        </tr>
+        </tbody>
+</table>
+        
+        <p>...but that doesn't really explain anything. What exactly is a go
+        block, and why can you use the one-exclamation varieties inside it?</p>
+        
+        <p>It all comes down to efficiency. Go blocks allow you to run your
+        processes on a fixed-size thread pool (containing a number of threads
+        equal to two plus the number of cores on your machine) instead of
+        having to create a new thread for each process. This often results in
+        better performance because you avoid the overhead associated with
+        creating a new thread. For example, in the next example we create 1000
+        go processes, but only a handful of threads are used:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="k">def </span><span class="nv">hi-chan</span> <span class="p">(</span><span class="nf">chan</span><span class="p">))</span>
+<span class="p">(</span><span class="nb">doseq </span><span class="p">[</span><span class="nv">n</span> <span class="p">(</span><span class="nb">range </span><span class="mi">1000</span><span class="p">)]</span>
+  <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nf">&gt;!</span> <span class="nv">hi-chan</span> <span class="p">(</span><span class="nb">str </span><span class="s">"hi "</span> <span class="nv">n</span><span class="p">))))</span></pre></div></div>
+        <p>Clojure is able to accomplish this feat with threads by giving special
+        care to the way they <em>wait</em>. We've already established that "put"
+        waits until another process does a "take" on the same channel, and
+        vice versa. In the example above, there are 1000 processes all waiting
+        to put the message <code>"hi"</code> on <code>hi-chan</code>.</p>
+        
+        <p>There are two varieties of waiting: <em>parking</em> and
+        <em>blocking</em>. <em>Blocking</em> is the kind of waiting you're familiar with: a
+        thread stops execution until a task is complete. Usually this happens
+        when you're performing some kind of I/O. This kind of waiting keeps
+        the thread alive, doing no work, so that if you want your program to
+        continue doing work you have to create a new thread. In the last
+        chapter, you learned how to do this with <code>future</code>.</p>
+        
+        <p><em>Parking</em> moves the waiting task off the thread, freeing up the thread
+        to do the work of processes that aren't waiting. Clojure's smart
+        enough to move the parked process back on to a thread as soon its put
+        or take is done. It's like parking allows interleaving on a single
+        thread, similar to the way that using multiple threads allows
+        interleaving on a single core:</p>
+        
+        <p><img src="images/core-async/parking.png" alt="Parking and Blocking"></p>
+        
+        <p>The implementation of parking isn't important; suffice to say that
+        it's only possible within go blocks, and it's only possible when you
+        use <code>&gt;!</code> and <code>&lt;!</code>, or <em>parking put</em> and <em>parking take</em>. As you've no
+        doubt guessed, <code>&gt;!!</code> and <code>&lt;!!</code> are <em>blocking put</em> and <em>blocking take</em>.</p>
+        
+        <p>There are definitely times when you should prefer blocking over
+        parking, like when your process will take a long time before putting
+        or taking, and for those occasions you should use <code>thread</code>:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="nf">thread</span> <span class="p">(</span><span class="nb">println </span><span class="p">(</span><span class="nf">&lt;!!</span> <span class="nv">echo-chan</span><span class="p">)))</span>
+<span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">echo-chan</span> <span class="s">"mustard"</span><span class="p">)</span>
+<span class="c1">; =&gt; true</span>
+<span class="c1">; =&gt; mustard</span></pre></div></div>
+        <p><code>thread</code> acts almost exactly like <code>future</code>: it creates a new thread,
+        executing a process on that thread. However, instead of returning an
+        object which you can dereference, <code>thread</code> returns a channel. When
+        <code>thread</code>'s process stops, the process's return value is put on the
+        channel that <code>thread</code> returns:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">t</span> <span class="p">(</span><span class="nf">thread</span> <span class="s">"chili"</span><span class="p">)]</span>
+  <span class="p">(</span><span class="nf">&lt;!!</span> <span class="nv">t</span><span class="p">))</span>
+<span class="c1">; =&gt; "chili"</span></pre></div></div>
+        <p>In this case, the process doesn't wait for any events, instead
+        stopping immediately. Its return value is <code>"chili"</code>, which gets put on
+        the channel that's bound to <code>t</code>. We take from <code>t</code>, returning
+        <code>"chili"</code>.</p>
+        
+        <p>The reason you should use <code>thread</code> instead of a go block when you're
+        performing a long-running task is so that you don't "clog up" your
+        thread pool. Imagine you're running four processes which download
+        humongous files, saves them, and then puts the file paths on a
+        channel. While the processes are downloading files and saving them,
+        Clojure can't park their threads. It can only park the thread at the
+        last step, when the process puts the files' paths on a
+        channel. Therefore, if your thread pool only has four threads, then
+        all four threads will be used for downloading, and no other process
+        will be allowed to run until one of the downloads finishes.</p>
+        
+        <p><code>go</code>, <code>thread</code>, <code>chan</code>, <code>&lt;!</code>, <code>&lt;!!</code>, <code>&gt;!</code>, and <code>&gt;!!</code> are the core
+        tools you'll use for creating and communicating with processes. Both
+        put and take will cause a process to wait until its complement is
+        performed on the given channel. <code>go</code> allows you to use the parking
+        variants of put and take, which could improve your
+        performance. The blocking variants should be used, along with
+        <code>thread</code>, if you're performing some long-running task before the put
+        or take.</p>
+        
+        <p>And that should give us everything we need to fulfill our hearts'
+        desire and create a machine that turns money into hot dogs.</p>
+        
+        <h2 id="3__The_Hot_Dog_Process_You_ve_Been_Longing_For">3. The Hot Dog Process You've Been Longing For</h2>
+        
+        <p>Behold, your dreams made real!</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="kd">defn </span><span class="nv">hotdog-machine</span>
+  <span class="p">[]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">in</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)</span>
+        <span class="nv">out</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">in</span><span class="p">)</span>
+        <span class="p">(</span><span class="nf">&gt;!</span> <span class="nv">out</span> <span class="s">"hotdog"</span><span class="p">))</span>
+    <span class="p">[</span><span class="nv">in</span> <span class="nv">out</span><span class="p">]))</span></pre></div></div>
+        <p>This function creates an <code>in</code> channel for receiving money and an <code>out</code>
+        channel for dispensing a hotdog. It then creates an asynchronous
+        process with <code>go</code> which waits for money, and then pops out a
+        hotdog. Finally, it returns the <code>in</code> and <code>out</code> channels. Time for a
+        hotdog!</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="k">let </span><span class="p">[[</span><span class="nv">in</span> <span class="nv">out</span><span class="p">]</span> <span class="p">(</span><span class="nf">hotdog-machine</span><span class="p">)]</span>
+  <span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">in</span> <span class="s">"pocket lint"</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">&lt;!!</span> <span class="nv">out</span><span class="p">))</span>
+<span class="c1">; =&gt; "hotdog"</span></pre></div></div>
+        <p>Wait a minute... that's not right. I mean, yay, free hotdogs, but
+        someone's bound to get upset that the machine's getting paid in pocket
+        lint. Not only that, this machine will only dispense one hot dog
+        before shutting down. We can do better than that:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="kd">defn </span><span class="nv">hotdog-machine-v2</span>
+  <span class="p">[</span><span class="nv">hotdog-count</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">in</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)</span>
+        <span class="nv">out</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="k">loop </span><span class="p">[</span><span class="nv">hc</span> <span class="nv">hotdog-count</span><span class="p">]</span>
+          <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">&gt; </span><span class="nv">hc</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">input</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">in</span><span class="p">)]</span>
+              <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">= </span><span class="mi">3</span> <span class="nv">input</span><span class="p">)</span>
+                <span class="p">(</span><span class="k">do </span><span class="p">(</span><span class="nf">&gt;!</span> <span class="nv">out</span> <span class="s">"hotdog"</span><span class="p">)</span>
+                    <span class="p">(</span><span class="nf">recur</span> <span class="p">(</span><span class="nb">dec </span><span class="nv">hc</span><span class="p">)))</span>
+                <span class="p">(</span><span class="k">do </span><span class="p">(</span><span class="nf">&gt;!</span> <span class="nv">out</span> <span class="s">"wilted lettuce"</span><span class="p">)</span>
+                    <span class="p">(</span><span class="nf">recur</span> <span class="nv">hc</span><span class="p">))))</span>
+            <span class="p">(</span><span class="k">do </span><span class="p">(</span><span class="nf">close!</span> <span class="nv">in</span><span class="p">)</span>
+                <span class="p">(</span><span class="nf">close!</span> <span class="nv">out</span><span class="p">)))))</span>
+    <span class="p">[</span><span class="nv">in</span> <span class="nv">out</span><span class="p">]))</span></pre></div></div>
+        <p>There's a lot more code here, but the strategy is straightforward. The
+        new function <code>hotdog-machine-v2</code> allows you to specify the
+        <code>hotdog-count</code>. Within the go block, it only dispenses a hotdog if the
+        number 3 is placed on the <code>in</code> channel, otherwise it dispenses wilted
+        lettuce, which is the opposite of a hotdog. Once a process has taken
+        the "output", whether it's lettuce or a hotdog, the process loops back
+        with an updated hotdog count, ready to receive money again.</p>
+        
+        <p>Once it's out of hotdogs, it <em>closes</em> the channels. When you close a
+        channel, you can no longer perform puts on it, and once you've taken
+        all values off a closed channel subsequent takes will return <code>nil</code>.</p>
+        
+        <p>Let's give it a go:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="k">let </span><span class="p">[[</span><span class="nv">in</span> <span class="nv">out</span><span class="p">]</span> <span class="p">(</span><span class="nf">hotdog-machine-v2</span> <span class="mi">2</span><span class="p">)]</span>
+  <span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">in</span> <span class="s">"pocket lint"</span><span class="p">)</span>
+  <span class="p">(</span><span class="nb">println </span><span class="p">(</span><span class="nf">&lt;!!</span> <span class="nv">out</span><span class="p">))</span>
+
+  <span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">in</span> <span class="mi">3</span><span class="p">)</span>
+  <span class="p">(</span><span class="nb">println </span><span class="p">(</span><span class="nf">&lt;!!</span> <span class="nv">out</span><span class="p">))</span>
+
+  <span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">in</span> <span class="mi">3</span><span class="p">)</span>
+  <span class="p">(</span><span class="nb">println </span><span class="p">(</span><span class="nf">&lt;!!</span> <span class="nv">out</span><span class="p">))</span>
+
+  <span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">in</span> <span class="mi">3</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">&lt;!!</span> <span class="nv">out</span><span class="p">))</span>
+<span class="c1">; =&gt; wilted lettuce</span>
+<span class="c1">; =&gt; hotdog</span>
+<span class="c1">; =&gt; hotdog</span>
+<span class="c1">; =&gt; nil</span></pre></div></div>
+        <p>First, we try the ol' pocket lint trick and get wilted lettuce. Then
+        we put in 3 dollars twice and get a hot dog both times. Finally, we
+        try to put in another 3 dollars, but that's ignored because the the
+        channel is closed. When we try to take something out we get <code>nil</code>,
+        again because the channel is closed.</p>
+        
+        <p>There are a couple interesting things about this hotdog
+        machine. First, it does both a put and a take within the same go
+        block. This isn't that unusual, and it's one way that you can create a
+        pipeline of processes: just make the "in" channel of one process the
+        "out" channel of another. The next example does just that, passing a
+        string through a series of processes that perform transformations
+        until the string finally gets printed by the last process:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">c1</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)</span>
+      <span class="nv">c2</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)</span>
+      <span class="nv">c3</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)]</span>
+  <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nf">&gt;!</span> <span class="nv">c2</span> <span class="p">(</span><span class="nf">clojure.string/upper-case</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">c1</span><span class="p">))))</span>
+  <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nf">&gt;!</span> <span class="nv">c3</span> <span class="p">(</span><span class="nf">clojure.string/reverse</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">c2</span><span class="p">))))</span>
+  <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nb">println </span><span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">c3</span><span class="p">)))</span>
+  <span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">c1</span> <span class="s">"redrum"</span><span class="p">))</span>
+<span class="c1">; =&gt; MURDER</span></pre></div></div>
+        <p>I'll have more to say about process pipelines and how they can be used
+        instead of callbacks toward the end of the chapter. The second cool
+        thing about the hot dog machine, though, is that the machine doesn't
+        accept more money until you've dealt with whatever it's
+        dispensed. This allows you to model state-machine-like behavior, where
+        the completion of channel operations trigger state transitions. For
+        example, you can think of the vending machine as having two states,
+        "ready to receive money" and "dispensed item," with the inserting of
+        money and taking of the item triggering transitions between the two.</p>
+        
+        <h2 id="4__Choice">4. Choice</h2>
+        
+        <p>The core.async function <code>alts!!</code> lets you use the result of the first
+        successful channel operation among a collection of operations. We did
+        something similar to this in the previous chapter with delays and
+        futures. In that example, we uploaded a set of headshots to a
+        headshot-sharing site and notified the headhot owner when the first
+        photo was uploaded. Here's how you'd do the same thing with <code>alts!!</code>:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="kd">defn </span><span class="nv">upload</span>
+  <span class="p">[</span><span class="nv">headshot</span> <span class="nv">c</span><span class="p">]</span>
+  <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nf">Thread/sleep</span> <span class="p">(</span><span class="nb">rand </span><span class="mi">100</span><span class="p">))</span>
+      <span class="p">(</span><span class="nf">&gt;!</span> <span class="nv">c</span> <span class="nv">headshot</span><span class="p">)))</span>
+
+<span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">c1</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)</span>
+      <span class="nv">c2</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)</span>
+      <span class="nv">c3</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)]</span>
+  <span class="p">(</span><span class="nf">upload</span> <span class="s">"serious.jpg"</span> <span class="nv">c1</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">upload</span> <span class="s">"fun.jpg"</span> <span class="nv">c2</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">upload</span> <span class="s">"sassy.jpg"</span> <span class="nv">c3</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[[</span><span class="nv">headshot</span> <span class="nv">channel</span><span class="p">]</span> <span class="p">(</span><span class="nf">alts!!</span> <span class="p">[</span><span class="nv">c1</span> <span class="nv">c2</span> <span class="nv">c3</span><span class="p">])]</span>
+    <span class="p">(</span><span class="nb">println </span><span class="s">"Sending headshot notification for"</span> <span class="nv">headshot</span><span class="p">)))</span>
+<span class="c1">; =&gt; Sending headshot notification for sassy.jpg</span></pre></div></div>
+        <p>Here, the <code>upload</code> function is pretty straightforward: it takes a
+        headshot and a channel and creates a new process which sleeps for a
+        random amount of time (simulating the upload) and then puts the
+        headshot on the channel. The next few lines should make sense: we
+        create three channels, then use them to perform the uploads.</p>
+        
+        <p>The next part is where it gets interesting. The <code>alts!!</code> function
+        takes a vector of channels as its argument. This is like saying, "Try
+        to do a blocking take on each of these channels simultaneously. As
+        soon as a take succeeds, return a vector whose first element is the
+        value taken and whose second element is the winning channel. Consign
+        the remaining channels to the dust heap of history." In this case, the
+        channel associated with "sassy.jpg" received a value first.</p>
+        
+        <p>One cool thing about <code>alts!!</code> is that you can give it a <em>timeout
+        channel</em>. A timeout channel is a channel which waits the specified
+        number of milliseconds, then closes, and it's an elegant mechanism for
+        putting a time limit on concurrent operations. Here's how you could
+        use it with the upload service:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">c1</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)]</span>
+  <span class="p">(</span><span class="nf">upload</span> <span class="s">"serious.jpg"</span> <span class="nv">c1</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[[</span><span class="nv">headshot</span> <span class="nv">channel</span><span class="p">]</span> <span class="p">(</span><span class="nf">alts!!</span> <span class="p">[</span><span class="nv">c1</span> <span class="p">(</span><span class="nf">timeout</span> <span class="mi">20</span><span class="p">)])]</span>
+    <span class="p">(</span><span class="k">if </span><span class="nv">headshot</span>
+      <span class="p">(</span><span class="nb">println </span><span class="s">"Sending headshot notification for"</span> <span class="nv">headshot</span><span class="p">)</span>
+      <span class="p">(</span><span class="nb">println </span><span class="s">"Timed out!"</span><span class="p">))))</span>
+<span class="c1">; =&gt; Timed out!</span></pre></div></div>
+        <p>In this case, we set the timeout to 20 milliseconds. After 20
+        milliseconds, the timeout channel closes, and the take on that channel
+        succeeds. It might seem counterintuitive that you can successfully
+        take from a closed channel, but remember that closed channels always
+        return <code>nil</code> when you try to take from them. In this case, the timeout
+        channel returns <code>nil</code>, so the value of <code>headshot</code> is <code>nil</code>, and we get
+        a timeout messages.</p>
+        
+        <p>You can also use <code>alts!!</code> to specify "put" operations. To do that, put
+        a vector inside the vector you pass to <code>alts</code>, like this:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="n">let</span> <span class="p">[</span><span class="n">c1</span> <span class="p">(</span><span class="n">chan</span><span class="p">)</span>
+      <span class="n">c2</span> <span class="p">(</span><span class="n">chan</span><span class="p">)]</span>
+  <span class="p">(</span><span class="n">go</span> <span class="p">(</span><span class="o">&lt;!</span> <span class="n">c2</span><span class="p">))</span>
+  <span class="p">(</span><span class="n">let</span> <span class="p">[[</span><span class="n">value</span> <span class="n">channel</span><span class="p">]</span> <span class="p">(</span><span class="n">alts</span><span class="o">!!</span> <span class="p">[</span><span class="n">c1</span> <span class="p">[</span><span class="n">c2</span> <span class="s">"put!"</span><span class="p">]])]</span>
+    <span class="p">(</span><span class="n">println</span> <span class="n">value</span><span class="p">)</span>
+    <span class="p">(</span><span class="o">=</span> <span class="n">channel</span> <span class="n">c2</span><span class="p">)))</span>
+<span class="p">;</span> <span class="o">=&gt;</span> <span class="nb">true</span>
+<span class="p">;</span> <span class="o">=&gt;</span> <span class="nb">true</span></pre></div></div>
+        <p>In this example, you're creating two channels and then creating a
+        process that's waiting to perform a take on <code>c2</code>. The vector that you
+        supply to <code>alts!!</code> tells it, "Try to do a take on <code>c1</code> and try to put
+        <code>"put!"</code> on <code>c2</code>. If the take on <code>c1</code> finishes first, return its value
+        and channel. If the put on <code>c2</code> finishes first, return <code>true</code> if the
+        put was successful (the channel was open) and <code>false</code> otherwise."
+        Finally, you print the result of <code>value</code> (<code>true</code>, because the <code>c2</code>
+        channel was open) and show that the channel returned was indeed <code>c2</code>.</p>
+        
+        <p>Like <code>&lt;!!</code> and <code>&gt;!!</code>, <code>alts!!</code> has a parking alternative, <code>alts!</code>,
+        that you can use in go blocks.</p>
+        
+        <h2 id="5__Queues">5. Queues</h2>
+        
+        <p>In the last chapter, we wrote a macro that let us queue our
+        futures. Processes let us do something similar in a more
+        straightforward manner. Here's how you'd snag quotes and write them to
+        a file without having to worry about quotes being interleaved:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="kd">defn </span><span class="nv">append-to-file</span>
+  <span class="p">[</span><span class="nv">filename</span> <span class="nv">s</span><span class="p">]</span>
+  <span class="p">(</span><span class="nf">spit</span> <span class="nv">filename</span> <span class="nv">s</span> <span class="ss">:append</span> <span class="nv">true</span><span class="p">))</span>
+
+<span class="p">(</span><span class="kd">defn </span><span class="nv">format-quote</span>
+  <span class="p">[</span><span class="nv">quote</span><span class="p">]</span>
+  <span class="p">(</span><span class="nb">str </span><span class="s">"=== BEGIN QUOTE ===\n"</span> <span class="k">quote </span><span class="s">"=== END QUOTE ===\n\n"</span><span class="p">))</span>
+
+<span class="p">(</span><span class="kd">defn </span><span class="nv">random-quote</span>
+  <span class="p">[]</span>
+  <span class="p">(</span><span class="nf">format-quote</span> <span class="p">(</span><span class="nb">slurp </span><span class="s">"http://www.iheartquotes.com/api/v1/random"</span><span class="p">)))</span>
+
+<span class="p">(</span><span class="kd">defn </span><span class="nv">snag-quotes</span>
+  <span class="p">[</span><span class="nv">filename</span> <span class="nv">num-quotes</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">c</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nf">while</span> <span class="nv">true</span> <span class="p">(</span><span class="nf">append-to-file</span> <span class="nv">filename</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">c</span><span class="p">))))</span>
+    <span class="p">(</span><span class="nb">dotimes </span><span class="p">[</span><span class="nv">n</span> <span class="nv">num-quotes</span><span class="p">]</span> <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nf">&gt;!</span> <span class="nv">c</span> <span class="p">(</span><span class="nf">random-quote</span><span class="p">))))))</span></pre></div></div>
+        <p>The functions <code>append-to-file</code>, <code>format-quote</code>, and <code>random-quote</code> are
+        all lifted from the last chapter's example. <code>snag-quotes</code> is where the
+        interesting work is happening. First, it creates a channel to be
+        shared between the quote producing processes and the quote consuming
+        process. Then, it creates a process which uses <code>while true</code> to create
+        an infinite loop. On every iteration of the loop, it waits for a quote
+        to arrive on <code>c</code> and then appends it to a file. Finally, <code>snag-quotes</code>
+        creates an <code>num-quotes</code> number of processes that fetch a quote and
+        then put it on <code>c</code>. If you evaluate <code>(snag-quotes "/tmp/quotes" 2)</code>
+        and check <code>/tmp/quotes</code>, it should have two quotes:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="o">===</span><span class="w"> </span><span class="vg">BEGIN</span><span class="w"> </span><span class="vg">QUOTE</span><span class="w"> </span><span class="o">===</span>
+<span class="vg">Nobody</span><span class="c1">'s gonna believe that computers are intelligent until they start</span>
+<span class="vg">coming</span><span class="w"> </span><span class="vg">in</span><span class="w"> </span><span class="vg">late</span><span class="w"> </span><span class="vg">and</span><span class="w"> </span><span class="vg">lying</span><span class="w"> </span><span class="vg">about</span><span class="w"> </span><span class="vg">it</span><span class="o">.</span>
+
+<span class="p">[</span><span class="vg">codehappy</span><span class="p">]</span><span class="w"> </span><span class="nl">http:</span><span class="o">//</span><span class="vg">iheartquotes</span><span class="o">.</span><span class="vg">com</span><span class="o">/</span><span class="vg">fortune</span><span class="o">/</span><span class="vg">show</span><span class="o">/</span><span class="vg">23605</span>
+<span class="o">===</span><span class="w"> </span><span class="kr">END</span><span class="w"> </span><span class="vg">QUOTE</span><span class="w"> </span><span class="o">===</span>
+
+<span class="o">===</span><span class="w"> </span><span class="vg">BEGIN</span><span class="w"> </span><span class="vg">QUOTE</span><span class="w"> </span><span class="o">===</span>
+<span class="vg">Give</span><span class="w"> </span><span class="vg">your</span><span class="w"> </span><span class="vg">child</span><span class="w"> </span><span class="vg">mental</span><span class="w"> </span><span class="vg">blocks</span><span class="w"> </span><span class="vg">for</span><span class="w"> </span><span class="vg">Christmas</span><span class="o">.</span>
+
+<span class="p">[</span><span class="vg">fortune</span><span class="p">]</span><span class="w"> </span><span class="nl">http:</span><span class="o">//</span><span class="vg">iheartquotes</span><span class="o">.</span><span class="vg">com</span><span class="o">/</span><span class="vg">fortune</span><span class="o">/</span><span class="vg">show</span><span class="o">/</span><span class="vg">47398</span>
+<span class="o">===</span><span class="w"> </span><span class="kr">END</span><span class="w"> </span><span class="vg">QUOTE</span><span class="w"> </span><span class="o">===</span></pre></div></div>
+        <p>This kind of queueing differs from the example in the last chapter in
+        that that example ensured that each task was handled in the order it
+        was <em>created</em>. Here, though, each quote-retrieving task is handled in
+        the order that it <em>finishes</em>. In both cases, you ensure that only one
+        quote at a time is being written to a file.</p>
+        
+        <h2 id="6__Callbacks">6. Callbacks</h2>
+        
+        <p>In languages without channels, you end up needing to express the idea
+        "when X happens, do Y" with <em>callbacks</em>.  If you've worked with
+        JavaScript, you've probably spent some time wallowing in Callback Hell
+        with code that looks like this (extra relevant if you've also used
+        JavaScript to raise an army of the undead, and, well, who hasn't):</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="nx">$</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"/cemetaries"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">cemetaries</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">cemetaries</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">cemetary</span><span class="p">){</span>
+    <span class="nx">raiseMinions</span><span class="p">(</span><span class="nx">cemetary</span><span class="p">);</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s2">"/cemetaries/"</span> <span class="o">+</span> <span class="nx">cemetary</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">cemetary</span><span class="p">){</span>
+      <span class="nx">updateCemetaryDom</span><span class="p">(</span><span class="nx">cemetary</span><span class="p">);</span>
+    <span class="p">})</span>
+  <span class="p">})</span>
+<span class="p">});</span></pre></div></div>
+        <p>In case you're unfamiliar with JavaScript and jQuery, <code>$.get</code> and
+        <code>$.put</code> perform asynchronous HTTP requests. Here, their first argument
+        is the URL and the second argument is the callback function - when the
+        HTTP request returns, the callback function gets called on the
+        resulting data. This is following the same event-driven behavior
+        pattern that we've been looking at for this whole chapter: <em>when</em> X
+        happens, do Y. <em>When</em> the request to "/cemetaries" returns, iterate over
+        each cemetary in the result, raising minions and so forth.</p>
+        
+        <p>The reason this is called "Callback <em>Hell</em>" is that it's very easy to
+        create unobvious dependencies among the layers of callbacks. They end
+        up sharing state, making it difficult to reason about the state of the
+        overall system as the callbacks get triggered. You can avoid this
+        depressing outcome by creating a process pipeline. That way, each unit
+        of logic lives in its own isolated environment (a process), with
+        communication between units of logic occurring through
+        explicitly-defined and easy-to-reason-about input and output
+        channels. This is analogous to the way that pure functions are easier
+        to reason about than non-pure functions, the difference being that
+        processes place their data on an output channel, creating a one-way
+        flow of data transformations rather than returning a value to a
+        calling function.</p>
+        
+        <p>In this next example, we create three infinitely looping
+        processes connected through channels, passing the "out" channel of one
+        process as the "in" channel of the next process in the pipeline:</p>
+        <div class="code pygments"><div class="highlight"><pre><span class="p">(</span><span class="kd">defn </span><span class="nv">upper-caser</span>
+  <span class="p">[</span><span class="nv">in</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">out</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nf">while</span> <span class="nv">true</span> <span class="p">(</span><span class="nf">&gt;!</span> <span class="nv">out</span> <span class="p">(</span><span class="nf">clojure.string/upper-case</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">in</span><span class="p">)))))</span>
+    <span class="nv">out</span><span class="p">))</span>
+
+<span class="p">(</span><span class="kd">defn </span><span class="nv">reverser</span>
+  <span class="p">[</span><span class="nv">in</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">out</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nf">while</span> <span class="nv">true</span> <span class="p">(</span><span class="nf">&gt;!</span> <span class="nv">out</span> <span class="p">(</span><span class="nf">clojure.string/reverse</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">in</span><span class="p">)))))</span>
+    <span class="nv">out</span><span class="p">))</span>
+
+<span class="p">(</span><span class="kd">defn </span><span class="nv">printer</span>
+  <span class="p">[</span><span class="nv">in</span><span class="p">]</span>
+  <span class="p">(</span><span class="nf">go</span> <span class="p">(</span><span class="nf">while</span> <span class="nv">true</span> <span class="p">(</span><span class="nb">println </span><span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">in</span><span class="p">)))))</span>
+
+<span class="p">(</span><span class="k">def </span><span class="nv">in-chan</span> <span class="p">(</span><span class="nf">chan</span><span class="p">))</span>
+<span class="p">(</span><span class="k">def </span><span class="nv">upper-caser-out</span> <span class="p">(</span><span class="nf">upper-caser</span> <span class="nv">in-chan</span><span class="p">))</span>
+<span class="p">(</span><span class="k">def </span><span class="nv">reverser-out</span> <span class="p">(</span><span class="nf">reverser</span> <span class="nv">upper-caser-out</span><span class="p">))</span>
+<span class="p">(</span><span class="nf">printer</span> <span class="nv">reverser-out</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">in-chan</span> <span class="s">"redrum"</span><span class="p">)</span>
+<span class="c1">; =&gt; MURDER</span>
+
+<span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">in-chan</span> <span class="s">"repaid"</span><span class="p">)</span>
+<span class="c1">; =&gt; DIAPER</span></pre></div></div>
+        <p>By handling events using processes like this, it's easier to reason
+        about the individual steps of the overall data transformation
+        system. You can look at each step and understand what it does without
+        having to refer to what might have happened before it or what might
+        happen after it; each process is as easy to reason about as a pure
+        function.</p>
+        
+        <h2 id="7__Additional_Resources">7. Additional Resources</h2>
+        
+        <p>Clojure's core.async library was largely inspired by Go's concurrency
+        model, which is based on the work by Tony Hoare in
+        <a href="http://www.usingcsp.com/">Communicating Sequential Processes</a>.</p>
+        
+        <p>Rob Pike, co-creator of Go, has a
+        <a href="https://www.youtube.com/watch?v=f6kdp27TYZs">good talk</a> on
+        concurrency.</p>
+        
+        <p>Finally, check out the
+        <a href="http://clojure.github.io/core.async/">api docs</a>.</p>
+        
+        <h2 id="8__Summary">8. Summary</h2>
+        
+        <p>In this chapter, you learned about how core.async allows you to create
+        concurrent processes that respond to the put and take communication
+        events on channels. You learned about how to use <code>go</code> and <code>thread</code> to
+        create concurrent processes that wait for communication events by
+        parking and blocking. You also learned how to create process pipelines
+        by making the "out" channel of one process the "in" channel of
+        another, and how this allows you to create saner code than nested
+        callbacks. Finally, you meditated on whether or not you're just a
+        fancy hot dog vending machine.</p>
+        <div class="pagenav bottom">
+          <div class="prev">
+            <a href="../concurrency/">
+              ←
+              Concurrency, Parallelism, and State. And Zombies.
+            </a>
+          </div>
+          <div class="next">
+            <a href="../java/">
+              Interacting with Java
+              →
+            </a>
+          </div>
+        </div>
+        <div id="disqus_thread"></div>
+        <script>
+          /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+          var disqus_shortname = 'clojureforthebraveandtrue'; // required: replace example with your forum shortname
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        </script>
+      </div>
+      <div class="chapter-nav">
+        <div class="wrapper"><ol>
+<li><a href="/core-async/#1__Processes">1. Processes</a></li>
+<li><a href="/core-async/#2__Go_Blocks__thread__Blocking__and_Parking">2. Go Blocks, thread, Blocking, and Parking</a></li>
+<li><a href="/core-async/#3__The_Hot_Dog_Process_You_ve_Been_Longing_For">3. The Hot Dog Process You've Been Longing For</a></li>
+<li><a href="/core-async/#4__Choice">4. Choice</a></li>
+<li><a href="/core-async/#5__Queues">5. Queues</a></li>
+<li><a href="/core-async/#6__Callbacks">6. Callbacks</a></li>
+<li><a href="/core-async/#7__Additional_Resources">7. Additional Resources</a></li>
+<li><a href="/core-async/#8__Summary">8. Summary</a></li>
+</ol></div>
+      </div>
+    </div>
+    <div class="topnav-content container">
+      <ul>
+        <li class="home">
+          <a href="../concurrency/">
+            ←
+          </a>
+          <a href="/#toc">↑</a>
+          <a href="../java/">
+            →
+          </a>
+        </li>
+        <li class="chapters">
+          <form action="/search/" id="search">
+            <input id="tipue_search_input" name="q" placeholder="search site" type="search">
+          </form>
+        </li>
+        <li>
+          <a class="buy" href="http://nostarch.com/clojure">PREORDER!</a>
+        </li>
+        <!-- /%li -->
+        <!-- /  %a.buy{:href => "https://leanpub.com/clojure-for-the-brave-and-true/"} buy the ebook!!?! -->
+        <li class="subscribe">
+          <form action="http://flyingmachinestudios.us1.list-manage.com/subscribe/post?u=60763b0c4890c24bd055f32e6&amp;amp;amp;id=0b40ffd1e1" class="validate" id="mc-embedded-subscribe-form" method="post" name="mc-embedded-subscribe-form" novalidate="" target="_blank">
+            <input class="email" id="mce-EMAIL" name="EMAIL" placeholder="email address" required="" type="email" value="">
+            <input class="button" id="mc-embedded-subscribe" name="subscribe" type="submit" value="get email updates">
+          </form>
+        </li>
+        <li class="tweet">
+          <a class="twitter-share-button" href="https://twitter.com/share">tweet bravely and truly</a>
+          <script>
+            !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs')
+          </script>
+        </li>
+      </ul>
+    </div>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="../javascripts/jquery.sticky.js"></script>
+    <script src="../javascripts/sticky.js"></script>
+    <script>
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-43463851-1']);
+      _gaq.push(['_trackPageview']);
+      
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+  </body>
+</html>

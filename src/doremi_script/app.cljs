@@ -2,15 +2,10 @@
   ;;(:require-macros 
   (:require-macros 
     ;;               [cljs.core :refer [assert]]
-                     [cljs.core.async.macros :refer [go]]
-                   )
+    [cljs.core.async.macros :refer [go]]
+        )
   (:require 
-    #?(:clj
-        [com.stuartsierra.component :as component]
-        )
-    #?(:cljs
-        [quile.component :as component]
-        )
+    [quile.component :as component]
     [doremi-script.core :refer [
                                 new-parser
                                 doremi-text->collapsed-parse-tree]]
@@ -22,7 +17,6 @@
     [goog.dom :as dom]
     [goog.Uri] 
     [goog.events :as events]
-    [goog.net.NetworkTester]
     [goog.net.XhrIo]
     [goog.json]
     [clojure.set]
@@ -34,30 +28,58 @@
     [instaparse.core :as insta] 
     ))
 (enable-console-print!)
+(def seconds 1000)
 
 (defn by-id [id]
-    (.getElementById js/document (name id)))
+  (.getElementById js/document (name id)))
 
 (defn listen [el event-type]
   (let [out (chan)]
     (events/listen el event-type
                    (fn [e] (put! out e)))
     out))
+(defonce app-state
+  (reagent.core/atom 
+    {
+     :online true 
+     :the-parser nil
+     :key-map {}
+     :rendering false
+     :ajax-is-running false 
+     :composition-kind :sargam-composition
+     :mp3-url nil
+     ;;"http://ragapedia.com/compositions/yesterday.mp3"
+     :render-as :sargam-composition
+     :staff-notation-path nil 
+     :composition nil 
+     }))
 
-(comment
-(let [uri (new goog/Uri "//www.google.com/images/zcleardot.gif")
+(defn check-network[]
+  (println "checking network")
+(let [uri (new goog/Uri "//www.google.com/images/cleardot.gif")
       _  (.makeUnique uri)
       img (new js/Image)
       ch (listen img "load")
+      ch2 (listen img "error")
       _ (set! (.-src img) (str uri))
-      _ (.log js/console  "img is" img)
       ]
-  (go  (println "img on load returns" (.log js/console (<! ch)))
-      (println "after image has loaded") 
+  (go  (let[result (<! ch)] 
+      (when (not (:online @app-state))
+          (swap! app-state assoc :online true))
+          (println "image loaded correctly")
       ))
-(println "after let")
-)
+  (go  (let[result (<! ch2)] 
+         (println "error case")
+      (when (:online @app-state)
+    (println "image didn't load")
+               (swap! app-state assoc :online false))))
+  ))
 
+
+      (go (while true
+            (check-network)
+            (<! (timeout (* 30 seconds))) 
+                ))
 
 
 
@@ -160,20 +182,6 @@
 
 (defonce printing (reagent.core/atom false))
 
-(defonce app-state
-  (reagent.core/atom 
-    {
-     :the-parser nil
-     :key-map {}
-     :rendering false
-     :ajax-is-running false 
-     :composition-kind :sargam-composition
-     :mp3-url nil
-     ;;"http://ragapedia.com/compositions/yesterday.mp3"
-     :render-as :sargam-composition
-     :staff-notation-path nil 
-     :composition nil 
-     }))
 
 
 (declare draw-item) ;; need forward reference since it is recursive
@@ -199,22 +207,6 @@
 ;; takes 30 seconds to load unserialized grammar. 1 second for serialized
 (def unserialized-grammar-path "ebnf/doremiscript.ebnf")
 (def serialized-grammar-path "ebnf/grammar.txt") 
-
-(defn network-tester[]
-  ;; googles network tester seems broken!!!
-  (println "entering network tester")
-  ;; Returns a channel which will have true or false on it
-  (let [out (chan)
-        my-fn (fn [res] 
-                (println "in network-tester callback, res=" res)
-                (put! out res))
-
-        req (goog.net.NetworkTester. my-fn) ]
-    (.start req)
-    out))
-
-
-;;; (go  (println "network-tester returns" (<! (network-tester))))
 
 
 (defn load-grammar-xhr[]
@@ -284,16 +276,16 @@
   (log "in generate-staff-notation-xhr callback")
   (let [raw-response (.-target event)
         response-text (.getResponseText raw-response)
-  ;;    {:keys [:composition :error] :as results}
+        ;;    {:keys [:composition :error] :as results}
         results
-         (-> response-text
-                   goog.json/parse
-                   (js->clj :keywordize-keys true)
-                   )
+        (-> response-text
+            goog.json/parse
+            (js->clj :keywordize-keys true)
+            )
         my-map (if (:error results)
-                      results
-                   (update-in results [:composition]
-                              keywordize-vector))
+                 results
+                 (update-in results [:composition]
+                            keywordize-vector))
         _ (prn "my-map" my-map)
         {:keys [:links :composition :error]} my-map 
         ]
@@ -317,18 +309,17 @@
 
 
 (defn update-app-state![ {:keys [:composition :error] :as results}]
-   (swap! app-state merge results
-             (if error
-               {}
-                {:key-map (key-map-for-composition composition)})))
+  (swap! app-state merge results
+         (if error
+           {}
+           {:key-map (key-map-for-composition composition)})))
 
-(defn parse-local[doremi-text kind]
-  (let [composition-view (dom/getElement "doremiContent")]
-  ;; reagent doesn't immediately redraw it, so do it manually
-;;   (set! (.-innerHTML composition-view) "Redrawing: Please wait")
-     (-> doremi-text  
-           (doremi-text->collapsed-parse-tree (get @app-state :the-parser) kind)
-            update-app-state!)))
+(defn parse-local[{src :src kind :kind}]
+    ;; reagent doesn't immediately redraw it, so do it manually
+    ;;   (set! (.-innerHTML composition-view) "Redrawing: Please wait")
+    (-> src  
+        (doremi-text->collapsed-parse-tree (get @app-state :the-parser) kind)
+        update-app-state!))
 
 
 
@@ -336,21 +327,19 @@
   (let [raw-response (.-target event)
         response-text (.getResponseText raw-response)
         results (-> response-text
-                   goog.json/parse
-                   (js->clj :keywordize-keys true))
+                    goog.json/parse
+                    (js->clj :keywordize-keys true))
         _ (assert (contains? results :composition))
         _ (assert (contains? results :error))
         results2 (if (not (:error results))
-                          (assoc results :composition
-                                 (keywordize-vector (:composition results)))
-                          results)
+                   (assoc results :composition
+                          (keywordize-vector (:composition results)))
+                   results)
         ]
     (update-app-state! results2)))
 
 
-
-
-(defn parse-xhr[url {src :src kind :kind}]
+(defn parse-xhr-old[url {src :src kind :kind}]
   (log "entering parse-xhr:"  "url=" url " src= " src "\nkind=" kind)
   (let [ query-data (new goog.Uri/QueryData) ]
     (.set query-data "src"  src)
@@ -360,13 +349,30 @@
                          "POST"
                          query-data)))
 
+;; TODO:return channel
+(defn parse-xhr[url {src :src kind :kind}]
+ ;; (println "entering parse-xhr:"  "url=" url " src= " src "\nkind=" kind)
+  (let [ out (chan)
+        query-data (new goog.Uri/QueryData) ]
+    (.set query-data "src"  src)
+    (.set query-data "kind" (name  kind))
+    (goog.net.XhrIo/send
+      url
+      (fn [event] (parse-xhr-callback event) 
+        (put! out event))
+      "POST"
+      query-data)
+    out 
+    ))
+
 
 (defn parse[]
-  (parse-xhr 
-    PARSE-URL
-    {:src (.-value (sel1 :#the_area))
+  (let [args {:src (.-value (sel1 :#the_area))
      :kind (get-in @app-state [:composition-kind])
-     }))
+     }]
+ (if (:online @app-state)
+  (parse-xhr  PARSE-URL args)
+   (parse-local args))))   
 
 
 (defn generate-staff-notation-xhr [url content]
@@ -612,32 +618,6 @@
    }
   )
 
-(defn downloads[]
-  [:select#downloads.form-control
-   {
-    :on-change (fn[evt]
-                 (.preventDefault evt)
-                 (.open js/window (.-value (.-target evt))))
-  ;;  :value "TODO"                         
-    } 
-   [:option
-    {
-     :defaultValue true
-      }
-    "Links"]
-   (when-let [links (get-in @app-state [:links])] 
-     (doall (map-indexed
-              (fn[idx [k v]] 
-                [:option
-                 {
-                  :value v
-                  :key idx
-                  }
-                 (string/replace (name k) "-url" "")
-                 ])
-              links
-              ))) 
-   ]) 
 
 
 
@@ -768,8 +748,8 @@
     :on-click 
     (fn [e]
       (.preventDefault e)
-      (parse-local (.-value (sel1 :#the_area))
-                   (:composition-kind @app-state))
+      (parse-local {:src (.-value (sel1 :#the_area))
+                    :kind (:composition-kind @app-state)})
       )
     }
    "Redraw Local"
@@ -794,6 +774,9 @@
 (defn entry-area-box[]
   [:div.form-group.hidden-print
    [:label {:for "entryArea"} "Enter Letter Notation Source:"]
+   (if (not (get @app-state :online))
+   [:span.offline "You are working offline. Features such as generating staff notation are disabled" ]
+     )
    [:textarea#the_area.entryArea.form-control
     {
      :autofocus true
@@ -822,7 +805,7 @@
       [:div#doremiContent.composition.doremiContent ]
       ;; else
       [:div#doremiContent.composition.doremiContent {:class (if @printing "printing"
-                                                "")}
+                                                              "")}
        (draw-children (rest composition))]
       )))
 
@@ -849,11 +832,28 @@
 ;; var items = rest(item);
 ;;
 
-
-(def seconds 1000)
-(defn start-parse-timer[]
-  (js/setInterval parse (* 6 seconds))
+(defn user-entry[]
+  (.-value (dom/getElement "the_area"))
   )
+
+
+(defn start-parse-timer[]
+  (let [
+        last-value (atom "") 
+        keypresses (listen (dom/getElement "the_area") "keypress")]
+    (go (while true
+          (<! keypresses)
+          (let [cur-value (user-entry)]
+            (when (not= cur-value @last-value) 
+              (reset! last-value cur-value)
+              (let [ results (<! 
+  (parse-xhr PARSE-URL {:src cur-value 
+                        :kind (get-in @app-state [:composition-kind])}))
+                    ]
+                (<! (timeout (* 6 seconds))) 
+                )
+              ))
+          ))))
 
 
 ;;;;  add-right-margin-to-notes-with-pitch-signs = function(context) {
@@ -1016,9 +1016,9 @@
     [:li
      [parse-button]  
      ]
-    [:li
-     [parse-local-button]  
-     ]
+  ;;  [:li
+   ;;  [parse-local-button]  
+    ;; ]
     ]
    [composition-wrapper]
    ]
@@ -1427,6 +1427,20 @@
        ]
       )))
 
+
+
+
+
+
+
+(defn mp3-url[] 
+  [:a.btn.btn-info 
+   { :href (:mp3-url @app-state)
+    :target "_blank",
+    :title "Opens in new window"}
+   "Play mp3"]
+  )
+
 (defn select-notation-box[kind]
   [:div.form-group ;;selectNotationBox
    [:label {:for "selectNotation"}
@@ -1444,6 +1458,7 @@
         (swap! app-state assoc :composition-kind my-kind)
         )
      } 
+    [:option]
     [:option {:value :abc-composition}
      "ABC"]
     [:option {:value :doremi-composition}
@@ -1455,7 +1470,6 @@
     [:option {:value :sargam-composition}
      "sargam"]]]
   )
-
 (defn render-as-box[]
   [:div.form-group ;;selectNotationBox
    ;;[:div.RenderAsBox
@@ -1469,6 +1483,7 @@
              (keyword (-> % .-target .-value))
              )
      }
+    [:option {:value nil}]
     [:option {:value :abc-composition}
      "ABC"]
     [:option {:value :doremi-composition}
@@ -1479,20 +1494,6 @@
      "number"]
     [:option {:value :sargam-composition}
      "sargam"]]]
-  )
-(defn print-toggle[]
-  [:button.btn.btn-primary
-   {
-    :title "Toggle font size for rendered letter notation"
-    :name "font_toggle"
-    :on-click 
-    (fn [e]
-      (.preventDefault e)
-      (swap! printing not)
-      )
-    }
-   "Toggle Font Size"
-   ] 
   )
 
 (defn generate-staff-notation-button[]
@@ -1514,40 +1515,55 @@
         ))
     }
    (if (:ajax-is-running @app-state)
-     "Generating staff notation... Please wait. This may take some time..."
-     "Generate Staff Notation and audio..."
+     "Redrawing..."
+     "Generate Staff Notation and audio"
      )
    ] 
   )
 
-
-
-(defn mp3-url[] 
-  [:a.btn.btn-info 
-   { :href (:mp3-url @app-state)
-    :target "_blank",
-    :title "Opens in new window"}
-   "Play mp3"]
+(defn audio-div[]
+  [:audio#audio
+   {
+    :controls "controls"
+    :preload "auto",
+    :src (:mp3-url @app-state)}]
   )
 
-(defn audio-div[]
-  (when-let [mp3-url (get-in @app-state [:links :mp3-url])]
-    [:audio#audio
-     {
-      :controls "controls"
-      :preload "auto",
-      :src mp3-url
-      }]
-    ))
+(defn downloads[]
+  [:div.dropdown.downloads
+   [:button#dropdownMenu1.btn.btn-default.dropdown-toggle
+    {:aria-expanded "true", :data-toggle "dropdown", :type "button"}
+    "Links"
+    [:span.caret]]
+   [:ul.dropdown-menu
+    {:aria-labelledby "dropdownMenu1", :role "menu"}
+    [:li [:a {:href "browse" ;; TODO: have server provide list of links ALA rest
+              :target "_blank"
+              :tabIndex "-1", :role "menuitem"}
+          ]]
+    (if (:staff-notation-url @app-state)
+      (doall (map-indexed
+               (fn[idx z] 
+                 [:li
+                  {:role "presentation"
+                   :key idx}
+                  [:a
+                   {:href (or (z @app-state) "#") 
+                    :target "_blank"
+                    :tabIndex "-1", :role "menuitem"}
+                   (string/replace (name z) #"-url$"   "")]])
+               [:browse-url :pdf-url :mp3-url :midi-url :doremi-text-url :lilypond-url :staff-notation-url]))) 
+    ]]      
+  )
 
 (defn controls[]
-  [:form.form-inline.hidden-print
+  [:form.form-inline
    [select-notation-box (get @app-state :kind)]
    [render-as-box (get @app-state :render-as)]
    [generate-staff-notation-button]
    [downloads]
-   [audio-div]
-   [print-toggle]
+   (if (:mp3-url @app-state)
+     [audio-div])
    ]
   )
 
@@ -1577,10 +1593,10 @@
   (println "Save this in resources/ebnf.txt")
   (go
     (let [parser (component/start (new-parser (<! (load-grammar-xhr))))]
-    ;; use this to create ebnf.txt file
-    (binding [*print-dup* true] 
-      (prn (:grammar (:parser parser)) 
-           )))))
+      ;; use this to create ebnf.txt file
+      (binding [*print-dup* true] 
+        (prn (:grammar (:parser parser)) 
+             )))))
 
 
 ;;;; *******************IMPORTANT****************
@@ -1605,12 +1621,13 @@
         )))
 
 (defn init []
+
   (go
     (swap! app-state 
            assoc
            :the-parser 
            (component/start (new-parser
-                                    (<! (load-serialized-grammar-xhr))))
+                              (<! (load-serialized-grammar-xhr))))
            ))
   (let [old-val (.-value (.getElementById js/document "the_area"))
         url-to-load (.getParameterValue
@@ -1631,66 +1648,7 @@
           )
     (if old-val
       (set! (.-value (sel1 :#the_area)) old-val))
-    ;; (start-parse-timer)
+    (start-parse-timer)
     ))
 
 
-;; ********************** code from xhr-keystrokes follows****
-(comment
-  (ns async-test.app
-    (:require-macros [cljs.core.async.macros :refer [go]])
-    (:require
-     i        [goog.dom :as dom]
-              [goog.Uri] 
-              [goog.net.Jsonp]
-              [goog.events :as events]
-              [cljs.core.async :refer [close! timeout put! chan <!]])
-    )
-
-  (def wiki-url
-    "http://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=")
-
-  (defn jsonp [uri]
-    (let [out (chan)
-          req (goog.net.Jsonp. (goog/Uri. uri))]
-      (.send req nil (fn [res] (put! out res)))
-      out))
-
-  (defn listen [el event-type]
-    (let [out (chan)]
-      (events/listen el event-type
-                     (fn [e] (put! out e)))
-      out))
-
-  (def seconds 1000)
-
-  (defn user-query []
-    (.-value (dom/getElement "query")))
-
-  (defn render-query [results]
-    (str
-      "<ul>"
-      (apply str
-             (for [result results]
-               (str "<li>" result "</li>")))
-      "</ul>"))
-
-  (defn zzzzinit []
-    (println "in init")
-    (let [ results-view (dom/getElement "results")
-          last-value (atom "") 
-          keypresses (listen (dom/getElement "query") "keypress")]
-      (go (while true
-            (<! keypresses)
-            (let [cur-value (user-query)]
-              (when (not= cur-value @last-value) 
-                (reset! last-value cur-value)
-                (let [ results (<! (jsonp (str wiki-url cur-value))) ]
-                  (set! (.-innerHTML results-view) (render-query results))
-                  )
-                (<! (timeout (* 6 seconds))) 
-                ))
-            ))))
-
-
-  )

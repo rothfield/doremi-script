@@ -3,6 +3,7 @@
   :url "http://github.com/rothfield/doremi-script"
   :dependencies [
                  [org.clojure/clojure "1.7.0-beta1"]
+                 [reagent "0.5.0"]
                  [digest "1.4.4"]
                  [compojure "1.3.3"]
                  [stencil "0.3.5"]  ;;; mustache implementation-clostache is broken
@@ -13,12 +14,12 @@
                  [com.stuartsierra/component "0.2.3"]
                  [quile/component-cljs "0.2.4"  :exclusions [org.clojure/clojure]]
                  [org.clojure/clojure "1.7.0-beta2"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [org.clojure/clojurescript "0.0-3211"]
                  [ring/ring-json "0.3.1"]
                  [ring-cors "0.1.7"]
                  [ring-server "0.4.0"]
                  [org.clojure/clojurescript "0.0-3211"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [com.lucasbradstreet/instaparse-cljs "1.3.5"]
                  [prismatic/dommy "1.0.0"]
                  [reagent "0.5.0"]
@@ -36,8 +37,9 @@
               ;;
               :builds [{:source-paths ["src"]
                         :compiler {
-                                   ;; :target :nodejs
-                                   :output-to "app.js"
+                        :output-to "out/app.js"
+                   :output-dir "out"
+            ;; :target :nodejs
                                    :optimizations :simple}}]}
   :profiles
   {:uberjar {:aot :all}

@@ -1,0 +1,1535 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html dir='ltr' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
+<head>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+<script type="text/javascript">(function() { var b=window,f="chrome",g="tick",k="jstiming";(function(){function d(a){this.t={};this.tick=function(a,d,c){var e=void 0!=c?c:(new Date).getTime();this.t[a]=[e,d];if(void 0==c)try{b.console.timeStamp("CSI/"+a)}catch(h){}};this[g]("start",null,a)}var a;b.performance&&(a=b.performance.timing);var n=a?new d(a.responseStart):new d;b.jstiming={Timer:d,load:n};if(a){var c=a.navigationStart,h=a.responseStart;0<c&&h>=c&&(b[k].srt=h-c)}if(a){var e=b[k].load;0<c&&h>=c&&(e[g]("_wtsrt",void 0,c),e[g]("wtsrt_","_wtsrt",h),e[g]("tbsd_","wtsrt_"))}try{a=null,
+b[f]&&b[f].csi&&(a=Math.floor(b[f].csi().pageT),e&&0<c&&(e[g]("_tbnd",void 0,b[f].csi().startE),e[g]("tbnd_","_tbnd",c))),null==a&&b.gtbExternal&&(a=b.gtbExternal.pageT()),null==a&&b.external&&(a=b.external.pageT,e&&0<c&&(e[g]("_tbnd",void 0,b.external.startE),e[g]("tbnd_","_tbnd",c))),a&&(b[k].pt=a)}catch(p){}})();b.tickAboveFold=function(d){var a=0;if(d.offsetParent){do a+=d.offsetTop;while(d=d.offsetParent)}d=a;750>=d&&b[k].load[g]("aft")};var l=!1;function m(){l||(l=!0,b[k].load[g]("firstScrollTime"))}b.addEventListener?b.addEventListener("scroll",m,!1):b.attachEvent("onscroll",m);
+ })();</script>
+<meta content='blogger' name='generator'/>
+<link href='http://andrevdm.blogspot.com/favicon.ico' rel='icon' type='image/x-icon'/>
+<link href='http://andrevdm.blogspot.com/2014/02/parsing-s-expressions-in-clojure.html' rel='canonical'/>
+<link rel="alternate" type="application/atom+xml" title="Andre Van Der Merwe - Atom" href="http://andrevdm.blogspot.com/feeds/posts/default" />
+<link rel="alternate" type="application/rss+xml" title="Andre Van Der Merwe - RSS" href="http://andrevdm.blogspot.com/feeds/posts/default?alt=rss" />
+<link rel="service.post" type="application/atom+xml" title="Andre Van Der Merwe - Atom" href="http://www.blogger.com/feeds/2108758405551517278/posts/default" />
+
+<link rel="alternate" type="application/atom+xml" title="Andre Van Der Merwe - Atom" href="http://andrevdm.blogspot.com/feeds/7789164313774988160/comments/default" />
+<link href='http://3.bp.blogspot.com/-5PYDFNNJV9M/UwBTRUKP2SI/AAAAAAAAF2w/cavQSwWmco0/s1600/sexprParsing_parseTree.png' rel='image_src'/>
+<link href='https://plus.google.com/106843183635213366985' rel='publisher'/>
+<!--[if IE]> <script> (function() { var html5 = ("abbr,article,aside,audio,canvas,datalist,details," + "figure,footer,header,hgroup,mark,menu,meter,nav,output," + "progress,section,time,video").split(','); for (var i = 0; i < html5.length; i++) { document.createElement(html5[i]); } try { document.execCommand('BackgroundImageCache', false, true); } catch(e) {} })(); </script> <![endif]-->
+<title>Andre Van Der Merwe: Parsing s-expressions in Clojure</title>
+<link type='text/css' rel='stylesheet' href='https://www.blogger.com/static/v1/widgets/1278881358-widget_css_bundle.css' />
+<link type='text/css' rel='stylesheet' href='https://www.blogger.com/dyn-css/authorization.css?targetBlogID=2108758405551517278&zx=87d594d4-407b-475d-b04d-28c8aa6e0181' />
+<style id='page-skin-1' type='text/css'><!--
+/*
+-----------------------------------------------
+Blogger Template Style
+Name:     Stretch Denim Light
+Designer: Darren Delaye
+URL:      www.DarrenDelaye.com
+Date:     11 Jul 2006
+-----------------------------------------------
+*/
+/* Variable definitions
+====================
+<Variable name="bgColor" description="Page Background Color"
+type="color" default="#ffffff">
+<Variable name="textColor" description="Text Color"
+type="color" default="#333333">
+<Variable name="linkColor" description="Link Color"
+type="color" default="#336699">
+<Variable name="headerBgColor" description="Page Header Background Color"
+type="color" default="#c4e1ff">
+<Variable name="headerTextColor" description="Page Header Text Color"
+type="color" default="#003366">
+<Variable name="headerCornersColor" description="Page Header Corners Color"
+type="color" default="#c4e1ff">
+<Variable name="mainBgColor" description="Main Background Color"
+type="color" default="#ffffff">
+<Variable name="borderColor" description="Border Color"
+type="color" default="#ffffff">
+<Variable name="dateHeaderColor" description="Date Header Color"
+type="color" default="#999999">
+<Variable name="sidebarTitleBgColor" description="Sidebar Title Background Color"
+type="color" default="#ffffff">
+<Variable name="sidebarTitleTextColor" description="Sidebar Title Text Color"
+type="color" default="#333333">
+<Variable name="bodyFont" description="Text Font"
+type="font" default="normal normal 100% Verdana, Arial, Sans-serif;">
+<Variable name="headerFont" description="Page Header Font"
+type="font" default="normal normal 210% Verdana, Arial, Sans-serif;">
+<Variable name="startSide" description="Start side in blog language"
+type="automatic" default="left">
+<Variable name="endSide" description="End side in blog language"
+type="automatic" default="right">
+*/
+body {
+background: #ffffff;
+margin: 0;
+padding: 0px;
+font: x-small Verdana, Arial;
+text-align: center;
+color: #333333;
+font-size/* */:/**/small;
+font-size: /**/small;
+}
+a:link {
+color: #336699;
+}
+a:visited {
+color: #336699;
+}
+a img {
+border-width: 0;
+}
+#outer-wrapper {
+font: normal normal 100% Verdana, Arial, Sans-serif;;
+}
+/* Header
+----------------------------------------------- */
+#header-wrapper {
+margin:0;
+padding: 0;
+background-color: #c4e1ff;
+text-align: left;
+}
+#header {
+margin: 0 2%;
+background-color: #c4e1ff;
+color: #003366;
+padding: 0;
+font: normal normal 210% Verdana, Arial, Sans-serif;;
+position: relative;
+}
+h1.title {
+padding-top: 38px;
+margin: 0 1% .1em;
+line-height: 1.2em;
+font-size: 100%;
+}
+h1.title a, h1.title a:visited {
+color: #003366;
+text-decoration: none;
+}
+#header .description {
+display: block;
+margin: 0 1%;
+padding: 0 0 40px;
+line-height: 1.4em;
+font-size: 50%;
+}
+/* Content
+----------------------------------------------- */
+.clear {
+clear: both;
+}
+#content-wrapper {
+margin: 0 2%;
+padding: 0 0 15px;
+text-align: left;
+background-color: #ffffff;
+border: 1px solid #ffffff;
+border-top: 0;
+}
+#main-wrapper {
+margin-left: 1%;
+width: 64%;
+float: left;
+background-color: #ffffff;
+display: inline;       /* fix for doubling margin in IE */
+word-wrap: break-word; /* fix for long text breaking sidebar float in IE */
+overflow: hidden;      /* fix for long non-text content breaking IE sidebar float */
+}
+#sidebar-wrapper {
+margin-right: 1%;
+width: 29%;
+float: right;
+background-color: #ffffff;
+display: inline;       /* fix for doubling margin in IE */
+word-wrap: break-word; /* fix for long text breaking sidebar float in IE */
+overflow: hidden;      /* fix for long non-text content breaking IE sidebar float */
+}
+/* Headings
+----------------------------------------------- */
+h2, h3 {
+margin: 0;
+}
+/* Posts
+----------------------------------------------- */
+.date-header {
+margin: 1.5em 0 0;
+font-weight: normal;
+color: #999999;
+font-size: 100%;
+}
+.post {
+margin: 0 0 1.5em;
+padding-bottom: 1.5em;
+}
+.post-title {
+margin: 0;
+padding: 0;
+font-size: 125%;
+font-weight: bold;
+line-height: 1.1em;
+}
+.post-title a, .post-title a:visited, .post-title strong {
+text-decoration: none;
+color: #333333;
+font-weight: bold;
+}
+.post div {
+margin: 0 0 .75em;
+line-height: 1.3em;
+}
+.post-footer {
+margin: -.25em 0 0;
+color: #333333;
+font-size: 87%;
+}
+.post-footer .span {
+margin-right: .3em;
+}
+.post img, table.tr-caption-container {
+padding: 4px;
+border: 1px solid #ffffff;
+}
+.tr-caption-container img {
+border: none;
+padding: 0;
+}
+.post blockquote {
+margin: 1em 20px;
+}
+.post blockquote p {
+margin: .75em 0;
+}
+/* Comments
+----------------------------------------------- */
+#comments h4 {
+margin: 1em 0;
+color: #999999;
+}
+#comments h4 strong {
+font-size: 110%;
+}
+#comments-block {
+margin: 1em 0 1.5em;
+line-height: 1.3em;
+}
+#comments-block dt {
+margin: .5em 0;
+}
+#comments-block dd {
+margin: .25em 0 0;
+}
+#comments-block dd.comment-footer {
+margin: -.25em 0 2em;
+line-height: 1.4em;
+font-size: 78%;
+}
+#comments-block dd p {
+margin: 0 0 .75em;
+}
+.deleted-comment {
+font-style:italic;
+color:gray;
+}
+.feed-links {
+clear: both;
+line-height: 2.5em;
+}
+#blog-pager-newer-link {
+float: left;
+}
+#blog-pager-older-link {
+float: right;
+}
+#blog-pager {
+text-align: center;
+}
+/* Sidebar Content
+----------------------------------------------- */
+.sidebar h2 {
+margin: 1.6em 0 .5em;
+padding: 4px 5px;
+background-color: #ffffff;
+font-size: 100%;
+color: #333333;
+}
+.sidebar ul {
+margin: 0;
+padding: 0;
+list-style: none;
+}
+.sidebar li {
+margin: 0;
+padding-top: 0;
+padding-right: 0;
+padding-bottom: .5em;
+padding-left: 15px;
+text-indent: -15px;
+line-height: 1.5em;
+}
+.sidebar {
+color: #333333;
+line-height:1.3em;
+}
+.sidebar .widget {
+margin-bottom: 1em;
+}
+.sidebar .widget-content {
+margin: 0 5px;
+}
+/* Profile
+----------------------------------------------- */
+.profile-img {
+float: left;
+margin-top: 0;
+margin-right: 5px;
+margin-bottom: 5px;
+margin-left: 0;
+padding: 4px;
+border: 1px solid #ffffff;
+}
+.profile-data {
+margin:0;
+text-transform:uppercase;
+letter-spacing:.1em;
+font-weight: bold;
+line-height: 1.6em;
+font-size: 78%;
+}
+.profile-datablock {
+margin:.5em 0 .5em;
+}
+.profile-textblock {
+margin: 0.5em 0;
+line-height: 1.6em;
+}
+/* Footer
+----------------------------------------------- */
+#footer {
+clear: both;
+text-align: center;
+color: #333333;
+}
+#footer .widget {
+margin:.5em;
+padding-top: 20px;
+font-size: 85%;
+line-height: 1.5em;
+text-align: left;
+}
+/** Page structure tweaks for layout editor wireframe */
+body#layout #header {
+width: 750px;
+}
+
+--></style>
+<span class='Apple-style-span' style='font-family: inherit;'><link href='http://alexgorbatchev.com/pub/sh/current/styles/shCore.css' rel='stylesheet' type='text/css'/>
+<link href='http://alexgorbatchev.com/pub/sh/current/styles/shThemeDefault.css' rel='stylesheet' type='text/css'/>
+<link href='https://sites.google.com/site/andredart/blogfiles/shClojureExtra.css' rel='stylesheet' type='text/css'/>
+<script src='http://alexgorbatchev.com/pub/sh/current/scripts/shCore.js' type='text/javascript'></script>
+<script src='http://alexgorbatchev.com/pub/sh/current/scripts/shBrushCpp.js' type='text/javascript'></script>
+<script src='http://alexgorbatchev.com/pub/sh/current/scripts/shBrushCSharp.js' type='text/javascript'></script>
+<script src='http://alexgorbatchev.com/pub/sh/current/scripts/shBrushCss.js' type='text/javascript'></script>
+<script src='http://alexgorbatchev.com/pub/sh/current/scripts/shBrushJava.js' type='text/javascript'></script>
+<script src='http://alexgorbatchev.com/pub/sh/current/scripts/shBrushJScript.js' type='text/javascript'></script>
+<script src='http://alexgorbatchev.com/pub/sh/current/scripts/shBrushPython.js' type='text/javascript'></script>
+<script src='http://alexgorbatchev.com/pub/sh/current/scripts/shBrushRuby.js' type='text/javascript'></script>
+<script src='http://alexgorbatchev.com/pub/sh/current/scripts/shBrushSql.js' type='text/javascript'></script>
+<script src='http://alexgorbatchev.com/pub/sh/current/scripts/shBrushXml.js' type='text/javascript'></script>
+<script src='https://sites.google.com/site/andredart/blogfiles/shBrushFSharp.js' type='text/javascript'></script>
+<script src='https://sites.google.com/site/andredart/blogfiles/shBrushClojure.js' type='text/javascript'></script>
+<script language='javascript'>
+SyntaxHighlighter.config.bloggerMode = true;
+SyntaxHighlighter.config.clipboardSwf = 'http://alexgorbatchev.com/pub/sh/current/scripts/clipboard.swf';
+SyntaxHighlighter.all();
+</script>
+</span>
+<script type="text/javascript">var a="indexOf",b="&m=1",e="(^|&)m=",f="?",g="?m=1";function h(){var c=window.location.href,d=c.split(f);switch(d.length){case 1:return c+g;case 2:return 0<=d[1].search(e)?null:c+b;default:return null}}var k=navigator.userAgent;if(-1!=k[a]("Mobile")&&-1!=k[a]("WebKit")&&-1==k[a]("iPad")||-1!=k[a]("Opera Mini")||-1!=k[a]("IEMobile")){var l=h();l&&window.location.replace(l)};
+</script><script type="text/javascript">
+if (window.jstiming) window.jstiming.load.tick('headEnd');
+</script></head>
+<body>
+<div class='navbar section' id='navbar'><div class='widget Navbar' id='Navbar1'><script type="text/javascript">
+    function setAttributeOnload(object, attribute, val) {
+      if(window.addEventListener) {
+        window.addEventListener('load',
+          function(){ object[attribute] = val; }, false);
+      } else {
+        window.attachEvent('onload', function(){ object[attribute] = val; });
+      }
+    }
+  </script>
+<div id="navbar-iframe-container"></div>
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+<script type="text/javascript">
+        gapi.load("gapi.iframes:gapi.iframes.style.bubble", function() {
+          if (gapi.iframes && gapi.iframes.getContext) {
+            gapi.iframes.getContext().openChild({
+                url: 'https://www.blogger.com/navbar.g?targetBlogID\0752108758405551517278\46blogName\75Andre+Van+Der+Merwe\46publishMode\75PUBLISH_MODE_BLOGSPOT\46navbarType\75BLUE\46layoutType\75LAYOUTS\46searchRoot\75//andrevdm.blogspot.com/search\46blogLocale\75en_GB\46v\0752\46homepageUrl\75http://andrevdm.blogspot.com/\46targetPostID\0757789164313774988160\46blogPostOrPageUrl\75http://andrevdm.blogspot.com/2014/02/parsing-s-expressions-in-clojure.html\46blogFollowUrl\75https://plus.google.com/106843183635213366985\46vt\0753756988994248420346',
+                where: document.getElementById("navbar-iframe-container"),
+                id: "navbar-iframe"
+            });
+          }
+        });
+      </script><script type="text/javascript">
+(function() {
+var script = document.createElement('script');
+script.type = 'text/javascript';
+script.src = '//pagead2.googlesyndication.com/pagead/js/google_top_exp.js';
+var head = document.getElementsByTagName('head')[0];
+if (head) {
+head.appendChild(script);
+}})();
+</script>
+</div></div>
+<div id='outer-wrapper'><div id='wrap2'>
+<!-- skip links for text browsers -->
+<span id='skiplinks' style='display:none;'>
+<a href='#main'>skip to main </a> |
+      <a href='#sidebar'>skip to sidebar</a>
+</span>
+<div id='header-wrapper'>
+<div class='header section' id='header'><div class='widget Header' id='Header1'>
+<div id='header-inner'>
+<div class='titlewrapper'>
+<h1 class='title'>
+<a href='http://andrevdm.blogspot.com/'>Andre Van Der Merwe</a>
+</h1>
+</div>
+<div class='descriptionwrapper'>
+<p class='description'><span>
+</span></p>
+</div>
+</div>
+</div></div>
+</div>
+<div id='content-wrapper'>
+<div id='crosscol-wrapper' style='text-align:center'>
+<div class='crosscol section' id='crosscol'></div>
+</div>
+<div id='main-wrapper'>
+<div class='main section' id='main'><div class='widget Blog' id='Blog1'>
+<div class='blog-posts hfeed'>
+<!-- google_ad_section_start(name=default) -->
+
+          <div class="date-outer">
+        
+<h2 class='date-header'><span>Sunday, 16 February 2014</span></h2>
+
+          <div class="date-posts">
+        
+<div class='post-outer'>
+<div class='post hentry uncustomized-post-template' itemprop='blogPost' itemscope='itemscope' itemtype='http://schema.org/BlogPosting'>
+<meta content='http://3.bp.blogspot.com/-5PYDFNNJV9M/UwBTRUKP2SI/AAAAAAAAF2w/cavQSwWmco0/s1600/sexprParsing_parseTree.png' itemprop='image_url'/>
+<meta content='2108758405551517278' itemprop='blogId'/>
+<meta content='7789164313774988160' itemprop='postId'/>
+<a name='7789164313774988160'></a>
+<h3 class='post-title entry-title' itemprop='name'>
+Parsing s-expressions in Clojure
+</h3>
+<div class='post-header'>
+<div class='post-header-line-1'></div>
+</div>
+<div class='post-body entry-content' id='post-body-7789164313774988160' itemprop='description articleBody'>
+<h2>
+Introduction</h2>
+<br />
+This is a quick look at parsing in clojure. First using instaparse and then writing the lexer and parser by hand. The comparison should illustrate how great instaparse is but also show that writing a simple lexer &amp; parser is not as complex as some would think.<br />
+<br />
+BTW this is my first clojure project so I may have got some of the idioms in the code incorrect. I'll update the code samples based on feedback here and on the project <a href="https://github.com/andrevdm/blog-clojure-sexpr-parse" target="_blank">repo in github</a> :)<br />
+<br />
+<h2>
+The demo project</h2>
+<br />
+To demonstrate instaparse I'll be implementing a simple external DSL. The DSL should have the following characteristics<br />
+<ol>
+<li>Expressions written as sexprs</li>
+<li>External DSL - I'm not interested in using the clojure reader to read the sexpr for this demo</li>
+<li>Constrained - functions can only be defined in clojure not in the DSL itself. The functions available to the DSL must be strictly controlled.</li>
+</ol>
+All code is in the <a href="https://github.com/andrevdm/blog-clojure-sexpr-parse" target="_blank">github repository</a> (<a href="https://github.com/andrevdm/blog-clojure-sexpr-parse" target="_blank">https://github.com/andrevdm/blog-clojure-sexpr-parse</a>)<br />
+<br />
+<h3>
+Instaparse </h3>
+<h3>
+Using instaparse</h3>
+<a href="https://github.com/Engelberg/instaparse" target="_blank">Instaparse</a> (<a href="https://github.com/Engelberg/instaparse" target="_blank">https://github.com/Engelberg/instaparse</a>) is a clojure library for generating a parser (and lexer) from a EBNF/ABNF. It is one of the easiest parser generators I've used, I highly recommend giving it a try.<br />
+<br />
+<h3>
+&nbsp;The grammar</h3>
+The instaparse page has a nice introduction to the grammar syntax. Start there if you are not familiar with EBNF.<br />
+<br />
+Here is the grammar that I'll be parsing <br />
+<br />
+<span style="font-family: &quot;Courier New&quot;,Courier,monospace;">&nbsp;&nbsp; S = (expression <ws>)*<br />&nbsp;&nbsp;&nbsp; expression = list | vector | atom<br />&nbsp;&nbsp;&nbsp; list = &lt;'('&gt; <ws> (expression <ws>)* &lt;')'&gt;<br />&nbsp;&nbsp;&nbsp; vector = &lt;'['&gt; (expression <ws>)* &lt;']'&gt;<br />&nbsp;&nbsp;&nbsp; atom = number | string | name<br />&nbsp;&nbsp;&nbsp; number = #'\d+'<br />&nbsp;&nbsp;&nbsp; string = &lt;'"'&gt; #'[^\"]+' &lt;'"'&gt;<br />&nbsp;&nbsp;&nbsp; name = #'[a-zA-Z\+-]([0-9a-zA-Z\+-]*)'<br />&nbsp;&nbsp;&nbsp; ws = #'\s+'</ws></ws></ws></ws></span><br />
+<br />
+<br />
+<br />
+This is pretty standard EBNF. Some things to note<br />
+<br />
+<ol>
+<li>Wrap an element in angle brackets to remove it from the output e.g. <ws><ws></ws></ws></li>
+<li>Match literal characters with single quotes. e.g. '('</li>
+<li>Regular expressions using #'regex'</li>
+<li>Remember to escape regex characters correctly. See the code example for the correct escaping</li>
+</ol>
+<br />
+Again the instaparse page has a nice introduction that covers all of this.<br />
+<br />
+<h3>
+The output parse tree</h3>
+<br />
+The output parse tree from instaparse can be in hiccup or enliven format. I'll be using the default hiccup format.<br />
+<br />
+As an example here is the output for "<span style="font-family: &quot;Courier New&quot;,Courier,monospace;">(+ 1 2 3) 4</span>"<br />
+<br />
+<span style="font-family: &quot;Courier New&quot;,Courier,monospace;">&nbsp;&nbsp; [:S<br />&nbsp;&nbsp;&nbsp; [:expression<br />&nbsp;&nbsp;&nbsp;&nbsp; [:list<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [:expression [:atom [:name "+"]]]<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [:expression [:atom [:number "1"]]]<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [:expression [:atom [:number "2"]]]<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [:expression [:atom [:number "3"]]]]]<br />&nbsp;&nbsp;&nbsp; [:expression [:atom [:number "4"]]]]</span><br />
+<br />
+Instaparse can visualise a parse tree using graphviz and rhizome (see <a href="https://github.com/Engelberg/instaparse#visualizing-the-tree" target="_blank">https://github.com/Engelberg/instaparse#visualizing-the-tree</a>). E.g. for the parse tree above you get this<br />
+<br />
+<div class="separator" style="clear: both; text-align: center;">
+<a href="http://3.bp.blogspot.com/-5PYDFNNJV9M/UwBTRUKP2SI/AAAAAAAAF2w/cavQSwWmco0/s1600/sexprParsing_parseTree.png" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" src="http://3.bp.blogspot.com/-5PYDFNNJV9M/UwBTRUKP2SI/AAAAAAAAF2w/cavQSwWmco0/s1600/sexprParsing_parseTree.png" height="516" width="640" /></a></div>
+<br />
+<br />
+<h3>
+Interpreting the parse tree</h3>
+There are several ways to interpret the output from instaparse, e.g. using zippers or using the built in instaparse transformation function. However I chose to use simple recursive functions since it is so simple.<br />
+<br />
+<pre class="brush: clojure;">   (defmulti run (fn [s] (nth s 0)))
+   (defmethod run :S [[s &amp; es]] (last (doall (map run es))))
+   (defmethod run :expression [[e t]] (run t))
+   (defmethod run :atom [[a t]] (run t))
+   (defmethod run :number [[n val]] (read-string val))
+   (defmethod run :string [[s val]] val)
+   (defmethod run :vector [[v &amp; vs]] (vec (map run vs)))
+   (defmethod run :name [[n &amp; nn]] (first nn))
+   (defmethod run :list [[l n &amp; ls]] (let [args (map run ls)]
+                                        (apply (methods (run n)) args)))</pre>
+<br />
+<br />
+<br />
+The multimethod's dispatch function gets the first item from each vector. Look at the parse tree above, you'll see that this will always be the type of the current element (:S or :expression or :number etc)<br />
+<br />
+Each method then is responsible for destructuring its element type. E.g. the :number method must parse the number and return a string. The :vector method must return a vector. Each method calls the run multimethod recursively to get the lowest level atom<br />
+<br />
+Notice that the :S method calls last on doall, which is called to force evaluation of the whole lazy seq. last is called to get the last value. I.e. the parser will return the last value evaluated just as clojure would.<br />
+<br />
+The :list method is where the interpreter actually "runs" functions called by the DSL.<br />
+<br />
+<br />
+<br />
+<pre class="brush: clojure;">   (defmethod run :list [[l n &amp; ls]] (let [args (map run ls)]
+                                         (apply (methods (run n)) args)))
+
+</pre>
+<br />
+<br />
+<br />
+The parameters<span style="font-family: &quot;Courier New&quot;,Courier,monospace;"> [ [l n &amp; ls] ]&nbsp;</span> destructure the incoming element into<br />
+<ol>
+<li>&nbsp;l = the :list</li>
+<li>&nbsp;n = the name of the function as a :name element</li>
+<li>&nbsp;s = the method arguments</li>
+</ol>
+<br />
+Remember that a list is executed by treating the first expression as the function and the rest as the arguments to that function.<br />
+<br />
+<br />
+Once we have the arguments they must be evaluated by calling run for each argument<br />
+&nbsp;&nbsp; <span style="font-family: &quot;Courier New&quot;,Courier,monospace;">(map run ls)</span><br />
+<br />
+We get the name of the function to run<br />
+&nbsp;&nbsp;<span style="font-family: &quot;Courier New&quot;,Courier,monospace;"> (run n)</span><br />
+<br />
+We look up the actual function to call in the methods map. It is this map that lets us control exactly which functions can be called. All together it looks like this<br />
+&nbsp;&nbsp; <span style="font-family: &quot;Courier New&quot;,Courier,monospace;">(let [args (map run ls) (apply (methods (run n)) args)))</span><br />
+<br />
+<br />
+<h3>
+Full sample code</h3>
+Here is the full code for the DSL parser and interpreter using instaparse<br />
+<pre class="brush: clojure;">(ns cljsexp-instaparse.core
+ (:require [instaparse.core :as insta]))
+
+(def parse
+ (insta/parser
+ "S = (expression <ws>)*
+ expression = list | vector | atom
+ list = &lt;'('&gt; <ws> (expression <ws>)* &lt;')'&gt;
+ vector = &lt;'['&gt; (expression <ws>)* &lt;']'&gt;
+ atom = number | string | name
+ number = #'\\d+'
+ string = &lt;'\"'&gt; #'[^\\\"]+' &lt;'\"'&gt;
+ name = #'[a-zA-Z\\+-]([0-9a-zA-Z\\+-]*)'
+ ws = #'\\s+'"))
+
+(def methods
+ {"+" +
+ "-" -
+ "*" *
+ "/" /
+ "++" inc
+ "--" dec
+ "prn" println})
+
+(defmulti run (fn [s] (nth s 0)))
+(defmethod run :S [[s &amp; es]] (last (doall (map run es))))
+(defmethod run :expression [[e t]] (run t))
+(defmethod run :atom [[a t]] (run t))
+(defmethod run :number [[n val]] (read-string val))
+(defmethod run :string [[s val]] val)
+(defmethod run :vector [[v &amp; vs]] (vec (map run vs)))
+(defmethod run :name [[n &amp; nn]] (first nn))
+(defmethod run :list [[l n &amp; ls]] (let [args (map run ls)]
+                                       (apply (methods (run n)) args)))</ws></ws></ws></ws></pre>
+<br />
+<h3>
+Conclusion - instaparse</h3>
+Instaparse is amazing. It makes writing a parser very easy indeed. A simple sexp parser and interpreter in less that 40 lines of clojure is a great result.<br />
+<br />
+<br />
+<h2>
+A simple recursive descent parser</h2>
+<br />
+Writing the lexer and parser by hand is an interesting exercise as it shows that its not too hard to do. However in my opinion it also shows how much simpler instaparse makes things even for simple projects.<br />
+<br />
+For what it is worth note that there is no mutable state in this code. All the functions are pure. This made testing very easy.<br />
+<br />
+<h3>
+Lexing</h3>
+<br />
+<br />
+Lexing or tokenising a string is the process of converting the characters from the source code into higher level tokens (equivalent to taking individual letters and making words).<br />
+<br />
+E.g. taking this character stream<br />
+<br />
+<span style="font-family: &quot;Courier New&quot;,Courier,monospace;">&nbsp;|&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |<br />&nbsp;| ( | i | f |&nbsp;&nbsp; | ( | a | n | d | ( | a | b | c |</span><br />
+<span style="font-family: &quot;Courier New&quot;,Courier,monospace;">&nbsp;|&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |&nbsp;&nbsp; |</span><br />
+And creating these tokens<br />
+<br />
+&nbsp;left-paren, if, left-paren, and, left-paren, abc<br />
+<br />
+Each token has meta-data associated with it. Such as the line and column in the source file and the type of token (string vs name vs paren etc).<br />
+<br />
+Tokenising the input means that the parser does not need to deal with individual characters but rather can work with higher level tokens. This greatly simplifies the design as the concerns of lexing the input and parsing the resulting tokens can be separated. In a recursive descent parser you could lex the next token on demand rather than lex everything first as I have here.<br />
+<br />
+NB remember that the output of the tokeniser is a flat list of tokens. No meaning has yet been inferred from the source code<br />
+<br />
+<br />
+In the code above each token has the following clojure structure<br />
+<br />
+<pre class="brush: clojure;">{:type :xxx,
+ :val xxx,
+ :line xxx,
+ :col xxx,
+ :expressions []}
+
+</pre>
+<br />
+Each token has a<br />
+<ol>
+<li>Type (e.g. name/string/list)</li>
+<li>Value (e.g. the numeric or string value of the text)</li>
+<li>The line and column number that the token started in the source file</li>
+<li>A place holder for nested expressions</li>
+</ol>
+<br />
+<br />
+<h4>
+Matching the next token</h4>
+<br />
+<pre class="brush: clojure;">(def tokenMap {:byChar { \( :lparen
+                         \) :rparen,
+                         \[ :lbracket,
+                         \] :rbracket}
+               :byRegex { #"'" parseString
+                          #"\d+" parseNumber
+                          #"[a-zA-Z\+\-\*\\\/\?_\$\&lt;\&gt;=]" parseName
+                          #";" parseComment }})
+
+
+
+
+
+</pre>
+<br />
+<br />
+Here there are two maps. The first identifies single character tokens such as brackets or parentheses. The second uses a regular expression to match the first letter of a token and defines the function that gets called to tokenise it.<br />
+<br />
+For example if the tokeniser gets a semi-colon it calls the parseComment function which calls the parseRegex helper function. Below you can see these two methods. When a semi-colon is found the regex will match to the end of the line and the current position will be moved (moveRight) by the number of matched characters.<br />
+<br />
+<pre class="brush: clojure;">(defn parseRegex [state, typeName, token, re]
+  (let [s (subs (currentLine state) (:col state))
+        val (re-find re s)]
+    ;Does the remainder of the line match the regex - it should!
+    (if val
+
+      (assoc
+          (moveRight state (count val))
+        :token token
+        :val val)
+
+      (throw (Exception. (str "Failed to parse " typeName))))))
+
+(defn parseComment [state]
+  (parseRegex state "comment" :comment #";.*"))
+
+
+</pre>
+<br />
+<br />
+<h4>
+Moving in the input stream</h4>
+Below is the moveRight function which moves right in the input stream. Notice that this takes the current position in a state argument and returns a new state as a result. I.e. nothing is mutated.<br />
+<br />
+<pre class="brush: clojure;">(defn moveRight [state by]
+  "Move current position  1 char to the right, roll over to next line if required"
+  (let [updated (assoc state :col (+ (:col state) by) )]
+    (let [line (currentLine state)]
+      (if (&lt; (:col updated) (count line))
+
+        ;Still space on current line, return it
+        updated
+
+        ;Move to next line
+        (assoc
+          state
+          :col 0
+          :line (inc (:line state)))))))
+
+
+</pre>
+<br />
+<h4>
+Running the tokeniser</h4>
+<br />
+Finally here are the two functions that control the tokenising<br />
+<br />
+<pre class="brush: clojure;">(defn- nextToken [state]
+  "Gets the next token"
+  (let [c (currentChar state)]
+    (cond
+
+     (nil? c) (clearToken state)
+
+     ;Ignore white space
+     (Character/isSpaceChar c) (recur (moveRight state 1))
+
+     ;Check if a token can be found in the token map by character
+     :else  (if-let [token ((:byChar tokenMap) c)]
+              (assoc (moveRight state 1) :token token :val c)
+
+              ;Nothing found so now search by regex
+              ; Get the function associated with the first regex that matches and call that
+              (if-let [r (first (filter #(re-matches (% 0) (str c)) (:byRegex tokenMap)))]
+                ((r 1) state)
+                (throw (Exception. (str "dont understand next token - " c state))))))))
+
+
+(defn- tokenise [state]
+  (loop [nextState (nextToken state), tokens []]
+    (if (= :none (:token nextState))
+      tokens
+      (recur
+       (nextToken nextState)
+       (conj tokens {:line (:line nextState),
+                     :col (:col nextState),
+                     :val (:val nextState),:type (:token nextState)})))))
+
+
+</pre>
+<br />
+<br />
+<br />
+nextToken gets 1 next token<br />
+tokenise repeatedly calls nextToken until the whole input stream has been tokenised<br />
+<br />
+<h3>
+Parsing</h3>
+<br />
+At this point the lexer has lexed the entire file and the parser can now parse the token stream.<br />
+<br />
+The function that runs the parser is parseAll<br />
+<br />
+<pre class="brush: clojure;">(defn- parseAll [allTokens]
+  (loop [expressions [], tokens allTokens]
+    (let [r (parseExpression (first tokens) (rest tokens))]
+      (if (= 0 (count (:expr r)))
+        expressions
+        (recur (conj expressions (:expr r)) (:tokens r))))))
+
+
+</pre>
+<br />
+<br />
+<br />
+But all the work is actually done in parseExpression. This is quite a long function that is just a large case statement. Not pretty but reasonably clear, hopefully.<br />
+<br />
+<pre class="brush: clojure;">(defn- parseExpression [token tokens]
+    (case (:type token)
+      (nil '()) [nil tokens]
+
+      :name {:expr {:type :name,
+                    :val (:val token),
+                    :line (:line token),
+                    :col (:col token),
+                    :expressions []}
+             :tokens tokens}
+
+      :string {:expr {:type :string,
+                      :val (:val token),
+                      :line (:line token),
+                      :col (:col token),
+                      :expressions []}
+               :tokens tokens}
+
+      :number {:expr {:type :number,
+                      :val (read-string (:val token)),
+                      :line (:line token),
+                      :col (:col token),
+                      :expressions []}
+               :tokens tokens}
+
+      (:lparen :lbracket) (let [grp (if (= :lparen (:type token))
+                                      {:start :lparen, :end :rparen, :type :list}
+                                      {:start :lbracket, :end :rbracket, :type :vector})]
+                            (loop [expressions []
+                                   [loopToken &amp; loopTokens] tokens]
+
+                              (let [type (:type loopToken)]
+                                (cond
+                                 (or (nil? token) (= '() token)) (throw (Exception. (str "EOF waiting for :rparen")))
+
+                                 (= (:end grp) type) {:expr {:type (:type grp)
+                                                             :val (:type grp)
+                                                             :line (:line token)
+                                                             :col (:col token)
+                                                             :expressions expressions}
+                                                      :tokens loopTokens}
+
+                                 :else (let [r (parseExpression loopToken loopTokens)]
+                                         (recur (conj expressions (:expr r)) (:tokens r)))))))))
+
+
+</pre>
+<br />
+<br />
+<br />
+This function is switching on the first token and returning the matched token and the remaining tokens. For example when it gets a :name it returns an :expr of type :name and returns the rest of the tokens.<br />
+<br />
+When parseExpression gets lparen or lbracket it will recursively loop through the tokens until the end of the list or vector, returning the tokens that have not been consumed.<br />
+<br />
+<h3>
+Interpreting the syntax tree</h3>
+Evaluating the syntax tree is similar to the code in the instaparse Version<br />
+<br />
+<pre class="brush: clojure;">(declare eval)
+
+(defmulti run (fn [x] (:type x)))
+(defmethod run :string [e] (:val e))
+(defmethod run :number [e] (:val e))
+(defmethod run :name [e] (:val e))
+(defmethod run :vector [e] (vec (map run (:expressions e))))
+(defmethod run :list [e] (do
+                           (let [f (run (first (:expressions e)))
+                                 args (map run (rest (:expressions e)))]
+                             (apply (get funcs f) args))))
+(defmethod run :default [e] (println "unknown: " e))
+
+
+(defn eval [[car &amp; cdr]]
+  (let [r (run car)]
+    (if (empty? cdr)
+      r
+      (recur cdr))))
+
+
+</pre>
+<br />
+<br />
+Again a multimethod is used to recursively evaluate the syntax tree and as with the instaparse code only functions defined in the 'funcs' map may be executed.<br />
+<br />
+<h3>
+Conclusion - hand written</h3>
+<br />
+The hand written lexer and parser are a lot longer than just using instaparse. However it is not that complicated to do manually. Personally I'll be using instaparse for 99% of my Clojure DSL needs but it is always good to know how to do it manually.<br />
+<br />
+<h3>
+The full source code</h3>
+<pre class="brush: clojure;">(ns cljsexp-simple.core
+
+
+(def funcs {"prn" println
+            "+" +})
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn currentLine [state]
+  "Gets the current line"
+  (get (:code state) (:line state)))
+
+
+(defn currentChar [state]
+  "Gets the current charater"
+  (get (currentLine state) (:col state)))
+
+
+(defn moveRight [state by]
+  "Move current position  1 char to the right, roll over to next line if required"
+  (let [updated (assoc state :col (+ (:col state) by) )]
+    (let [line (currentLine state)]
+      (if (&lt; (:col updated) (count line))
+
+        ;Still space on current line, return it
+        updated
+
+        ;Move to next line
+        (assoc
+            state
+          :col 0
+          :line (inc (:line state)))))))
+
+
+(defn parseRegex [state, typeName, token, re]
+  (let [s (subs (currentLine state) (:col state))
+        val (re-find re s)]
+    ;Does the remainder of the line match the regex - it should!
+    (if val
+
+      (assoc
+          (moveRight state (count val))
+        :token token
+        :val val)
+
+      (throw (Exception. (str "Failed to parse " typeName))))))
+
+
+(defn parseName [state]
+  (parseRegex state "name" :name #"[a-zA-Z\+\-\*\\\/\?_\$\&lt;\&gt;=]+"))
+
+(defn parseComment [state]
+  (parseRegex state "comment" :comment #";.*"))
+
+(defn parseString [state]
+  (parseRegex state "string" :string #"'[^']+'"))
+
+(defn parseNumber [state]
+  (parseRegex state "number" :number #"\d+"))
+
+(def tokenMap {:byChar { \( :lparen
+                         \) :rparen,
+                         \[ :lbracket,
+                         \] :rbracket}
+               :byRegex { #"'" parseString
+                          #"\d+" parseNumber
+                          #"[a-zA-Z\+\-\*\\\/\?_\$\&lt;\&gt;=]" parseName
+                          #";" parseComment }})
+
+(defn clearToken [state]
+  (assoc state
+    :token :none
+    :val :none))
+
+(defn- nextToken [state]
+  "Gets the next token"
+  (let [c (currentChar state)]
+    (cond
+
+     (nil? c) (clearToken state)
+
+     ;Ignore white space
+     (Character/isSpaceChar c) (recur (moveRight state 1))
+
+     ;Check if a token can be found in the token map by character
+     :else  (if-let [token ((:byChar tokenMap) c)]
+              (assoc (moveRight state 1) :token token :val c)
+
+              ;Nothing found so now search by regex
+              ; Get the function associated with the first regex that matches and call that
+              (if-let [r (first (filter #(re-matches (% 0) (str c)) (:byRegex tokenMap)))]
+                ((r 1) state)
+                (throw (Exception. (str "dont understand next token - " c state))))))))
+
+
+(defn- tokenise [state]
+  (loop [nextState (nextToken state), tokens []]
+    (if (= :none (:token nextState))
+      tokens
+      (recur
+       (nextToken nextState)
+       (conj tokens {:line (:line nextState),
+                     :col (:col nextState),
+                     :val (:val nextState),:type (:token nextState)})))))
+
+(defn- parseExpression [token tokens]
+    (case (:type token)
+      (nil '()) [nil tokens]
+
+      :name {:expr {:type :name,
+                    :val (:val token),
+                    :line (:line token),
+                    :col (:col token),
+                    :expressions []}
+             :tokens tokens}
+
+      :string {:expr {:type :string,
+                      :val (:val token),
+                      :line (:line token),
+                      :col (:col token),
+                      :expressions []}
+               :tokens tokens}
+
+      :number {:expr {:type :number,
+                      :val (read-string (:val token)),
+                      :line (:line token),
+                      :col (:col token),
+                      :expressions []}
+               :tokens tokens}
+
+      (:lparen :lbracket) (let [grp (if (= :lparen (:type token))
+                                      {:start :lparen, :end :rparen, :type :list}
+                                      {:start :lbracket, :end :rbracket, :type :vector})]
+                            (loop [expressions []
+                                   [loopToken &amp; loopTokens] tokens]
+
+                              (let [type (:type loopToken)]
+                                (cond
+                                 (or (nil? token) (= '() token)) (throw (Exception. (str "EOF waiting for :rparen")))
+
+                                 (= (:end grp) type) {:expr {:type (:type grp)
+                                                             :val (:type grp)
+                                                             :line (:line token)
+                                                             :col (:col token)
+                                                             :expressions expressions}
+                                                      :tokens loopTokens}
+
+                                 :else (let [r (parseExpression loopToken loopTokens)]
+                                         (recur (conj expressions (:expr r)) (:tokens r)))))))))
+
+
+(defn- parseAll [allTokens]
+  (loop [expressions [], tokens allTokens]
+    (let [r (parseExpression (first tokens) (rest tokens))]
+      (if (= 0 (count (:expr r)))
+        expressions
+        (recur (conj expressions (:expr r)) (:tokens r))))))
+
+
+(defn parse [code]
+  (let [tokens (tokenise {:code code, :line 0, :col 0, :val :none, :token :none})
+        result (parseAll tokens)]
+    result))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;
+
+(declare eval)
+
+(defmulti run (fn [x] (:type x)))
+(defmethod run :string [e] (:val e))
+(defmethod run :number [e] (:val e))
+(defmethod run :name [e] (:val e))
+(defmethod run :vector [e] (vec (map run (:expressions e))))
+(defmethod run :list [e] (do
+                           (let [f (run (first (:expressions e)))
+                                 args (map run (rest (:expressions e)))]
+                             (apply (get funcs f) args))))
+(defmethod run :default [e] (println "unknown: " e))
+
+
+(defn eval [[car &amp; cdr]]
+  (let [r (run car)]
+    (if (empty? cdr)
+      r
+      (recur cdr))))
+
+
+</pre>
+<br />
+<br />
+<div style='clear: both;'></div>
+</div>
+<div class='post-footer'>
+<div class='post-footer-line post-footer-line-1'>
+<span class='post-author vcard'>
+Posted by
+<span class='fn' itemprop='author' itemscope='itemscope' itemtype='http://schema.org/Person'>
+<meta content='https://plus.google.com/106843183635213366985' itemprop='url'/>
+<a class='g-profile' href='https://plus.google.com/106843183635213366985' rel='author' title='author profile'>
+<span itemprop='name'>Andre Van Der Merwe</span>
+</a>
+</span>
+</span>
+<span class='post-timestamp'>
+at
+<meta content='http://andrevdm.blogspot.com/2014/02/parsing-s-expressions-in-clojure.html' itemprop='url'/>
+<a class='timestamp-link' href='http://andrevdm.blogspot.com/2014/02/parsing-s-expressions-in-clojure.html' rel='bookmark' title='permanent link'><abbr class='published' itemprop='datePublished' title='2014-02-16T10:27:00+02:00'>10:27</abbr></a>
+</span>
+<span class='reaction-buttons'>
+</span>
+<span class='post-comment-link'>
+</span>
+<span class='post-backlinks post-comment-link'>
+</span>
+<span class='post-icons'>
+<span class='item-action'>
+<a href='http://www.blogger.com/email-post.g?blogID=2108758405551517278&postID=7789164313774988160' title='Email Post'>
+<img alt='' class='icon-action' height='13' src='//img1.blogblog.com/img/icon18_email.gif' width='18'/>
+</a>
+</span>
+<span class='item-control blog-admin pid-516328215'>
+<a href='http://www.blogger.com/post-edit.g?blogID=2108758405551517278&postID=7789164313774988160&from=pencil' title='Edit Post'>
+<img alt='' class='icon-action' height='18' src='//img2.blogblog.com/img/icon18_edit_allbkg.gif' width='18'/>
+</a>
+</span>
+</span>
+<div class='post-share-buttons goog-inline-block'>
+</div>
+</div>
+<div class='post-footer-line post-footer-line-2'>
+<span class='post-labels'>
+Labels:
+<a href='http://andrevdm.blogspot.com/search/label/clojure' rel='tag'>clojure</a>,
+<a href='http://andrevdm.blogspot.com/search/label/compiler' rel='tag'>compiler</a>
+</span>
+</div>
+<div class='post-footer-line post-footer-line-3'>
+<span class='post-location'>
+</span>
+</div>
+</div>
+</div>
+<script src='https://apis.google.com/js/plusone.js' type='text/javascript'></script>
+<div class='cmt_iframe_holder' data-href='http://andrevdm.blogspot.com/2014/02/parsing-s-expressions-in-clojure.html' data-viewtype='FILTERED_POSTMOD'></div>
+</div>
+
+        </div></div>
+      
+<!-- google_ad_section_end -->
+</div>
+<div class='blog-pager' id='blog-pager'>
+<span id='blog-pager-newer-link'>
+<a class='blog-pager-newer-link' href='http://andrevdm.blogspot.com/2014/07/unit-testing-embedded-c-projects-with.html' id='Blog1_blog-pager-newer-link' title='Newer Post'>Newer Post</a>
+</span>
+<span id='blog-pager-older-link'>
+<a class='blog-pager-older-link' href='http://andrevdm.blogspot.com/2014/02/fixing-assembly-version-conflicts-in.html' id='Blog1_blog-pager-older-link' title='Older Post'>Older Post</a>
+</span>
+<a class='home-link' href='http://andrevdm.blogspot.com/'>Home</a>
+</div>
+<div class='clear'></div>
+<div class='post-feeds'>
+<div class='feed-links'>
+Subscribe to:
+<a class='feed-link' href='http://andrevdm.blogspot.com/feeds/7789164313774988160/comments/default' target='_blank' type='application/atom+xml'>Post Comments (Atom)</a>
+</div>
+</div>
+<script type="text/javascript">window.___gcfg = {'lang': 'en_GB'};</script>
+</div></div>
+</div>
+<div id='sidebar-wrapper'>
+<div class='sidebar section' id='sidebar'><div class='widget BlogArchive' id='BlogArchive1'>
+<h2>Blog Archive</h2>
+<div class='widget-content'>
+<div id='ArchiveList'>
+<div id='BlogArchive1_ArchiveList'>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/search?updated-min=2015-01-01T00:00:00%2B02:00&amp;updated-max=2016-01-01T00:00:00%2B02:00&amp;max-results=4'>2015</a>
+<span class='post-count' dir='ltr'>(4)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2015_01_01_archive.html'>January</a>
+<span class='post-count' dir='ltr'>(4)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate expanded'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy toggle-open'>&#9660;&#160;</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/search?updated-min=2014-01-01T00:00:00%2B02:00&amp;updated-max=2015-01-01T00:00:00%2B02:00&amp;max-results=5'>2014</a>
+<span class='post-count' dir='ltr'>(5)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2014_11_01_archive.html'>November</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2014_10_01_archive.html'>October</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2014_07_01_archive.html'>July</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate expanded'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy toggle-open'>&#9660;&#160;</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2014_02_01_archive.html'>February</a>
+<span class='post-count' dir='ltr'>(2)</span>
+<ul class='posts'>
+<li><a href='http://andrevdm.blogspot.com/2014/02/parsing-s-expressions-in-clojure.html'>Parsing s-expressions in Clojure</a></li>
+<li><a href='http://andrevdm.blogspot.com/2014/02/fixing-assembly-version-conflicts-in.html'>Fixing assembly version conflicts in .net with Asm...</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/search?updated-min=2013-01-01T00:00:00%2B02:00&amp;updated-max=2014-01-01T00:00:00%2B02:00&amp;max-results=4'>2013</a>
+<span class='post-count' dir='ltr'>(4)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2013_08_01_archive.html'>August</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2013_05_01_archive.html'>May</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2013_03_01_archive.html'>March</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2013_02_01_archive.html'>February</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/search?updated-min=2012-01-01T00:00:00%2B02:00&amp;updated-max=2013-01-01T00:00:00%2B02:00&amp;max-results=1'>2012</a>
+<span class='post-count' dir='ltr'>(1)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2012_01_01_archive.html'>January</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/search?updated-min=2011-01-01T00:00:00%2B02:00&amp;updated-max=2012-01-01T00:00:00%2B02:00&amp;max-results=2'>2011</a>
+<span class='post-count' dir='ltr'>(2)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2011_11_01_archive.html'>November</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2011_09_01_archive.html'>September</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/search?updated-min=2010-01-01T00:00:00%2B02:00&amp;updated-max=2011-01-01T00:00:00%2B02:00&amp;max-results=1'>2010</a>
+<span class='post-count' dir='ltr'>(1)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2010_12_01_archive.html'>December</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/search?updated-min=2009-01-01T00:00:00%2B02:00&amp;updated-max=2010-01-01T00:00:00%2B02:00&amp;max-results=4'>2009</a>
+<span class='post-count' dir='ltr'>(4)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2009_11_01_archive.html'>November</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2009_08_01_archive.html'>August</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2009_04_01_archive.html'>April</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2009_03_01_archive.html'>March</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/search?updated-min=2008-01-01T00:00:00%2B02:00&amp;updated-max=2009-01-01T00:00:00%2B02:00&amp;max-results=1'>2008</a>
+<span class='post-count' dir='ltr'>(1)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+          &#9658;&#160;
+        
+</span>
+</a>
+<a class='post-count-link' href='http://andrevdm.blogspot.com/2008_06_01_archive.html'>June</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=2108758405551517278&widgetType=BlogArchive&widgetId=BlogArchive1&action=editWidget&sectionId=sidebar' onclick='return _WidgetManager._PopupConfig(document.getElementById("BlogArchive1"));' target='configBlogArchive1' title='Edit'>
+<img alt='' height='18' src='//img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div>
+</div><div class='widget Profile' id='Profile1'>
+<h2>About Me</h2>
+<div class='widget-content'>
+<a href='https://plus.google.com/106843183635213366985'><img alt='My Photo' class='profile-img' height='80' src='//lh3.googleusercontent.com/-S1rDDMEqNrw/AAAAAAAAAAI/AAAAAAAAF3k/2D7zBt1gq74/s80-c/photo.jpg' width='80'/></a>
+<dl class='profile-datablock'>
+<dt class='profile-data'>
+<a class='profile-name-link g-profile' href='https://plus.google.com/106843183635213366985' rel='author' style='background-image: url(//www.google.com/images/icons/ui/gprofile_button-16.png);'>
+Andre Van Der Merwe
+</a>
+<br/>
+<div class='g-follow' data-annotation='bubble' data-height='20' data-href='https://plus.google.com/106843183635213366985'></div>
+</dt>
+</dl>
+<a class='profile-link' href='https://plus.google.com/106843183635213366985' rel='author'>View my complete profile</a>
+<div class='clear'></div>
+<span class='widget-item-control'>
+<span class='item-control blog-admin'>
+<a class='quickedit' href='//www.blogger.com/rearrange?blogID=2108758405551517278&widgetType=Profile&widgetId=Profile1&action=editWidget&sectionId=sidebar' onclick='return _WidgetManager._PopupConfig(document.getElementById("Profile1"));' target='configProfile1' title='Edit'>
+<img alt='' height='18' src='//img1.blogblog.com/img/icon18_wrench_allbkg.png' width='18'/>
+</a>
+</span>
+</span>
+<div class='clear'></div>
+</div>
+</div></div>
+</div>
+<!-- spacer for skins that want sidebar and main to be the same height-->
+<div class='clear'>&#160;</div>
+</div>
+<!-- end content-wrapper -->
+<div id='footer-wrapper'>
+<div class='footer section' id='footer'></div>
+</div>
+</div></div>
+<!-- end outer-wrapper -->
+<script type='text/javascript'>
+</script>
+<script type="text/javascript">
+if (window.jstiming) window.jstiming.load.tick('widgetJsBefore');
+</script><script type="text/javascript" src="https://www.blogger.com/static/v1/widgets/2599453900-widgets.js"></script>
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+<script type='text/javascript'>
+if (typeof(BLOG_attachCsiOnload) != 'undefined' && BLOG_attachCsiOnload != null) { window['blogger_templates_experiment_id'] = "templatesV1";window['blogger_blog_id'] = '2108758405551517278';BLOG_attachCsiOnload('item_'); }_WidgetManager._Init('//www.blogger.com/rearrange?blogID\x3d2108758405551517278','//andrevdm.blogspot.com/2014/02/parsing-s-expressions-in-clojure.html','2108758405551517278');
+_WidgetManager._SetDataContext([{'name': 'blog', 'data': {'blogId': '2108758405551517278', 'bloggerUrl': 'http://www.blogger.com', 'title': 'Andre Van Der Merwe', 'pageType': 'item', 'postId': '7789164313774988160', 'url': 'http://andrevdm.blogspot.com/2014/02/parsing-s-expressions-in-clojure.html', 'canonicalUrl': 'http://andrevdm.blogspot.com/2014/02/parsing-s-expressions-in-clojure.html', 'canonicalHomepageUrl': 'http://andrevdm.blogspot.com/', 'homepageUrl': 'http://andrevdm.blogspot.com/', 'blogspotFaviconUrl': 'http://andrevdm.blogspot.com/favicon.ico', 'enabledCommentProfileImages': true, 'adultContent': false, 'disableAdSenseWidget': false, 'analyticsAccountNumber': '', 'searchLabel': '', 'searchQuery': '', 'pageName': 'Parsing s-expressions in Clojure', 'pageTitle': 'Andre Van Der Merwe: Parsing s-expressions in Clojure', 'encoding': 'UTF-8', 'locale': 'en_GB', 'localeUnderscoreDelimited': 'en_gb', 'isPrivate': false, 'isMobile': false, 'isMobileRequest': false, 'mobileClass': '', 'isPrivateBlog': false, 'languageDirection': 'ltr', 'feedLinks': '\74link rel\75\42alternate\42 type\75\42application/atom+xml\42 title\75\42Andre Van Der Merwe - Atom\42 href\75\42http://andrevdm.blogspot.com/feeds/posts/default\42 /\76\n\74link rel\75\42alternate\42 type\75\42application/rss+xml\42 title\75\42Andre Van Der Merwe - RSS\42 href\75\42http://andrevdm.blogspot.com/feeds/posts/default?alt\75rss\42 /\76\n\74link rel\75\42service.post\42 type\75\42application/atom+xml\42 title\75\42Andre Van Der Merwe - Atom\42 href\75\42http://www.blogger.com/feeds/2108758405551517278/posts/default\42 /\76\n\n\74link rel\75\42alternate\42 type\75\42application/atom+xml\42 title\75\42Andre Van Der Merwe - Atom\42 href\75\42http://andrevdm.blogspot.com/feeds/7789164313774988160/comments/default\42 /\76\n', 'meTag': '', 'openIdOpTag': '', 'googleProfileUrl': 'https://plus.google.com/106843183635213366985', 'postImageThumbnailUrl': 'http://3.bp.blogspot.com/-5PYDFNNJV9M/UwBTRUKP2SI/AAAAAAAAF2w/cavQSwWmco0/s72-c/sexprParsing_parseTree.png', 'postImageUrl': 'http://3.bp.blogspot.com/-5PYDFNNJV9M/UwBTRUKP2SI/AAAAAAAAF2w/cavQSwWmco0/s1600/sexprParsing_parseTree.png', 'latencyHeadScript': '\74script type\75\42text/javascript\42\76(function() { var b\75window,f\75\42chrome\42,g\75\42tick\42,k\75\42jstiming\42;(function(){function d(a){this.t\75{};this.tick\75function(a,d,c){var e\75void 0!\75c?c:(new Date).getTime();this.t[a]\75[e,d];if(void 0\75\75c)try{b.console.timeStamp(\42CSI/\42+a)}catch(h){}};this[g](\42start\42,null,a)}var a;b.performance\46\46(a\75b.performance.timing);var n\75a?new d(a.responseStart):new d;b.jstiming\75{Timer:d,load:n};if(a){var c\75a.navigationStart,h\75a.responseStart;0\74c\46\46h\76\75c\46\46(b[k].srt\75h-c)}if(a){var e\75b[k].load;0\74c\46\46h\76\75c\46\46(e[g](\42_wtsrt\42,void 0,c),e[g](\42wtsrt_\42,\42_wtsrt\42,h),e[g](\42tbsd_\42,\42wtsrt_\42))}try{a\75null,\nb[f]\46\46b[f].csi\46\46(a\75Math.floor(b[f].csi().pageT),e\46\0460\74c\46\46(e[g](\42_tbnd\42,void 0,b[f].csi().startE),e[g](\42tbnd_\42,\42_tbnd\42,c))),null\75\75a\46\46b.gtbExternal\46\46(a\75b.gtbExternal.pageT()),null\75\75a\46\46b.external\46\46(a\75b.external.pageT,e\46\0460\74c\46\46(e[g](\42_tbnd\42,void 0,b.external.startE),e[g](\42tbnd_\42,\42_tbnd\42,c))),a\46\46(b[k].pt\75a)}catch(p){}})();b.tickAboveFold\75function(d){var a\0750;if(d.offsetParent){do a+\75d.offsetTop;while(d\75d.offsetParent)}d\75a;750\76\75d\46\46b[k].load[g](\42aft\42)};var l\75!1;function m(){l||(l\75!0,b[k].load[g](\42firstScrollTime\42))}b.addEventListener?b.addEventListener(\42scroll\42,m,!1):b.attachEvent(\42onscroll\42,m);\n })();\74/script\076', 'mobileHeadScript': '', 'view': '', 'dynamicViewsCommentsSrc': '//www.blogblog.com/dynamicviews/4224c15c4e7c9321/js/comments.js', 'dynamicViewsScriptSrc': '//www.blogblog.com/dynamicviews/cda3ddef07a85452', 'plusOneApiSrc': 'https://apis.google.com/js/plusone.js', 'sf': 'n', 'tf': ''}}, {'name': 'skin', 'data': {'vars': {'textColor': '#333333', 'linkColor': '#336699', 'borderColor': '#ffffff', 'headerTextColor': '#003366', 'mainBgColor': '#ffffff', 'sidebarTitleTextColor': '#333333', 'bgColor': '#ffffff', 'headerCornersColor': '#c4e1ff', 'headerFont': 'normal normal 210% Verdana, Arial, Sans-serif;', 'sidebarTitleBgColor': '#ffffff', 'bodyFont': 'normal normal 100% Verdana, Arial, Sans-serif;', 'dateHeaderColor': '#999999', 'endSide': 'right', 'startSide': 'left', 'headerBgColor': '#c4e1ff'}, 'override': ''}}, {'name': 'view', 'data': {'classic': {'name': 'classic', 'url': '?view\75classic'}, 'flipcard': {'name': 'flipcard', 'url': '?view\75flipcard'}, 'magazine': {'name': 'magazine', 'url': '?view\75magazine'}, 'mosaic': {'name': 'mosaic', 'url': '?view\75mosaic'}, 'sidebar': {'name': 'sidebar', 'url': '?view\75sidebar'}, 'snapshot': {'name': 'snapshot', 'url': '?view\75snapshot'}, 'timeslide': {'name': 'timeslide', 'url': '?view\75timeslide'}}}]);
+_WidgetManager._RegisterWidget('_NavbarView', new _WidgetInfo('Navbar1', 'navbar', null, document.getElementById('Navbar1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HeaderView', new _WidgetInfo('Header1', 'header', null, document.getElementById('Header1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogView', new _WidgetInfo('Blog1', 'main', null, document.getElementById('Blog1'), {'cmtInteractionsEnabled': false, 'legacyCommentModerationUrl': 'https://www.blogger.com/moderate-legacy-comment.g?blogID\0752108758405551517278', 'iframeCommentsId': 'gpluscomments', 'viewType': 'FILTERED_POSTMOD', 'lightboxEnabled': true, 'lightboxModuleUrl': 'https://www.blogger.com/static/v1/jsbin/650684531-lbx__en_gb.js', 'lightboxCssUrl': 'https://www.blogger.com/static/v1/v-css/2392111094-lightbox_bundle.css'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogArchiveView', new _WidgetInfo('BlogArchive1', 'sidebar', null, document.getElementById('BlogArchive1'), {'languageDirection': 'ltr'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_ProfileView', new _WidgetInfo('Profile1', 'sidebar', null, document.getElementById('Profile1'), {}, 'displayModeFull'));
+</script>
+</body>
+</html>

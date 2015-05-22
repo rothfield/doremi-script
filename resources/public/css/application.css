@@ -1,11 +1,17 @@
 select.selectNotation.form-control ,select.renderAs.form-control {
   width: 100px;
 }
+span.offline {
+  background-color: orange;
+}
 .form-inline audio {
   vertical-align: middle
 }
 div.has-error #parse-results {
   font-family: monospace;
+}
+select#downloads {
+  width:100px;
 }
 div.downloads {
   display:inline-block;
