@@ -3,9 +3,13 @@
   (:require-macros 
     ;;               [cljs.core :refer [assert]]
     [cljs.core.async.macros :refer [go]]
-        )
+    [reagent.ratom :refer [reaction]]
+    )
   (:require 
     [quile.component :as component]
+    [doremi-script.handlers]
+    [doremi-script.sargam-key-map :refer
+     [default-key-map mode-and-notes-used->key-map ]]
     [doremi-script.core :refer [
                                 new-parser
                                 doremi-text->collapsed-parse-tree]]
@@ -23,175 +27,33 @@
     [clojure.string :as string :refer [lower-case upper-case join]]
     [dommy.core :as dommy :refer-macros [sel sel1]]
     [cljs.core.async :refer [<! chan close! timeout put!]]
-    [reagent.core]
+    [reagent.core :as reagent]
+    [re-frame.core :refer [register-handler
+                           path
+                           register-sub
+                           dispatch
+                           dispatch-sync
+                           subscribe]]
     [cljs.reader :refer [read-string]]
     [instaparse.core :as insta] 
     ))
+
+(def debug false)
+
 (enable-console-print!)
+
 (def seconds 1000)
-
-(defn by-id [id]
-  (.getElementById js/document (name id)))
-
-(defn listen [el event-type]
-  (let [out (chan)]
-    (events/listen el event-type
-                   (fn [e] (put! out e)))
-    out))
-(defonce app-state
-  (reagent.core/atom 
-    {
-     :online true 
-     :the-parser nil
-     :key-map {}
-     :rendering false
-     :ajax-is-running false 
-     :composition-kind :sargam-composition
-     :mp3-url nil
-     ;;"http://ragapedia.com/compositions/yesterday.mp3"
-     :render-as :sargam-composition
-     :staff-notation-path nil 
-     :composition nil 
-     }))
-
-(defn check-network[]
-  (println "checking network")
-(let [uri (new goog/Uri "//www.google.com/images/cleardot.gif")
-      _  (.makeUnique uri)
-      img (new js/Image)
-      ch (listen img "load")
-      ch2 (listen img "error")
-      _ (set! (.-src img) (str uri))
-      ]
-  (go  (let[result (<! ch)] 
-      (when (not (:online @app-state))
-          (swap! app-state assoc :online true))
-          (println "image loaded correctly")
-      ))
-  (go  (let[result (<! ch2)] 
-         (println "error case")
-      (when (:online @app-state)
-    (println "image didn't load")
-               (swap! app-state assoc :online false))))
-  ))
-
-
-      (go (while true
-            (check-network)
-            (<! (timeout (* 30 seconds))) 
-                ))
-
-
 
 (def production?
   ;; set the global in index.html
   (and (not= js/undefined js/DOREM_SCRIPT_APP_ENV)
        (= js/DOREM_SCRIPT_APP_ENV "production")
        ))
+
 (log "production? = " production?)
-;;(= "production" (get (System/getenv) "APP_ENV")))
 
 (def development?
   (not production?))
-
-(def mode->notes-used
-  {
-   :ionian "SRGmPDN"
-   :dorian "SRgmPDn"
-   :phyrgian "SrgmPdn"
-   :lydian "SRGMPDN"
-   :mixolydian "SRGmPDn"
-   :aeolian "SRgmPdn"
-   :locrian "SrgmPdn"
-
-   :major "SRGmPDN"
-   :minor "SRgmPdn"
-   (keyword "harmonic minor") "SRgmPdN"
-
-   :bilaval "SRGmPDN"
-   :kafi "SRgmPDn"
-   :bhairavi "SrgmPdn"
-   :kalyan "SRGMPDN"
-   :khammaj "SRGmPDn"
-   :asavri "SRgmPdn"
-
-   :marwa "SrGMPDN"
-   :purvi "SrGMPdN"
-   :lalit "SrGmMPdN"
-   :hindol "SGMDN"
-   :kirwani "SRgmPdN"
-   (keyword "ahir bhairav") "SrGmPDn"
-   }) 
-
-
-(def lower-sargam? #{"s" "r" "g" "m" "p" "d" "n"})
-
-(def upper-sargam? #{"S" "R" "G" "M" "P" "D" "N"})
-
-(defn remove-if-both-cases[my-set ch]
-  ;;(log "remove-if-both-cases, " my-set ch)
-  (let [lower-ch (lower-case ch)
-        upper-ch (upper-case ch)]
-    (if (and (get my-set lower-ch)
-             (get my-set upper-ch)
-             )
-      (clojure.set/difference my-set #{ lower-ch upper-ch })
-      my-set
-      )))
-
-;;(log "remove-if-both-cases test:" (remove-if-both-cases #{"N" "n" "S"} "n"))
-
-(defn notes-used-set-for[{mode :mode notes-used :notes-used}]
-  (log "entering notes-used-set-for, mode,notes-used" mode notes-used)
-  (let [
-        mode-notes-used (when mode
-                          (get mode->notes-used  (keyword (lower-case mode)) ""))
-        _ (log "mode-notes-used=*************" mode-notes-used)
-        notes-used2 (or  notes-used
-                        mode-notes-used
-                        "SP")
-        _ (log "notes-used2=*************" notes-used2)
-
-        ]
-    (assert (string? notes-used2))
-    (set (reduce (fn[accum item] (remove-if-both-cases accum item))
-                 notes-used2
-                 "rgmdn"))
-    ))
-
-(defn sargam-set->key-map[sargam-set]
-  ;; Returns a keymap: ie {"s" "S" }. Saves typing
-  ;; example (sargam-set->key-map #{R}) -> {"r" "R" "R" "r"}
-  (assert (set? sargam-set))
-  (log "entering sargam-set->key-map sargam-set is" sargam-set)
-  (reduce (fn[accum item]
-            (if (upper-sargam? item)
-              (assoc accum 
-                     item (lower-case item) 
-                     (lower-case item) item)
-              ;; else
-              accum
-              )) 
-          {"s" "S" "p" "P"}  sargam-set)
-  )
-
-(comment
-  (sargam-set->key-map #{"S" "R" "G" "m" "P" "D" "N"})
-  (comment "test:  @key-map is" @key-map)
-  )
-
-(defonce printing (reagent.core/atom false))
-
-
-
-(declare draw-item) ;; need forward reference since it is recursive
-
-(enable-console-print!)
-
-(defn css-class-name-for[x]
-  (string/replace (name x) "-" "_")
-  )
-
 
 (def GENERATE-STAFF-NOTATION-URL
   (if production?
@@ -204,9 +66,324 @@
     "http://ragapedia.com/doremi-server/parse"
     "http://localhost:4000/doremi-server/parse")
   )
+
 ;; takes 30 seconds to load unserialized grammar. 1 second for serialized
 (def unserialized-grammar-path "ebnf/doremiscript.ebnf")
 (def serialized-grammar-path "ebnf/grammar.txt") 
+
+(defn stop-default-action[event]
+  (.preventDefault event)) 
+
+
+(defn by-id [id]
+  (.getElementById js/document (name id)))
+
+(defn listen [el event-type]
+  (let [out (chan)]
+    (events/listen el event-type
+                   (fn [e] (put! out e)))
+    out))
+
+(defn key-map-for-composition[composition]
+  (let [
+        attributes (if composition (get-attributes composition) {})
+        notes-used (:notesused attributes)
+        mode (:mode attributes)
+        ]
+    (mode-and-notes-used->key-map mode notes-used)
+    ))
+
+(def initial-state
+  {
+   :generate-staff-notation-url GENERATE-STAFF-NOTATION-URL
+   :parse-url PARSE-URL
+   :parser nil
+   :links []
+   :doremi-text "|S"
+   :online true 
+   :the-parser nil
+   :key-map  default-key-map
+   :rendering false
+   :ajax-is-running false 
+   :composition-kind :sargam-composition
+   :mp3-url nil
+   ;;"http://ragapedia.com/compositions/yesterday.mp3"
+   :render-as :abc-composition
+   :staff-notation-path nil 
+   :composition nil 
+   })
+
+
+;; subscriptions
+(register-sub :links
+              (fn [db _]  
+                (reaction (:links @db))))
+
+(register-sub :mp3-url
+              (fn [db _]  
+                (reaction (get-in @db [:links :mp3-url]))))
+
+(register-sub :staff-notation-url
+              (fn [db _]  
+                (reaction (get-in @db [:links :staff-notation-url]))))
+
+(register-sub :ajax-is-running
+              (fn [db _]  
+                (reaction (:ajax-is-running @db))))
+(register-sub :online
+              (fn [db _]  
+                (reaction (:online @db))))
+
+(register-sub :doremi-text
+              (fn [db _]  
+                (reaction (:doremi-text @db))))
+
+(register-sub :composition
+              (fn [db _]
+                (reaction (:composition @db))))
+
+(register-sub :composition-kind
+              (fn [db _]
+                (reaction (:composition-kind @db))))
+
+(register-sub :current-entry-area
+              (fn [db _]
+                (reaction (:current-entry-area @db))))
+(register-sub :render-as
+              (fn [db _]
+                (reaction (:render-as @db))))
+(register-sub :error
+              (fn [db _]
+                (reaction (:error @db))))
+(register-sub :parser
+              (fn [db _]
+                (reaction (:parser @db))))
+
+(register-sub :key-map
+              (fn [db _]
+                (reaction (:key-map @db))))
+
+(declare key-map-for-composition)
+
+(defn update-db-with-parse-results[ db {:keys [:composition :error] :as results}]
+  (merge db results
+         (if error
+           {}
+           {:key-map (key-map-for-composition composition)})))
+
+(comment register-handler :set-parser
+   (fn [db [_ parser]]
+     (assoc db :parser parser)
+     ))
+
+(comment register-handler :redraw-letter-notation
+   (fn [db [_]]
+  (let [results
+        (-> (:doremi-text db)  
+      (doremi-text->collapsed-parse-tree 
+        (:parser db) 
+        (:composition-kind db)))]
+    (update-db-with-parse-results db results)
+     )))
+
+(comment register-handler :open-url
+   (fn [db [_ url]]
+     (println ":open-url" url)
+  (goog.net.XhrIo/send url
+                       (fn[event]
+                         (let [raw-response (.-target event)
+                               response-text (.getResponseText raw-response)
+                               ]
+              (dispatch [:open-url-callback response-text])))
+                       "GET")
+     (assoc db :ajax-is-running true)))
+
+
+(comment register-handler :open-url-callback
+   (fn [db [_ response-text]]
+     (if (and response-text
+              (:current-entry-area db))
+       (do
+     (println :open-url-callback response-text)
+     (println (:current-entry-area db))
+     (set! (.-value 
+     (.getElementById
+     js/document
+     (:current-entry-area db)
+     ))
+           response-text)
+     (assoc db :ajax-is-running false))
+       ;; else
+      db 
+       )))
+
+(comment register-handler :set-current-entry-area
+   (fn [db [_ dom-id]]
+     (assoc db :current-entry-area dom-id)))
+
+(comment register-handler :open-link
+   (fn [db [_ link]]
+     (println ":open-link" link)
+     (.open js/window link)
+     db))
+
+(comment register-handler :xhr-callback
+   (fn [db [_ event]]
+     (.log js/console "event is" event)
+       (println ":xhr-callback, event is" event)
+  (let [
+        tgt (.-target event)
+        response-text (.getResponseText tgt) ;;(.-target event))
+        _ (when debug (prn "response-text is" response-text))
+        results
+        (-> response-text
+            goog.json/parse
+            (js->clj :keywordize-keys true)
+            )
+        my-map (if (:error results)
+                 results
+                 (update-in results [:composition]
+                            keywordize-vector))
+        _ (when debug (prn "my-map" my-map))
+        {:keys [:links :composition :error]} my-map ;; destructure
+        ]
+    (when debug
+    (log "in callback my-map" my-map)
+    (log "in callback, links=" links))
+    (assoc db
+           :ajax-is-running
+           false
+           :composition
+           composition
+           :error
+           error
+           :links
+           links
+           :key-map
+           (if (not (:error my-map))
+             (key-map-for-composition composition)
+             (:key-map db))
+           )
+    )
+  ))
+
+ (comment register-handler :generate-staff-notation-handler
+     (fn [db [ _ response-text]]
+       (when debug (println "in :generate-staff-notation-handler")
+       (println "response-text=" response-text))
+  (let [
+        results
+        (-> response-text
+            goog.json/parse
+            (js->clj :keywordize-keys true)
+            )
+        my-map (if (:error results)
+                 results
+                 (update-in results [:composition]
+                            keywordize-vector))
+        _ (when debug (println"my-map" my-map))
+        _ (when debug (println "results=" results))
+        {:keys [:links :composition :error]} my-map 
+       ]
+    (assoc db
+           :ajax-is-running
+           false
+           :composition
+           composition
+           :error
+           error
+           :links
+           links
+           :key-map
+           (if (not (:error my-map))
+             (key-map-for-composition composition)
+             (:key-map db))
+           )
+   )))
+;; event handlers
+(comment register-handler :generate-staff-notation
+   (fn comment register-handler-aux[db _]
+(println "in :generate-staff-notation")
+  (if (not (:ajax-is-running db))
+    (let [ query-data (new goog.Uri/QueryData) ]
+      ;; TODO: try sending json
+      (.set query-data "src"  (:doremi-text db))
+      (.set query-data "kind"  (name (:composition-kind db)))
+      (.set query-data "mp3"  true)
+      (goog.net.XhrIo/send GENERATE-STAFF-NOTATION-URL
+            (fn[event]
+              (println "in callback")
+              (dispatch [:generate-staff-notation-handler
+                       (.getResponseText (.-target event))]
+                        ))
+                           "POST"
+                           query-data)
+      (println "setting ajax-is-running true")
+       (assoc db :ajax-is-running true) 
+      )
+    db)))
+
+
+
+(comment register-handler :initialize 
+                  (fn 
+                    [db _]
+                    (merge db initial-state))) 
+(comment register-handler :set-online-state
+                  (fn [db [_ value]]
+                    (assoc db :online value)))
+(comment register-handler :set-render-as
+                  (fn [db [_ value]]
+                    (println "in set-render-as, value=" value)
+                    (assoc db :render-as value)))
+
+(comment register-handler :set-doremi-text
+                  (fn [db [_ value]]
+                    (assoc db :doremi-text value)))
+
+(comment register-handler :set-composition-kind
+                  (fn [db [_ value]]
+                    (assoc db :composition-kind value)))
+
+
+
+
+
+
+(defn check-network[]
+  (println "checking network")
+  (let [uri (new goog/Uri "//www.google.com/images/cleardot.gif")
+        _  (.makeUnique uri)
+        img (new js/Image)
+        ch (listen img "load")
+        ch2 (listen img "error")
+        _ (set! (.-src img) (str uri))
+        ]
+    (go  (let[result (<! ch)] 
+             (dispatch [:set-online-state true]) 
+             ))
+    (go  (let[result (<! ch2)] 
+             (dispatch [:set-online-state false]) 
+    ))))
+
+
+(go (while true
+      (check-network)
+      (<! (timeout (* 300 seconds))) 
+      ))
+
+
+
+(defonce printing (reagent.core/atom false))
+
+(declare draw-item) ;; need forward reference since it is recursive
+
+
+(defn css-class-name-for[x]
+  (string/replace (name x) "-" "_")
+  )
+
+
 
 
 (defn load-grammar-xhr[]
@@ -234,163 +411,9 @@
            )
     out))
 
-(defn load-doremi-url-xhr[url]
-  (swap! app-state assoc :ajax-is-running true)
-  (log "load-doremi-url-xhr")
-  (log "load-doremi-url-xhr: url is" url)
-  (goog.net.XhrIo/send url
-                       (fn [event]
-                         (swap! app-state assoc :ajax-is-running false)
-                         (log "in callback")
-                         (let [raw-response (.-target event)
-                               response-text (.getResponseText raw-response)
-                               ]
-                           (set! (.-value (sel1 :#the_area)) response-text)
-                           ))
-                       "GET"))
-
-
-(defn key-map-for-composition[composition]
-  (let [
-        attributes (if composition (get-attributes composition) {})
-        notes-used (:notesused attributes)
-        mode (:mode attributes)
-        ]
-    (->
-      {:mode mode :notes-used notes-used}
-      notes-used-set-for
-      sargam-set->key-map)
-    ))
-
-
-(defn generate-staff-notation-xhr-callback[event]
-  ;; response looks somthing like
-  ;; {
-  ;;
-  ;; :links [xxx]
-  ;; :composition [:composition...
-  ;; :error "fadfadf"
-  ;;   }
-  (println "entering generate-staff-notation-xhr-callback")
-  (swap! app-state assoc :ajax-is-running false)
-  (log "in generate-staff-notation-xhr callback")
-  (let [raw-response (.-target event)
-        response-text (.getResponseText raw-response)
-        ;;    {:keys [:composition :error] :as results}
-        results
-        (-> response-text
-            goog.json/parse
-            (js->clj :keywordize-keys true)
-            )
-        my-map (if (:error results)
-                 results
-                 (update-in results [:composition]
-                            keywordize-vector))
-        _ (prn "my-map" my-map)
-        {:keys [:links :composition :error]} my-map 
-        ]
-    (log "in callback my-map" my-map)
-    (log "in callback, links=" links)
-    (swap!  app-state
-           assoc 
-           :composition
-           composition
-           :error
-           error
-           :links
-           links
-           :key-map
-           (if (not (:error my-map))
-             (key-map-for-composition composition)
-             (:key-map @app-state))
-           )
-    (log "after xhr callback-app-state is" @app-state)
-    ))
-
-
-(defn update-app-state![ {:keys [:composition :error] :as results}]
-  (swap! app-state merge results
-         (if error
-           {}
-           {:key-map (key-map-for-composition composition)})))
-
-(defn parse-local[{src :src kind :kind}]
-    ;; reagent doesn't immediately redraw it, so do it manually
-    ;;   (set! (.-innerHTML composition-view) "Redrawing: Please wait")
-    (-> src  
-        (doremi-text->collapsed-parse-tree (get @app-state :the-parser) kind)
-        update-app-state!))
 
 
 
-(defn parse-xhr-callback[event]
-  (let [raw-response (.-target event)
-        response-text (.getResponseText raw-response)
-        results (-> response-text
-                    goog.json/parse
-                    (js->clj :keywordize-keys true))
-        _ (assert (contains? results :composition))
-        _ (assert (contains? results :error))
-        results2 (if (not (:error results))
-                   (assoc results :composition
-                          (keywordize-vector (:composition results)))
-                   results)
-        ]
-    (update-app-state! results2)))
-
-
-(defn parse-xhr-old[url {src :src kind :kind}]
-  (log "entering parse-xhr:"  "url=" url " src= " src "\nkind=" kind)
-  (let [ query-data (new goog.Uri/QueryData) ]
-    (.set query-data "src"  src)
-    (.set query-data "kind" (name  kind))
-    (goog.net.XhrIo/send url
-                         parse-xhr-callback
-                         "POST"
-                         query-data)))
-
-;; TODO:return channel
-(defn parse-xhr[url {src :src kind :kind}]
- ;; (println "entering parse-xhr:"  "url=" url " src= " src "\nkind=" kind)
-  (let [ out (chan)
-        query-data (new goog.Uri/QueryData) ]
-    (.set query-data "src"  src)
-    (.set query-data "kind" (name  kind))
-    (goog.net.XhrIo/send
-      url
-      (fn [event] (parse-xhr-callback event) 
-        (put! out event))
-      "POST"
-      query-data)
-    out 
-    ))
-
-
-(defn parse[]
-  (let [args {:src (.-value (sel1 :#the_area))
-     :kind (get-in @app-state [:composition-kind])
-     }]
- (if (:online @app-state)
-  (parse-xhr  PARSE-URL args)
-   (parse-local args))))   
-
-
-(defn generate-staff-notation-xhr [url content]
-  (when (not (:ajax-is-running @app-state))
-    (log "entering GENERATE-STAFF-NOTATION-URL" url content)
-    (swap! app-state 
-           assoc :links nil
-           :ajax-is-running true)
-
-    (let [ query-data (new goog.Uri/QueryData) ]
-      ;; TODO: try sending json
-      (.set query-data "src"  (:src content))
-      (.set query-data "kind"  (name (:kind content)))
-      (.set query-data "mp3"  true)
-      (goog.net.XhrIo/send url
-                           generate-staff-notation-xhr-callback
-                           "POST"
-                           query-data))))
 
 (def class-for-octave
   {nil "octave0"
@@ -622,14 +645,12 @@
 
 
 (defn display-parse-to-user-box []
-  (let [error (get-in @app-state [:error])
-        _ (log "in display-parse-to-user-box, error=" error)
-        parse-results (:composition @app-state)
-        _ (log "in display-parse-to-user-box, parsed" parse-results)
+  (let [error (subscribe [:error])
+        composition (subscribe [:composition])
         ]
     [:div.form-group.hidden-print
      {
-      :class (if error "has-error" "") 
+      :class (if @error "has-error" "") 
       }
      [:label.control-label {:for "parse-results"
                             } "Parse Results:"]
@@ -638,9 +659,9 @@
        :spellCheck false
        :readOnly true
        :value 
-       (if error
-         (print-str error)
-         (print-str parse-results))
+       (if @error
+         (print-str @error)
+         (print-str @composition))
        }
       ]]))
 
@@ -690,71 +711,42 @@
     (my-contains? line "|")))
 
 
-(defn on-key-press[evt] 
-  (if (not= :sargam-composition (get @app-state :composition-kind))
-    true 
-    (do
-      (log "entering on-key-press")
-      (let [
-            my-key-map (:key-map @app-state)
-            target (.-target evt)
-            key-code (.-keyCode evt)
-            ctrl-key? (or (.-ctrlKey evt)
-                          (.-altKey evt)
-                          (.-metaKey evt))
-            from-char-code-fn (.-fromCharCode js/String)
-            ch (from-char-code-fn key-code)
-            ; _ (log "evt is" evt) 
-            ; _ (comment "ch is ****" ch)
-            ; _ (comment "my-key-map is" my-key-map)
-            new-char (if-not ctrl-key?  (get my-key-map ch ))
-            ; _ (comment "new-char ****" new-char " *********")
-            caret-pos (.-selectionStart target)
-            ; _ (comment "caret-pos" caret-pos)
-            ;; var caretPos = document.getElementById("txt").selectionStart;
-            text-area-text (.-value target)
-            ; _ (comment "text-area-text=" text-area-text) 
-            selection (get-selection target)
-            ; _ (comment "selection is" selection)
-            my-within-sargam-line (within-sargam-line? text-area-text (:start selection))
-            ; _ (comment "my-within-sargam-line=" my-within-sargam-line)
-            ]
-        ;;; nativeEvent looks like  {which: 189, keyCode: 189, charCode: 0, repeat: false, metaKey: false…}
-        (comment "app-state is" @app-state)
-        ;;  jQuery("#txt").val(textAreaTxt.substring(0, caretPos) + txtToAdd + textAreaTxt.substring(caretPos) );
-        ;;  TODO: review returning true/false. Shouldn't it be prevent default?
-        (if (and my-within-sargam-line
-                 new-char)
-          (do
-            ;; (.preventDefault evt)
-            (set! (.-value target)
-                  (str (.substring text-area-text 0 caret-pos) 
-                       new-char 
-                       (.substring text-area-text caret-pos)))
-            (set! (.-selectionStart target)
-                  (inc (:start selection)))
-            (set! (.-selectionEnd target)
-                  (inc (:end selection)))
-            false)
-          ;; else
-          true )
-        ))))
+(defn on-key-press-new[event my-key-map composition-kind]
+  ;; event is a dom event
+  (if (not= :sargam-composition composition-kind)
+    true
+    (let [
+          target (.-target event)
+          key-code (.-keyCode event)
+          ctrl-key? (or (.-ctrlKey event)
+                        (.-altKey event)
+                        (.-metaKey event))
+          from-char-code-fn (.-fromCharCode js/String)
+          ch (from-char-code-fn key-code)
+          new-char (if-not ctrl-key?  (get my-key-map ch ))
+          caret-pos (.-selectionStart target)
+          text-area-text (.-value target)
+          selection (get-selection target)
+          my-within-sargam-line (within-sargam-line? text-area-text (:start selection))
+          ]
+      ;;; nativeEvent looks like  {which: 189, keyCode: 189, charCode: 0, repeat: false, metaKey: false…}
+      (if (and my-within-sargam-line
+               new-char)
+        (do
+          (set! (.-value target)
+                (str (.substring text-area-text 0 caret-pos) 
+                     new-char 
+                     (.substring text-area-text caret-pos)))
+          (set! (.-selectionStart target)
+                (inc (:start selection)))
+          (set! (.-selectionEnd target)
+                (inc (:end selection)))
+          false
+          )
+        true
+        )
+      )))
 
-(defn parse-local-button[]
-  [:button.btn.btn-primary
-   {
-    :title "Redraw Letter Notation use when server is down",
-    :name "redraw_letter_notation"
-    :on-click 
-    (fn [e]
-      (.preventDefault e)
-      (parse-local {:src (.-value (sel1 :#the_area))
-                    :kind (:composition-kind @app-state)})
-      )
-    }
-   "Redraw Local"
-   ] 
-  )
 
 (defn parse-button[]
   [:button.btn.btn-primary
@@ -763,28 +755,70 @@
     :name "redraw_letter_notation"
     :on-click 
     (fn [e]
-      (.preventDefault e)
-      (parse)
+      (stop-default-action e)
+         (dispatch [:redraw-letter-notation]) ;; include dom-id as param ??
       )
     }
    "Redraw"
    ] 
   )
 
-(defn entry-area-box[]
-  [:div.form-group.hidden-print
-   [:label {:for "entryArea"} "Enter Letter Notation Source:"]
-   (if (not (get @app-state :online))
-   [:span.offline "You are working offline. Features such as generating staff notation are disabled" ]
-     )
-   [:textarea#the_area.entryArea.form-control
-    {
-     :autofocus true
-     :placeholder text-area-placeholder
-     :name "src",
-     :spellCheck false
-     } 
-    ]])
+(comment
+  (defn color-input
+    []
+    (let [doremi-text (subscribe [:doremi-text])]
+      (fn color-input-render
+        []
+        [:div.color-input
+         "Time color: "
+         [:input {:type "text"
+                  :value @time-color
+                  :on-change #(dispatch [:time-color (-> % .-target .-value)])}]])))
+  )
+
+
+;; "form-3" component see 
+;; https://github.com/Day8/re-frame/wiki/Creating-Reagent-Components
+(defn entry-area-input[]  
+  ;; textarea input keypresses is not handled by reagent
+  (let [ dom-id "area2"
+        dom-id-key (keyword (str "#" dom-id))
+        online (subscribe [:online])
+        composition-kind (subscribe [:composition-kind])
+        key-map (subscribe [:key-map])
+        ]   
+    (reagent.core/create-class    
+      {:component-did-mount       
+       (fn entry-area-input-did-mount[this]
+         (dispatch [:set-current-entry-area dom-id])
+         (set! (.-onkeypress 
+                 (sel1 dom-id-key)
+                 )
+               (fn my-on-key-press[event]
+                 (on-key-press-new event @key-map @composition-kind ))))
+       :display-name  "entry-area-input" 
+       :reagent-render
+       (fn []  ;; remember to repeat parameters
+         [:div.form-group.hidden-print
+          [:label {:for "entryArea"} "Enter Letter Notation Source:"]
+          (if (not @online)
+            [:span.offline "You are working offline. Features such as generating staff notation are disabled" ]
+            )
+          [:textarea.entryArea.form-control
+           {
+            :autofocus true
+            :placeholder text-area-placeholder
+            :id "area2"
+            :name "src",
+            :spellCheck false
+            ;; :onKeyPress - for handling key strokes see above
+
+            :on-change 
+            (fn on-change-text-area[event]
+              (dispatch [:set-doremi-text (-> event .-target .-value)]))
+            }
+           ]]
+         )})))
 
 
 (defn draw-children[items]
@@ -794,19 +828,21 @@
            items)))
 
 (defn staff-notation[]
+  (let [staff-notation-url (subscribe [:staff-notation-url])]
   [:img#staff_notation.hidden-print 
    {:class (if @printing "printing" "")
-    :src (get-in @app-state [:links :staff-notation-url])}])
+    :src @staff-notation-url
+    }]))
 
 (defn html-rendered-composition[]
-  (let [composition (:composition @app-state)] 
+  (let [composition (subscribe [:composition])] 
 
-    (if (not composition)
+    (if (not @composition)
       [:div#doremiContent.composition.doremiContent ]
       ;; else
-      [:div#doremiContent.composition.doremiContent {:class (if @printing "printing"
-                                                              "")}
-       (draw-children (rest composition))]
+      [:div#doremiContent.composition.doremiContent 
+       {:class (if @printing "printing" "")}
+       (draw-children (rest @composition))]
       )))
 
 
@@ -833,22 +869,29 @@
 ;;
 
 (defn user-entry[]
-  (.-value (dom/getElement "the_area"))
+  (.-value (dom/getElement "area2"))
   )
 
+(defn parse-xhr[url {txt :txt kind :kind }]
+  (println "parse-xhr stub")
+  (chan)
+  ;; TODO: review old code
+  )
 
 (defn start-parse-timer[]
   (let [
+        composition-kind (subscribe [:composition-kind])
         last-value (atom "") 
-        keypresses (listen (dom/getElement "the_area") "keypress")]
+        keypresses (listen (dom/getElement "area2") "keypress")]
     (go (while true
           (<! keypresses)
           (let [cur-value (user-entry)]
             (when (not= cur-value @last-value) 
               (reset! last-value cur-value)
               (let [ results (<! 
-  (parse-xhr PARSE-URL {:src cur-value 
-                        :kind (get-in @app-state [:composition-kind])}))
+                               (parse-xhr PARSE-URL {:src cur-value 
+                                                     :kind @composition-kind
+                                                     }))
                     ]
                 (<! (timeout (* 6 seconds))) 
                 )
@@ -1016,9 +1059,6 @@
     [:li
      [parse-button]  
      ]
-  ;;  [:li
-   ;;  [parse-local-button]  
-    ;; ]
     ]
    [composition-wrapper]
    ]
@@ -1059,7 +1099,8 @@
     [:span.upper_attribute.ornament.placement_after
      [:span.ornament_item.upper_octave_1
       "g"]])
-  (let [items (rest item)
+  (let [render-as (subscribe [:render-as])
+        items (rest item)
         filtered (filter #(and (vector? %)
                                (= :ornament-pitch (first %))) items)
         _ (log "filtered " filtered)  
@@ -1071,7 +1112,7 @@
      (doall (map-indexed
               (fn notes-line-aux[idx item]
                 [ornament-pitch {:item item
-                                 :render-as (get @app-state :render-as)
+                                 :render-as @render-as
                                  :key idx
                                  }
                  ]) filtered)) 
@@ -1239,11 +1280,11 @@
             )
         kommal-indicator 
         (when (needs-kommal-indicator? (second item)
-                                       render-as)
+                                       @render-as)
           [:kommal-indicator])
         deconstructed-pitch ;; C#,sargam -> ["S" "#"] 
         (deconstruct-pitch-string-by-kind (second item)
-                                          render-as
+                                          @render-as
                                           ) 
         sort-table 
         {:ornament 1 
@@ -1365,7 +1406,9 @@
 ;;   }, "_");
 
 (defn draw-item[item idx]
-  (let [my-key  (first item)]
+  (let [my-key  (first item)
+        render-as (subscribe [:render-as]) 
+        ]
     (cond 
       (= my-key :begin-slur)
       nil
@@ -1404,11 +1447,12 @@
       (= my-key :pitch-alteration)
       [pitch-alteration {:key idx :item item}]
       (= my-key :ornament-pitch)
-      [ornament-pitch {:key idx :item item
-                       :render-as (get @app-state :render-as)}]
+      (do
+        (println "my-key= :ornament-pitch")
+    ;;  [ornament-pitch {:key idx :item item :render-as @render-as }]
+      )
       (= my-key :pitch)
-      [pitch {:key idx :item item
-              :render-as (get @app-state :render-as)}]
+      [pitch {:key idx :item item :render-as render-as }]
       (= my-key "syl")
       [syl {:key idx :item item}]
       (= my-key :octave)
@@ -1427,36 +1471,24 @@
        ]
       )))
 
-
-
-
-
-
-
-(defn mp3-url[] 
-  [:a.btn.btn-info 
-   { :href (:mp3-url @app-state)
-    :target "_blank",
-    :title "Opens in new window"}
-   "Play mp3"]
-  )
-
 (defn select-notation-box[kind]
+  (let [composition-kind (subscribe [:composition-kind])]
   [:div.form-group ;;selectNotationBox
    [:label {:for "selectNotation"}
     "Enter Notation as: "]
    [:select#selectNotation.selectNotation.form-control
-    {:value (get @app-state :composition-kind)
+    {:value @composition-kind 
      :on-change 
-     #(let
-        [kind-str (-> % .-target .-value)
+     (fn on-change-select-notation[x]
+       (let
+        [kind-str (-> x .-target .-value)
          my-kind (if (= "" kind-str)
                    nil
                    ;; else
                    (keyword kind-str))
          ]
-        (swap! app-state assoc :composition-kind my-kind)
-        )
+        (dispatch [:set-composition-kind my-kind])
+        ))
      } 
     [:option]
     [:option {:value :abc-composition}
@@ -1469,19 +1501,20 @@
      "number"]
     [:option {:value :sargam-composition}
      "sargam"]]]
-  )
-(defn render-as-box[]
+  ))
+
+(defn render-as-box[render-as]
   [:div.form-group ;;selectNotationBox
    ;;[:div.RenderAsBox
    [:label { :for "renderAs"} "Render as:"]
    [:select#renderAs.renderAs.form-control
-    {:value (name (get @app-state :render-as))
+    {:value (name render-as)
      :on-change 
-     #(swap! app-state 
-             assoc
-             :render-as
-             (keyword (-> % .-target .-value))
-             )
+     (fn on-change-render-as[x]
+       (let [value (-> x .-target .-value)]
+         (when (not= value "")
+         (println "value=" value)
+       (dispatch [:set-render-as (keyword value)]))))
      }
     [:option {:value nil}]
     [:option {:value :abc-composition}
@@ -1497,80 +1530,83 @@
   )
 
 (defn generate-staff-notation-button[]
+    (let [ajax-is-running (subscribe [:ajax-is-running])
+          online (subscribe [:online]) 
+          ]
   [:button.btn.btn-primary
    {
     :title "Redraws rendered letter notation and Generates staff notation and MIDI file using Lilypond",
     :name "generateStaffNotation"
-    :disabled (:ajax-is-running @app-state)
+    :disabled (or (not @online) @ajax-is-running)
     :on-click 
     (fn [e]
-      (.preventDefault e)
-      (when (not (:ajax-is-running @app-state))
-        (log "in generate-staff-notation-button callback")
-        (generate-staff-notation-xhr 
-          GENERATE-STAFF-NOTATION-URL
-          {:src (.-value (sel1 :#the_area))
-           :kind (get-in @app-state [:composition-kind])
-           })
-        ))
+      (stop-default-action e)
+      (dispatch [:generate-staff-notation]))
     }
-   (if (:ajax-is-running @app-state)
+   (if @ajax-is-running
      "Redrawing..."
      "Generate Staff Notation and audio"
      )
    ] 
-  )
+  ))
 
-(defn audio-div[]
+(defn audio-div[mp3-url]
   [:audio#audio
    {
     :controls "controls"
-    :preload "auto",
-    :src (:mp3-url @app-state)}]
-  )
-
-(defn downloads[]
-  [:div.dropdown.downloads
-   [:button#dropdownMenu1.btn.btn-default.dropdown-toggle
-    {:aria-expanded "true", :data-toggle "dropdown", :type "button"}
-    "Links"
-    [:span.caret]]
-   [:ul.dropdown-menu
-    {:aria-labelledby "dropdownMenu1", :role "menu"}
-    [:li [:a {:href "browse" ;; TODO: have server provide list of links ALA rest
-              :target "_blank"
-              :tabIndex "-1", :role "menuitem"}
-          ]]
-    (if (:staff-notation-url @app-state)
-      (doall (map-indexed
-               (fn[idx z] 
-                 [:li
-                  {:role "presentation"
-                   :key idx}
-                  [:a
-                   {:href (or (z @app-state) "#") 
-                    :target "_blank"
-                    :tabIndex "-1", :role "menuitem"}
-                   (string/replace (name z) #"-url$"   "")]])
-               [:browse-url :pdf-url :mp3-url :midi-url :doremi-text-url :lilypond-url :staff-notation-url]))) 
-    ]]      
-  )
-
-(defn controls[]
-  [:form.form-inline
-   [select-notation-box (get @app-state :kind)]
-   [render-as-box (get @app-state :render-as)]
-   [generate-staff-notation-button]
-   [downloads]
-   (if (:mp3-url @app-state)
-     [audio-div])
+    :preload "auto"
+    :src mp3-url
+    }
    ]
   )
+
+(defn links[]
+  (let [my-links (subscribe [:links])
+        ]
+  [:div.form-group ;;selectNotationBox
+   ;;[:div.RenderAsBox
+   [:select.form-control
+    {
+     :value ""
+     :on-change 
+     (fn[x]
+       (let [value (-> x .-target .-value)]
+       (when (not= value "")
+       (dispatch [:open-link value]))))
+     }
+    [:option  {:value ""} "Links"]
+      (doall (map-indexed
+               (fn[idx z] 
+                 (let [k (first z)
+                       v (second z)]
+    [:option {:key idx
+              :value v}
+                   (string/replace (name k) #"-url$"   "")]
+    ))
+               @my-links
+               ))
+      ]]))
+
+
+(defn controls[]
+  (let [mp3-url (subscribe [:mp3-url])
+        render-as (subscribe [:render-as]) 
+        composition-kind (subscribe [:composition-kind])
+        ]
+  [:form.form-inline
+   [select-notation-box @composition-kind]
+   [render-as-box @render-as]
+   [generate-staff-notation-button]
+   [links]
+   (if @mp3-url
+     [audio-div @mp3-url])
+   ]
+  ))
 
 (defn doremi-box[]
   [:div.doremiBox
    [controls]
-   [entry-area-box]
+   [entry-area-input]
    [composition-box]
    [staff-notation]
    [display-parse-to-user-box]
@@ -1620,34 +1656,40 @@
             ))
         )))
 
-(defn init []
 
+(defn simple-example
+  []
+  [:div
+   "HI"])
+
+
+
+(defn init []
+  (dispatch-sync [:initialize initial-state])
   (go
-    (swap! app-state 
-           assoc
-           :the-parser 
+     (dispatch [:set-parser 
            (component/start (new-parser
                               (<! (load-serialized-grammar-xhr))))
-           ))
+           ]) 
+    )
   (let [old-val (.-value (.getElementById js/document "the_area"))
         url-to-load (.getParameterValue
                       (new goog/Uri (.-href (.-location js/window)))
                       "url")
         _ (log "url-to-load is" url-to-load)
         ]
-    (when url-to-load
-      (load-doremi-url-xhr url-to-load))
-
     (reagent.core/render-component 
       [doremi-box]
       (.getElementById js/document "container"))
+
+    (when url-to-load
+        (dispatch [:open-url url-to-load]))
+
     (log "starting timer")
-    (.focus (.getElementById js/document "the_area"))
-    (set! (.-onkeypress (by-id "the_area"))
-          on-key-press
-          )
+
+    (.focus (.getElementById js/document "area2"))
     (if old-val
-      (set! (.-value (sel1 :#the_area)) old-val))
+      (set! (.-value (sel1 :#area2)) old-val))
     (start-parse-timer)
     ))
 

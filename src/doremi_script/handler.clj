@@ -137,8 +137,11 @@
 ;; (pprint (run-lilypond-on-doremi-text {} "S" :sargam-composition true))
 (defn run-lilypond-on-doremi-text[req doremi-text kind mp3]
   ;; version2; eventually delete version1
+  ;; TODO: handle and log failures better
   (try
-    (let [kind2 (if (= kind "")
+    (let [
+          debug false
+          kind2 (if (= kind "")
                   nil
                 (keyword kind)
                   )
@@ -159,7 +162,7 @@
                   title (sanitize (get attributes :title "untitled"))
                   dir-str (str compositions-dir "/" title)
                   mkdir-results (.mkdir (java.io.File. dir-str))
-                  ;; _ (println "result of mkdir is" mkdir-results)
+                   _ (when debug (println "result of mkdir is" mkdir-results))
                   dir (clojure.java.io/file dir-str)
                   _ (println "title is " title)
                   file-count (count (file-seq dir))
@@ -167,27 +170,27 @@
                   file-name (str title "-" md5)
                   file-path-base (str dir-str "/" file-name) 
                   current-path-base (str dir-str "/" title "-" "current") 
-                  _ (when false (println "********file-path-base=" file-path-base))
+                  _ (when debug (println "********file-path-base=" file-path-base))
                   doremi-script-fname (str file-path-base ".doremi.txt")
                   lilypond-fname (str file-path-base ".ly")
-                  _ (when false (println "lilypond-fname=" lilypond-fname))
+                  _ (when debug (println "lilypond-fname=" lilypond-fname))
                   fname-with-page1 (str file-path-base "-page1.png")
-                  _ (when false (println "fname-with-page1" fname-with-page1))
+                  _ (when debug (println "fname-with-page1" fname-with-page1))
                   lily2image-command (str "lily2image -f=png -q " lilypond-fname)
                   path-for-url (absolute-url (str "/compositions/" title "/" file-name) req)
-                  _ (when false (println "path-for-url=" path-for-url))
+                  _ (when debug (println "path-for-url=" path-for-url))
 
                   lilypond-results (to-lilypond composition doremi-text)
 
                   ]
-              (when false
+              (when debug
               (println "lilypond-results=" lilypond-results)
               (println "***************parse-results=" composition)
                 )
               (->> lilypond-results (spit lilypond-fname))
               ;; if [ -f "$name_with_page1" ]
               ;;(.exists (as-file "myfile.txt"))
-              (when false (println "writing" lilypond-fname))
+              (when debug (println "writing" lilypond-fname))
               (->> doremi-text (spit doremi-script-fname))
               (println "running lily2image")
               (let [

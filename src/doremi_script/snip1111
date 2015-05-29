@@ -1,0 +1,18 @@
+  (let [
+        tgt (.-target event)
+        _ (.log js/console "tgt=" tgt)
+        response-text (.getResponseText tgt)
+        _ (println "response-text=" response-text)
+        results
+        (-> response-text
+            goog.json/parse
+            (js->clj :keywordize-keys true)
+            )
+        my-map (if (:error results)
+                 results
+                 (update-in results [:composition]
+                            keywordize-vector))
+        _ (prn "my-map" my-map)
+        _ (println "results=" results)
+       ] ;;(.-target event))
+                            )
