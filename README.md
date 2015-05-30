@@ -1,5 +1,7 @@
 DoremiScript
 ============
+5/29/2015 Re-wrote using re-frame framework and refactored app.cljs into views handlers subscriptions etc.
+
 5/7/2015  Milestone. Re-written. Front end is an html app written in Clojurescript, Reagent,Bootstrap, Instaparse/cljs. Back end was cleaned up and old gui removed. Front end uses async js and css loading. Async css loading implemented using loadCss method. New version should support offline letter notation rendering via instaparse/cljs. Codebase uses cljc to share code between Clojure on server and Clojurescript in the browser. TODO: port musicXML generation from old js version. Simplified lilypond generation somewhat. 
 The clojurescript app uses boot, the Clojure ring app uses leiningen.
 
