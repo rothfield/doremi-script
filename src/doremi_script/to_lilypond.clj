@@ -9,6 +9,8 @@
                                  items map-even-items is? get-attribute]]
     ))
 
+;;; TODO: try making it cljc and add to-lilypond functionality to the javascript pp
+
 ;;;; *********************READ ME*****************
 ;;;; What works and doesn't work:
 ;;;; This seems to work well:

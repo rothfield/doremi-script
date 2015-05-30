@@ -6,7 +6,9 @@
     [reagent.ratom :refer [reaction]]
     )
   (:require 
+    [doremi-script.check-network :refer [start-check-network]]
     [quile.component :as component]
+    [doremi-script.dom-utils :refer [listen seconds by-id production?]]
     [doremi-script.sargam-key-map :refer
      [default-key-map mode-and-notes-used->key-map ]]
     [doremi-script.core :refer [
@@ -38,6 +40,7 @@
     ))
 
 (def debug false)
+(enable-console-print!)
 
 (defn key-map-for-composition[composition]
   (let [
@@ -54,8 +57,81 @@
            {}
            {:key-map (key-map-for-composition composition)})))
 
+(defn parse-xhr-callback[response-text]
+ (.log js/console "parse-xhr-callback, response-text is " response-text)
+     (dispatch [:generate-staff-notation-handler response-text]))
 
-(println "in handlers")
+(defn parse-xhr[url {src :src kind :kind}]
+  (println "entering parse-xhr:"  "url=" url " src= " src "\nkind=" kind)
+  (let [out (chan)
+        query-data (new goog.Uri/QueryData) ]
+    (.set query-data "src"  src)
+    (.set query-data "kind" (name  kind))
+    (goog.net.XhrIo/send
+      url
+      (fn[event]
+      (let [raw-response (.-target event)
+      response-text (.getResponseText raw-response)
+                               ]
+    (put! out response-text)))
+
+    ;;  (fn [event] (put! out event))
+      "POST"
+      query-data)
+    out 
+    ))
+
+(defn zparse-xhr[url {txt :txt kind :kind }]
+  (println "parse-xhr stub")
+  (chan)
+  ;; TODO: review old code
+  )
+
+
+(def PARSE-URL
+  ;; TODO dry
+  (if production?
+    "http://ragapedia.com/doremi-server/parse"
+    "http://localhost:4000/doremi-server/parse")
+  )
+
+(defn start-parse-timer[dom-id]
+  (println "start-parse-timer " dom-id)
+  (let [
+        composition-kind (subscribe [:composition-kind])
+        last-value (atom "") 
+        keypresses (listen (by-id dom-id) "keypress")]
+    (go (while true
+          (<! keypresses)
+          (let [cur-value 
+                 (.-value (by-id dom-id))
+                 ]
+            (when (not= cur-value @last-value) 
+              (reset! last-value cur-value)
+              (let [ response-text (<! 
+                               (parse-xhr PARSE-URL {:src cur-value 
+                                                     :kind @composition-kind
+                                                                   }))
+                    ]
+               (parse-xhr-callback response-text)
+                (<! (timeout (* 6 seconds))) 
+                )
+              ))
+          ))))
+
+(register-handler :start-parse-timer
+   (fn [db [_ dom-id]]
+      (start-parse-timer dom-id)
+      db
+     ))
+
+
+(register-handler :start-check-network
+   (fn [db [_ _]]
+      (start-check-network)
+      db
+     ))
+
 (register-handler :set-parser
    (fn [db [_ parser]]
      (assoc db :parser parser)
@@ -151,6 +227,40 @@
            )
     )
   ))
+
+ (register-handler :parse-xhr-handler
+     (fn [db [ _ response-text]]
+       (when debug (println "in :generate-staff-notation-handler")
+       (println "response-text=" response-text))
+  (let [
+        results
+        (-> response-text
+            goog.json/parse
+            (js->clj :keywordize-keys true)
+            )
+        my-map (if (:error results)
+                 results
+                 (update-in results [:composition]
+                            keywordize-vector))
+        _ (when debug (println"my-map" my-map))
+        _ (when debug (println "results=" results))
+        {:keys [:links :composition :error]} my-map 
+       ]
+    (assoc db
+           :ajax-is-running
+           false
+           :composition
+           composition
+           :error
+           error
+           :links
+           links
+           :key-map
+           (if (not (:error my-map))
+             (key-map-for-composition composition)
+             (:key-map db))
+           )
+   )))
 
  (register-handler :generate-staff-notation-handler
      (fn [db [ _ response-text]]
