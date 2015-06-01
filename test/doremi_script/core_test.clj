@@ -5,7 +5,7 @@
             [clojure.java.io :as io :refer [resource]]
             [ring.mock.request :as mock]
             [doremi-script.utils :refer [get-attributes]]
-            [doremi-script.core :refer [doremi-script-parser new-parser doremi-text->collapsed-parse-tree]]))
+            [doremi-script.core :refer [new-parser doremi-text->collapsed-parse-tree]]))
 
 (defonce parser 
   (component/start (new-parser (slurp (resource "doremiscript.ebnf")))))
@@ -38,9 +38,6 @@
                      :sargam-composition))
   ))
 
-(deftest doremi-script-grammar-test[]
-    (is (= instaparse.core.Parser (class @doremi-script-parser)))
-)
 (def collapsed-parse-tree1
   [:composition [:attribute-section "title" "Hello" "kind" :sargam-composition]
    [:stave [:notes-line [:measure [:beat [:pitch "C" [:octave 0] [:syl "\" \" "]]]] [:barline [:single-barline]]]]]

@@ -36,6 +36,7 @@
   ( [grammar-specification]
    (new-parser grammar-specification :sargam-composition))
   ( [grammar-specification default-kind]
+   ;; map->Parser function is created by defrecord
    (map->Parser {:grammar-specification grammar-specification :default-kind default-kind})
    ))
 

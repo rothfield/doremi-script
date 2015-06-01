@@ -28,6 +28,6 @@
 (defn start-check-network[]
 (go (while true
       (check-network)
-      (<! (timeout (* 300 seconds))) 
+      (<! (timeout (* 20 seconds))) 
       )))
 

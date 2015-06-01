@@ -7,6 +7,9 @@
     [reagent.core :as reagent]
     ))
 
+(register-sub :environment
+              (fn [db _]  
+                (reaction (:environment @db))))
 
 (register-sub :links
               (fn [db _]  

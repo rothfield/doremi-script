@@ -3,8 +3,19 @@
     [clojure.string :as string :refer [lower-case upper-case ]]
     ))
 
+;; Provide a keymap for entering sargam letter notation. The AACM
+;; sargam notation is case sensitive. To save typing, map characters
+;; that are in sargam letters according to mode. S and P get automatically
+;; mapped {"s" "S" "p" "P"} so that you can type a lower case "S" and it
+;; is mapped to uppercase "S". The api takes a mode name (as a keyword) and
+;; a string of notes used. A keymap (map) is returned. TODO: write test cases
+(def debug false)
+
+(enable-console-print!)
+
 (def default-key-map 
     {"s" "S" "p" "P"})
+
 (def mode->notes-used
   {
    :ionian "SRGmPDN"
@@ -42,6 +53,7 @@
   ;; Returns a keymap: ie {"s" "S" }. Saves typing
   ;; example (sargam-set->key-map #{R}) -> {"r" "R" "R" "r"}
   (assert (set? sargam-set))
+  (when debug (println "in sargam-set-key-map, sargam-set=" sargam-set))
   (reduce (fn[accum item]
             (if (upper-sargam? item)
               (assoc accum 
@@ -64,32 +76,32 @@
       )))
 
 
-(defn notes-used-set-for[{mode :mode notes-used :notes-used}]
-  (let [
-        mode-notes-used (when mode
-                          (get mode->notes-used  (keyword (lower-case mode)) ""))
-        notes-used2 (or  notes-used
-                        mode-notes-used
-                        "SP")
+(defn notes-used->sargam-set[s]
+  (assert (string? s))
+    (set (reduce (fn[accum item] (println "accum,item"
+                                          accum item)
+                   (remove-if-both-cases (conj accum item) item))
+                  #{} 
+                 s))
+    )
 
-        ]
-    (assert (string? notes-used2))
-    (set (reduce (fn[accum item] (remove-if-both-cases accum item))
-                 notes-used2
-                 "rgmdn"))
-    ))
-
+(defn mode-and-notes-used->key-map[mode notes-used]
+  { :pre [(or (keyword? mode) (nil? mode))
+          (or (string? notes-used) (nil? notes-used))
+          ]
+   :post [(map? %)]
+   }
+  (when debug (println "Entering mode-and-notes-used->key-map, mode, notes-used" mode notes-used))
+    (->
+      (or (mode->notes-used mode) notes-used "SP")
+      notes-used->sargam-set 
+      sargam-set->key-map)
+    )
 
 (comment
+(println "**1 " (-> "SRGMPDnN" notes-used->sargam-set))
   (sargam-set->key-map #{"S" "R" "G" "m" "P" "D" "N"})
   (comment "test:  @key-map is" @key-map)
   )
 
-(defn mode-and-notes-used->key-map[mode notes-used]
-    (->
-      {:mode mode :notes-used notes-used}
-      notes-used-set-for
-      sargam-set->key-map)
-  {}      
-)
 

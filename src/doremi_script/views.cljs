@@ -337,6 +337,7 @@
 
 (defn on-key-press-new[event my-key-map composition-kind]
   ;; event is a dom event
+  (when debug (println "entering on-key-press, my-key-map=" my-key-map))
   (if (not= :sargam-composition composition-kind)
     true
     (let [
@@ -357,6 +358,7 @@
       (if (and my-within-sargam-line
                new-char)
         (do
+          (when debug "in do********")
           (set! (.-value target)
                 (str (.substring text-area-text 0 caret-pos) 
                      new-char 
@@ -405,6 +407,7 @@
                  (by-id dom-id)
                  )
                (fn my-on-key-press[event]
+                 (when debug (println "my-on-key-press"))
                  (on-key-press-new event @key-map @composition-kind ))))
        :display-name  "entry-area-input" 
        :reagent-render
@@ -891,7 +894,7 @@
       [pitch-alteration {:key idx :item item}]
       (= my-key :ornament-pitch)
       (do
-        (println "my-key= :ornament-pitch")
+        (println "error-don't use-my-key= :ornament-pitch")
     ;;  [ornament-pitch {:key idx :item item :render-as @render-as }]
       )
       (= my-key :pitch)
@@ -946,17 +949,17 @@
      "sargam"]]]
   ))
 
-(defn render-as-box[render-as]
+(defn render-as-box[]
+  (let [render-as (subscribe [:render-as])]
   [:div.form-group ;;selectNotationBox
    ;;[:div.RenderAsBox
    [:label { :for "renderAs"} "Render as:"]
    [:select#renderAs.renderAs.form-control
-    {:value (name render-as)
+    {:value @render-as
      :on-change 
      (fn on-change-render-as[x]
        (let [value (-> x .-target .-value)]
          (when (not= value "")
-         (println "value=" value)
        (dispatch [:set-render-as (keyword value)]))))
      }
     [:option {:value nil}]
@@ -970,10 +973,11 @@
      "number"]
     [:option {:value :sargam-composition}
      "sargam"]]]
-  )
+  ))
 
 (defn generate-staff-notation-button[]
     (let [ajax-is-running (subscribe [:ajax-is-running])
+          parser (subscribe [:parser])
           online (subscribe [:online]) 
           ]
   [:button.btn.btn-primary
@@ -986,8 +990,10 @@
       (stop-default-action e)
       (dispatch [:generate-staff-notation]))
     }
-   (if @ajax-is-running
+   (cond
+     @ajax-is-running
      "Redrawing..."
+     true
      "Generate Staff Notation and audio"
      )
    ] 
@@ -1003,8 +1009,19 @@
    ]
   )
 
+(defn key-map[]
+  (let [key-map (subscribe [:key-map])
+        environment (subscribe [:environment])
+        ]
+  (when (= :development @environment)
+    [:div
+         (print-str @key-map)
+     ]
+    )))
+
 (defn links[]
   (let [my-links (subscribe [:links])
+        environment (subscribe [:environment])
         ]
   [:div.form-group ;;selectNotationBox
    ;;[:div.RenderAsBox
@@ -1015,8 +1032,12 @@
      :on-change 
      (fn[x]
        (let [value (-> x .-target .-value)]
-       (when (not= value "")
-       (dispatch [:open-link value]))))
+        (cond (= value "")
+              nil
+              (= value "print-grammar")
+              (dispatch [:print-grammar])
+              true
+              (dispatch [:open-link value]))))
      }
     [:option  {:value ""} "Links"]
       (doall (map-indexed
@@ -1029,17 +1050,18 @@
     ))
                @my-links
                ))
+    [:option  {:value "print-grammar"} "Print grammar"]
+
       ]]))
 
 
 (defn controls[]
   (let [mp3-url (subscribe [:mp3-url])
-        render-as (subscribe [:render-as]) 
         composition-kind (subscribe [:composition-kind])
         ]
   [:form.form-inline
    [select-notation-box @composition-kind]
-   [render-as-box @render-as]
+   [render-as-box]
    [generate-staff-notation-button]
    [links]
    (if @mp3-url
@@ -1050,6 +1072,7 @@
 (defn doremi-box[]
   [:div.doremiBox
    [controls]
+   [key-map]
    [entry-area-input]
    [composition-box]
    [staff-notation]

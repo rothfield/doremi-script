@@ -1,16 +1,15 @@
 (ns doremi-script.grammar-test
   (:require [clojure.test :refer :all]
+            [com.stuartsierra.component :as component]
             [clojure.pprint :refer [pprint]]
             [instaparse.core :as insta]
             [clojure.java.io :as io :refer [input-stream resource]]
             [ring.mock.request :as mock]
-            [doremi-script.core :refer [initialize-parser! doremi-script-parser]]))
+            [doremi-script.core :refer [new-parser]]))
 
 
-;; (run-tests)
-(defonce initialize-parser
-  (initialize-parser!  (slurp (resource "doremiscript.ebnf"))))
-
+(defonce parser 
+  (:parser (component/start (new-parser (slurp (resource "doremiscript.ebnf"))))))
 
 (defn fixtures[which]
   (->> (str "fixtures/" (clojure.string/replace (name which) "-" "_"))
@@ -31,8 +30,8 @@
   (doseq [my-file (fixtures which)
           :let [file-name (.getName my-file)
                 txt (-> my-file slurp)
-                result (insta/parse @doremi-script-parser txt :start which)
-                results2 (insta/parses @doremi-script-parser txt
+                result (insta/parse parser txt :start which)
+                results2 (insta/parses parser txt
                                        :start which )
                 more (second results2)
                 ambiguous? (not (nil? (second results2)))
