@@ -1059,7 +1059,9 @@
     ))
                @my-links
                ))
-    [:option  {:value "print-grammar"} "Print grammar"]
+    [:option  {:value "print-grammar"} "Print grammar to console"]
+    [:option  {:value "https://github.com/rothfield/doremi-script/#readme"}
+     "Help (github README)"]
 
       ]]))
 
