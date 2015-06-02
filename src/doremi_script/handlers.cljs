@@ -303,7 +303,9 @@
  (register-handler :generate-staff-notation-handler
      (fn [db [ _ response-text which]]
        ;;; which is :ajax-is-running or :parse-xhr-is-running
+       ;;; parse-xhr doesn't generate links.
        ;;; TODO: rename which and rename this handler.
+       (println "in :generate-staff-notation-handler, which is" which)
        (when debug (println "in :generate-staff-notation-handler")
        (println "response-text=" response-text))
   (let [
@@ -323,12 +325,14 @@
     (assoc db
            which
            false
+           ;; Following is awkward code. 
+           ;; only update links on generate xhr. not parse-xhr 
+           :links
+           (if (not (nil? links)) links (:links db))  
            :composition
            composition
            :error
            error
-           :links
-           links
            :key-map
            (if (not (:error my-map))
              (key-map-for-composition composition)
