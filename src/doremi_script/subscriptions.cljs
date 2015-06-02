@@ -23,9 +23,14 @@
               (fn [db _]  
                 (reaction (get-in @db [:links :staff-notation-url]))))
 
+(register-sub :parse-xhr-is-running
+              (fn [db _]  
+                (reaction (:parse-xhr-is-running @db))))
+
 (register-sub :ajax-is-running
               (fn [db _]  
                 (reaction (:ajax-is-running @db))))
+
 (register-sub :online
               (fn [db _]  
                 (reaction (:online @db))))

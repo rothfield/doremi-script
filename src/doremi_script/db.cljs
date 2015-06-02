@@ -34,12 +34,11 @@
    :online true 
    :the-parser nil
    :key-map  default-key-map
-   :rendering false
+  :rendering false
+  :parse-xhr-is-running false
    :ajax-is-running false 
    :composition-kind :sargam-composition
-   :mp3-url nil
    :render-as :sargam-composition
-   :staff-notation-path nil 
    :composition nil 
    :environment (if production? :production :development)
    })

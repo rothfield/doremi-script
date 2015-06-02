@@ -16,6 +16,8 @@
     [doremi-script.utils :refer [items map-even-items is? get-attribute]]
     ))
 
+(def debug false)
+
 (defrecord Parser [grammar-specification default-kind]
   ;; Implement the Lifecycle protocol
   ;; Discards the grammar-specification.
@@ -23,7 +25,7 @@
   (start [component]
     (let [ret-value
           (assoc component :parser  (insta/parser (:grammar-specification component) :start :composition :total true))]
-      (println "Parser has been initialized")
+      (when debug (println "Parser has been initialized"))
       ret-value
       ))
 

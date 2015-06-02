@@ -4,22 +4,9 @@
     [dommy.core :as dommy :refer-macros [sel sel1]]
     ))
 
-
-;;;;  add-right-margin-to-notes-with-pitch-signs = function(context) {
-;;;;    if (context == null) {
-;;;;      context = null;
-;;;;    }
-;;;;    return $('span.note_wrapper *.pitch_sign', context).each(function(index) {
-;;;;      var current_margin_right, parent;
-;;;;      parent = $(this).parent();
-;;;;      current_margin_right = parseInt($(parent).css('margin-right').replace('px', ''));
-;;;;      return $(parent).css('margin-right', $(this).width());
-;;;;    });
-;;;;  };
-
-
 (defn add-right-margin-to-notes-with-pitch-signs[context] 
-  (let [items (sel "span.note_wrapper *.pitch_sign") ]
+  ;; TODO: pitch_sign was matching nothing. 
+  (let [items (sel "span.note_wrapper *.alteration") ]
     (dorun (map (fn[item]
                   (let
                     [parent (dommy/parent item)]

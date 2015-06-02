@@ -367,11 +367,14 @@
                 (inc (:start selection)))
           (set! (.-selectionEnd target)
                 (inc (:end selection)))
+         (dispatch [:set-doremi-text (.-value target)])
           false
           )
-        true
-        )
-      )))
+        (do
+         (dispatch [:set-doremi-text (.-value target)])
+        true)
+        ))
+      ))
 
 
 (defn parse-button[]
@@ -976,7 +979,9 @@
   ))
 
 (defn generate-staff-notation-button[]
-    (let [ajax-is-running (subscribe [:ajax-is-running])
+    (let [
+          ajax-is-running (subscribe [:ajax-is-running])
+          parse-xhr-is-running (subscribe [:parse-xhr-is-running])
           parser (subscribe [:parser])
           online (subscribe [:online]) 
           ]
@@ -984,13 +989,16 @@
    {
     :title "Redraws rendered letter notation and Generates staff notation and MIDI file using Lilypond",
     :name "generateStaffNotation"
-    :disabled (or (not @online) @ajax-is-running)
+    :disabled (or ;;;@parse-xhr-is-running
+                  (not @online) @ajax-is-running)
     :on-click 
     (fn [e]
       (stop-default-action e)
       (dispatch [:generate-staff-notation]))
     }
    (cond
+    ;; @parse-xhr-is-running
+     ;;"Generate Staff Notation and audio"
      @ajax-is-running
      "Redrawing..."
      true
@@ -1010,6 +1018,7 @@
   )
 
 (defn key-map[]
+  ;; for debugging. Not currently used
   (let [key-map (subscribe [:key-map])
         environment (subscribe [:environment])
         ]
@@ -1072,7 +1081,6 @@
 (defn doremi-box[]
   [:div.doremiBox
    [controls]
-   [key-map]
    [entry-area-input]
    [composition-box]
    [staff-notation]

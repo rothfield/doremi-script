@@ -29,7 +29,7 @@
    :major "SRGmPDN"
    :minor "SRgmPdn"
    (keyword "harmonic minor") "SRgmPdN"
-
+   :bhairav "SrGmPdN"
    :bilaval "SRGmPDN"
    :kafi "SRgmPDn"
    :bhairavi "SrgmPdn"
@@ -78,8 +78,8 @@
 
 (defn notes-used->sargam-set[s]
   (assert (string? s))
-    (set (reduce (fn[accum item] (println "accum,item"
-                                          accum item)
+    (set (reduce (fn[accum item] 
+                   (when debug (println "accum,item" accum item))
                    (remove-if-both-cases (conj accum item) item))
                   #{} 
                  s))

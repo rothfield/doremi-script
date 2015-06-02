@@ -9,19 +9,22 @@
     [re-frame.core :refer [dispatch]]
     ))
 
+(def debug false)
+
 (defn check-network[]
-  (println "checking network")
+  (when debug (println "checking network"))
   (let [uri (new goog/Uri "//www.google.com/images/cleardot.gif")
         _  (.makeUnique uri)
         img (new js/Image)
-        ch (listen img "load")
-        ch2 (listen img "error")
+        loaded-chan (listen img "load")
+        error-chan (listen img "error")
         _ (set! (.-src img) (str uri))
         ]
-    (go  (let[result (<! ch)] 
+    ;; TODO: use alt ???? review
+    (go  (let[result (<! loaded-chan)] 
              (dispatch [:set-online-state true]) 
              ))
-    (go  (let[result (<! ch2)] 
+    (go  (let[result (<! error-chan)] 
              (dispatch [:set-online-state false]) 
     ))))
 

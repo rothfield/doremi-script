@@ -49,13 +49,13 @@
                (-> mode-a lower-case keyword))
         new-key-map (mode-and-notes-used->key-map mode notes-used)
         ]
-    (when true (println "attributes=" attributes "new-key-map=" new-key-map))
+    (when debug (println "attributes=" attributes "new-key-map=" new-key-map))
     new-key-map
     ))
 
 (defn update-db-with-parse-results[ db {:keys [:composition :error] :as results}]
   (let [new-key-map (key-map-for-composition composition)]
-    (println "new-key-map: " new-key-map)
+    (when debug (println "new-key-map: " new-key-map))
   (merge db 
          results
          (if error
@@ -94,11 +94,13 @@
              )))))
 
 (defn parse-xhr-callback[response-text]
- (.log js/console "parse-xhr-callback, response-text is " response-text)
-     (dispatch [:generate-staff-notation-handler response-text]))
+ (when debug (.log js/console "parse-xhr-callback, response-text is " response-text))
+     (dispatch [:generate-staff-notation-handler response-text :parse-xhr-is-running]))
 
 (defn parse-xhr[url {src :src kind :kind}]
-  (println "entering parse-xhr:"  "url=" url " src= " src "\nkind=" kind)
+     (dispatch [:set-parse-xhr-is-running true]) 
+  (when debug
+    (println "entering parse-xhr:"  "url=" url " src= " src "\nkind=" kind))
   (let [out (chan)
         query-data (new goog.Uri/QueryData) ]
     (.set query-data "src"  src)
@@ -115,14 +117,7 @@
       "POST"
       query-data)
     out 
-    ))
-
-(defn zparse-xhr[url {txt :txt kind :kind }]
-  (println "parse-xhr stub")
-  (chan)
-  ;; TODO: review old code
-  )
-
+    ))  
 
 (def PARSE-URL
   ;; TODO dry
@@ -146,7 +141,8 @@
     out))
 
 (defn start-parse-timer[dom-id]
-  (println "start-parse-timer " dom-id)
+  ;; TODO: use parse-local if offline...
+  (when debug (println "start-parse-timer " dom-id))
   (let [
         composition-kind (subscribe [:composition-kind])
         last-value (atom "") 
@@ -168,6 +164,13 @@
                 )
               ))
           ))))
+(register-handler :set-ajax-is-running
+   (fn [db [_ b]]
+     (assoc db :ajax-is-running b)))
+
+(register-handler :set-parse-xhr-is-running
+   (fn [db [_ b]]
+     (assoc db :parse-xhr-is-running b)))
 
 (register-handler :print-grammar
    (fn [db [_ dom-id]]
@@ -204,6 +207,7 @@
      ))
 
 (register-handler :redraw-letter-notation
+   ;; TODO: redraw on server unless offline ???????or composition gets too big ????
    (fn [db [_]]
     (when debug ":redraw-letter-notation")
   (let [results
@@ -295,9 +299,11 @@
     )
   ))
 
-
+       
  (register-handler :generate-staff-notation-handler
-     (fn [db [ _ response-text]]
+     (fn [db [ _ response-text which]]
+       ;;; which is :ajax-is-running or :parse-xhr-is-running
+       ;;; TODO: rename which and rename this handler.
        (when debug (println "in :generate-staff-notation-handler")
        (println "response-text=" response-text))
   (let [
@@ -315,7 +321,7 @@
         {:keys [:links :composition :error]} my-map 
        ]
     (assoc db
-           :ajax-is-running
+           which
            false
            :composition
            composition
@@ -332,7 +338,7 @@
 ;; event handlers
 (register-handler :generate-staff-notation
    (fn register-handler-aux[db _]
-(println "in :generate-staff-notation")
+  (when debug (println "in :generate-staff-notation"))
   (if (not (:ajax-is-running db))
     (let [ query-data (new goog.Uri/QueryData) ]
       ;; TODO: try sending json
@@ -341,13 +347,15 @@
       (.set query-data "mp3"  true)
       (goog.net.XhrIo/send (:generate-staff-notation-url db)
             (fn[event]
-              (println "in callback")
+              (when debug (println "in callback"))
               (dispatch [:generate-staff-notation-handler
-                       (.getResponseText (.-target event))]
+                       (.getResponseText (.-target event))
+                        :ajax-is-running 
+                       ]
                         ))
                            "POST"
                            query-data)
-      db
+      (assoc db :ajax-is-running true)
       )
     db)))
 
@@ -362,7 +370,7 @@
                     (assoc db :online value)))
 (register-handler :set-render-as
                   (fn [db [_ value]]
-                    (println "in set-render-as, value=" value)
+                    (when debug (println "in set-render-as, value=" value))
                     (assoc db :render-as value)))
 
 (register-handler :set-doremi-text

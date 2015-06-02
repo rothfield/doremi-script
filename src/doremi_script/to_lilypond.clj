@@ -65,20 +65,33 @@
   (assert (map? x))
   (= :abc-composition (get x :kind)))
 
+(def valid-lilypond-mode?
+  #{:ionian :dorian :phrygian :lydian :mixolydian :aeolian :locrian
+    :minor :major })
 (defn key-signature-snippet[attributes]
-  (assert (map? attributes))
-  (str "\\" "key "
-  (if (is-abc-composition attributes)
-    (str (normalized-pitch->lilypond-pitch (:key  attributes
-                                                 "C"))
-         " "
-         (str "\\" (lower-case (:mode attributes "major"))) "\n")
-    ;; else
-    (str "c " 
-         "\\" (lower-case (:mode attributes "major"))
-         "\n"
-         ) 
-    )))
+  (let [my-mode (->
+                  (get attributes :mode "major")
+                  lower-case
+                  keyword)
+        _ (println "my-mode is" my-mode)
+        my-mode2 (if (not (valid-lilypond-mode? my-mode))
+                   :major
+                   my-mode)
+        _ (println "my-mode2 is" my-mode2)
+        ]
+    (assert (map? attributes))
+    (str "\\" "key "
+         (if (is-abc-composition attributes)
+           (str (normalized-pitch->lilypond-pitch (:key  attributes
+                                                        "C"))
+                " "
+                (str "\\" (name my-mode2) "\n"))
+           ;; else
+           (str "c " 
+                "\\" (name my-mode2)
+                "\n"
+                ) 
+           ))))
 
 (defn time-signature-snippet[x]
   (if x
@@ -322,14 +335,14 @@
         last-barline1 (or (get accum :last-barline)
                           "\\bar \"|\"")
         last-barline2 (if (:in-notes-line-beginning accum)
-                        (do (println ":in-notes-line-beginning, omitting barline")
-                            nil)
+                        (when debug (println ":in-notes-line-beginning, omitting barline")
+                          nil)
                         last-barline1) 
         last-barline (get accum :last-barline)
         ]
     (-> accum (assoc :current-pitch nil :last-barline nil)
         (update-in [:output] #(str % " " last-barline
-                                  " "
+                                   " "
                                    ))
         )))
 
@@ -419,8 +432,8 @@
     (join " " items2)))
 
 (defn finish-pitch[accum]
-  (when false (println "finish-pitch"))
-  (when false (pprint (remove :output accum)))
+  (when debug (println "finish-pitch"))
+  (when debug (pprint (remove :output accum)))
   (let [pitch (:obj (:current-pitch accum))
         syl  (get-syl pitch)
 
@@ -505,11 +518,7 @@
 
 
 (defn lilypond-transition[accum obj]
-  { :pre [ (do (when false
-                 (println "Entering lilypond-transition")
-                 (if (vector? obj)
-                   (println "first obj=" (first obj))))
-               true)
+  { :pre [
           (map? accum)
           (#{:lyrics-section :lyrics-line :stave :pitch :barline :measure :notes-line :line-number :composition
              :beat :dash :output :eof :attribute-section :source} (first obj))
@@ -519,7 +528,7 @@
           (vector obj)]}
   (let [token (first obj)
         cur-state (:state accum)
-        _ (when false (println "Entering lilypond-transition\n" "state,token=" cur-state token))
+        _ (when debug (println "Entering lilypond-transition\n" "state,token=" cur-state token))
         ]
     (case [cur-state token]
       [:start :composition]
@@ -662,7 +671,7 @@
           (vector obj)]}
   (let [token (first obj)
         cur-state (:state accum)
-        _ (when false (println "Entering lilypond-transition\n" "state,token=" cur-state token))
+        _ (when debug (println "Entering lilypond-transition\n" "state,token=" cur-state token))
         ]
     (case [cur-state token]
       [:start :composition]
@@ -836,26 +845,26 @@
      (render-string (stave-templ-str)
                     (merge context 
                            { 
-                            
-                             :cadenza-on (if false 
-                                        "\\cadenzaOn\n")
+
+                            :cadenza-on (if false 
+                                          "\\cadenzaOn\n")
                             :melody (->> (conj stave [:eof]
-                                                )
-                                          (tree-seq  #(and (vector? %)
-                                                           (#{:stave :lyrics-line :composition :notes-line :measure :beat} (first %)))
-                                                    identity)
-                                          (filter vector?)
-                                          (reduce lilypond-transition
-                                                  {:state :looking-for-attribute-section
-                                                   :finished-first-line false
-                                                   :in-slur (atom false)
-                                                   :syllables ""
-                                                   :source "" 
-                                                   :output ""
-                                                   :composition stave}
-                                                  )
-                                          :output 
-                                          )
+                                               )
+                                         (tree-seq  #(and (vector? %)
+                                                          (#{:stave :lyrics-line :composition :notes-line :measure :beat} (first %)))
+                                                   identity)
+                                         (filter vector?)
+                                         (reduce lilypond-transition
+                                                 {:state :looking-for-attribute-section
+                                                  :finished-first-line false
+                                                  :in-slur (atom false)
+                                                  :syllables ""
+                                                  :source "" 
+                                                  :output ""
+                                                  :composition stave}
+                                                 )
+                                         :output 
+                                         )
                             :lyrics lyrics
                             } 
                            )))))
@@ -864,57 +873,37 @@
 (defn to-lilypond
   ([composition] (to-lilypond composition "")) 
   ([composition src]
-  (when false
-    (println "entering to-lilypond, composition=" composition)
-    )
-  (assert (is? :composition composition))
-  (let [ staves (filter #(is? :stave %) (rest composition))
-        attributes (get-attributes composition)
-        _ (println "**attributes=" attributes)
-        context (merge attributes 
-                       {
-                        :all-lyrics (all-syls composition)
-                        :version "2.18.2"
-                        :time-signature-snippet (time-signature-snippet (:timesignature attributes))
-                        :doremi-source (lilypond-escape src)
+   (when debug
+     (println "entering to-lilypond, composition=" composition)
+     )
+   (assert (is? :composition composition))
+   (let [ staves (filter #(is? :stave %) (rest composition))
+         attributes (get-attributes composition)
+         _ (when debug (println "**attributes=" attributes))
+         context (merge attributes 
+                        {
+                         :all-lyrics (all-syls composition)
+                         :version "2.18.2"
+                         :time-signature-snippet (time-signature-snippet (:timesignature attributes))
+                         :doremi-source (lilypond-escape src)
 
-                        :transpose-snippet
-                        (when (not (is-abc-composition attributes))
-                          (transpose-snippet (:key attributes)))
+                         :transpose-snippet
+                         (when (not (is-abc-composition attributes))
+                           (transpose-snippet (:key attributes)))
 
-                        :key-signature-snippet (key-signature-snippet 
-                                                 attributes
-                                                 )
-                        }) 
-        stave-data (clojure.string/join "\n" (map #(stave-to-lilypond % context) staves))
-        ]
-    ;;(println "context is" context)
-    ;;(println "before render-string in to-lilypond, stave-data=" stave-data)
-    (render-string (lilypond-templ-str)
-                   (assoc context :staves
-                          (clojure.string/join "\n" (map #(stave-to-lilypond % context) staves))
-                          
-                          
-                          ))
-    ))) 
+                         :key-signature-snippet (key-signature-snippet 
+                                                  attributes
+                                                  )
+                         }) 
+         stave-data (clojure.string/join "\n" (map #(stave-to-lilypond % context) staves))
+         ]
+     ;;(println "context is" context)
+     ;;(println "before render-string in to-lilypond, stave-data=" stave-data)
+     (render-string (lilypond-templ-str)
+                    (assoc context :staves
+                           (clojure.string/join "\n" (map #(stave-to-lilypond % context) staves))
 
 
-(comment
-  [x (-> "TimeSignaturez: 3/4\nComposer:Bach\nAuthor: John R\nKey: D\nMode: Minor\nTitle: Row row\n\n|S - - - | \nhe-llo\n\n|r - - -|" 
-         (doremi/doremi-text->collapsed-parse-tree :sargam-composition) to-lilypond)
-   ]
-  ;;   (println x)
-  (spit "/home/john/scratch/x.ly" x)
-  )
-
-(comment
-  [x (-> "Key: B\nMode:phrygian\n\n | C#DF# |"
-         (doremi/doremi-text->collapsed-parse-tree :abc-composition))
-   ]
-  (println x)
-  (println  (to-lilypond x))
-
-  ;;   (println x)
-  (spit "/home/john/scratch/x.ly" x)
-  )
+                           ))
+     ))) 
 

@@ -12,11 +12,10 @@
     [re-frame.core :refer [dispatch dispatch-sync]]
     ))
 
+;;; Clojurescript web app. 
 (def debug false)
 
 (enable-console-print!)
-
-
 
 
 (defn user-entry[]
@@ -42,8 +41,9 @@
         (dispatch [:open-url url-to-load]))
 
     (.focus (by-id "area2"))
-    (if old-val
+    (when old-val
+      (dispatch [:set-doremi-text old-val])
       (set! (.-value (by-id "area2")) old-val))
-    ))
+    ))   
 
 
