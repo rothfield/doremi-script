@@ -371,7 +371,8 @@
                     (merge db initial-state))) 
 (register-handler :set-online-state
                   (fn [db [_ value]]
-                    (assoc db :online value)))
+                    (assoc db :online true )))
+                    ;;(assoc db :online value)))
 (register-handler :set-render-as
                   (fn [db [_ value]]
                     (when debug (println "in set-render-as, value=" value))

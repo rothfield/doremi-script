@@ -20,9 +20,10 @@
 ;;;;        \key c \major
 ;;;;        \autoBeamOn  
 ;;;;        \override Staff.TimeSignature #'style = #'()
+;;; TODO: add back in \partial 4*1 measures !!!!! Old version worked better
+;;; see  http://ragapedia.com/open/Bansuri_V2_Traditional_1327249816068.ly          
 ;;;
 ;;; WHAT DOESN'T WORK: 
-;;; partial measures
 ;;; cadenzaOn
 ;;;
 ;;;
@@ -328,10 +329,23 @@
 (def obj  [:measure [:beat [:pitch "C"]]])
 
 (defn finish-measure[accum]
-  accum)
+  (println "in finish-measure, accum=" accum)
+  accum
+  )
+  ;;  (-> accum (assoc :current-pitch nil :last-barline nil)
+   ;;     (update-in [:output] #(str % " " 
+    ;;                               "\\partiallast-barline
+
 
 (defn start-measure[accum measure]
+  (println "in start-measure, measure =")
+  (pprint measure)
   (let [
+        measure-beat-count (->> measure 
+                                rest 
+                                (filter #(= :beat (first %)))
+                               count
+                               ) 
         last-barline1 (or (get accum :last-barline)
                           "\\bar \"|\"")
         last-barline2 (if (:in-notes-line-beginning accum)
@@ -343,6 +357,7 @@
     (-> accum (assoc :current-pitch nil :last-barline nil)
         (update-in [:output] #(str % " " last-barline
                                    " "
+                                   (str "\\partial 4*" measure-beat-count)
                                    ))
         )))
 
