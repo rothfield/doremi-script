@@ -7,6 +7,10 @@
     [reagent.core :as reagent]
     ))
 
+(register-sub :supports-utf8-characters
+              (fn [db _]  
+                (reaction (:supports-utf8-characters @db))))
+
 (register-sub :environment
               (fn [db _]  
                 (reaction (:environment @db))))

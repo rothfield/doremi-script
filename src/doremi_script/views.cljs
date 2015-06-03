@@ -74,38 +74,25 @@
 ;;    In Unicode, the sharp symbol (♯) is at code point U+266F. Its HTML entity is &#9839;. The symbol for double sharp (double sharp) is at U+1D12A (so &#119082;). These characters may not display correctly in all fonts.
 
 (def bullet "&bull;")
-(def sharp-symbol "&#9839;")
-(def flat-symbol  "&#9837;")
-(def lookup_simple {
-                    "b" "b"
-                    "#" "#"
-                    "." "&bull;"
-                    "*" "&bull;"
-                    "|:" "|:"
-                    "~" "~"
-                    ":|" ":|"
-                    "|" "|"
-                    "||" "||"
-                    "%" "%"
-                    "|]" "|"
-                    "[|" "|"
-                    })
+(def sharp-symbol "#")
+(def sharp-symbol-utf8 "&#9839;")
+(def flat-symbol  "b")
+(def flat-symbol-utf8  "&#9837;")
 
-(def lookup_html_entity {
-                         "b" "&#9837;"
-                         "#" "&#9839;"
-                         "." "&bull;"
-                         "*" "&bull;"
-                         "|:" "&#x1d106"
-                         "~" "&#x1D19D&#x1D19D"
-                         ":|" "&#x1d107"
-                         "|" "&#x1d100"
-                         "||" "&#x1d101"
-                         "%" "&#x1d10E"
-                         "|]" "&#x1d102"
-                         "[|" "&#x1d103"
+(def alteration->utf8 {
+                         "b" flat-symbol-utf8
+                         "#" sharp-symbol-utf8
                          })
-(def lookup-sargam {
+
+;; TODO: need to put fallback mechanism if the UTF symbols are not supported
+;; old versions added data-fallback-if-no-utf8-chars="|" for example for barline
+;; to the html. Then a small bit of javascript can adjust things (dom_fixer) in the case of a statically generated page.
+;; For dynamic pages, set the value appropriately. Perhaps a lookup table
+;; utf->simple  { flat-symbol "b" bar-line "|" } etc.
+;; app-state should have :supports-utf8-chars
+
+(def lookup-sargam
+  {
                     "Cb" ["S", flat-symbol]
                     "C" ["S"]
                     "C#" ["S", sharp-symbol]
@@ -229,6 +216,15 @@
                     "B#" ["T", sharp-symbol]
                     })
 
+
+(defn deconstruct-pitch-string[pitch kind utf-supported]
+   (let [ [p alteration] (deconstruct-pitch-string-by-kind pitch kind)]
+     [p 
+      (if utf-supported 
+      (get alteration->utf8 alteration alteration)
+      alteration)
+      ]
+  ))
 ;; not sure if using multi-methods is better than a case statement
 (defmulti deconstruct-pitch-string-by-kind (fn [pitch kind] kind))
 
@@ -253,7 +249,7 @@
 
 (def mordent-entity "&#x1D19D&#x1D19D")
 
-(def lookup-barline
+(def lookup-barline-utf8
   {
    :single-barline "&#x1d100"
    :double-barline "&#x1d101"
@@ -265,6 +261,17 @@
    }
   )
 
+(def lookup-barline
+  {
+   :single-barline "|"
+   :double-barline "||"
+   :left-repeat "|:"
+   :mordent "~"
+   :right-repeat ":|"
+   :final-barline "||"
+   :reverse-final-barline ":||"
+   }
+  )
 
 
 
@@ -367,14 +374,14 @@
                 (inc (:start selection)))
           (set! (.-selectionEnd target)
                 (inc (:end selection)))
-         (dispatch [:set-doremi-text (.-value target)])
+          (dispatch [:set-doremi-text (.-value target)])
           false
           )
         (do
-         (dispatch [:set-doremi-text (.-value target)])
-        true)
+          (dispatch [:set-doremi-text (.-value target)])
+          true)
         ))
-      ))
+    ))
 
 
 (defn parse-button[]
@@ -385,7 +392,7 @@
     :on-click 
     (fn [e]
       (stop-default-action e)
-         (dispatch [:redraw-letter-notation]) ;; include dom-id as param ??
+      (dispatch [:redraw-letter-notation]) ;; include dom-id as param ??
       )
     }
    "Redraw"
@@ -445,10 +452,10 @@
 
 (defn staff-notation[]
   (let [staff-notation-url (subscribe [:staff-notation-url])]
-  [:img#staff_notation.hidden-print 
-   {:class (if @printing "printing" "")
-    :src @staff-notation-url
-    }]))
+    [:img#staff_notation.hidden-print 
+     {:class (if @printing "printing" "")
+      :src @staff-notation-url
+      }]))
 
 (defn html-rendered-composition[]
   (let [composition (subscribe [:composition])] 
@@ -515,6 +522,8 @@
 
 (defn ornament-pitch[{item :item
                       render-as :render-as}]
+  (let [utf-supported (subscribe [:supports-utf8-characters])]
+
   ;; item looks like:
   ;; ;; ["ornament",["ornament-pitch","B",["octave",1]]
   ;; [:span.ornament_item.upper_octave_1 "g"]
@@ -522,8 +531,9 @@
   (log item)
   (let [
         deconstructed-pitch ;; C#,sargam -> ["S" "#"] 
-        (deconstruct-pitch-string-by-kind (second item)
+        (deconstruct-pitch-string (second item)
                                           render-as
+                                          @utf-supported
                                           ) 
         octave (some #(when (and (vector %)
                                  (= :octave (first %)))
@@ -540,7 +550,7 @@
                                 } 
       }
      ]
-    ))
+    )))
 
 (defn ornament[{item :item}]
   ;; should generate something like this:
@@ -572,10 +582,15 @@
 
 
 (defn mordent[{item :item}]
+  (let [utf-supported (subscribe [:supports-utf8-characters])]
   [:span.mordent
    {:dangerouslySetInnerHTML 
-    { :__html mordent-entity }
-    }]) 
+    { :__html 
+    (if @utf-supported 
+     mordent-entity
+    "~") }
+    }])
+  ) 
 
 (defn ending[{item :item}]
   [:span.ending
@@ -600,13 +615,18 @@
     src]])
 
 (defn barline[{src :src item :item}]
-  (let [barline-name (first (second item))]
+  (let [barline-name (first (second item))
+       utf-supported (subscribe [:supports-utf8-characters])
+       ]
     (log "barline-name is" barline-name)
     [:span.note_wrapper
      [:span.note.barline 
       {:dangerouslySetInnerHTML 
        { :__html 
+        (if @utf-supported
+        (get lookup-barline-utf8 (keyword (first (second item))))
         (get lookup-barline (keyword (first (second item))))
+        )
         }
        }
       ]]))
@@ -686,6 +706,7 @@
 
 (defn pitch[{item :item
              render-as :render-as}]
+  (let [utf-supported (subscribe [:supports-utf8-characters])]
   (log "entering pitch, item=" item) 
   ;; gnarly code here.
   (log "pitch, (first (last item))=" (first (last item))) 
@@ -732,8 +753,9 @@
                                        @render-as)
           [:kommal-indicator])
         deconstructed-pitch ;; C#,sargam -> ["S" "#"] 
-        (deconstruct-pitch-string-by-kind (second item)
+        (deconstruct-pitch-string (second item)
                                           @render-as
+                                          @utf-supported
                                           ) 
         sort-table 
         {:ornament 1 
@@ -769,7 +791,7 @@
     [:span.note_wrapper h  ;; This indicates slur is ending and gives the id of where the slur starts. NOTE.
      (draw-children item6)
      ]
-    ))
+    )))
 
 (defn lyrics-section [{item :item}]
   ;; ["lyrics-section",["lyrics-line","first","line","of","ly-","rics"],["lyrics-line","se-","cond","line","of","ly-","rics"]]
@@ -898,8 +920,8 @@
       (= my-key :ornament-pitch)
       (do
         (println "error-don't use-my-key= :ornament-pitch")
-    ;;  [ornament-pitch {:key idx :item item :render-as @render-as }]
-      )
+        ;;  [ornament-pitch {:key idx :item item :render-as @render-as }]
+        )
       (= my-key :pitch)
       [pitch {:key idx :item item :render-as render-as }]
       (= my-key "syl")
@@ -922,90 +944,90 @@
 
 (defn select-notation-box[kind]
   (let [composition-kind (subscribe [:composition-kind])]
-  [:div.form-group ;;selectNotationBox
-   [:label {:for "selectNotation"}
-    "Enter Notation as: "]
-   [:select#selectNotation.selectNotation.form-control
-    {:value @composition-kind 
-     :on-change 
-     (fn on-change-select-notation[x]
-       (let
-        [kind-str (-> x .-target .-value)
-         my-kind (if (= "" kind-str)
-                   nil
-                   ;; else
-                   (keyword kind-str))
-         ]
-        (dispatch [:set-composition-kind my-kind])
-        ))
-     } 
-    [:option]
-    [:option {:value :abc-composition}
-     "ABC"]
-    [:option {:value :doremi-composition}
-     "doremi"]
-    [:option {:value :hindi-composition}
-     "hindi( स र ग़ म म' प ध ऩ )"]
-    [:option {:value :number-composition}
-     "number"]
-    [:option {:value :sargam-composition}
-     "sargam"]]]
-  ))
+    [:div.form-group ;;selectNotationBox
+     [:label {:for "selectNotation"}
+      "Enter Notation as: "]
+     [:select#selectNotation.selectNotation.form-control
+      {:value @composition-kind 
+       :on-change 
+       (fn on-change-select-notation[x]
+         (let
+           [kind-str (-> x .-target .-value)
+            my-kind (if (= "" kind-str)
+                      nil
+                      ;; else
+                      (keyword kind-str))
+            ]
+           (dispatch [:set-composition-kind my-kind])
+           ))
+       } 
+      [:option]
+      [:option {:value :abc-composition}
+       "ABC"]
+      [:option {:value :doremi-composition}
+       "doremi"]
+      [:option {:value :hindi-composition}
+       "hindi( स र ग़ म म' प ध ऩ )"]
+      [:option {:value :number-composition}
+       "number"]
+      [:option {:value :sargam-composition}
+       "sargam"]]]
+    ))
 
 (defn render-as-box[]
   (let [render-as (subscribe [:render-as])]
-  [:div.form-group ;;selectNotationBox
-   ;;[:div.RenderAsBox
-   [:label { :for "renderAs"} "Render as:"]
-   [:select#renderAs.renderAs.form-control
-    {:value @render-as
-     :on-change 
-     (fn on-change-render-as[x]
-       (let [value (-> x .-target .-value)]
-         (when (not= value "")
-       (dispatch [:set-render-as (keyword value)]))))
-     }
-    [:option {:value nil}]
-    [:option {:value :abc-composition}
-     "ABC"]
-    [:option {:value :doremi-composition}
-     "doremi"]
-    [:option {:value :hindi-composition}
-     "hindi( स र ग़ म म' प ध ऩ )"]
-    [:option {:value :number-composition}
-     "number"]
-    [:option {:value :sargam-composition}
-     "sargam"]]]
-  ))
+    [:div.form-group ;;selectNotationBox
+     ;;[:div.RenderAsBox
+     [:label { :for "renderAs"} "Render as:"]
+     [:select#renderAs.renderAs.form-control
+      {:value @render-as
+       :on-change 
+       (fn on-change-render-as[x]
+         (let [value (-> x .-target .-value)]
+           (when (not= value "")
+             (dispatch [:set-render-as (keyword value)]))))
+       }
+      [:option {:value nil}]
+      [:option {:value :abc-composition}
+       "ABC"]
+      [:option {:value :doremi-composition}
+       "doremi"]
+      [:option {:value :hindi-composition}
+       "hindi( स र ग़ म म' प ध ऩ )"]
+      [:option {:value :number-composition}
+       "number"]
+      [:option {:value :sargam-composition}
+       "sargam"]]]
+    ))
 
 (defn generate-staff-notation-button[]
-    (let [
-          ajax-is-running (subscribe [:ajax-is-running])
-          parse-xhr-is-running (subscribe [:parse-xhr-is-running])
-          parser (subscribe [:parser])
-          online (subscribe [:online]) 
-          ]
-  [:button.btn.btn-primary
-   {
-    :title "Redraws rendered letter notation and Generates staff notation and MIDI file using Lilypond",
-    :name "generateStaffNotation"
-    :disabled (or ;;;@parse-xhr-is-running
-                  (not @online) @ajax-is-running)
-    :on-click 
-    (fn [e]
-      (stop-default-action e)
-      (dispatch [:generate-staff-notation]))
-    }
-   (cond
-    ;; @parse-xhr-is-running
-     ;;"Generate Staff Notation and audio"
-     @ajax-is-running
-     "Redrawing..."
-     true
-     "Generate Staff Notation and audio"
-     )
-   ] 
-  ))
+  (let [
+        ajax-is-running (subscribe [:ajax-is-running])
+        parse-xhr-is-running (subscribe [:parse-xhr-is-running])
+        parser (subscribe [:parser])
+        online (subscribe [:online]) 
+        ]
+    [:button.btn.btn-primary
+     {
+      :title "Redraws rendered letter notation and Generates staff notation and MIDI file using Lilypond",
+      :name "generateStaffNotation"
+      :disabled (or ;;;@parse-xhr-is-running
+                    (not @online) @ajax-is-running)
+      :on-click 
+      (fn [e]
+        (stop-default-action e)
+        (dispatch [:generate-staff-notation]))
+      }
+     (cond
+       ;; @parse-xhr-is-running
+       ;;"Generate Staff Notation and audio"
+       @ajax-is-running
+       "Redrawing..."
+       true
+       "Generate Staff Notation and audio"
+       )
+     ] 
+    ))
 
 (defn audio-div[mp3-url]
   [:audio#audio
@@ -1022,63 +1044,89 @@
   (let [key-map (subscribe [:key-map])
         environment (subscribe [:environment])
         ]
-  (when (= :development @environment)
-    [:div
-         (print-str @key-map)
-     ]
-    )))
+    (when (= :development @environment)
+      [:div
+       (print-str @key-map)
+       ]
+      )))
 
 (defn links[]
   (let [my-links (subscribe [:links])
         environment (subscribe [:environment])
         ]
-  [:div.form-group ;;selectNotationBox
-   ;;[:div.RenderAsBox
-   [:select.form-control
-    {
-     :title "Opens a new window"
-     :value ""
-     :on-change 
-     (fn[x]
-       (let [value (-> x .-target .-value)]
-        (cond (= value "")
-              nil
-              (= value "print-grammar")
-              (dispatch [:print-grammar])
-              true
-              (dispatch [:open-link value]))))
-     }
-    [:option  {:value ""} "Links"]
+    [:div.form-group ;;selectNotationBox
+     ;;[:div.RenderAsBox
+     [:select.form-control
+      {
+       :title "Opens a new window"
+       :value ""
+       :on-change 
+       (fn[x]
+         (let [value (-> x .-target .-value)]
+           (cond (= value "")
+                 nil
+                 (= value "print-grammar")
+                 (dispatch [:print-grammar])
+                 true
+                 (dispatch [:open-link value]))))
+       }
+      [:option  {:value ""} "Links"]
       (doall (map-indexed
                (fn[idx z] 
                  (let [k (first z)
                        v (second z)]
-    [:option {:key idx
-              :value v}
-                   (string/replace (name k) #"-url$"   "")]
-    ))
+                   [:option {:key idx
+                             :value v}
+                    (string/replace (name k) #"-url$"   "")]
+                   ))
                @my-links
                ))
-    [:option  {:value "print-grammar"} "Print grammar to console"]
-    [:option  {:value "https://github.com/rothfield/doremi-script/#readme"}
-     "Help (github README)"]
+      [:option  {:value "print-grammar"} "Print grammar to console"]
+      [:option  {:value "https://github.com/rothfield/doremi-script/#readme"}
+       "Help (github README)"]
 
       ]]))
+
+(defn utf-support-div[]
+  (let []
+    (reagent.core/create-class    
+      {:component-did-mount       
+       (fn utf-support-div-did-mount[this]
+         (dispatch [:check-utf-support (reagent/dom-node this) ])
+         )
+       :reagent-render
+       (fn []  ;; remember to repeat parameters
+         [:div.testing_utf_support
+          [:span#utf_left_repeat.note.testing_utf_support
+           {:style {:display "none"} }
+           "𝄆"]
+          [:span#utf_single_barline.note.testing_utf_support
+           {:style {:display "none"} }
+           "𝄀"]
+          ]
+         )
+       }
+      )))
+
 
 
 (defn controls[]
   (let [mp3-url (subscribe [:mp3-url])
         composition-kind (subscribe [:composition-kind])
+        supports-utf8-characters (subscribe [:supports-utf8-characters])
         ]
-  [:form.form-inline
-   [select-notation-box @composition-kind]
-   [render-as-box]
-   [generate-staff-notation-button]
-   [links]
-   (if @mp3-url
-     [audio-div @mp3-url])
-   ]
-  ))
+    [:form.form-inline
+     (if @supports-utf8-characters
+       [:div "utf is supported"]
+       [:div "utf is not supported"])
+     [select-notation-box @composition-kind]
+     [render-as-box]
+     [generate-staff-notation-button]
+     [links]
+     (if @mp3-url
+       [audio-div @mp3-url])
+     ]
+    ))
 
 (defn doremi-box[]
   [:div.doremiBox
@@ -1087,6 +1135,7 @@
    [composition-box]
    [staff-notation]
    [display-parse-to-user-box]
+   [utf-support-div]
    ]
   )
 

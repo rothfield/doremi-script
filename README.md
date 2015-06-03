@@ -1,46 +1,5 @@
 DoremiScript
 ============
-6/1/2015 Re-write is complete. Javascript/Coffe-script front end has been retired and replaced with a Clojurescript front end. 
-
-5/29/2015 Re-wrote using re-frame framework and refactored app.cljs into views, handlers, and subscriptions. 
-
-5/7/2015  Milestone. Re-written. Front end is an html app written in Clojurescript, Reagent,Bootstrap, Instaparse/cljs. Back end was cleaned up and old gui removed. Front end uses async js and css loading. Async css loading implemented using loadCss method. New version should support offline letter notation rendering via instaparse/cljs. Codebase uses cljc to share code between Clojure on server and Clojurescript in the browser. TODO: port musicXML generation from old js version. Simplified lilypond generation somewhat. 
-The clojurescript app uses boot, the Clojure ring app uses leiningen.
-
-4/17/2015 You can add annotations above notes (not barlines yet). You can use alphanumeric plus spaces. Use brackets:  like [hello there]
-
-4/15/2015 Now generates mp3's and plays them using html5 audio tag
- 
-4/14/2015 New clojure-script front end is useable. http://ragapedia.com points to the new front end [doremi-script-app](http://github.com/rothfield/doremi-script-app) The new front end is a separate github project. You can access the old app [here](http://ragapedia.com:4000)  
-
-
-[Integration test results](https://rawgithub.com/rothfield/doremi-script/master/test/good_test_results/report.html?https://raw.github.com/user/repo/master/)
-
-   3/14/2014 Note that lilypond 2.12.3 is required in order to get web-friendly staff notation via the lily2image program.
-	 I found the old version at this page: http://www.lilypond.org/old-downloads.html  
-
-   3/14/2014  Merged doremi-script with doremi-script-base. doremi-script-base is the older version written in Javascript. The legacy directory contains the older code.
-
-	3/13/2014  Staff notation generation moved from shell script to a java shell call and ajax updated.
-
-   MILESTONE RELEASE Feb 28,2014 - New GUI and multi notation system support
-   
-     - New GUI is written and up at [http://ragapedia.com](http://ragapedia.com)
-	   - GUI is written using [react.js](http://facebook.github.io/react/)
-	   - Implemented multi notation system support
-		 - Added choice of which system to render notation in. For example, enter notation in numbers and display in Hindi.
-	   - Added doremi to notation systems
-	   - Chords are now entered in brackets. [Dm7]
-	   - Old gui (written using knockout.js) is [here](http://ragapedia.com/doremi-script-gui/index.html#/root)
-
-   MILESTONE RELEASE Feb 12,2014 - Tests look good
-   
-	   - Status: Lilypond conversion is working. TODO: MusicXML output as
-	 in old version.
-     - DoremiScript is implented in Clojure and uses Instaparse for parsing.
-		 - Front end is written using html, css, and React.js
-
-
 **DoremiScript** is a small language for creating [letter based musical notation](http://en.wikipedia.org/wiki/Letter_notation). It currently supports western ABC style notation, [Numbered notation](http://en.wikipedia.org/wiki/Numbered_musical_notation) using 1234567, [Sargam](http://en.wikipedia.org/wiki/Swara) notation using english letters SrRgGmMPdnN as used at the AACM for notating Ragas, and [Devanagri notation in Bhatkande style](http://en.wikipedia.org/wiki/Musical_notation#India) [(See also)](http://www.omenad.net/page.php?goPage=http%3A%2F%2Fwww.omenad.net%2Farticles%2Fomeswarlipi.htm) using Devanagri letters for the sargam letters. **DoremiScript** lets you write letter music notation using an easy-to-read, easy-to-write plain text format, then nicely formats it using css and html. DoremiScript can also generate standard western notation via a [Lilypond](http://lilypond.org) converter. 
 
 Try the [online version](http://ragapedia.com)
@@ -149,7 +108,47 @@ should be used to indicate the melismas
 	- Tip: You can underline devanagri notes RGD and N to get a flat note. This is standard in Bhatkande's notation.
 	- Tip: Doremi-script will automatically align syllables based on notes and slurs.
   - This project borrows ideas from [ABC musical notation](http://en.wikipedia.org/wiki/ABC_notation), [lilypond](http://lilypond.org), and [markdown](http://en.wikipedia.org/wiki/Markdown).
-  - Special thanks to George Ruckert, Ali Akbar Khan and the authors of Clojure, Instaprse, react.js, and lilypond.
+  - Special thanks to George Ruckert, Ali Akbar Khan and the authors of Clojure, Instaparse, react.js, re-frame, and lilypond.
+
+Release Notes:
+
+6/1/2015 Re-write is complete. Javascript/Coffe-script front end has been retired and replaced with a Clojurescript front end. 
+
+5/29/2015 Re-wrote using re-frame framework and refactored app.cljs into views, handlers, and subscriptions. 
+
+5/7/2015  Milestone. Re-written. Front end is an html app written in Clojurescript, Reagent,Bootstrap, Instaparse/cljs. Back end was cleaned up and old gui removed. Front end uses async js and css loading. Async css loading implemented using loadCss method. New version should support offline letter notation rendering via instaparse/cljs. Codebase uses cljc to share code between Clojure on server and Clojurescript in the browser. TODO: port musicXML generation from old js version. Simplified lilypond generation somewhat. 
+The clojurescript app uses boot, the Clojure ring app uses leiningen.
+
+4/17/2015 You can add annotations above notes (not barlines yet). You can use alphanumeric plus spaces. Use brackets:  like [hello there]
+
+4/15/2015 Now generates mp3's and plays them using html5 audio tag
+ 
+4/14/2015 New clojure-script front end is useable. http://ragapedia.com points to the new front end [doremi-script-app](http://github.com/rothfield/doremi-script-app) The new front end is a separate github project. You can access the old app [here](http://ragapedia.com:4000)  
 
 
+[Integration test results](https://rawgithub.com/rothfield/doremi-script/master/test/good_test_results/report.html?https://raw.github.com/user/repo/master/)
+
+   3/14/2014 Note that lilypond 2.12.3 is required in order to get web-friendly staff notation via the lily2image program.
+	 I found the old version at this page: http://www.lilypond.org/old-downloads.html  
+
+   3/14/2014  Merged doremi-script with doremi-script-base. doremi-script-base is the older version written in Javascript. The legacy directory contains the older code.
+
+	3/13/2014  Staff notation generation moved from shell script to a java shell call and ajax updated.
+
+   MILESTONE RELEASE Feb 28,2014 - New GUI and multi notation system support
    
+     - New GUI is written and up at [http://ragapedia.com](http://ragapedia.com)
+	   - GUI is written using [react.js](http://facebook.github.io/react/)
+	   - Implemented multi notation system support
+		 - Added choice of which system to render notation in. For example, enter notation in numbers and display in Hindi.
+	   - Added doremi to notation systems
+	   - Chords are now entered in brackets. [Dm7]
+	   - Old gui (written using knockout.js) is [here](http://ragapedia.com/doremi-script-gui/index.html#/root)
+
+   MILESTONE RELEASE Feb 12,2014 - Tests look good
+   
+	   - Status: Lilypond conversion is working. TODO: MusicXML output as
+	 in old version.
+     - DoremiScript is implented in Clojure and uses Instaparse for parsing.
+		 - Front end is written using html, css, and React.js
+
