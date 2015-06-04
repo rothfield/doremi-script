@@ -217,14 +217,6 @@
                     })
 
 
-(defn deconstruct-pitch-string[pitch kind utf-supported]
-   (let [ [p alteration] (deconstruct-pitch-string-by-kind pitch kind)]
-     [p 
-      (if utf-supported 
-      (get alteration->utf8 alteration alteration)
-      alteration)
-      ]
-  ))
 ;; not sure if using multi-methods is better than a case statement
 (defmulti deconstruct-pitch-string-by-kind (fn [pitch kind] kind))
 
@@ -245,6 +237,15 @@
 
 (defmethod deconstruct-pitch-string-by-kind :default [pitch _]
   (get lookup-sargam pitch))
+
+(defn deconstruct-pitch-string[pitch kind utf-supported]
+   (let [ [p alteration] (deconstruct-pitch-string-by-kind pitch kind)]
+     [p 
+      (if utf-supported 
+      (get alteration->utf8 alteration alteration)
+      alteration)
+      ]
+  ))
 
 
 (def mordent-entity "&#x1D19D&#x1D19D")
