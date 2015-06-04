@@ -363,56 +363,49 @@
                         )
                       db)))
 
-;;;;          fallback_if_utf8_characters_not_supported = function(context) 
-;;;;          {
-;;;;               var tag, width1, width2;
-;;;;               if (context == null) {
-;;;;               context = null;
-;;;;               }
-;;;;               if (!(window.ok_to_use_utf8_music_characters != null)) {
-;;;;               width1 = $('#utf_left_repeat').show().width();
-;;;;               width2 = $('#utf_single_barline').show().width();
-;;;;               $('#utf_left_repeat').hide();
-;;;;               $('#utf_single_barline').hide();
-;;;;               window.ok_to_use_utf8_music_characters = width1 !== width2;
-;;;;               }
-;;;;               if (!window.ok_to_use_utf8_music_characters) {
-;;;;               tag = "data-fallback-if-no-utf8-chars";
-;;;;               $("span[" + tag + "]", context).addClass('dont_use_utf8_chars');
-;;;;               return $("span[" + tag + "]", context).each(function(index) {
-;;;;               var attr, obj;
-;;;;               obj = $(this);
-;;;;               attr = obj.attr(tag);
-;;;;               return obj.html(attr);
-;;;;               });
-;;;;               }
-;;;;               };
+(comment
+  ;;;;          fallback_if_utf8_characters_not_supported = function(context) 
+  ;;;;          {
+  ;;;;               var tag, width1, width2;
+  ;;;;               if (context == null) {
+  ;;;;               context = null;
+  ;;;;               }
+  ;;;;               if (!(window.ok_to_use_utf8_music_characters != null)) {
+  ;;;;               width1 = $('#utf_left_repeat').show().width();
+  ;;;;               width2 = $('#utf_single_barline').show().width();
+  ;;;;               $('#utf_left_repeat').hide();
+  ;;;;               $('#utf_single_barline').hide();
+  ;;;;               window.ok_to_use_utf8_music_characters = width1 !== width2;
+  ;;;;               }
+  ;;;;               if (!window.ok_to_use_utf8_music_characters) {
+  ;;;;               tag = "data-fallback-if-no-utf8-chars";
+  ;;;;               $("span[" + tag + "]", context).addClass('dont_use_utf8_chars');
+  ;;;;               return $("span[" + tag + "]", context).each(function(index) {
+  ;;;;               var attr, obj;
+  ;;;;               obj = $(this);
+  ;;;;               attr = obj.attr(tag);
+  ;;;;               return obj.html(attr);
+  ;;;;               });
+  ;;;;               }
+  ;;;;               };
+  )
 
 (register-handler :check-utf-support
                   (fn 
                     [db [_ dom-id]]
                     (let [
-                          _ (println "check-utf-support")
-                          item1 (sel1 "#utf_left_repeat")
-                          item2 (sel1 "#utf_single_barline")
-                          _ (dommy/set-style! item1 :display "inline-block")
-                          _ (dommy/set-style! item2 :display "inline-block")
-                          width1 (dommy/px item1 :width)
-                          width2 (dommy/px item2 :width)
-                          new-db
-                          (assoc db 
-                                 :supports-utf8-characters
-                                 (not= 
-                                   (dommy/px item1 :width) 
-                                   (dommy/px item2 :width)) 
-                                 )
-
+                          div  (sel1 :#testing_utf_support)
+                          item1 (sel1 :#utf_left_repeat)
+                          item2 (sel1 :#utf_single_barline)
+                          item1-width (dommy/px item1 :width) 
+                          item2-width (dommy/px item2 :width)
                           ]
-                      (when debug (println ":check-utf-support handler, width1, width2= " width1 width2))
-                      (dommy/set-style! item1 :display "none")
-                      (dommy/set-style! item2 :display "none")
-                      db
-                      )))
+                        (if true 
+                          (println "check-utf-support, width1 and 2" item1-width " " item2-width)) 
+                        (assoc db 
+                               :supports-utf8-characters
+                               (not=  item1-width item2-width)
+                               ))))
 
 (defn db-was-initialized?[db]
   (:the-parser db)
