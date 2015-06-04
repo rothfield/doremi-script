@@ -443,7 +443,7 @@
            ]]
          )})))
 
-
+ 
 (defn draw-children[items]
   (doall (map-indexed
            (fn notes-line-aux[idx item]
@@ -1092,7 +1092,7 @@
     (reagent.core/create-class    
       {:component-did-mount       
        (fn utf-support-div-did-mount[this]
-         (dispatch [:check-utf-support (reagent/dom-node this) ])
+          (dispatch [:check-utf-support (reagent/dom-node this) ])
          )
        :reagent-render
        (fn []  ;; remember to repeat parameters
@@ -1113,12 +1113,8 @@
 (defn controls[]
   (let [mp3-url (subscribe [:mp3-url])
         composition-kind (subscribe [:composition-kind])
-        supports-utf8-characters (subscribe [:supports-utf8-characters])
         ]
     [:form.form-inline
-     (if @supports-utf8-characters
-       [:div "utf is supported"]
-       [:div "utf is not supported"])
      [select-notation-box @composition-kind]
      [render-as-box]
      [generate-staff-notation-button]

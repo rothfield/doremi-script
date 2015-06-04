@@ -407,12 +407,19 @@
                          (dommy/px item2 :width)) 
                     ))))
 
+(defn db-was-initialized?[db]
+  (:the-parser db)
+  )
 
 (register-handler :initialize 
+                  ;; implemented so it will only run once
                   (fn 
                     [db [_ initial-state]]
-                    (merge db initial-state))) 
-
+                    (if (db-was-initialized? db)
+                      db
+                    (merge db initial-state)
+                    ))) 
+ 
 (register-handler :set-online-state
                   (fn [db [_ value]]
                     (assoc db :online value)))
