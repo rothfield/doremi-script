@@ -1,6 +1,5 @@
 (ns doremi-script.app
-  (:require-macros 
-    )
+(:require-macros [clojure.core.strint :as strint])
   (:require 
     [doremi-script.db :refer [initial-state]]
     [doremi-script.dom-utils :refer [by-id]]
@@ -17,6 +16,12 @@
 
 (enable-console-print!)
 
+(let [name "Ethel Smyth"
+            profession "Composer"
+                  born 1858]
+    (println
+         (strint/<< "The person named ~{name} works as a ~{profession}
+                    and was born in ~{born}")))
 
 (defn user-entry[]
   (.-value (by-id "area2"))

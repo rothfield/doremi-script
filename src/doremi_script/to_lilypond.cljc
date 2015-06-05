@@ -1,13 +1,19 @@
 (ns doremi-script.to-lilypond
+    #?(:cljs
+(:require-macros [clojure.core.strint :as strint])
+)
   (:require	
-    [clojure.pprint :refer [pprint]] 
-    [clojure.java.io :as io :refer [input-stream resource]]
-    [stencil.core :refer [render-string]]
     [clojure.string :refer 
      [replace-first lower-case join] :as string] 
+    #?(:clj
+    [clojure.core.strint :as strint]
+    )
     [doremi-script.utils :refer [get-attributes
                                  items map-even-items is? get-attribute]]
     ))
+
+;;(defn v[] 30.5)
+;;(println (<< "This trial required ~{v}ml of solution."))
 
 ;;; TODO: try making it cljc and add to-lilypond functionality to the javascript pp
 
@@ -27,6 +33,8 @@
 ;;; cadenzaOn
 ;;;
 ;;;
+
+
 
 (comment
   ;; to use in repl:
@@ -174,7 +182,6 @@
 (defn lilypond-headers[accum composition]
   accum)
 
-
 (defn ratio->lilypond-durations
   "ratio->lilypond-durations(3 4) => ['8.']   Ratio is ratio of 1/4 note "
   [my-numerator subdivisions-in-beat]
@@ -199,7 +206,7 @@
     ;; Take the case of S----R--   
     ;; S is 5 microbeats amounting to 5/32nds. To get 5 we have to tie either
     ;; 4/8th of a beat plus 1/32nd  or there are other approaches.
-    (if (not (ratio? my-ratio))
+    (if (integer? my-ratio)
       ({ 1 ["4"]
         2 ["2"]
         3 ["2."]
@@ -208,7 +215,7 @@
         } my-ratio
        (into [] (repeat my-numerator "4"))
        )
-      ;; else
+      ;; else - it is a fraction
       (let [ 
             my-table
             { 1 ["4"] ;; a whole beat is a quarter note
@@ -332,20 +339,20 @@
   (println "in finish-measure, accum=" accum)
   accum
   )
-  ;;  (-> accum (assoc :current-pitch nil :last-barline nil)
-   ;;     (update-in [:output] #(str % " " 
-    ;;                               "\\partiallast-barline
+;;  (-> accum (assoc :current-pitch nil :last-barline nil)
+;;     (update-in [:output] #(str % " " 
+;;                               "\\partiallast-barline
 
 
 (defn start-measure[accum measure]
   (println "in start-measure, measure =")
-  (pprint measure)
+  (println measure)
   (let [
         measure-beat-count (->> measure 
                                 rest 
                                 (filter #(= :beat (first %)))
-                               count
-                               ) 
+                                count
+                                ) 
         last-barline1 (or (get accum :last-barline)
                           "\\bar \"|\"")
         last-barline2 (if (:in-notes-line-beginning accum)
@@ -448,7 +455,7 @@
 
 (defn finish-pitch[accum]
   (when debug (println "finish-pitch"))
-  (when debug (pprint (remove :output accum)))
+  (when debug (println (remove :output accum)))
   (let [pitch (:obj (:current-pitch accum))
         syl  (get-syl pitch)
 
@@ -548,7 +555,7 @@
     (case [cur-state token]
       [:start :composition]
       ;; accum ;;;(-> accum (lilypond-headers obj) 
-      (assoc :state :looking-for-attribute-section)
+      (-> accum (assoc :state :looking-for-attribute-section)) ;; REVIEW this line!!! TODO
 
       [:looking-for-source :source]
       (-> accum (assoc :state :looking-for-attribute-section))
@@ -833,57 +840,97 @@
       syls-str)
     ))
 
-;; (all-syls composition)
 
-(def default-templ "2")
+(defn merge-with-lilypond-template[my-map]
+  (let 
+        [{:keys [version
+                 title 
+                 composer 
+                 doremi-source
+                 time-signature-snippet
+                 key-signature-snippet
+                 transpose-snippet
+                 all-lyrics
+                 staves
+                 ]} my-map]
+(strint/<< 
+"#(ly:set-option 'midi-extension \"mid\")
+\\version \"~{version}\"
+\\include \"english.ly\"
+\\header{ 
+title = \"~{title}\" 
+composer = \"~{composer}\" 
+tagline = \"\"  % remove lilypond footer!!!
+}
 
-(defn stave-templ-str
-  ([] (stave-templ-str default-templ))
-  ([which]
-   (slurp (resource (str "templates/" which "/stave.mustache")))))
+\\include \"english.ly\"
+
+%{
+    ~{doremi-source}
+%}
 
 
-(defn lilypond-templ-str
+melody =  {
+		%  \\clef treble
+%		\\cadenzaOn
+    \\accidentalStyle modern-cautionary
+		~{time-signature-snippet}
+		~{key-signature-snippet}
+    \\autoBeamOn  
+		\\override Staff.TimeSignature #'style = #'()
+~{staves}
 
-  ([] (lilypond-templ-str default-templ)) 
-  ([which]
-   (slurp (resource (str "templates/" which "/lilypond.mustache")))))
+}
+\\score {
+	\\new Staff <<
+   ~{transpose-snippet} \\melody
+   \\addlyrics {  ~{all-lyrics}
+	 }
+>>
+\\layout { }
+		\\midi {
+				\\context {
+						\\Staff
+				}
+				\\tempo 2 = 72
+		}
+
+}")))
 
 
 (defn stave-to-lilypond
   ([stave] (stave-to-lilypond stave {}))
   ([stave context]
    (let [lyrics (staff-lyrics stave)
+         v "23.5"
+         my-map
+         (merge context 
+                { 
+                 :melody (->> (conj stave [:eof]
+                                    )
+                              (tree-seq  #(and (vector? %)
+                                               (#{:stave :lyrics-line :composition :notes-line :measure :beat} (first %)))
+                                        identity)
+                              (filter vector?)
+                              (reduce lilypond-transition
+                                      {:state :looking-for-attribute-section
+                                       :finished-first-line false
+                                       :in-slur (atom false)
+                                       :syllables ""
+                                       :source "" 
+                                       :output ""
+                                       :composition stave}
+                                      )
+                              :output 
+                              )
+                 :lyrics lyrics
+                 } 
+                )
          ]
      (when debug 
        (println "entering stave-to-lilypond, stave=" stave "lyrics=" lyrics))
-     (render-string (stave-templ-str)
-                    (merge context 
-                           { 
-
-                            :cadenza-on (if false 
-                                          "\\cadenzaOn\n")
-                            :melody (->> (conj stave [:eof]
-                                               )
-                                         (tree-seq  #(and (vector? %)
-                                                          (#{:stave :lyrics-line :composition :notes-line :measure :beat} (first %)))
-                                                   identity)
-                                         (filter vector?)
-                                         (reduce lilypond-transition
-                                                 {:state :looking-for-attribute-section
-                                                  :finished-first-line false
-                                                  :in-slur (atom false)
-                                                  :syllables ""
-                                                  :source "" 
-                                                  :output ""
-                                                  :composition stave}
-                                                 )
-                                         :output 
-                                         )
-                            :lyrics lyrics
-                            } 
-                           )))))
-
+     (strint/<< "~{(:melody my-map)}
+                  \\break \\grace s16")))) 
 
 (defn to-lilypond
   ([composition] (to-lilypond composition "")) 
@@ -912,13 +959,6 @@
                          }) 
          stave-data (clojure.string/join "\n" (map #(stave-to-lilypond % context) staves))
          ]
-     ;;(println "context is" context)
-     ;;(println "before render-string in to-lilypond, stave-data=" stave-data)
-     (render-string (lilypond-templ-str)
-                    (assoc context :staves
-                           (clojure.string/join "\n" (map #(stave-to-lilypond % context) staves))
-
-
-                           ))
+     (merge-with-lilypond-template (assoc context :staves stave-data))
      ))) 
 

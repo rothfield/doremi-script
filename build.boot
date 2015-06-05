@@ -5,6 +5,8 @@
  [adzerk/boot-cljs      "0.0-2814-4" :scope "test"]
  ;;                [adzerk/boot-cljs-repl "0.1.9"      :scope "test"]
  [com.stuartsierra/component "0.2.3"]
+ [org.clojure/core.incubator "0.1.3"]
+ ;;[org.clojure/core.incubator "0.1.3"]
  [quile/component-cljs "0.2.4"  :exclusions [org.clojure/clojure]]
  [com.lucasbradstreet/instaparse-cljs "1.3.5"]
  [prismatic/dommy "1.0.0"]

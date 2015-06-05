@@ -6,6 +6,7 @@
   (:require 
     [doremi-script.check-network :refer [start-check-network]]
     [quile.component :as component]
+    [doremi-script.to-lilypond :refer [to-lilypond]]
     [doremi-script.dom-utils :refer [listen seconds by-id production?]]
     [doremi-script.sargam-key-map :refer
      [default-key-map mode-and-notes-used->key-map ]]
@@ -205,6 +206,23 @@
                   (fn [db [_ parser]]
                     (assoc db :parser parser)
                     ))
+
+(register-handler :redraw-lilypond-source
+                  (fn [db [_]]
+                    (let [results
+                          (-> (:doremi-text db)  
+                              (doremi-text->collapsed-parse-tree 
+                                (:parser db) 
+                                (:composition-kind db)))
+                           error (:error results) 
+                           _ (println "results=" results)
+                           lilypond-source (to-lilypond (:composition results) (:doremi-text db))
+                          ]
+                       (assoc db :lilypond-source 
+                              (if error "parse error, can't generate lilypond source"
+                                lilypond-source))
+                      )))
+
 
 (register-handler :redraw-letter-notation
                   ;; TODO: redraw on server unless offline ???????or composition gets too big ????

@@ -3,6 +3,7 @@
   :url "http://github.com/rothfield/doremi-script"
   :dependencies [
                  [org.clojure/clojure "1.7.0-beta1"]
+                 [org.clojure/core.incubator "0.1.3"]
                  [reagent "0.5.0"]
                  [digest "1.4.4"]
                  [compojure "1.3.3"]

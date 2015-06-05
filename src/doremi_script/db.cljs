@@ -26,6 +26,7 @@
 
 (def initial-state
   {
+   :lilypond-source "lilypond source here"
    :supports-utf8-characters false
    :generate-staff-notation-url GENERATE-STAFF-NOTATION-URL
    :parse-url PARSE-URL

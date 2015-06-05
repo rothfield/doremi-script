@@ -274,7 +274,41 @@
    }
   )
 
+(defn redraw-lilypond-button[]
+  [:button.btn.btn-primary
+   {
+    :title "Display Lilypond Source",
+    :name "redraw_lilypond_source"
+    :on-click 
+    (fn [e]
+      (stop-default-action e)
+      (dispatch [:redraw-lilypond-source]) ;; include dom-id as param ??
+      )
+    }
+   "Lilypond Source"
+   ] 
+  )
 
+(defn display-lilypond-source []
+  (let [
+        lilypond-source (subscribe [:lilypond-source])
+        ]
+    [:div.form-group.hidden-print
+     {
+     ;; :class (if @error "has-error" "") 
+      }
+     [redraw-lilypond-button]
+     [:label.control-label {:for "lilypond_source"
+                            } "Lilypond Source:"]
+
+     [:textarea#lilypond_source.form-control 
+      {:rows "3" 
+       :spellCheck false
+       :readOnly true
+       :value 
+         (print-str @lilypond-source)
+       }
+      ]]))
 
 (defn display-parse-to-user-box []
   (let [error (subscribe [:error])
@@ -1132,6 +1166,7 @@
    [composition-box]
    [staff-notation]
    [display-parse-to-user-box]
+   [display-lilypond-source]
    [utf-support-div]
    ]
   )
